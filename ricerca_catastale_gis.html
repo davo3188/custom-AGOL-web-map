@@ -321,6 +321,24 @@ require([
 
   esriMods={Graphic,Polygon,projection,FeatureLayer,Layer,WebMap,LayerList,Expand,Editor,IdentityManager,Portal,PortalQueryParams,geometryEngine,Point,webMercatorUtils};
 
+  // ── Guard: la pagina DEVE essere servita via http(s), non aperta come file ──
+  // Aprendola con doppio click (protocollo file://) l'origin è "null": OAuth
+  // fallisce con "Invalid redirect_uri (400)" e le fetch/localStorage possono
+  // rompersi. Mostro un avviso chiaro invece dell'errore criptico.
+  if(location.protocol==='file:'){
+    const b=document.createElement('div');
+    b.style.cssText='position:fixed;inset:0;z-index:9999;background:#0f1720;color:#e6edf3;display:flex;align-items:center;justify-content:center;padding:32px;font-family:-apple-system,Segoe UI,Roboto,sans-serif';
+    b.innerHTML='<div style="max-width:520px;text-align:center;line-height:1.5">'+
+      '<div style="font-size:40px;margin-bottom:12px">🚫</div>'+
+      '<h2 style="margin:0 0 8px">Apri la pagina da un indirizzo web, non dal file</h2>'+
+      '<p style="color:#8aa0b3;font-size:14px">Hai aperto <code>ricerca_catastale_gis.html</code> con un doppio click (<code>file://</code>). '+
+      'In questa modalità il login AGOL restituisce <b>Invalid redirect_uri (400)</b>.</p>'+
+      '<p style="font-size:14px">Aprila invece da un URL <b>http(s)://</b>: il server di sviluppo '+
+      '(<code>http://localhost:8125/…</code>) oppure il link pubblicato su ArcGIS Online / Experience Builder.</p></div>';
+    document.body.appendChild(b);
+    return; // interrompo l'inizializzazione: in file:// non funzionerebbe comunque
+  }
+
   catasto=new WMSLayer({
     url:"https://webgis.regione.sardegna.it/geoserver/dbu/wms",
     sublayers:[{name:"AdE_cadastral_parcel"},{name:"AdE_fabbricati"}],
@@ -390,7 +408,18 @@ require([
     // scambio token del flusso authorization-code può fallire silenziosamente nel
     // browser. L'implicit restituisce il token direttamente nell'hash: nessuno
     // scambio, nessun secret. Adatto a un tool interno.
-    IdentityManager.registerOAuthInfos([ new OAuthInfo({appId:CLIENT_ID, portalUrl:PORTAL, popup:false, flowType:"implicit"}) ]);
+    // popup:true — necessario quando la pagina gira DENTRO un iframe (es. widget
+    // Embed di Experience Builder): un redirect a tutta pagina atterrerebbe
+    // nell'iframe e non tornerebbe mai. Il popup fa il login in una finestra
+    // separata e passa il token al parent. Fuori da iframe funziona identico.
+    // OAuth adattivo secondo il contesto:
+    // - fuori iframe (aperto direttamente, es. GitHub Pages / hosting IT):
+    //   redirect a tutta pagina (popup:false). Il redirect_uri = URL di questa
+    //   pagina, che è già registrato nell'app. Semplice e robusto.
+    // - dentro iframe (widget Embed di Experience Builder): popup:true, perché
+    //   un redirect a tutta pagina atterrerebbe nell'iframe e non tornerebbe.
+    const inIframeInit = (window.self !== window.top);
+    IdentityManager.registerOAuthInfos([ new OAuthInfo({appId:CLIENT_ID, portalUrl:PORTAL, popup:inIframeInit, flowType:"implicit"}) ]);
     // Il ritorno dal redirect crea una credenziale: aggancio l'evento così lo
     // stato "connesso" si applica anche se checkSignInStatus corre prima.
     IdentityManager.on("credential-create", ()=>{ console.log('[OAuth] credenziale creata'); onSignedIn(); });
@@ -401,9 +430,12 @@ require([
         if(!/not-authenticated|not signed in/i.test(m)) console.warn('[OAuth] errore login:', m, err);
         if(!signedIn){
           onSignedOut();
-          // login richiesto automaticamente all'apertura (redirect verso l'SSO).
-          // ?noauto in URL disattiva l'auto-login (comodo per test/anteprima).
-          if(!/[?&]noauto\b/.test(location.search))
+          // Auto-login all'apertura SOLO se la pagina NON è dentro un iframe.
+          // In iframe (Experience Builder) il login deve partire da un gesto
+          // dell'utente (click su "Accedi"), altrimenti il browser blocca il popup.
+          // ?noauto in URL disattiva comunque l'auto-login (comodo per test/anteprima).
+          const inIframe = (window.self !== window.top);
+          if(!inIframe && !/[?&]noauto\b/.test(location.search))
             IdentityManager.getCredential(PORTAL+"/sharing").then(()=>onSignedIn()).catch(()=>{});
         }
       });
