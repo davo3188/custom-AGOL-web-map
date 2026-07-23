@@ -71,23 +71,45 @@
   .authbar .dot{width:8px;height:8px;border-radius:50%;background:var(--err);flex:none}
   .authbar .dot.on{background:var(--ok)}
   .authbar span.t{flex:1}
-  /* pannello Strumenti (dentro l'Expand) */
-  #toolsPanel{width:290px;max-height:78vh;overflow-y:auto;background:var(--panel);color:var(--txt);padding:4px 0 8px}
-  #toolsPanel h3{margin:0;padding:10px 14px;font-size:13px;text-transform:uppercase;letter-spacing:.5px;color:var(--mut);border-bottom:1px solid var(--line)}
+  /* sidebar destra Strumenti — collassabile, simmetrica alla sinistra */
+  #toolsPanel{width:340px;min-width:340px;background:var(--panel);border-left:1px solid var(--line);display:flex;flex-direction:column;overflow:hidden}
+  #toolsPanel.collapsed{width:44px;min-width:44px}
+  #toolsHead{display:flex;align-items:center;justify-content:space-between;padding:14px 10px 14px 16px;border-bottom:1px solid var(--line)}
+  #toolsHead b{font-size:13px;text-transform:uppercase;letter-spacing:.5px;color:var(--mut);white-space:nowrap}
+  #toolsPanel.collapsed #toolsHead{padding:14px 0;justify-content:center}
+  #toolsPanel.collapsed #toolsHead b{display:none}
+  #toolsToggle{background:transparent;border:none;color:var(--txt);font-size:18px;cursor:pointer;width:auto;margin:0;padding:0 4px;line-height:1}
+  #toolsBody{flex:1;overflow-y:auto}
+  #toolsPanel.collapsed #toolsBody{display:none}
   .tsec{padding:11px 14px;border-bottom:1px solid var(--line)}
   .tlab{font-size:11px;color:var(--mut);text-transform:uppercase;letter-spacing:.5px;margin-bottom:7px}
   .tlab2{display:block;font-size:10px;color:var(--mut);text-transform:uppercase;letter-spacing:.4px;margin-bottom:3px}
   #toolsPanel .btns{display:flex;gap:6px;flex-wrap:wrap}
-  #toolsPanel .btns button{flex:1;min-width:70px}
+  #toolsPanel .btns button{flex:1;min-width:64px}
+  #toolsPanel .btns button.active{background:var(--acc);color:#1a1200;border-color:var(--acc);font-weight:700}
   .thint{color:var(--mut);font-size:11px;margin-top:6px;line-height:1.35}
   .thint.ok{color:var(--ok)} .thint.err{color:var(--err)}
-  /* modale promote */
-  #promoteModal{position:fixed;inset:0;background:#000a;display:none;align-items:center;justify-content:center;z-index:1000}
-  #promoteModal .card{position:relative;background:var(--panel);border:1px solid var(--line);border-radius:10px;width:440px;max-width:92vw;max-height:90vh;overflow-y:auto;padding:18px 20px}
-  #pmClose{position:absolute;top:10px;right:12px;width:30px;height:30px;padding:0;margin:0;background:transparent;color:var(--mut);border:none;font-size:22px;line-height:1;cursor:pointer}
-  #pmClose:hover{color:var(--txt)}
-  #promoteModal h2{margin:0 0 4px;font-size:16px}
-  #promoteModal .sub{color:var(--mut);font-size:12px;margin-bottom:12px}
+  /* modali (promote + export) */
+  #promoteModal,#exportModal{position:fixed;inset:0;background:#000a;display:none;align-items:center;justify-content:center;z-index:1000}
+  #promoteModal .card,#exportModal .card{position:relative;background:var(--panel);border:1px solid var(--line);border-radius:10px;width:440px;max-width:92vw;max-height:90vh;overflow-y:auto;padding:18px 20px}
+  #pmClose,#exClose{position:absolute;top:10px;right:12px;width:30px;height:30px;padding:0;margin:0;background:transparent;color:var(--mut);border:none;font-size:22px;line-height:1;cursor:pointer}
+  #pmClose:hover,#exClose:hover{color:var(--txt)}
+  #promoteModal h2,#exportModal h2{margin:0 0 4px;font-size:16px}
+  #promoteModal .sub,#exportModal .sub{color:var(--mut);font-size:12px;margin-bottom:12px}
+  #exportModal .card input[type=checkbox]{width:auto;flex:none}
+  #exportModal .card label{display:flex;align-items:center;gap:8px;text-transform:none;letter-spacing:0;font-size:13px;color:var(--txt);margin:6px 0}
+  #exportModal .card label span{color:var(--mut);font-size:12px}
+  /* pannello sottostazioni */
+  #subPanel{width:290px;max-width:82vw;max-height:60vh;overflow-y:auto;background:var(--panel);color:var(--txt);padding:12px 14px}
+  #subToggle.active{background:var(--acc);color:#1a1200;border-color:var(--acc);font-weight:700}
+  .subrow{padding:7px 8px;border-bottom:1px solid var(--line);font-size:12px;line-height:1.4;cursor:pointer;border-left:3px solid transparent}
+  .subrow:last-child{border-bottom:none}
+  .subrow:hover{background:#1f2c38}
+  .subrow.key{border-left-color:var(--acc);background:#f5a6230d}
+  .subrow.key .subn{color:var(--acc)}
+  .subrow .subn{font-weight:600;color:var(--txt)}
+  .subrow .subd{float:right;color:var(--acc);font-weight:700}
+  .subrow .subm{color:var(--mut);font-size:11px}
 </style>
 </head>
 <body>
@@ -166,47 +188,93 @@
 </div>
 <div id="viewDiv"></div>
 
-<!-- ── PANNELLO STRUMENTI (spostato nell'Expand in alto a destra) ── -->
+<!-- ── SIDEBAR DESTRA · STRUMENTI (collassabile) ── -->
 <div id="toolsPanel">
-  <h3>Strumenti</h3>
-  <div class="tsec">
-    <div class="tlab">Aggiungi layer dal portale</div>
-    <div class="row">
-      <div style="flex:2"><input id="itemQ" placeholder="cerca per titolo…" disabled></div>
-      <div style="flex:0 0 auto"><button class="sec" id="searchItem" disabled style="margin-top:0;padding:8px 10px">🔍</button></div>
+  <div id="toolsHead"><b>Strumenti</b><button id="toolsToggle" title="Comprimi/espandi">»</button></div>
+  <div id="toolsBody">
+    <div class="tsec">
+      <div class="tlab">Misura</div>
+      <div class="btns">
+        <button class="sec" id="msDist">📏 Distanza</button>
+        <button class="sec" id="msArea">▱ Area</button>
+        <button class="sec" id="msClear">Pulisci</button>
+      </div>
     </div>
-    <div id="itemResults"></div>
-    <div class="thint">Richiede login. Clicca un risultato per aggiungerlo alla legenda.</div>
+    <div class="tsec">
+      <div class="tlab">Strumenti di disegno</div>
+      <div class="btns">
+        <button class="sec" id="drwPoint">• Punto</button>
+        <button class="sec" id="drwLine">╱ Linea</button>
+        <button class="sec" id="drwArea">▱ Area</button>
+      </div>
+      <label class="tlab2" style="margin-top:9px">Categoria</label>
+      <select id="drwCat"><option value="">— scegli prima il tipo —</option></select>
+      <label class="tlab2" style="margin-top:7px">Nota (facoltativa)</label>
+      <input id="drwNote" placeholder="testo libero…">
+      <div class="btns" style="margin-top:8px"><button class="sec danger" id="drwClear">Pulisci disegni</button></div>
+      <div id="drwMsg" class="thint">I disegni sono locali (come i buffer) ed esportabili.</div>
+    </div>
+    <div class="tsec">
+      <div class="tlab">Strumenti per buffer</div>
+      <div class="btns">
+        <button class="sec" id="bufPoint">• Punto</button>
+        <button class="sec" id="bufLine">╱ Linea</button>
+        <button class="sec" id="bufArea">▱ Area</button>
+      </div>
+      <div class="row" style="margin-top:8px;align-items:flex-end">
+        <div style="flex:2"><label class="tlab2">Distanza (m)</label><input id="bufDist" type="number" value="100" min="1"></div>
+        <div style="flex:0 0 auto"><button class="sec" id="bufGen" disabled style="margin-top:0">Genera</button></div>
+      </div>
+      <div class="btns" style="margin-top:8px"><button class="sec" id="bufClear">Pulisci</button></div>
+      <div id="bufMsg" class="thint"></div>
+    </div>
+    <div class="tsec">
+      <div class="tlab">Profilo elevazione</div>
+      <div id="elevProfile"></div>
+      <div class="thint">Disegna una linea sulla mappa per il profilo del terreno (richiede login).</div>
+    </div>
+    <div class="tsec">
+      <div class="tlab">Vai a coordinate (lat, lon)</div>
+      <div class="row">
+        <div style="flex:2"><input id="coordIn" placeholder="es. 41.9028, 12.4964"></div>
+        <div style="flex:0 0 auto"><button class="sec" id="coordGo" style="margin-top:0">Vai</button></div>
+      </div>
+      <div id="coordMsg" class="thint"></div>
+    </div>
+    <div class="tsec" style="border-bottom:none">
+      <div class="tlab">Aggiungi layer dal portale</div>
+      <div class="row">
+        <div style="flex:2"><input id="itemQ" placeholder="cerca per titolo…" disabled></div>
+        <div style="flex:0 0 auto"><button class="sec" id="searchItem" disabled style="margin-top:0;padding:8px 10px">🔍</button></div>
+      </div>
+      <div id="itemResults"></div>
+      <div class="thint">Richiede login. Clicca un risultato per aggiungerlo alla legenda.</div>
+    </div>
   </div>
-  <div class="tsec">
-    <div class="tlab">Misura</div>
-    <div class="btns">
-      <button class="sec" id="msDist">📏 Distanza</button>
-      <button class="sec" id="msArea">▱ Area</button>
-      <button class="sec" id="msClear">Pulisci</button>
+</div>
+
+<!-- ── PANNELLO SOTTOSTAZIONI (contenuto Expand basso-dx) ── -->
+<div id="subPanel">
+  <div class="tlab" style="margin-bottom:8px">Sottostazione più vicina</div>
+  <button class="sec" id="subToggle" style="margin-top:0">📍 Attiva: click su mappa</button>
+  <div id="subResults" class="thint" style="margin-top:8px">Attiva, poi clicca un punto sulla mappa.</div>
+</div>
+
+<!-- ── MODALE EXPORT (scegli cosa includere) ── -->
+<div id="exportModal">
+  <div class="card">
+    <button id="exClose" title="Chiudi">×</button>
+    <h2>Esporta</h2>
+    <div class="sub">Scegli cosa includere nel file <b id="exFmt">GeoJSON</b>.</div>
+    <label style="display:flex;align-items:center;gap:8px;margin:6px 0"><input type="checkbox" id="exParcels" checked> Particelle <span id="exNP" class="thint" style="margin:0"></span></label>
+    <label style="display:flex;align-items:center;gap:8px;margin:6px 0"><input type="checkbox" id="exBuffers" checked> Buffer <span id="exNB" class="thint" style="margin:0"></span></label>
+    <label style="display:flex;align-items:center;gap:8px;margin:6px 0"><input type="checkbox" id="exDrawings" checked> Disegni <span id="exND" class="thint" style="margin:0"></span></label>
+    <label style="display:flex;align-items:center;gap:8px;margin:10px 0 0"><input type="checkbox" id="exDiss"> Dissolvi le particelle in un'unica area</label>
+    <div id="exMsg"></div>
+    <div class="btns" style="margin-top:14px">
+      <button class="sec" id="exCancel">Annulla</button>
+      <button id="exConfirm">Esporta</button>
     </div>
-  </div>
-  <div class="tsec">
-    <div class="tlab">Strumenti per buffer</div>
-    <div class="btns">
-      <button class="sec" id="bufPoint">• Punto</button>
-      <button class="sec" id="bufLine">╱ Linea</button>
-      <button class="sec" id="bufArea">▱ Area</button>
-    </div>
-    <div class="row" style="margin-top:8px;align-items:flex-end">
-      <div style="flex:2"><label class="tlab2">Distanza (m)</label><input id="bufDist" type="number" value="100" min="1"></div>
-      <div style="flex:0 0 auto"><button class="sec" id="bufGen" disabled style="margin-top:0">Genera</button></div>
-    </div>
-    <div class="btns" style="margin-top:8px"><button class="sec" id="bufClear">Pulisci</button></div>
-    <div id="bufMsg" class="thint"></div>
-  </div>
-  <div class="tsec" style="border-bottom:none">
-    <div class="tlab">Vai a coordinate (lat, lon)</div>
-    <div class="row">
-      <div style="flex:2"><input id="coordIn" placeholder="es. 41.9028, 12.4964"></div>
-      <div style="flex:0 0 auto"><button class="sec" id="coordGo" style="margin-top:0">Vai</button></div>
-    </div>
-    <div id="coordMsg" class="thint"></div>
   </div>
 </div>
 
@@ -258,6 +326,17 @@ const AREAS_LAYER_URL="https://services-eu1.arcgis.com/Kxsn3iT6KEQ7OlSW/arcgis/r
 const AREAS_WKID=6876;   // RDN2008 / Italia — SR del layer 426
 // ISTAT Comuni (stesso item usato dall'espressione "Autocompilazione Comune"): serve PRO_COM_T
 const ISTAT_COMUNI_URL="https://services-eu1.arcgis.com/Kxsn3iT6KEQ7OlSW/arcgis/rest/services/IT_ISTAT_Confini_amministrativi_e_statistiche/FeatureServer/0";
+// Sottostazioni elemens: esistenti divise per tensione (layer 2/3/4/5) + Nuove CP (layer separato)
+const SUB_ESIST="https://services-eu1.arcgis.com/Kxsn3iT6KEQ7OlSW/arcgis/rest/services/IT_elemens_Sottostazioni_esistenti/FeatureServer/";
+const SUB_LAYERS=[
+  {url:SUB_ESIST+"2", kind:'Esistente', volt:'380 kV', nameField:'name', opField:'operator'},
+  {url:SUB_ESIST+"3", kind:'Esistente', volt:'220 kV', nameField:'name', opField:'operator'},
+  {url:SUB_ESIST+"4", kind:'Esistente', volt:'150 kV', nameField:'name', opField:'operator'},
+  {url:SUB_ESIST+"5", kind:'Esistente', volt:'132 kV', nameField:'name', opField:'operator'},
+  {url:"https://services-eu1.arcgis.com/Kxsn3iT6KEQ7OlSW/arcgis/rest/services/IT_elemens_Nuove_CP/FeatureServer/1", kind:'Nuova CP', volt:'', nameField:'full_name', opField:null}
+];
+// elevazione mondiale Esri (ground per il profilo)
+const WORLD_ELEV="https://elevation3d.arcgis.com/arcgis/rest/services/WorldElevation3D/Terrain3D/ImageServer";
 
 // Lookup Regione (Zornade) → item id "IT - PORTALE CHECK VINCOLI - …"
 // Match normalizzato (spazi/trattini ignorati). Mancano: Liguria, Molise,
@@ -304,22 +383,31 @@ const ADDABLE=new Set(["Feature Service","Map Service","Image Service","Vector T
 let view, gl, catasto, esriMods, basemapLayers, layerListExpand;
 let toolsGL, measurement, sketchVM, bufferGeom=null;   // strumenti (misura/buffer)
 let areasEditorExpand=null, areasLayer=null, recomputingArea=false;   // edit AREAS COLLECTION
-let sketchPurpose=null;   // 'buffer' | 'selection' — a cosa serve il disegno corrente
+let subActive=false;      // modalità "sottostazione più vicina" (click su mappa)
+let sketchPurpose=null;   // 'buffer' | 'selection' | 'drawing' — a cosa serve il disegno corrente
 let selMode=null;         // modalità selezione: null(nessuna)|point|rectangle|polygon|polyline
+let drawType=null;        // tipo disegno attivo: null|point|polyline|polygon
+// categorie disegno (dai domini del layer IT Sites Notes)
+const DRAW_CATS={
+  point:['Beni interesse culturale','Costruzioni e antropizzazioni','Rilievo Fotografico','Alberi e vegetazione','Idrografia'],
+  polyline:['Elettrodotto','Idrografia','Acquedotto','Gasdotti','Viabilità','Accessi','Manufatti e interferenze','Percorso Sopralluogo','Ferrovia'],
+  polygon:['Perimetro Netto','Vincoli paesaggistici','Vincoli Archeologici','Vincoli beni culturali','Vincoli da Piani','Vincoli da Piani di settore','Pendenze alte','Edifici ed aree rilevanti','Vegetazione','Misurazioni','DPA']
+};
 
 require([
   "esri/config","esri/Map","esri/views/MapView","esri/WebMap","esri/Basemap",
-  "esri/layers/GraphicsLayer","esri/layers/WMSLayer","esri/layers/FeatureLayer","esri/layers/Layer","esri/layers/TileLayer",
+  "esri/layers/GraphicsLayer","esri/layers/WMSLayer","esri/layers/FeatureLayer","esri/layers/Layer","esri/layers/TileLayer","esri/layers/ElevationLayer",
   "esri/Graphic","esri/geometry/Polygon","esri/geometry/projection",
   "esri/widgets/BasemapGallery","esri/widgets/LayerList","esri/widgets/Expand",
   "esri/widgets/Search","esri/widgets/Measurement","esri/widgets/Sketch/SketchViewModel","esri/widgets/Editor",
+  "esri/widgets/ElevationProfile","esri/widgets/Print",
   "esri/geometry/geometryEngine","esri/geometry/Point","esri/geometry/support/webMercatorUtils",
   "esri/identity/OAuthInfo","esri/identity/IdentityManager","esri/portal/Portal","esri/portal/PortalQueryParams"
-],(esriConfig,Map,MapView,WebMap,Basemap,GraphicsLayer,WMSLayer,FeatureLayer,Layer,TileLayer,Graphic,Polygon,projection,
-   BasemapGallery,LayerList,Expand,Search,Measurement,SketchViewModel,Editor,geometryEngine,Point,webMercatorUtils,
+],(esriConfig,Map,MapView,WebMap,Basemap,GraphicsLayer,WMSLayer,FeatureLayer,Layer,TileLayer,ElevationLayer,Graphic,Polygon,projection,
+   BasemapGallery,LayerList,Expand,Search,Measurement,SketchViewModel,Editor,ElevationProfile,Print,geometryEngine,Point,webMercatorUtils,
    OAuthInfo,IdentityManager,Portal,PortalQueryParams)=>{
 
-  esriMods={Graphic,Polygon,projection,FeatureLayer,Layer,WebMap,LayerList,Expand,Editor,IdentityManager,Portal,PortalQueryParams,geometryEngine,Point,webMercatorUtils};
+  esriMods={Graphic,Polygon,projection,FeatureLayer,Layer,WebMap,LayerList,Expand,Editor,IdentityManager,Portal,PortalQueryParams,geometryEngine,Point,webMercatorUtils,ElevationLayer};
 
   catasto=new WMSLayer({
     url:"https://webgis.regione.sardegna.it/geoserver/dbu/wms",
@@ -337,7 +425,7 @@ require([
   const bmTopo=bm("Topografica","https://services.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer","topo");
   const bmImg=bm("Satellite","https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer","img");
   const bmStreets=bm("Stradale","https://services.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer","streets");
-  const map=new Map({basemap:bmTopo, layers:[catasto, gl, toolsGL]});
+  const map=new Map({basemap:bmTopo, ground:{layers:[new ElevationLayer({url:WORLD_ELEV})]}, layers:[catasto, gl, toolsGL]});
   view=new MapView({container:"viewDiv", map, center:[12.5,42.0], zoom:6});
   window.view=view;
   // popup ancorato a SINISTRA (di default si ancorava in alto a destra)
@@ -348,6 +436,11 @@ require([
   view.ui.add(new Expand({view, content:gallery, expandTooltip:"Cambia mappa di base"}),"top-right");
   layerListExpand=new Expand({view, content:new LayerList({view}), expandTooltip:"Legenda / layer", expanded:false});
   view.ui.add(layerListExpand,"top-right");
+
+  // ── Fase B: Stampa (basso-sx), Sottostazioni (basso-dx), Profilo elevazione (sidebar) ──
+  try{ view.ui.add(new Expand({view, content:new Print({view}), expandTooltip:"Stampa", expandIconClass:"esri-icon-printer", expanded:false}),"bottom-left"); }catch(e){ console.warn('Print:',e&&e.message); }
+  view.ui.add(new Expand({view, content:document.getElementById('subPanel'), expandTooltip:"Sottostazione più vicina", expandIconClass:"esri-icon-organization", expanded:false}),"bottom-right");
+  try{ new ElevationProfile({view, container:"elevProfile", profiles:[{type:"ground"}]}); }catch(e){ console.warn('ElevProfile:',e&&e.message); }
 
   // ── Strumenti ──
   // ricerca indirizzo (widget nativo; usa il geocoder dell'org quando loggati)
@@ -368,16 +461,19 @@ require([
       toolsGL.remove(e.graphic);          // non lascio la forma di selezione sulla mappa
       selectByGeometry(geom);
       if(selMode && selMode!=='point'){ sketchPurpose='selection'; sketchVM.create(selMode); }  // ri-armo per un'altra selezione
+    }else if(sketchPurpose==='drawing'){  // disegno locale con categoria (Sites Notes)
+      e.graphic.attributes={_kind:'drawing', geomType:drawType, categoria:$('drwCat').value||'', note:$('drwNote').value||''};
+      const cat=$('drwCat').value; toolMsg('drwMsg','Disegnato'+(cat?' · '+cat:'')+'. Continua o cambia tipo.','ok'); refreshDl();
+      if(drawType){ sketchPurpose='drawing'; sketchVM.create(drawType); }   // ri-armo per un altro disegno
     }else{                                // buffer
       bufferGeom=geom; $('bufGen').disabled=false;
       toolMsg('bufMsg','Geometria disegnata. Imposta la distanza e genera il buffer.','ok');
     }
   });
-  // pannello Strumenti a scomparsa (contiene: layer portale, misura, buffer, coordinate)
-  view.ui.add(new Expand({view, content:document.getElementById('toolsPanel'),
-    expandTooltip:"Strumenti", expandIconClass:"esri-icon-applications", expanded:false}),"top-right");
+  // (il pannello Strumenti ora è la sidebar destra collassabile, non più un Expand)
 
   view.on("click", async e=>{
+    if(subActive){ if(e.mapPoint) querySubstations(e.mapPoint); return; }   // modalità sottostazioni
     if(selMode!=='point') return;                          // modalità forma attiva → il click serve al disegno
     if(measurement && measurement.activeTool) return;      // misura attiva → non aggiungere particella
     if(sketchVM && sketchVM.state==="active") return;      // disegno in corso
@@ -503,7 +599,7 @@ function wireUI(){
   $('com').addEventListener('change',checkReady);
   $('go').addEventListener('click',search);
   $('par').addEventListener('keydown',e=>{if(e.key==='Enter'&&!$('go').disabled)search();});
-  $('dl').onclick=download;
+  $('dl').onclick=openExport;
   $('reset').onclick=()=>{if(parcels.length&&confirm('Svuotare l\'elenco?')){parcels=[];render();msg('','');}};
   $('searchItem').onclick=searchPortalItems;
   $('itemQ').addEventListener('keydown',e=>{if(e.key==='Enter'&&!$('searchItem').disabled)searchPortalItems();});
@@ -533,7 +629,9 @@ function wireTools(){
   $('bufPoint').onclick=()=>startBuf('point','il punto');
   $('bufLine').onclick=()=>startBuf('polyline','la linea (doppio click per finire)');
   $('bufArea').onclick=()=>startBuf('polygon','l\'area (doppio click per finire)');
-  $('bufClear').onclick=()=>{ try{sketchVM.cancel();}catch(e){} toolsGL.removeAll(); bufferGeom=null; $('bufGen').disabled=true; toolMsg('bufMsg',''); };
+  $('bufClear').onclick=()=>{ try{sketchVM.cancel();}catch(e){}
+    toolsGL.graphics.toArray().filter(g=>g.attributes&&g.attributes._kind==='buffer').forEach(g=>toolsGL.remove(g));
+    bufferGeom=null; $('bufGen').disabled=true; toolMsg('bufMsg',''); refreshDl(); };
   $('bufGen').onclick=()=>{
     if(!bufferGeom){ toolMsg('bufMsg','Prima disegna punto, linea o area.','err'); return; }
     const d=parseFloat($('bufDist').value)||0;
@@ -543,7 +641,7 @@ function wireTools(){
       toolsGL.add(new esriMods.Graphic({geometry:buf,
         attributes:{_kind:'buffer', dist_m:d, area_ha:+areaHa.toFixed(4)},   // tag per l'export
         symbol:{type:'simple-fill', color:[121,192,255,0.2], outline:{color:[121,192,255],width:1.5}}}));
-      toolMsg('bufMsg',`Buffer di ${d} m generato.`,'ok'); view.goTo(buf.extent.expand(1.5)).catch(()=>{}); }
+      toolMsg('bufMsg',`Buffer di ${d} m generato.`,'ok'); refreshDl(); view.goTo(buf.extent.expand(1.5)).catch(()=>{}); }
     else toolMsg('bufMsg','Buffer non generato.','err');
   };
   // vai a coordinate (lat, lon)
@@ -561,6 +659,35 @@ function wireTools(){
   $('coordIn').addEventListener('keydown',e=>{ if(e.key==='Enter') goCoord(); });
   // modalità selezione particelle
   $('selModeBox').querySelectorAll('button').forEach(b=>b.onclick=()=>setSelMode(b.dataset.m));
+  // sidebar destra: comprimi/espandi
+  $('toolsToggle').onclick=()=>{ const p=$('toolsPanel'); p.classList.toggle('collapsed');
+    $('toolsToggle').textContent=p.classList.contains('collapsed')?'«':'»'; };
+  // strumenti di disegno (locali, categorie da Sites Notes)
+  const setDrawBtns=()=>{ const m={point:'drwPoint',polyline:'drwLine',polygon:'drwArea'};
+    Object.entries(m).forEach(([t,id])=>$(id).classList.toggle('active', drawType===t)); };
+  const startDraw=t=>{
+    if(drawType===t){ drawType=null; try{sketchVM.cancel();}catch(e){} setDrawBtns(); toolMsg('drwMsg','Disegno disattivato.'); return; }
+    drawType=t; setDrawBtns();
+    $('drwCat').innerHTML=(DRAW_CATS[t]||[]).map(c=>`<option>${c}</option>`).join('');
+    sketchPurpose='drawing'; try{sketchVM.cancel();}catch(e){} sketchVM.create(t);
+    toolMsg('drwMsg','Disegna sulla mappa'+(t==='point'?'':' (doppio click per finire)')+'.');
+  };
+  $('drwPoint').onclick=()=>startDraw('point');
+  $('drwLine').onclick=()=>startDraw('polyline');
+  $('drwArea').onclick=()=>startDraw('polygon');
+  $('drwClear').onclick=()=>{ try{sketchVM.cancel();}catch(e){} drawType=null; setDrawBtns();
+    toolsGL.graphics.toArray().filter(g=>g.attributes&&g.attributes._kind==='drawing').forEach(g=>toolsGL.remove(g));
+    toolMsg('drwMsg','Disegni rimossi.'); refreshDl(); };
+  // finestra di export
+  $('exCancel').onclick=closeExport; $('exClose').onclick=closeExport; $('exConfirm').onclick=doExport;
+  // sottostazione più vicina: toggle modalità click
+  $('subToggle').onclick=()=>{
+    subActive=!subActive;
+    if(subActive){ try{sketchVM.cancel();}catch(e){} }
+    $('subToggle').classList.toggle('active', subActive);
+    $('subToggle').textContent=subActive?'📍 Attivo — clicca sulla mappa':'📍 Attiva: click su mappa';
+    $('subResults').innerHTML=subActive?'<div class="thint">Clicca un punto sulla mappa.</div>':'Attiva, poi clicca un punto sulla mappa.';
+  };
 }
 
 const SEL_NEUTRAL='Nessuna modalità attiva: i click consultano i popup, non aggiungono particelle. Clicca un pulsante per attivare (e di nuovo per disattivare).';
@@ -623,6 +750,44 @@ async function selectByGeometry(geom){
 }
 window.selectByGeometry=selectByGeometry;   // hook debug (come window.view)
 
+// ── Sottostazione più vicina (click su mappa, layer elemens) ──────────────
+function haversineKm(la1,lo1,la2,lo2){
+  const R=6371, r=Math.PI/180, dLa=(la2-la1)*r, dLo=(lo2-lo1)*r;
+  const a=Math.sin(dLa/2)**2 + Math.cos(la1*r)*Math.cos(la2*r)*Math.sin(dLo/2)**2;
+  return 2*R*Math.asin(Math.min(1,Math.sqrt(a)));
+}
+// operatori "chiave" da mettere in evidenza (varianti di E-Distribuzione / Terna)
+function isKeyOperator(op){ const s=(op||'').toLowerCase().replace(/[^a-z]/g,''); return /enel|distribuz|terna/.test(s); }
+async function querySubstations(pt){
+  if(!signedIn){ $('subResults').innerHTML='<span style="color:var(--acc)">Accedi ad AGOL per interrogare le sottostazioni.</span>'; return; }
+  const p=to4326(pt); if(!p){ return; } const clat=p.y, clng=p.x;
+  $('subResults').innerHTML='<div class="thint">Cerco le più vicine…</div>';
+  const found=[];
+  await Promise.all(SUB_LAYERS.map(async cfg=>{
+    try{
+      const fl=new esriMods.FeatureLayer({url:cfg.url});
+      const r=await fl.queryFeatures({geometry:pt, distance:80000, units:'meters', spatialRelationship:'intersects', returnGeometry:true, outFields:["*"], num:25});
+      (r.features||[]).forEach(f=>{ const g=to4326(f.geometry); if(!g) return;
+        const a=f.attributes||{}, nm=a[cfg.nameField]||a.name||a.Name||a.full_name||'(senza nome)';
+        const op=cfg.opField?(a[cfg.opField]||''):'';
+        found.push({nome:nm, operatore:op, kind:cfg.kind, volt:cfg.volt, km:haversineKm(clat,clng,g.y,g.x), lat:g.y, lng:g.x}); });
+    }catch(e){}
+  }));
+  // in evidenza prima gli operatori chiave, poi per distanza
+  found.sort((a,b)=>a.km-b.km);
+  const top=found.slice(0,10);
+  if(!top.length){ $('subResults').innerHTML='<div class="thint">Nessuna sottostazione entro 80 km.</div>'; return; }
+  $('subResults').innerHTML='<div class="thint" style="margin:0 0 6px">Le più vicine (click sul nome per zoom):</div>'+top.map((s,i)=>
+    `<div class="subrow${isKeyOperator(s.operatore)?' key':''}" data-lat="${s.lat}" data-lng="${s.lng}">
+       <span class="subd">${s.km.toFixed(1)} km</span>
+       <span class="subn">${esc(s.nome)}${s.operatore?' — '+esc(s.operatore):''}</span><br>
+       <span class="subm">${s.kind}${s.volt?' · '+s.volt:''}</span></div>`).join('');
+  $('subResults').querySelectorAll('.subrow').forEach(el=>el.onclick=()=>{
+    const lat=+el.dataset.lat, lng=+el.dataset.lng;
+    if(!isNaN(lat)&&!isNaN(lng)) view.goTo({center:[lng,lat], zoom:Math.max(view.zoom,14)}).catch(()=>{});
+  });
+}
+
 // ── caricamento di una web map del portale (General Map o CV) ──────────────
 // hideLayers=true → spegne i layer operativi (per le CV, che caricano lazy quando
 // l'utente li accende). NO loadAll: caricherebbe avidamente i WMS regionali (CORS).
@@ -631,6 +796,7 @@ async function loadWebMap(id, hideLayers, label){
     const wm=new esriMods.WebMap({portalItem:{id}});
     await wm.load();
     if(hideLayers) wm.layers.forEach(l=>{ l.visible=false; });
+    try{ wm.ground={layers:[new esriMods.ElevationLayer({url:WORLD_ELEV})]}; }catch(e){}   // profilo elevazione dopo lo swap
     wm.add(catasto); wm.add(gl); wm.add(toolsGL);       // ri-aggancio catasto + particelle + strumenti
     view.map=wm;
     if(parcels.length) view.goTo(gl.graphics.toArray()).catch(()=>{});
@@ -807,7 +973,7 @@ function render(){
   const has=parcels.length>0;
   const totHa=parcels.reduce((s,p)=>s+(p.area_m2||0),0)/10000;
   $('listTot').textContent = has ? `${parcels.length} particell${parcels.length>1?'e':'a'} · ${totHa.toFixed(2)} ha totali` : '';
-  ['dl','reset'].forEach(id=>$(id).disabled=!has);
+  $('reset').disabled=!has; refreshDl();
   $('promote').disabled=!(has&&signedIn);
   if(gl){
     gl.removeAll();
@@ -900,39 +1066,58 @@ function pmMsg(t,cls){$('pmMsg').innerHTML=t?`<div class="msg ${cls}">${t}</div>
 function dlBlob(name,blob){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();URL.revokeObjectURL(a.href);}
 const esc=s=>String(s==null?'':s).replace(/[<>&]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]));
 // buffer disegnati (tag _kind:'buffer' su toolsGL) → feature GeoJSON in 4326
-function bufferFeatures(){
+function esriGeomToGeojson(g){
+  if(!g) return null;
+  if(g.type==='point'||(g.x!==undefined&&!g.rings&&!g.paths)) return {type:'Point',coordinates:[g.x,g.y]};
+  if(g.rings) return {type:'Polygon',coordinates:g.rings.map(r=>r.map(c=>[c[0],c[1]]))};
+  if(g.paths) return g.paths.length>1
+    ? {type:'MultiLineString',coordinates:g.paths.map(p=>p.map(c=>[c[0],c[1]]))}
+    : {type:'LineString',coordinates:g.paths[0].map(c=>[c[0],c[1]])};
+  return null;
+}
+function to4326(geom){
+  try{ if(geom&&!(geom.spatialReference&&geom.spatialReference.wkid===4326)) return esriMods.webMercatorUtils.webMercatorToGeographic(geom); }catch(e){}
+  return geom;
+}
+// graphics locali (buffer o disegni) → feature GeoJSON 4326
+function graphicsFeatures(kind){
   const out=[];
   if(!toolsGL||!esriMods) return out;
-  toolsGL.graphics.forEach(g=>{
+  toolsGL.graphics.toArray().forEach(g=>{
     const at=g.attributes||{};
-    if(at._kind!=='buffer'||!g.geometry) return;
-    let geom=g.geometry;
-    try{ if(!(geom.spatialReference&&geom.spatialReference.wkid===4326)) geom=esriMods.webMercatorUtils.webMercatorToGeographic(geom); }catch(e){}
-    if(!geom||!geom.rings) return;
-    out.push({type:'Feature',
-      geometry:{type:'Polygon',coordinates:geom.rings.map(r=>r.map(c=>[c[0],c[1]]))},
-      properties:{tipo:'buffer',distanza_m:at.dist_m,area_ha:at.area_ha}});
+    if(at._kind!==kind||!g.geometry) return;
+    const gj=esriGeomToGeojson(to4326(g.geometry));
+    if(!gj) return;
+    const props = kind==='buffer'
+      ? {tipo:'buffer',distanza_m:at.dist_m,area_ha:at.area_ha}
+      : {tipo:'disegno',categoria:at.categoria||'',nota:at.note||''};
+    out.push({type:'Feature',geometry:gj,properties:props});
   });
   return out;
 }
-function buildFC(dissolve, includeBuffers){
-  let feats=parcels.map(p=>({type:'Feature',
-    geometry:p.geometry||{type:'Point',coordinates:[p.lng,p.lat]},
-    properties:{comune:p.comune,regione:p.regione,provincia:p.provincia,belfiore:p.belfiore,foglio:p.foglio,particella:p.particella,
-      area_m2:p.area_m2?Math.round(p.area_m2):null,area_ha:p.area_m2?+(p.area_m2/10000).toFixed(4):null,
-      land_use:p.land_use,omi:p.omi,ncr:p.ncr,fid:p.fid}}));
-  if(dissolve){
-    const polys=feats.filter(f=>f.geometry.type==='Polygon'||f.geometry.type==='MultiPolygon');
-    if(polys.length){
-      let u=polys[0]; for(let i=1;i<polys.length;i++){try{u=turf.union(u,polys[i]);}catch(e){}}
-      u.properties={n_particelle:parcels.length,
-        particelle:parcels.map(p=>p.foglio+'/'+p.particella).join('; '),
-        comuni:[...new Set(parcels.map(p=>p.comune))].join(', '),
-        area_ha:+(parcels.reduce((s,p)=>s+(p.area_m2||0),0)/10000).toFixed(4)};
-      feats=[u];
+function buildFC(dissolve, incl){
+  incl = incl || {parcels:true};
+  let feats=[];
+  if(incl.parcels!==false){
+    feats=parcels.map(p=>({type:'Feature',
+      geometry:p.geometry||{type:'Point',coordinates:[p.lng,p.lat]},
+      properties:{comune:p.comune,regione:p.regione,provincia:p.provincia,belfiore:p.belfiore,foglio:p.foglio,particella:p.particella,
+        area_m2:p.area_m2?Math.round(p.area_m2):null,area_ha:p.area_m2?+(p.area_m2/10000).toFixed(4):null,
+        land_use:p.land_use,omi:p.omi,ncr:p.ncr,fid:p.fid}}));
+    if(dissolve){
+      const polys=feats.filter(f=>f.geometry.type==='Polygon'||f.geometry.type==='MultiPolygon');
+      if(polys.length){
+        let u=polys[0]; for(let i=1;i<polys.length;i++){try{u=turf.union(u,polys[i]);}catch(e){}}
+        u.properties={n_particelle:parcels.length,
+          particelle:parcels.map(p=>p.foglio+'/'+p.particella).join('; '),
+          comuni:[...new Set(parcels.map(p=>p.comune))].join(', '),
+          area_ha:+(parcels.reduce((s,p)=>s+(p.area_m2||0),0)/10000).toFixed(4)};
+        feats=[u];
+      }
     }
   }
-  if(includeBuffers) feats=feats.concat(bufferFeatures());   // includo i buffer disegnati
+  if(incl.buffers) feats=feats.concat(graphicsFeatures('buffer'));
+  if(incl.drawings) feats=feats.concat(graphicsFeatures('drawing'));
   return {type:'FeatureCollection',features:feats};
 }
 window.buildFC=buildFC;   // hook debug
@@ -943,6 +1128,8 @@ function geomKML(g){
   if(g.type==='Polygon')return poly(g.coordinates);
   if(g.type==='MultiPolygon')return '<MultiGeometry>'+g.coordinates.map(poly).join('')+'</MultiGeometry>';
   if(g.type==='Point')return '<Point><coordinates>'+g.coordinates[0]+','+g.coordinates[1]+',0</coordinates></Point>';
+  if(g.type==='LineString')return '<LineString>'+ring(g.coordinates)+'</LineString>';
+  if(g.type==='MultiLineString')return '<MultiGeometry>'+g.coordinates.map(l=>'<LineString>'+ring(l)+'</LineString>').join('')+'</MultiGeometry>';
   return '';
 }
 function toKML(fc){
@@ -953,18 +1140,38 @@ function toKML(fc){
   }).join('');
   return `<?xml version="1.0" encoding="UTF-8"?><kml xmlns="http://www.opengis.net/kml/2.2"><Document><name>Particelle catastali</name>${pm}</Document></kml>`;
 }
-async function download(){
-  const fmt=$('fmt').value, diss=$('diss').checked, base=diss?'area_dissolta':'particelle';
-  if(fmt==='xlsx'){
-    const data=diss?buildFC(true).features.map(f=>({...f.properties})):parcels.map(p=>({Comune:p.comune,Cod_Belfiore:p.belfiore,Foglio:p.foglio,Particella:p.particella,
+// ── finestra di export: scegli cosa includere (particelle / buffer / disegni) ──
+function countKind(k){ return toolsGL? toolsGL.graphics.toArray().filter(g=>g.attributes&&g.attributes._kind===k).length : 0; }
+function refreshDl(){ const el=$('dl'); if(el) el.disabled=!(parcels.length||countKind('buffer')||countKind('drawing')); }
+function openExport(){
+  const nB=countKind('buffer'), nD=countKind('drawing');
+  $('exFmt').textContent=($('fmt').value||'geojson').toUpperCase();
+  $('exNP').textContent='('+parcels.length+')'; $('exNB').textContent='('+nB+')'; $('exND').textContent='('+nD+')';
+  $('exParcels').checked=parcels.length>0; $('exParcels').disabled=!parcels.length;
+  $('exBuffers').checked=nB>0; $('exBuffers').disabled=!nB;
+  $('exDrawings').checked=nD>0; $('exDrawings').disabled=!nD;
+  $('exDiss').checked=$('diss')&&$('diss').checked;
+  $('exMsg').innerHTML='';
+  $('exportModal').style.display='flex';
+}
+function closeExport(){ $('exportModal').style.display='none'; }
+async function doExport(){
+  const fmt=$('fmt').value;
+  const incl={parcels:$('exParcels').checked, buffers:$('exBuffers').checked, drawings:$('exDrawings').checked};
+  if(!incl.parcels && !incl.buffers && !incl.drawings){ $('exMsg').innerHTML='<div class="msg err">Seleziona almeno una categoria.</div>'; return; }
+  const diss=$('exDiss').checked, base='export';
+  if(fmt==='xlsx'){   // tabellare → solo particelle
+    const data=diss?buildFC(true,{parcels:true}).features.map(f=>({...f.properties})):parcels.map(p=>({Comune:p.comune,Regione:p.regione,Provincia:p.provincia,Cod_Belfiore:p.belfiore,Foglio:p.foglio,Particella:p.particella,
       Area_m2:p.area_m2?Math.round(p.area_m2):'',Area_ha:p.area_m2?+(p.area_m2/10000).toFixed(4):'',Destinazione_uso:p.land_use,OMI:p.omi,NCR:p.ncr,FID_Zornade:p.fid,Lat:p.lat,Lng:p.lng}));
-    const ws=XLSX.utils.json_to_sheet(data),wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Particelle');XLSX.writeFile(wb,base+'.xlsx');return;
+    const ws=XLSX.utils.json_to_sheet(data),wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Particelle');XLSX.writeFile(wb,base+'.xlsx'); closeExport(); return;
   }
-  const fc=buildFC(diss, true);   // includeBuffers: i buffer disegnati entrano nell'export geografico
+  const fc=buildFC(diss, incl);
+  if(!fc.features.length){ $('exMsg').innerHTML='<div class="msg err">Niente da esportare con questa selezione.</div>'; return; }
   if(fmt==='geojson'){dlBlob(base+'.geojson',new Blob([JSON.stringify(fc,null,1)],{type:'application/geo+json'}));}
   else if(fmt==='kml'){dlBlob(base+'.kml',new Blob([toKML(fc)],{type:'application/vnd.google-earth.kml+xml'}));}
   else if(fmt==='kmz'){const zip=new JSZip();zip.file('doc.kml',toKML(fc));const b=await zip.generateAsync({type:'blob'});dlBlob(base+'.kmz',b);}
   else if(fmt==='shp'){shpwrite.download(fc,{folder:base,types:{point:base,polygon:base,polyline:base}});}
+  closeExport();
 }
 function msg(t,cls){$('out').innerHTML=t?`<div class="msg ${cls}">${t}</div>`:'';}
 </script>
