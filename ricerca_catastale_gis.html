@@ -1,0 +1,972 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ricerca Catastale GIS — Urbasolar (fork ArcGIS)</title>
+
+<!-- ArcGIS Maps SDK for JS 4.x (sostituisce Leaflet) -->
+<link rel="stylesheet" href="https://js.arcgis.com/4.30/esri/themes/dark/main.css">
+<script src="https://js.arcgis.com/4.30/"></script>
+<!-- Export (UMD): ArcGIS carica il loader Dojo (AMD). Disabilito temporaneamente
+     define() così queste librerie si attaccano come global (XLSX/JSZip/shpwrite/turf)
+     invece di collidere col loader → evita gli errori "multipleDefine". -->
+<script>window.__define=window.define;window.define=undefined;</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://unpkg.com/jszip@3.10.1/dist/jszip.min.js"></script>
+<script src="https://unpkg.com/@mapbox/shp-write@0.4.3/shpwrite.js"></script>
+<script src="https://unpkg.com/@turf/turf@6.5.0/turf.min.js"></script>
+<script>window.define=window.__define;delete window.__define;</script>
+<style>
+  :root{--bg:#0f1720;--panel:#17212b;--line:#2a3947;--txt:#e6edf3;--mut:#8aa0b3;--acc:#f5a623;--ok:#3fb950;--err:#f85149}
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%}
+  body{display:flex;font-family:-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--txt)}
+  #side{width:360px;min-width:360px;background:var(--panel);border-right:1px solid var(--line);display:flex;flex-direction:column;overflow-y:auto}
+  #viewDiv{flex:1}
+  h1{font-size:15px;margin:0;padding:14px 16px;border-bottom:1px solid var(--line);letter-spacing:.3px}
+  h1 small{display:block;color:var(--mut);font-weight:400;font-size:11px;margin-top:3px}
+  .box{padding:12px 16px;border-bottom:1px solid var(--line)}
+  label{display:block;font-size:11px;color:var(--mut);text-transform:uppercase;letter-spacing:.5px;margin:9px 0 4px}
+  select,input{width:100%;padding:8px 10px;background:var(--bg);border:1px solid var(--line);border-radius:6px;color:var(--txt);font-size:14px}
+  select:disabled{opacity:.45}
+  .row{display:flex;gap:8px}
+  .row>div{flex:1}
+  button{width:100%;margin-top:12px;padding:10px;background:var(--acc);color:#1a1200;border:none;border-radius:6px;font-weight:700;font-size:14px;cursor:pointer}
+  button:disabled{opacity:.5;cursor:default}
+  button.sec{background:transparent;color:var(--txt);border:1px solid var(--line);font-weight:500;font-size:13px;padding:8px}
+  button.danger{color:var(--err);border-color:#5a2a2a}
+  .btns{display:flex;gap:8px}
+  .btns button{margin-top:0}
+  .hint{color:var(--mut);font-size:11px;margin-top:5px;line-height:1.4}
+  .warn{background:#f5a62311;border:1px dashed #5a4a1a;border-radius:6px;padding:8px 10px;font-size:11px;color:var(--mut);margin-top:8px}
+  .warn b{color:var(--acc)}
+  .msg{font-size:12px;padding:8px 10px;border-radius:6px;margin-top:10px}
+  .msg.err{background:#f8514922;color:var(--err)}
+  .msg.ok{background:#3fb95022;color:var(--ok)}
+  details summary{cursor:pointer;color:var(--mut);font-size:12px}
+  #listBox{display:flex;flex-direction:column;flex:0 0 auto}
+  #listHead{display:flex;justify-content:space-between;align-items:center;padding:12px 16px 6px}
+  #listHead b{font-size:12px;text-transform:uppercase;letter-spacing:.5px;color:var(--mut)}
+  #cnt{background:var(--acc);color:#1a1200;border-radius:20px;padding:1px 9px;font-size:12px;font-weight:700}
+  #list{overflow-y:auto;padding:0 10px 10px;min-height:150px;max-height:40vh}
+  .item{display:flex;align-items:center;gap:8px;padding:8px 6px;border-bottom:1px solid var(--line);font-size:13px;cursor:pointer}
+  .item:hover{background:#1f2c38}
+  .item .t{flex:1;line-height:1.35}
+  .item .t b{color:var(--acc)}
+  .item .t span{color:var(--mut);font-size:11px}
+  .item .x{color:var(--mut);border:none;background:none;font-size:16px;cursor:pointer;width:auto;margin:0;padding:0 4px}
+  .empty{color:var(--mut);font-size:12px;padding:16px;text-align:center}
+  .segbtns{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:2px}
+  .segbtns button{padding:7px 6px;background:var(--bg);color:var(--txt);border:1px solid var(--line);border-radius:6px;font-size:12px;cursor:pointer;margin:0}
+  .segbtns button.active{background:var(--acc);color:#1a1200;border-color:var(--acc);font-weight:700}
+  #itemResults{max-height:200px;overflow-y:auto;margin-top:8px}
+  #itemResults:not(:empty){border:1px solid var(--line);border-radius:6px}
+  .resItem{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:7px 9px;border-bottom:1px solid var(--line);font-size:13px;cursor:pointer}
+  .resItem:last-child{border-bottom:none}
+  .resItem:hover{background:#1f2c38}
+  .resItem .rt{flex:1;line-height:1.3}
+  .resItem .rty{color:var(--mut);font-size:10px;text-transform:uppercase;letter-spacing:.4px;white-space:nowrap}
+  .authbar{display:flex;align-items:center;gap:8px;font-size:12px}
+  .authbar .dot{width:8px;height:8px;border-radius:50%;background:var(--err);flex:none}
+  .authbar .dot.on{background:var(--ok)}
+  .authbar span.t{flex:1}
+  /* pannello Strumenti (dentro l'Expand) */
+  #toolsPanel{width:290px;max-height:78vh;overflow-y:auto;background:var(--panel);color:var(--txt);padding:4px 0 8px}
+  #toolsPanel h3{margin:0;padding:10px 14px;font-size:13px;text-transform:uppercase;letter-spacing:.5px;color:var(--mut);border-bottom:1px solid var(--line)}
+  .tsec{padding:11px 14px;border-bottom:1px solid var(--line)}
+  .tlab{font-size:11px;color:var(--mut);text-transform:uppercase;letter-spacing:.5px;margin-bottom:7px}
+  .tlab2{display:block;font-size:10px;color:var(--mut);text-transform:uppercase;letter-spacing:.4px;margin-bottom:3px}
+  #toolsPanel .btns{display:flex;gap:6px;flex-wrap:wrap}
+  #toolsPanel .btns button{flex:1;min-width:70px}
+  .thint{color:var(--mut);font-size:11px;margin-top:6px;line-height:1.35}
+  .thint.ok{color:var(--ok)} .thint.err{color:var(--err)}
+  /* modale promote */
+  #promoteModal{position:fixed;inset:0;background:#000a;display:none;align-items:center;justify-content:center;z-index:1000}
+  #promoteModal .card{position:relative;background:var(--panel);border:1px solid var(--line);border-radius:10px;width:440px;max-width:92vw;max-height:90vh;overflow-y:auto;padding:18px 20px}
+  #pmClose{position:absolute;top:10px;right:12px;width:30px;height:30px;padding:0;margin:0;background:transparent;color:var(--mut);border:none;font-size:22px;line-height:1;cursor:pointer}
+  #pmClose:hover{color:var(--txt)}
+  #promoteModal h2{margin:0 0 4px;font-size:16px}
+  #promoteModal .sub{color:var(--mut);font-size:12px;margin-bottom:12px}
+</style>
+</head>
+<body>
+<div id="side">
+  <h1>Ricerca Catastale · GIS<small>fork ArcGIS · dati AdE via Zornade + portale AGOL</small></h1>
+
+  <!-- ── AUTENTICAZIONE AGOL (Fase 1) ── -->
+  <div class="box">
+    <div class="authbar"><span class="dot" id="authDot"></span><span class="t" id="authTxt">Non connesso ad AGOL</span></div>
+    <button class="sec" id="signin" style="margin-top:8px">Accedi con AGOL</button>
+    <div class="warn" id="authTodo"><b>Config:</b> incolla il <code>client_id</code> di un'app OAuth registrata sul portale nella costante <code>CLIENT_ID</code> in cima allo script, e aggiungi il redirect URI di questa pagina. Finché è vuoto, le funzioni di portale restano disattivate.</div>
+  </div>
+
+  <div class="box">
+    <details id="tokBox">
+      <summary>Chiave API Zornade (già configurata)</summary>
+      <input id="tok" type="password" placeholder="lascia vuoto per la chiave predefinita" style="margin-top:8px">
+      <div class="hint">Chiave condivisa preconfigurata (ricerca catastale). Compila <b>solo</b> per usare un token diverso.</div>
+    </details>
+  </div>
+
+  <div class="box">
+    <label>Regione</label>
+    <select id="reg"><option value="">— seleziona —</option></select>
+    <label>Provincia</label>
+    <select id="prov" disabled><option value="">—</option></select>
+    <label>Comune</label>
+    <select id="com" disabled><option value="">—</option></select>
+    <div class="row">
+      <div><label>Foglio</label><input id="fog" placeholder="es. 174"></div>
+      <div><label>Particelle</label><input id="par" placeholder="es. 119, 121, 128"></div>
+    </div>
+    <div class="hint">Una o più particelle, separate da virgola o spazio.</div>
+    <button id="go" disabled>Aggiungi all'elenco</button>
+    <div class="hint" style="margin-top:8px">💡 Oppure <b>clicca direttamente sulla mappa</b> per aggiungere la particella in quel punto.</div>
+    <div id="cvNote" class="hint"></div>
+    <div id="out"></div>
+  </div>
+
+
+  <div class="box">
+    <label>Modalità selezione particelle</label>
+    <div class="segbtns" id="selModeBox">
+      <button data-m="point">👆 Puntuale</button>
+      <button data-m="rectangle">▭ Rettangolo</button>
+      <button data-m="polygon">⬠ Poligono</button>
+      <button data-m="polyline">╱ Linea</button>
+    </div>
+    <div class="hint" id="selHint">Nessuna modalità attiva: i click consultano i popup, non aggiungono particelle. Clicca un pulsante per attivare (e di nuovo per disattivare).</div>
+  </div>
+
+  <div id="listBox">
+    <div id="listHead"><b>Elenco particelle</b><span id="cnt">0</span></div>
+    <div id="listTot" class="hint" style="padding:0 16px 6px;margin-top:-2px"></div>
+    <div id="list"><div class="empty">Nessuna particella. Cerca e aggiungi.</div></div>
+    <div class="box" style="border-bottom:none">
+      <label>Scarica elenco</label>
+      <select id="fmt">
+        <option value="geojson">GeoJSON</option>
+        <option value="kml">KML</option>
+        <option value="kmz">KMZ</option>
+        <option value="shp">Shapefile (.zip)</option>
+        <option value="xlsx">XLSX (tabella)</option>
+      </select>
+      <label style="display:flex;align-items:center;gap:7px;text-transform:none;letter-spacing:0;margin-top:9px;font-size:13px;color:var(--txt)">
+        <input type="checkbox" id="diss" style="width:auto"> Dissolvi in un'unica area
+      </label>
+      <div class="btns" style="margin-top:9px">
+        <button class="sec" id="dl" disabled>⬇ Scarica</button>
+        <button class="sec danger" id="reset" disabled>Reset</button>
+      </div>
+      <button id="promote" disabled style="margin-top:8px">★ Promuovi in AREAS COLLECTION</button>
+      <div class="hint">Il promote usa lo stesso interruttore "Dissolvi". GPKG/GDB: converti il GeoJSON con <code>scripts/geojson_to_gpkg_gdb.py</code>.</div>
+    </div>
+  </div>
+</div>
+<div id="viewDiv"></div>
+
+<!-- ── PANNELLO STRUMENTI (spostato nell'Expand in alto a destra) ── -->
+<div id="toolsPanel">
+  <h3>Strumenti</h3>
+  <div class="tsec">
+    <div class="tlab">Aggiungi layer dal portale</div>
+    <div class="row">
+      <div style="flex:2"><input id="itemQ" placeholder="cerca per titolo…" disabled></div>
+      <div style="flex:0 0 auto"><button class="sec" id="searchItem" disabled style="margin-top:0;padding:8px 10px">🔍</button></div>
+    </div>
+    <div id="itemResults"></div>
+    <div class="thint">Richiede login. Clicca un risultato per aggiungerlo alla legenda.</div>
+  </div>
+  <div class="tsec">
+    <div class="tlab">Misura</div>
+    <div class="btns">
+      <button class="sec" id="msDist">📏 Distanza</button>
+      <button class="sec" id="msArea">▱ Area</button>
+      <button class="sec" id="msClear">Pulisci</button>
+    </div>
+  </div>
+  <div class="tsec">
+    <div class="tlab">Strumenti per buffer</div>
+    <div class="btns">
+      <button class="sec" id="bufPoint">• Punto</button>
+      <button class="sec" id="bufLine">╱ Linea</button>
+      <button class="sec" id="bufArea">▱ Area</button>
+    </div>
+    <div class="row" style="margin-top:8px;align-items:flex-end">
+      <div style="flex:2"><label class="tlab2">Distanza (m)</label><input id="bufDist" type="number" value="100" min="1"></div>
+      <div style="flex:0 0 auto"><button class="sec" id="bufGen" disabled style="margin-top:0">Genera</button></div>
+    </div>
+    <div class="btns" style="margin-top:8px"><button class="sec" id="bufClear">Pulisci</button></div>
+    <div id="bufMsg" class="thint"></div>
+  </div>
+  <div class="tsec" style="border-bottom:none">
+    <div class="tlab">Vai a coordinate (lat, lon)</div>
+    <div class="row">
+      <div style="flex:2"><input id="coordIn" placeholder="es. 41.9028, 12.4964"></div>
+      <div style="flex:0 0 auto"><button class="sec" id="coordGo" style="margin-top:0">Vai</button></div>
+    </div>
+    <div id="coordMsg" class="thint"></div>
+  </div>
+</div>
+
+<!-- ── MODALE PROMOTE (Fase 4) ── -->
+<div id="promoteModal">
+  <div class="card">
+    <button id="pmClose" title="Chiudi">×</button>
+    <h2>Promuovi in AREAS COLLECTION</h2>
+    <div class="sub" id="pmSub">—</div>
+    <label>Area class</label>
+    <select id="pmClass"></select>
+    <label>Area type</label>
+    <select id="pmType"></select>
+    <label>Sources</label>
+    <select id="pmSources"></select>
+    <label>Estrazione massiva</label>
+    <select id="pmEstr"></select>
+    <label>Project type (facoltativo)</label>
+    <input id="pmProjType" placeholder="es. GROUND / AGRIVOLTAICO…">
+    <div class="warn" style="margin-top:12px"><b>Scrittura sul portale.</b> Verranno aggiunte feature al layer 426 come utente loggato. COMUNE/REGIONE/PROVINCIA/area/ID_univoco sono compilati in automatico.</div>
+    <div id="pmMsg"></div>
+    <div class="btns" style="margin-top:14px">
+      <button class="sec" id="pmCancel">Annulla</button>
+      <button id="pmConfirm">Conferma inserimento</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ════════════════════════════════════════════════════════════════════════
+//  Ricerca Catastale · GIS — fork ArcGIS del prototipo Leaflet
+//  Fase 0: mappa + basemap + Zornade + elenco + export + click
+//  Fase 1: login OAuth per-utente (serve CLIENT_ID)
+//  Fase 2: cambio regione → carica la Check Vincoli (layer spenti) + LayerList
+//  Fase 3: aggiunta layer da item id del portale
+//  Fase 4: promote → applyEdits sul layer 426 (riproiezione 4326→6876)
+// ════════════════════════════════════════════════════════════════════════
+
+// ⚠️ CONFIG OAuth — Client ID dell'app registrata sul portale (flusso "autenticazione utenti").
+//    Il Client ID è PUBBLICO (va bene nel sorgente). Il Client SECRET NON si usa in questo
+//    flusso e NON va mai messo qui. Redirect URI da registrare nell'app: l'URL esatto di
+//    questa pagina (dev: http://localhost:8125/ricerca_catastale_gis.html; poi l'host interno).
+const CLIENT_ID="L2cYlWLKZ9bCUrHA";   // <-- VUOTO = funzioni di portale disattivate
+
+const ZB="https://api.zornade.com/api/v2";
+const GENERAL_MAP="9601b44f9e7a421ca0fd98b5ef9e230b";
+const PORTAL="https://sig-urbasolar.maps.arcgis.com";
+const AREAS_LAYER_URL="https://services-eu1.arcgis.com/Kxsn3iT6KEQ7OlSW/arcgis/rest/services/AREE_INDUSTRIALI_PROSPEZIONE/FeatureServer/426";
+const AREAS_WKID=6876;   // RDN2008 / Italia — SR del layer 426
+// ISTAT Comuni (stesso item usato dall'espressione "Autocompilazione Comune"): serve PRO_COM_T
+const ISTAT_COMUNI_URL="https://services-eu1.arcgis.com/Kxsn3iT6KEQ7OlSW/arcgis/rest/services/IT_ISTAT_Confini_amministrativi_e_statistiche/FeatureServer/0";
+
+// Lookup Regione (Zornade) → item id "IT - PORTALE CHECK VINCOLI - …"
+// Match normalizzato (spazi/trattini ignorati). Mancano: Liguria, Molise,
+// Trentino-Alto Adige, Valle d'Aosta → fallback (nessuna CV, resta la base).
+const CV_MAPS={
+  "Abruzzo":"95171305ff5b4428b00c53218d06f5af",
+  "Basilicata":"0562df4b537b433e92c5cbd8e3784be9",
+  "Calabria":"ed8c81b26ba74ef08f2c88972e40b09b",
+  "Campania":"676f7227bd4a4386b3ee7da5a06ef9e9",
+  "Emilia-Romagna":"53241e989cf44cc7a35d1c0261596b71",
+  "Friuli-Venezia Giulia":"e4040a447f9243fd8e6157ce60855d03",
+  "Lazio":"c429e59f5a3744f888d3df1b16a3c1de",
+  "Lombardia":"ae933290d9664116989ae40977e29fdb",
+  "Marche":"5eeb68183ac646bba874a65a76a8462c",
+  "Piemonte":"516eb19e4f3c48c99c094e29d7fe9363",
+  "Puglia":"f187628f1d5a4fc089359933bc15fc06",
+  "Sardegna":"44469bcaa62e4610b18504718a44a391",
+  "Sicilia":"702cb8b1cca143e6bf79e383cafe9d84",
+  "Toscana":"4a698da4790a4966b2ee6de0900531ce",
+  "Umbria":"79c81ff11ceb46c791074fae8217fb42",
+  "Veneto":"b11b11dd7da1433991c6171af63ed1be"
+};
+function cvIdFor(region){
+  const norm=s=>String(s||'').toLowerCase().replace(/[\s\-'’]/g,'');
+  const k=Object.keys(CV_MAPS).find(x=>norm(x)===norm(region));
+  return k?CV_MAPS[k]:null;
+}
+
+// Domini del layer 426 (estratti dal servizio — usati nel form promote)
+const DOM={
+  AREA_CLASS:[["INDUSTRIAL","Industrial"],["FORMER_QUARRY","Former Quarry"],["AGRICULTURAL","Agricoltural"],["PUBLIC_SERVICES","Public services"],["ROOFTOP","Rooftop"],["CARPORT","Carports"],["GREENHOUSES","Greenhouses"]],
+  AREA_TYPE:[["Brownfield / Industrial Zone","Brownfield / Industrial Zone"],["Sector to be urbanized (Zone U / AU / ZAC / Activity zone)","Sector to be urbanized"],["Agricultural land / Meadow","Agricultural land / Meadow"],["Quarry / Mine","Quarry / Mine"],["Former Landfill / ISDND / Technical Landfill Center (CET) / CSDU / ISDI","Former Landfill"],["Old airfield","Old airfield"],["Body of water","Body of water"],["Sector dedicated to solar / EnR projects (Npv - Ner, etc.)","Sector dedicated to solar/EnR"],["Abandoned from aerodrome / airport","Abandoned aerodrome/airport"],["Fallow / Agricultural wasteland / Unusual agricultural land","Fallow / wasteland"],["Military land / Former military site","Military / former military"]],
+  Sources:[["GIS Database","GIS Database"],["Internal Scouting outside GIS","Internal Scouting outside GIS"],["External scouter / broker","External scouter / broker"],["Incoming request","Incoming request"],["Network","Network"],["Call for tender","Call for tender"],["Historical UBS client","Historical UBS client"],["AXPO Group","AXPO Group"],["Project portfolio purchase","Project portfolio purchase"],["Press","Press"]],
+  Estrazione_Massiva:[[0,"Non è richiesta estrazione (default)"],[1,"Richiesta Estrazione"],[2,"Già Estratto"]]
+};
+
+const DEFAULT_KEY="zrn_290b2dd39e8da365efb9b08357643a6a9a0eb05a7bfe3250a4d5a3de95d98fba";
+const $=id=>document.getElementById(id);
+let parcels=[], signedIn=false, username=null, initialMapLoaded=false, portal=null;
+// tipi di item aggiungibili come layer (per la ricerca portale)
+const ADDABLE=new Set(["Feature Service","Map Service","Image Service","Vector Tile Service","WMS","WFS","KML","GeoJson","CSV","Feature Collection","Tiled Imagery Layer","Map Image Layer","Scene Service"]);
+
+// ── stato ArcGIS ──────────────────────────────────────────────────────────
+let view, gl, catasto, esriMods, basemapLayers, layerListExpand;
+let toolsGL, measurement, sketchVM, bufferGeom=null;   // strumenti (misura/buffer)
+let areasEditorExpand=null, areasLayer=null, recomputingArea=false;   // edit AREAS COLLECTION
+let sketchPurpose=null;   // 'buffer' | 'selection' — a cosa serve il disegno corrente
+let selMode=null;         // modalità selezione: null(nessuna)|point|rectangle|polygon|polyline
+
+require([
+  "esri/config","esri/Map","esri/views/MapView","esri/WebMap","esri/Basemap",
+  "esri/layers/GraphicsLayer","esri/layers/WMSLayer","esri/layers/FeatureLayer","esri/layers/Layer","esri/layers/TileLayer",
+  "esri/Graphic","esri/geometry/Polygon","esri/geometry/projection",
+  "esri/widgets/BasemapGallery","esri/widgets/LayerList","esri/widgets/Expand",
+  "esri/widgets/Search","esri/widgets/Measurement","esri/widgets/Sketch/SketchViewModel","esri/widgets/Editor",
+  "esri/geometry/geometryEngine","esri/geometry/Point","esri/geometry/support/webMercatorUtils",
+  "esri/identity/OAuthInfo","esri/identity/IdentityManager","esri/portal/Portal","esri/portal/PortalQueryParams"
+],(esriConfig,Map,MapView,WebMap,Basemap,GraphicsLayer,WMSLayer,FeatureLayer,Layer,TileLayer,Graphic,Polygon,projection,
+   BasemapGallery,LayerList,Expand,Search,Measurement,SketchViewModel,Editor,geometryEngine,Point,webMercatorUtils,
+   OAuthInfo,IdentityManager,Portal,PortalQueryParams)=>{
+
+  esriMods={Graphic,Polygon,projection,FeatureLayer,Layer,WebMap,LayerList,Expand,Editor,IdentityManager,Portal,PortalQueryParams,geometryEngine,Point,webMercatorUtils};
+
+  catasto=new WMSLayer({
+    url:"https://webgis.regione.sardegna.it/geoserver/dbu/wms",
+    sublayers:[{name:"AdE_cadastral_parcel"},{name:"AdE_fabbricati"}],
+    // GeoServer rifiuta il codice Esri 102100 (SR delle basemap tiled) come "InvalidSRS":
+    // forzo la richiesta in EPSG:3857 (equivalente, ma è il codice che GeoServer accetta).
+    spatialReferences:[3857],
+    minScale:25000, opacity:.7, title:"Catasto AdE"
+  });
+  gl=new GraphicsLayer({title:"Particelle selezionate", listMode:"hide"});
+  toolsGL=new GraphicsLayer({title:"Strumenti (misura/buffer)", listMode:"hide"});
+
+  // Basemap da servizi Esri PUBBLICI (no token, non bloccate come i tile OSM volontari)
+  const bm=(title,url,id)=>new Basemap({baseLayers:[new TileLayer({url})], title, id});
+  const bmTopo=bm("Topografica","https://services.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer","topo");
+  const bmImg=bm("Satellite","https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer","img");
+  const bmStreets=bm("Stradale","https://services.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer","streets");
+  const map=new Map({basemap:bmTopo, layers:[catasto, gl, toolsGL]});
+  view=new MapView({container:"viewDiv", map, center:[12.5,42.0], zoom:6});
+  window.view=view;
+  // popup ancorato a SINISTRA (di default si ancorava in alto a destra)
+  view.popup.dockEnabled=true;
+  view.popup.dockOptions={buttonEnabled:true, breakpoint:false, position:"top-left"};
+
+  const gallery=new BasemapGallery({view, source:[bmTopo,bmImg,bmStreets]});
+  view.ui.add(new Expand({view, content:gallery, expandTooltip:"Cambia mappa di base"}),"top-right");
+  layerListExpand=new Expand({view, content:new LayerList({view}), expandTooltip:"Legenda / layer", expanded:false});
+  view.ui.add(layerListExpand,"top-right");
+
+  // ── Strumenti ──
+  // ricerca indirizzo (widget nativo; usa il geocoder dell'org quando loggati)
+  const searchW=new Search({view, popupEnabled:false, resultGraphicEnabled:true});
+  view.ui.add(new Expand({view, content:searchW, expandTooltip:"Cerca indirizzo", expandIconClass:"esri-icon-search"}),"top-left");
+  // misura distanza/area (widget nativo, controllato dai bottoni del pannello)
+  measurement=new Measurement({view});
+  view.ui.add(measurement,"bottom-right");
+  // sketch per il buffer da linea
+  sketchVM=new SketchViewModel({view, layer:toolsGL,
+    polylineSymbol:{type:"simple-line", color:[121,192,255], width:2.5},
+    polygonSymbol:{type:"simple-fill", color:[121,192,255,0.12], outline:{color:[121,192,255],width:2}},
+    pointSymbol:{type:"simple-marker", color:[121,192,255], size:9, outline:{color:'#fff',width:1}}});
+  sketchVM.on("create", e=>{
+    if(e.state!=="complete") return;
+    const geom=e.graphic.geometry;
+    if(sketchPurpose==='selection'){
+      toolsGL.remove(e.graphic);          // non lascio la forma di selezione sulla mappa
+      selectByGeometry(geom);
+      if(selMode && selMode!=='point'){ sketchPurpose='selection'; sketchVM.create(selMode); }  // ri-armo per un'altra selezione
+    }else{                                // buffer
+      bufferGeom=geom; $('bufGen').disabled=false;
+      toolMsg('bufMsg','Geometria disegnata. Imposta la distanza e genera il buffer.','ok');
+    }
+  });
+  // pannello Strumenti a scomparsa (contiene: layer portale, misura, buffer, coordinate)
+  view.ui.add(new Expand({view, content:document.getElementById('toolsPanel'),
+    expandTooltip:"Strumenti", expandIconClass:"esri-icon-applications", expanded:false}),"top-right");
+
+  view.on("click", async e=>{
+    if(selMode!=='point') return;                          // modalità forma attiva → il click serve al disegno
+    if(measurement && measurement.activeTool) return;      // misura attiva → non aggiungere particella
+    if(sketchVM && sketchVM.state==="active") return;      // disegno in corso
+    if(e.mapPoint) await addByClick(e.mapPoint.latitude, e.mapPoint.longitude);
+  });
+
+  // ── Fase 1: OAuth ──
+  if(CLIENT_ID){
+    // flowType "implicit": l'app OAuth ha un client secret (confidenziale) e lo
+    // scambio token del flusso authorization-code può fallire silenziosamente nel
+    // browser. L'implicit restituisce il token direttamente nell'hash: nessuno
+    // scambio, nessun secret. Adatto a un tool interno.
+    IdentityManager.registerOAuthInfos([ new OAuthInfo({appId:CLIENT_ID, portalUrl:PORTAL, popup:false, flowType:"implicit"}) ]);
+    // Il ritorno dal redirect crea una credenziale: aggancio l'evento così lo
+    // stato "connesso" si applica anche se checkSignInStatus corre prima.
+    IdentityManager.on("credential-create", ()=>{ console.log('[OAuth] credenziale creata'); onSignedIn(); });
+    IdentityManager.checkSignInStatus(PORTAL+"/sharing")
+      .then(()=>onSignedIn())
+      .catch(err=>{
+        const m=(err&&(err.message||err.name))||String(err);
+        if(!/not-authenticated|not signed in/i.test(m)) console.warn('[OAuth] errore login:', m, err);
+        if(!signedIn){
+          onSignedOut();
+          // login richiesto automaticamente all'apertura (redirect verso l'SSO).
+          // ?noauto in URL disattiva l'auto-login (comodo per test/anteprima).
+          if(!/[?&]noauto\b/.test(location.search))
+            IdentityManager.getCredential(PORTAL+"/sharing").then(()=>onSignedIn()).catch(()=>{});
+        }
+      });
+  }else{
+    onSignedOut();
+  }
+  $('signin').onclick=()=>{
+    if(!CLIENT_ID){ msg('Manca CLIENT_ID: registra un\'app OAuth e incollane il client_id nello script.','err'); return; }
+    if(signedIn){ IdentityManager.destroyCredentials(); location.reload(); return; }
+    IdentityManager.getCredential(PORTAL+"/sharing").then(()=>onSignedIn()).catch(e=>msg('Login annullato: '+e.message,'err'));
+  };
+
+  loadRegions(); checkReady(); wireUI(); wireTools();
+});
+
+async function onSignedIn(){
+  signedIn=true;
+  try{ portal=new esriMods.Portal({authMode:"immediate"}); await portal.load(); username=portal.user&&portal.user.username; }catch(e){}
+  $('authDot').classList.add('on');
+  $('authTxt').textContent = username ? ('Connesso: '+username) : 'Connesso ad AGOL';
+  $('signin').textContent='Esci';
+  $('authTodo').style.display='none';
+  $('itemQ').disabled=false; $('searchItem').disabled=false;
+  render();
+  // mappa di default all'apertura: General Map (una sola volta, se nessuna regione scelta)
+  if(!initialMapLoaded){ initialMapLoaded=true; if(!$('reg').value) loadWebMap(GENERAL_MAP,false,'la General Map'); }
+}
+function onSignedOut(){
+  signedIn=false; username=null;
+  $('authDot').classList.remove('on');
+  $('authTxt').textContent='Non connesso ad AGOL';
+  $('signin').textContent='Accedi con AGOL';
+  portal=null; $('itemQ').disabled=true; $('searchItem').disabled=true; if($('itemResults')) $('itemResults').innerHTML='';
+  const todo=$('authTodo');
+  if(CLIENT_ID){
+    const ru=location.origin+location.pathname;   // redirect_uri esatto usato dall'SDK
+    todo.style.display='';
+    todo.innerHTML=`<b>Se il login dà "Invalid redirect_uri":</b> registra nell'app OAuth (Impostazioni → Redirect URIs) <b>esattamente</b> questo, poi riprova:<br><code style="word-break:break-all">${ru}</code>`;
+    console.log('[OAuth] redirect_uri da registrare nell\'app:', ru);
+  }else{
+    todo.style.display='';
+    todo.innerHTML=`<b>Config:</b> incolla il <code>client_id</code> di un'app OAuth nella costante <code>CLIENT_ID</code> in cima allo script. Finché è vuoto, le funzioni di portale restano disattivate.`;
+  }
+  render();
+}
+
+// ── conversione GeoJSON → geometria esri ──────────────────────────────────
+function geojsonToEsri(g){
+  if(!g) return null;
+  const sr={wkid:4326};
+  if(g.type==="Polygon")      return new esriMods.Polygon({rings:g.coordinates.map(r=>r.map(c=>[c[0],c[1]])), spatialReference:sr});
+  if(g.type==="MultiPolygon"){const rings=[]; g.coordinates.forEach(p=>p.forEach(r=>rings.push(r.map(c=>[c[0],c[1]])))); return new esriMods.Polygon({rings, spatialReference:sr});}
+  if(g.type==="Point")        return {type:"point", x:g.coordinates[0], y:g.coordinates[1], spatialReference:sr};
+  return null;
+}
+const PARCEL_SYMBOL={type:"simple-fill", color:[245,166,35,0.15], outline:{color:[245,166,35],width:2}};
+
+// ── token Zornade ─────────────────────────────────────────────────────────
+window.addEventListener("DOMContentLoaded",()=>{
+  $('tok').value=localStorage.getItem('zrn_tok')||'';
+  $('tok').addEventListener('change',()=>{
+    const v=$('tok').value.trim();
+    if(v) localStorage.setItem('zrn_tok',v); else localStorage.removeItem('zrn_tok');
+    loadRegions(); checkReady();
+  });
+});
+const key=()=>$('tok').value.trim()||DEFAULT_KEY;
+async function z(path,params){
+  const r=await fetch(ZB+path+(params?'?'+new URLSearchParams(params):''),{headers:{'x-api-key':key()}});
+  if(!r.ok) throw new Error('HTTP '+r.status);
+  return r.json();
+}
+
+// ── cascata amministrativa ────────────────────────────────────────────────
+async function loadRegions(){
+  if(!key()||!$('reg'))return;
+  try{const d=await z('/admin/regions');
+    $('reg').innerHTML='<option value="">— seleziona —</option>'+d.data.sort((a,b)=>a.name.localeCompare(b.name)).map(r=>`<option>${r.name}</option>`).join('');
+  }catch(e){msg('Chiave non valida o API irraggiungibile: '+e.message,'err');}
+}
+function wireUI(){
+  $('reg').addEventListener('change',async()=>{
+    $('prov').disabled=$('com').disabled=true;$('com').innerHTML='<option value="">—</option>';checkReady();
+    const region=$('reg').value;
+    swapCheckVincoli(region);        // Fase 2
+    if(!region)return;
+    const d=await z('/admin/provinces',{region});
+    $('prov').innerHTML='<option value="">— seleziona —</option>'+d.data.map(p=>`<option>${p.name}</option>`).join('');$('prov').disabled=false;
+  });
+  $('prov').addEventListener('change',async()=>{
+    $('com').disabled=true;$('com').innerHTML='<option value="">—</option>';checkReady();
+    if(!$('prov').value)return;
+    const d=await z('/admin/municipalities',{province:$('prov').value});
+    $('com').innerHTML='<option value="">— seleziona —</option>'+d.data.sort((a,b)=>a.name.localeCompare(b.name)).map(c=>`<option>${c.name}</option>`).join('');$('com').disabled=false;
+  });
+  ['fog','par'].forEach(id=>$(id).addEventListener('input',checkReady));
+  $('com').addEventListener('change',checkReady);
+  $('go').addEventListener('click',search);
+  $('par').addEventListener('keydown',e=>{if(e.key==='Enter'&&!$('go').disabled)search();});
+  $('dl').onclick=download;
+  $('reset').onclick=()=>{if(parcels.length&&confirm('Svuotare l\'elenco?')){parcels=[];render();msg('','');}};
+  $('searchItem').onclick=searchPortalItems;
+  $('itemQ').addEventListener('keydown',e=>{if(e.key==='Enter'&&!$('searchItem').disabled)searchPortalItems();});
+  $('promote').onclick=openPromote;
+  $('pmCancel').onclick=closePromote;
+  $('pmClose').onclick=closePromote;
+  $('pmConfirm').onclick=confirmPromote;
+  // popola i menu del form promote
+  const opt=arr=>arr.map(([c,n])=>`<option value="${String(c).replace(/"/g,'&quot;')}">${n}</option>`).join('');
+  $('pmClass').innerHTML='<option value="">— nessuna —</option>'+opt(DOM.AREA_CLASS);
+  $('pmType').innerHTML='<option value="">— nessuna —</option>'+opt(DOM.AREA_TYPE);
+  $('pmSources').innerHTML='<option value="">— nessuna —</option>'+opt(DOM.Sources);
+  $('pmEstr').innerHTML=opt(DOM.Estrazione_Massiva);
+}
+function checkReady(){$('go').disabled=!(key()&&$('com')&&$('com').value&&$('fog').value.trim()&&$('par').value.trim());}
+
+// ── Strumenti: misura / buffer / vai-a-coordinate ─────────────────────────
+function toolMsg(id,t,cls){ const el=$(id); if(el){ el.className='thint'+(cls?' '+cls:''); el.textContent=t||''; } }
+function wireTools(){
+  // misura (widget Measurement nativo, controllato dai bottoni)
+  $('msDist').onclick=()=>{ measurement.activeTool='distance'; };
+  $('msArea').onclick=()=>{ measurement.activeTool='area'; };
+  $('msClear').onclick=()=>{ measurement.clear(); };
+  // strumenti per buffer: disegna punto/linea/area, poi genera
+  const startBuf=(shape,label)=>{ try{sketchVM.cancel();}catch(e){} bufferGeom=null; $('bufGen').disabled=true;
+    sketchPurpose='buffer'; toolMsg('bufMsg','Disegna '+label+' sulla mappa.'); sketchVM.create(shape); };
+  $('bufPoint').onclick=()=>startBuf('point','il punto');
+  $('bufLine').onclick=()=>startBuf('polyline','la linea (doppio click per finire)');
+  $('bufArea').onclick=()=>startBuf('polygon','l\'area (doppio click per finire)');
+  $('bufClear').onclick=()=>{ try{sketchVM.cancel();}catch(e){} toolsGL.removeAll(); bufferGeom=null; $('bufGen').disabled=true; toolMsg('bufMsg',''); };
+  $('bufGen').onclick=()=>{
+    if(!bufferGeom){ toolMsg('bufMsg','Prima disegna punto, linea o area.','err'); return; }
+    const d=parseFloat($('bufDist').value)||0;
+    if(d<=0){ toolMsg('bufMsg','Distanza non valida.','err'); return; }
+    const buf=esriMods.geometryEngine.geodesicBuffer(bufferGeom, d, 'meters');
+    if(buf){ const areaHa=Math.abs(esriMods.geometryEngine.geodesicArea(buf,'hectares')||0);
+      toolsGL.add(new esriMods.Graphic({geometry:buf,
+        attributes:{_kind:'buffer', dist_m:d, area_ha:+areaHa.toFixed(4)},   // tag per l'export
+        symbol:{type:'simple-fill', color:[121,192,255,0.2], outline:{color:[121,192,255],width:1.5}}}));
+      toolMsg('bufMsg',`Buffer di ${d} m generato.`,'ok'); view.goTo(buf.extent.expand(1.5)).catch(()=>{}); }
+    else toolMsg('bufMsg','Buffer non generato.','err');
+  };
+  // vai a coordinate (lat, lon)
+  const goCoord=()=>{
+    const m=($('coordIn').value||'').split(/[,;\s]+/).map(parseFloat).filter(n=>!isNaN(n));
+    if(m.length<2){ toolMsg('coordMsg','Formato: lat, lon (es. 41.9028, 12.4964)','err'); return; }
+    const [lat,lng]=m;
+    if(Math.abs(lat)>90||Math.abs(lng)>180){ toolMsg('coordMsg','Coordinate fuori range.','err'); return; }
+    const pt=new esriMods.Point({latitude:lat, longitude:lng});
+    view.goTo({target:pt, zoom:17}).catch(()=>{});
+    toolsGL.add(new esriMods.Graphic({geometry:pt, symbol:{type:'simple-marker', color:[121,192,255], size:10, outline:{color:'#fff',width:1}}}));
+    toolMsg('coordMsg',`Vado a ${lat}, ${lng}.`,'ok');
+  };
+  $('coordGo').onclick=goCoord;
+  $('coordIn').addEventListener('keydown',e=>{ if(e.key==='Enter') goCoord(); });
+  // modalità selezione particelle
+  $('selModeBox').querySelectorAll('button').forEach(b=>b.onclick=()=>setSelMode(b.dataset.m));
+}
+
+const SEL_NEUTRAL='Nessuna modalità attiva: i click consultano i popup, non aggiungono particelle. Clicca un pulsante per attivare (e di nuovo per disattivare).';
+const SEL_HINT={point:'Click su mappa → aggiunge la particella nel punto.',
+  rectangle:'Trascina un rettangolo → aggiunge tutte le particelle nell\'area.',
+  polygon:'Disegna un poligono (doppio click per finire) → particelle nell\'area.',
+  polyline:'Disegna una linea (doppio click per finire) → particelle attraversate.'};
+function setSelMode(mode){
+  if(selMode===mode) mode=null;                 // click sul pulsante attivo → disattiva
+  selMode=mode;
+  $('selModeBox').querySelectorAll('button').forEach(b=>b.classList.toggle('active', b.dataset.m===mode));
+  $('selHint').textContent = mode ? (SEL_HINT[mode]||'') : SEL_NEUTRAL;
+  try{ sketchVM.cancel(); }catch(e){}
+  if(!mode || mode==='point'){ msg('',''); return; }   // neutra o puntuale: nessuno sketch
+  sketchPurpose='selection';                    // il disegno serve a selezionare
+  sketchVM.create(mode);                         // arma subito il disegno
+}
+
+// ── selezione particelle da geometria (campionamento punti + locate) ──────
+// Zornade non ha query spaziale per bbox/poligono: si campiona una griglia di
+// punti dentro/lungo la forma, si fa /parcels/locate su ognuno, si deduplica.
+const SEL_GRID=14, SEL_LINE_STEP=25, SEL_MAX_PTS=180, SEL_MAX_PARCELS=120, SEL_CONC=28;
+async function selectByGeometry(geom){
+  const ge=esriMods.geometryEngine, w=esriMods.webMercatorUtils;
+  let pts=[];   // [lng,lat]
+  try{
+    if(geom.type==='polyline'){
+      const len=ge.geodesicLength(geom,'meters')||0;
+      const step=Math.max(SEL_LINE_STEP, len/SEL_MAX_PTS);
+      const dens=ge.geodesicDensify(geom, step, 'meters');
+      dens.paths.forEach(pa=>pa.forEach(([x,y])=>{ const ll=w.xyToLngLat(x,y); if(ll) pts.push(ll); }));
+    }else{  // polygon o rectangle
+      const ext=geom.extent, step=Math.max(12, Math.max(ext.width,ext.height)/SEL_GRID);
+      for(let x=ext.xmin;x<=ext.xmax;x+=step) for(let y=ext.ymin;y<=ext.ymax;y+=step){
+        const pt=new esriMods.Point({x,y,spatialReference:geom.spatialReference});
+        if(ge.contains(geom,pt)){ const ll=w.xyToLngLat(x,y); if(ll) pts.push(ll); }
+      }
+    }
+  }catch(e){ msg('Errore nel campionamento: '+e.message,'err'); return; }
+  if(pts.length>SEL_MAX_PTS){ const k=Math.ceil(pts.length/SEL_MAX_PTS); pts=pts.filter((_,i)=>i%k===0); }
+  if(!pts.length){ msg('Nessun punto da analizzare nell\'area.','err'); return; }
+  // 1) locate su ogni punto → fid unici
+  const fids=new Map();
+  for(let i=0;i<pts.length;i+=SEL_CONC){
+    const b=pts.slice(i,i+SEL_CONC);
+    const rs=await Promise.all(b.map(([lng,lat])=>z('/parcels/locate',{lat,lng,limit:1}).catch(()=>null)));
+    rs.forEach(r=>{ const h=r&&r.data&&r.data[0]; if(h&&!fids.has(h.fid)) fids.set(h.fid,h); });
+    msg(`Analizzo… ${Math.min(i+SEL_CONC,pts.length)}/${pts.length} punti · ${fids.size} particelle`,'');
+    if(fids.size>=SEL_MAX_PARCELS) break;
+  }
+  // 2) profilo completo (geometria) + aggiunta
+  let added=0, dup=0; const hits=[...fids.values()];
+  for(let i=0;i<hits.length;i+=SEL_CONC){
+    const b=hits.slice(i,i+SEL_CONC);
+    const rs=await Promise.all(b.map(h=>addByFid(h.fid,(h.municipality&&h.municipality.name)||'',null,h.label,h.centroid)));
+    rs.forEach(r=>{ if(r==='ok')added++; else if(r==='dup')dup++; });
+  }
+  render();
+  msg(`Selezione: ${added} particelle aggiunte`+(dup?`, ${dup} già in elenco`:'')+` (${fids.size} nell'area).`, 'ok');
+}
+window.selectByGeometry=selectByGeometry;   // hook debug (come window.view)
+
+// ── caricamento di una web map del portale (General Map o CV) ──────────────
+// hideLayers=true → spegne i layer operativi (per le CV, che caricano lazy quando
+// l'utente li accende). NO loadAll: caricherebbe avidamente i WMS regionali (CORS).
+async function loadWebMap(id, hideLayers, label){
+  try{
+    const wm=new esriMods.WebMap({portalItem:{id}});
+    await wm.load();
+    if(hideLayers) wm.layers.forEach(l=>{ l.visible=false; });
+    wm.add(catasto); wm.add(gl); wm.add(toolsGL);       // ri-aggancio catasto + particelle + strumenti
+    view.map=wm;
+    if(parcels.length) view.goTo(gl.graphics.toArray()).catch(()=>{});
+    setTimeout(setupAreasEditor, 800);                  // abilita l'edit se AREAS COLLECTION è nella mappa
+    return true;
+  }catch(e){ if(label) $('cvNote').innerHTML=`<span style="color:var(--err)">Impossibile caricare ${label}: ${e.message}</span>`; return false; }
+}
+
+// ── Edit tool SOLO per AREAS COLLECTION (geometria modificabile, area ricalcolata) ──
+function findAreasLayer(){
+  let found=null;
+  view.map.allLayers.forEach(l=>{ if(!found && l.url && /AREE_INDUSTRIALI_PROSPEZIONE/i.test(l.url)
+    && (l.layerId===426 || /\/426$/.test(String(l.url)))) found=l; });
+  return found;
+}
+function setupAreasEditor(){
+  const l=findAreasLayer();
+  if(!l){ return; }                       // AREAS non presente (es. su una CV) → niente editor
+  if(areasLayer===l && areasEditorExpand){ return; }   // già configurato
+  areasLayer=l;
+  const editor=new esriMods.Editor({ view,
+    layerInfos:[{ layer:l, enabled:true, addEnabled:true, deleteEnabled:true, updateEnabled:true }] });
+  if(areasEditorExpand){ try{view.ui.remove(areasEditorExpand);}catch(e){} }
+  areasEditorExpand=new esriMods.Expand({view, content:editor,
+    expandTooltip:"Modifica AREAS COLLECTION", expandIconClass:"esri-icon-edit", expanded:false});
+  view.ui.add(areasEditorExpand,"top-right");
+  // ricalcolo e salvo l'area quando una feature viene modificata
+  l.on("edits", async evt=>{
+    if(recomputingArea) return;
+    // ricalcolo per feature CREATE e MODIFICATE (non per le eliminate)
+    const ids=[...(evt.addedFeatures||[]),...(evt.updatedFeatures||[])].map(f=>f.objectId).filter(x=>x!=null);
+    if(!ids.length) return;
+    recomputingArea=true;
+    try{
+      const istat=new esriMods.FeatureLayer({url:ISTAT_COMUNI_URL});
+      const q=await l.queryFeatures({objectIds:ids, returnGeometry:true, outFields:["OBJECTID"]});
+      const upd=[];
+      for(const f of q.features){
+        const attrs={OBJECTID:f.attributes.OBJECTID,
+          area:+Math.abs(esriMods.geometryEngine.planarArea(f.geometry,'hectares')||0).toFixed(4)};
+        try{  // ri-lookup ISTAT (la geometria può essere spostata): PRO_COM_T + COMUNE
+          const ir=await istat.queryFeatures({geometry:f.geometry.centroid, spatialRelationship:"intersects",
+            outFields:["PRO_COM_T","COMUNE"], returnGeometry:false, num:1});
+          const a=ir.features[0] && ir.features[0].attributes;
+          if(a){ attrs.PRO_COM_T=a.PRO_COM_T; attrs.COMUNE=a.COMUNE; }
+        }catch(e){}
+        upd.push({attributes:attrs});
+      }
+      if(upd.length) await l.applyEdits({updateFeatures:upd});
+    }catch(e){}
+    setTimeout(()=>{ recomputingArea=false; }, 800);   // evita il loop dell'evento edits ricorsivo
+  });
+}
+
+// ── Fase 2: cambio regione → Check Vincoli (layer spenti) ─────────────────
+async function swapCheckVincoli(region){
+  if(!view) return;
+  $('cvNote').textContent='';
+  if(!region){ if(signedIn) loadWebMap(GENERAL_MAP,false,'la General Map'); return; }  // regione deselezionata → torna alla General Map
+  const id=cvIdFor(region);
+  if(!id){ $('cvNote').innerHTML=`<span style="color:var(--acc)">Nessuna mappa Check Vincoli per <b>${region}</b></span> — resta la mappa di base.`; return; }
+  if(!signedIn){ $('cvNote').innerHTML=`<span style="color:var(--acc)">Accedi ad AGOL</span> per caricare i vincoli di ${region}.`; return; }
+  $('cvNote').textContent='Carico i vincoli di '+region+'…';
+  const ok=await loadWebMap(id, true, 'la CV');
+  if(ok) $('cvNote').innerHTML=`Vincoli di <b>${region}</b> caricati (spenti). Accendili dalla legenda ↗.`;
+}
+
+// ── Fase 3: cerca layer del portale per titolo, poi aggiungi ───────────────
+async function searchPortalItems(){
+  const q=$('itemQ').value.trim();
+  if(!q) return;
+  if(!signedIn||!portal){ msg('Accedi ad AGOL per cercare.','err'); return; }
+  $('itemResults').innerHTML='<div class="hint">Ricerca…</div>';
+  try{
+    let query=`title:(${q})`;
+    if(portal.id) query+=` AND orgid:${portal.id}`;      // solo contenuti dell'org
+    const res=await portal.queryItems(new esriMods.PortalQueryParams({
+      query, num:25, sortField:"title", sortOrder:"asc"
+    }));
+    const items=(res.results||[]).filter(it=>ADDABLE.has(it.type));
+    if(!items.length){ $('itemResults').innerHTML=`<div class="hint">Nessun layer trovato per «${esc(q)}».</div>`; return; }
+    $('itemResults').innerHTML=items.map(it=>
+      `<div class="resItem" data-id="${it.id}" data-title="${esc(it.title)}">
+        <span class="rt">${esc(it.title)}</span><span class="rty">${esc(it.type)}</span></div>`).join('');
+    $('itemResults').querySelectorAll('.resItem').forEach(el=>el.onclick=()=>addPortalLayer(el.dataset.id, el.dataset.title));
+  }catch(e){ $('itemResults').innerHTML=`<div class="hint" style="color:var(--err)">Errore ricerca: ${esc(e.message)}</div>`; }
+}
+async function addPortalLayer(id, title){
+  if(!signedIn){ msg('Accedi ad AGOL.','err'); return; }
+  msg(`Aggiungo «${title}»…`,'');
+  try{
+    const layer=await esriMods.Layer.fromPortalItem({portalItem:{id}});
+    view.map.add(layer);
+    layerListExpand.expanded=true;
+    msg('Layer aggiunto: '+(layer.title||title),'ok');
+  }catch(e){ msg('Item non aggiungibile ('+e.message+'). Verifica permessi/tipo.','err'); }
+}
+
+// ── aggiunta particelle (fid / ricerca / click) ───────────────────────────
+// area geodesica VERA in m² dalla geometria. Zornade fornisce area_m2 calcolata
+// in Web Mercator (gonfiata di ~1/cos²(lat)): non affidabile → la ricalcolo.
+function trueAreaM2(geojson){
+  try{
+    const poly=geojsonToEsri(geojson);
+    if(poly && poly.type==='polygon'){
+      const a=esriMods.geometryEngine.geodesicArea(poly,'square-meters');
+      if(a) return Math.abs(a);
+    }
+  }catch(e){}
+  return null;
+}
+async function addByFid(fid, hintComune, hintFoglio, hintPart, centroid){
+  try{
+    const prof=(await z('/parcels/'+fid)).data;
+    const cad=prof.cadastral||{};
+    const foglio=String(cad.foglio||hintFoglio||'');
+    const part=String(hintPart||prof.label||'');
+    const comune=(prof.municipality&&prof.municipality.name)||hintComune||'';
+    if(parcels.some(p=>p.fid===fid || (p.comune===comune&&p.foglio===foglio&&p.particella===part))) return 'dup';
+    const c=centroid||prof.centroid||{};
+    const areaVera=trueAreaM2(prof.geometry);   // area geodesica vera (Zornade è in Web Mercator, gonfiata)
+    const muni=prof.municipality||{};
+    parcels.push({fid, comune, foglio, particella:part,
+      regione:muni.region||'', provincia:muni.province||'',
+      belfiore:(prof.municipality&&prof.municipality.code)||cad.comune_code||'',
+      ncr:prof.cadastral_reference||prof.gml_id||'',
+      area_m2:(areaVera!=null?areaVera:prof.area_m2), land_use:(prof.land_use&&prof.land_use.class)||'',
+      omi:(prof.valuation&&(prof.valuation.omi_avg||prof.valuation.value))||'',
+      lat:c.lat, lng:c.lng, geometry:prof.geometry});
+    return 'ok';
+  }catch(e){return 'err';}
+}
+async function search(){
+  const comune=$('com').value, foglio=$('fog').value.trim();
+  const parts=[...new Set($('par').value.split(/[\s,;]+/).map(s=>s.trim()).filter(Boolean))];
+  if(!parts.length)return;
+  msg(`Ricerca di ${parts.length} particell${parts.length>1?'e':'a'}…`,'');
+  let added=0, dup=0, notfound=[];
+  for(const part of parts){
+    if(parcels.some(p=>p.comune===comune&&p.foglio===foglio&&p.particella===part)){dup++;continue;}
+    try{
+      let d=await z('/parcels/search',{comune,foglio,label:part,limit:5});
+      let hit=d.data.find(x=>String(x.label)===part);
+      if(!hit){d=await z('/parcels/search',{comune,foglio,limit:100});hit=d.data.find(x=>String(x.label)===part);}
+      if(!hit){notfound.push(part);continue;}
+      const r=await addByFid(hit.fid, comune, foglio, part, hit.centroid);
+      if(r==='ok')added++; else if(r==='dup')dup++; else notfound.push(part+'(err)');
+    }catch(e){notfound.push(part+'(err)');}
+  }
+  render();
+  let m=`${added} aggiunte`; if(dup)m+=`, ${dup} già in elenco`;
+  if(notfound.length)m+=`, non trovate: ${notfound.join(', ')} (oltre le 100/foglio o altra sezione → verifica su FoMaps)`;
+  msg(m, notfound.length?'err':'ok');
+}
+async function addByClick(lat,lng){
+  if(!key()){msg('Chiave API Zornade mancante.','err');return;}
+  msg('Individuo la particella nel punto…','');
+  try{
+    const d=await z('/parcels/locate',{lat,lng,limit:1});
+    const hit=(d.data||[])[0];
+    if(!hit){msg('Nessuna particella in questo punto.','err');return;}
+    const r=await addByFid(hit.fid,(hit.municipality&&hit.municipality.name)||'',null,hit.label,hit.centroid);
+    render();
+    const last=parcels[parcels.length-1];
+    if(r==='ok') msg(`Aggiunta: ${last.comune} · Fg ${last.foglio} · ${last.particella}.`,'ok');
+    else if(r==='dup') msg('Particella già in elenco.','ok');
+    else msg('Particella individuata ma profilo non leggibile.','err');
+  }catch(err){msg('Errore: '+err.message,'err');}
+}
+
+// ── elenco + disegno ──────────────────────────────────────────────────────
+function render(){
+  $('cnt').textContent=parcels.length;
+  const has=parcels.length>0;
+  const totHa=parcels.reduce((s,p)=>s+(p.area_m2||0),0)/10000;
+  $('listTot').textContent = has ? `${parcels.length} particell${parcels.length>1?'e':'a'} · ${totHa.toFixed(2)} ha totali` : '';
+  ['dl','reset'].forEach(id=>$(id).disabled=!has);
+  $('promote').disabled=!(has&&signedIn);
+  if(gl){
+    gl.removeAll();
+    parcels.forEach(p=>{
+      const geom=geojsonToEsri(p.geometry)||geojsonToEsri({type:'Point',coordinates:[p.lng,p.lat]});
+      if(!geom)return;
+      gl.add(new esriMods.Graphic({geometry:geom,
+        symbol:geom.type==='point'?{type:'simple-marker',color:[245,166,35],size:8}:PARCEL_SYMBOL}));
+    });
+    if(has && view){ view.goTo(gl.graphics.toArray()).catch(()=>{}); }
+  }
+  if(!has){$('list').innerHTML='<div class="empty">Nessuna particella. Cerca e aggiungi.</div>';return;}
+  $('list').innerHTML=parcels.map((p,i)=>`<div class="item" data-i="${i}">
+    <div class="t"><b>${p.comune} · Fg ${p.foglio} · ${p.particella}</b><br>
+    <span>${p.area_m2?(p.area_m2/10000).toFixed(2)+' ha':''}${p.land_use?' · '+p.land_use:''}</span></div>
+    <button class="x" data-x="${i}" title="Rimuovi">×</button></div>`).join('');
+  $('list').querySelectorAll('.item').forEach(el=>el.onclick=e=>{
+    if(e.target.dataset.x!==undefined)return;
+    const p=parcels[+el.dataset.i]; if(view) view.goTo({center:[p.lng,p.lat],zoom:18}).catch(()=>{});});
+  $('list').querySelectorAll('.x').forEach(b=>b.onclick=e=>{e.stopPropagation();parcels.splice(+b.dataset.x,1);render();});
+}
+
+// ── Fase 4: promote → AREAS COLLECTION ────────────────────────────────────
+function openPromote(){
+  if(!signedIn){ msg('Accedi ad AGOL per promuovere.','err'); return; }
+  if(!parcels.length) return;
+  const diss=$('diss').checked;
+  const n=diss?1:parcels.length;
+  $('pmSub').textContent = `${parcels.length} particell${parcels.length>1?'e':'a'} → ${n} feature ${diss?'(dissolta)':'(una per particella)'} nel layer 426.`;
+  $('pmMsg').innerHTML='';
+  $('promoteModal').style.display='flex';
+}
+function closePromote(){ $('promoteModal').style.display='none';
+  const b=$('pmConfirm'); b.disabled=false; b.textContent='Conferma inserimento'; }
+async function confirmPromote(){
+  const btn=$('pmConfirm'); if(btn.disabled) return;         // già in corso → niente doppio invio
+  btn.disabled=true; btn.textContent='Inserimento…';
+  const diss=$('diss').checked;
+  const fc=buildFC(diss);
+  const cls=$('pmClass').value, atype=$('pmType').value, src=$('pmSources').value;
+  const estr=parseInt($('pmEstr').value,10)||0, ptype=$('pmProjType').value.trim();
+  const region=$('reg').value, prov=$('prov').value;
+  pmMsg('Riproietto le geometrie e preparo l\'inserimento…','');
+  try{
+    await esriMods.projection.load();
+    const layer=new esriMods.FeatureLayer({url:AREAS_LAYER_URL});
+    const istat=new esriMods.FeatureLayer({url:ISTAT_COMUNI_URL});
+    pmMsg('Lookup comune/codice ISTAT…','');
+    const adds=[];
+    for(const f of fc.features){
+      const esriGeom=geojsonToEsri(f.geometry);
+      let g6876=esriMods.projection.project(esriGeom,{wkid:AREAS_WKID});
+      // le ring GeoJSON sono CCW → poligono NON simple/winding invertito: esri lo tratta come
+      // complemento e Intersects() nelle Arcade fallisce. simplify() corregge winding e topologia.
+      const gs=esriMods.geometryEngine.simplify(g6876); if(gs) g6876=gs;
+      // area dalla geometria proiettata (ettari) → coerente con la feature inserita
+      let areaHa=0; try{ areaHa=Math.abs(esriMods.geometryEngine.planarArea(g6876,'hectares'))||0; }catch(e){}
+      const pr=f.properties||{};
+      // lookup ISTAT dal centroide → PRO_COM_T (serve all'espressione Zona Sismica) + COMUNE ufficiale
+      let proComT=null, comuneIstat=null;
+      try{
+        const qr=await istat.queryFeatures({geometry:g6876.centroid, spatialRelationship:"intersects",
+          outFields:["PRO_COM_T","COMUNE"], returnGeometry:false, num:1});
+        const a=qr.features[0] && qr.features[0].attributes;
+        if(a){ proComT=a.PRO_COM_T; comuneIstat=a.COMUNE; }
+      }catch(e){}
+      const comune = comuneIstat || (diss ? (pr.comuni||'') : (pr.comune||''));
+      adds.push(new esriMods.Graphic({geometry:g6876, attributes:{
+        COMUNE:comune, REGIONE:(region||pr.regione||''), PROVINCIA:(prov||pr.provincia||''), PRO_COM_T:proComT,
+        area:+areaHa.toFixed(4), ID_univoco:genId(),
+        AREA_CLASS:cls||null, AREA_TYPE:atype||null, Sources:src||null,
+        PROJECT_TYPE:ptype||null, Estrazione_Massiva:estr
+      }}));
+    }
+    pmMsg(`Inserisco ${adds.length} feature…`,'');
+    const res=await layer.applyEdits({addFeatures:adds});
+    const okN=(res.addFeatureResults||[]).filter(r=>!r.error).length;
+    const errN=(res.addFeatureResults||[]).filter(r=>r.error).length;
+    if(errN){ pmMsg(`${okN} inserite, ${errN} in errore (${(res.addFeatureResults.find(r=>r.error)||{}).error?.message||''}).`,'err');
+      btn.disabled=false; btn.textContent='Conferma inserimento'; }
+    else{ closePromote(); msg(`✔ ${okN} feature aggiunte ad AREAS COLLECTION.`,'ok'); }   // chiudo su successo
+  }catch(e){ pmMsg('Errore: '+e.message,'err'); btn.disabled=false; btn.textContent='Conferma inserimento'; }
+}
+function genId(){ // ID_univoco stabile ~10 char
+  return Math.random().toString(36).slice(2,7).toUpperCase()+Date.now().toString(36).slice(-5).toUpperCase();
+}
+function pmMsg(t,cls){$('pmMsg').innerHTML=t?`<div class="msg ${cls}">${t}</div>`:'';}
+
+// ── export multi-formato (invariato) ──────────────────────────────────────
+function dlBlob(name,blob){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();URL.revokeObjectURL(a.href);}
+const esc=s=>String(s==null?'':s).replace(/[<>&]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]));
+// buffer disegnati (tag _kind:'buffer' su toolsGL) → feature GeoJSON in 4326
+function bufferFeatures(){
+  const out=[];
+  if(!toolsGL||!esriMods) return out;
+  toolsGL.graphics.forEach(g=>{
+    const at=g.attributes||{};
+    if(at._kind!=='buffer'||!g.geometry) return;
+    let geom=g.geometry;
+    try{ if(!(geom.spatialReference&&geom.spatialReference.wkid===4326)) geom=esriMods.webMercatorUtils.webMercatorToGeographic(geom); }catch(e){}
+    if(!geom||!geom.rings) return;
+    out.push({type:'Feature',
+      geometry:{type:'Polygon',coordinates:geom.rings.map(r=>r.map(c=>[c[0],c[1]]))},
+      properties:{tipo:'buffer',distanza_m:at.dist_m,area_ha:at.area_ha}});
+  });
+  return out;
+}
+function buildFC(dissolve, includeBuffers){
+  let feats=parcels.map(p=>({type:'Feature',
+    geometry:p.geometry||{type:'Point',coordinates:[p.lng,p.lat]},
+    properties:{comune:p.comune,regione:p.regione,provincia:p.provincia,belfiore:p.belfiore,foglio:p.foglio,particella:p.particella,
+      area_m2:p.area_m2?Math.round(p.area_m2):null,area_ha:p.area_m2?+(p.area_m2/10000).toFixed(4):null,
+      land_use:p.land_use,omi:p.omi,ncr:p.ncr,fid:p.fid}}));
+  if(dissolve){
+    const polys=feats.filter(f=>f.geometry.type==='Polygon'||f.geometry.type==='MultiPolygon');
+    if(polys.length){
+      let u=polys[0]; for(let i=1;i<polys.length;i++){try{u=turf.union(u,polys[i]);}catch(e){}}
+      u.properties={n_particelle:parcels.length,
+        particelle:parcels.map(p=>p.foglio+'/'+p.particella).join('; '),
+        comuni:[...new Set(parcels.map(p=>p.comune))].join(', '),
+        area_ha:+(parcels.reduce((s,p)=>s+(p.area_m2||0),0)/10000).toFixed(4)};
+      feats=[u];
+    }
+  }
+  if(includeBuffers) feats=feats.concat(bufferFeatures());   // includo i buffer disegnati
+  return {type:'FeatureCollection',features:feats};
+}
+window.buildFC=buildFC;   // hook debug
+function geomKML(g){
+  const ring=r=>'<coordinates>'+r.map(c=>c[0]+','+c[1]+',0').join(' ')+'</coordinates>';
+  const poly=coords=>'<Polygon><outerBoundaryIs><LinearRing>'+ring(coords[0])+'</LinearRing></outerBoundaryIs>'+
+    coords.slice(1).map(h=>'<innerBoundaryIs><LinearRing>'+ring(h)+'</LinearRing></innerBoundaryIs>').join('')+'</Polygon>';
+  if(g.type==='Polygon')return poly(g.coordinates);
+  if(g.type==='MultiPolygon')return '<MultiGeometry>'+g.coordinates.map(poly).join('')+'</MultiGeometry>';
+  if(g.type==='Point')return '<Point><coordinates>'+g.coordinates[0]+','+g.coordinates[1]+',0</coordinates></Point>';
+  return '';
+}
+function toKML(fc){
+  const pm=fc.features.map(f=>{
+    const pr=f.properties||{}, nm=pr.particella?`Fg ${pr.foglio} · Part. ${pr.particella}`:(pr.comuni||'area');
+    const ed='<ExtendedData>'+Object.entries(pr).map(([k,v])=>`<Data name="${esc(k)}"><value>${esc(v)}</value></Data>`).join('')+'</ExtendedData>';
+    return `<Placemark><name>${esc(nm)}</name>${ed}${geomKML(f.geometry)}</Placemark>`;
+  }).join('');
+  return `<?xml version="1.0" encoding="UTF-8"?><kml xmlns="http://www.opengis.net/kml/2.2"><Document><name>Particelle catastali</name>${pm}</Document></kml>`;
+}
+async function download(){
+  const fmt=$('fmt').value, diss=$('diss').checked, base=diss?'area_dissolta':'particelle';
+  if(fmt==='xlsx'){
+    const data=diss?buildFC(true).features.map(f=>({...f.properties})):parcels.map(p=>({Comune:p.comune,Cod_Belfiore:p.belfiore,Foglio:p.foglio,Particella:p.particella,
+      Area_m2:p.area_m2?Math.round(p.area_m2):'',Area_ha:p.area_m2?+(p.area_m2/10000).toFixed(4):'',Destinazione_uso:p.land_use,OMI:p.omi,NCR:p.ncr,FID_Zornade:p.fid,Lat:p.lat,Lng:p.lng}));
+    const ws=XLSX.utils.json_to_sheet(data),wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Particelle');XLSX.writeFile(wb,base+'.xlsx');return;
+  }
+  const fc=buildFC(diss, true);   // includeBuffers: i buffer disegnati entrano nell'export geografico
+  if(fmt==='geojson'){dlBlob(base+'.geojson',new Blob([JSON.stringify(fc,null,1)],{type:'application/geo+json'}));}
+  else if(fmt==='kml'){dlBlob(base+'.kml',new Blob([toKML(fc)],{type:'application/vnd.google-earth.kml+xml'}));}
+  else if(fmt==='kmz'){const zip=new JSZip();zip.file('doc.kml',toKML(fc));const b=await zip.generateAsync({type:'blob'});dlBlob(base+'.kmz',b);}
+  else if(fmt==='shp'){shpwrite.download(fc,{folder:base,types:{point:base,polygon:base,polyline:base}});}
+}
+function msg(t,cls){$('out').innerHTML=t?`<div class="msg ${cls}">${t}</div>`:'';}
+</script>
+</body>
+</html>
