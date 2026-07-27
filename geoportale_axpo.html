@@ -144,7 +144,7 @@
   code{background:var(--bg);padding:1px 4px;border-radius:4px;font-size:11px}
 
   /* ══ ACTION BAR DX + drawer (brief §4.3) ══ */
-  #toolsPanel{flex:none;display:flex;flex-direction:row-reverse;background:var(--panel);border-left:1px solid var(--line)}
+  #toolsPanel{flex:none;display:flex;flex-direction:row-reverse;background:var(--panel);border-left:1px solid var(--line);position:relative}
   #toolsHead{display:none}
   #actionIcons{width:48px;flex:none;display:flex;flex-direction:column;gap:6px;padding:10px 6px;border-left:1px solid var(--line)}
   #actionIcons button{width:36px;height:36px;padding:0;background:transparent;border:1px solid transparent;border-radius:8px;font-size:16px;cursor:pointer;color:var(--txt);display:flex;align-items:center;justify-content:center}
@@ -157,9 +157,9 @@
   /* durante il trascinamento disattivo la transizione per un resize fluido */
   #toolsPanel.resizing #toolsBody{transition:none}
   /* maniglia di ridimensionamento (compare solo a pannello aperto) */
-  #toolsResizer{display:none;width:6px;flex:none;cursor:col-resize;background:transparent;position:relative}
+  #toolsResizer{display:none;position:absolute;top:0;bottom:0;left:-3px;width:9px;z-index:5;cursor:col-resize;background:transparent}
   #toolsPanel.open #toolsResizer{display:block}
-  #toolsResizer::before{content:'';position:absolute;top:0;bottom:0;left:2px;width:2px;background:var(--line)}
+  #toolsResizer::before{content:'';position:absolute;top:0;bottom:0;left:3px;width:2px;background:transparent;transition:background .12s}
   #toolsResizer:hover::before,#toolsPanel.resizing #toolsResizer::before{background:var(--accent)}
   .drawer{display:none;padding:14px}
   .drawer.open{display:block}
@@ -2317,6 +2317,7 @@ function msg(t,cls){$('out').innerHTML=t?`<div class="msg ${cls}">${t}</div>`:''
     function onMove(e){ if(!dragging) return;
       var cx=(e.touches&&e.touches[0]?e.touches[0].clientX:e.clientX);
       // il pannello è a destra: la larghezza è (bordo destro finestra - x) meno la barra icone (48px)
+      // maniglia sul bordo sinistro del pannello: larghezza drawer = (bordo dx finestra - x) - barra icone(48)
       var w=setW(window.innerWidth - cx - 48);
       e.preventDefault();
     }
