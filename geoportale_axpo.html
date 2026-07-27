@@ -153,7 +153,14 @@
   #measureBtn .esri-icon-measure{font-size:17px}
   #actionIcons button:hover{background:var(--hover);border-color:var(--line)}
   #toolsBody{width:0;overflow:hidden;transition:width .2s}
-  #toolsPanel.open #toolsBody{width:300px;overflow-y:auto}
+  #toolsPanel.open #toolsBody{width:var(--tools-w,300px);overflow-y:auto}
+  /* durante il trascinamento disattivo la transizione per un resize fluido */
+  #toolsPanel.resizing #toolsBody{transition:none}
+  /* maniglia di ridimensionamento (compare solo a pannello aperto) */
+  #toolsResizer{display:none;width:6px;flex:none;cursor:col-resize;background:transparent;position:relative}
+  #toolsPanel.open #toolsResizer{display:block}
+  #toolsResizer::before{content:'';position:absolute;top:0;bottom:0;left:2px;width:2px;background:var(--line)}
+  #toolsResizer:hover::before,#toolsPanel.resizing #toolsResizer::before{background:var(--accent)}
   .drawer{display:none;padding:14px}
   .drawer.open{display:block}
   .tlab{font-size:11px;color:var(--mut);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;font-weight:700}
@@ -221,7 +228,10 @@
   .toast.err{border-left-color:var(--err)}
 
   /* ══ WIDGET ESRI — sfoltire angoli (brief §4.4) ══ */
-  .esri-ui-top-left .esri-expand{display:none!important}   /* Search nascosto: duplicava la ricerca (coordinate nella action bar) */
+  .esri-ui-top-left .esri-expand{display:none!important}   /* vecchio Search top-left nascosto */
+  /* Search in alto a destra: indirizzi + coordinate lat,lon */
+  #searchBox{width:300px;max-width:70vw}
+  #searchBox .esri-search{width:100%}
   .esri-ui-top-right{display:flex;flex-direction:column;gap:6px}
   .esri-ui-corner .esri-expand .esri-widget--button,.esri-ui-corner .esri-widget--button{border-radius:8px}
 
@@ -233,11 +243,6 @@
   #measureCtl.open #measureBtn{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
   #measurePop{display:none;margin-top:6px;background:color-mix(in srgb, var(--panel) 92%, transparent);backdrop-filter:blur(6px);border:1px solid var(--line);border-radius:12px;padding:10px;width:250px}
   #measureCtl.open #measurePop{display:block}
-  #coordCtl{display:flex;align-items:center;gap:6px;background:color-mix(in srgb, var(--panel) 75%, transparent);backdrop-filter:blur(6px);border:1px solid var(--line);border-radius:22px;padding:4px 6px 4px 12px}
-  #coordCtl input{width:150px;background:transparent;border:none;padding:4px 0;font-size:12px}
-  #coordCtl input:focus-visible{outline:none}
-  #coordCtl .chipbtn{border:none;background:var(--accent);color:var(--on-accent);border-radius:16px;padding:5px 12px;font-size:12px;font-weight:700;cursor:pointer}
-  #coordCtl #coordMsg{display:none}
   #brStack{position:absolute;right:14px;bottom:28px;z-index:24;display:flex;flex-direction:column;align-items:flex-end;gap:6px}
   #cursorCoords{display:flex;align-items:center;gap:5px;background:color-mix(in srgb, var(--panel) 78%, transparent);backdrop-filter:blur(6px);border:1px solid var(--line);border-radius:22px;padding:3px 10px 3px 4px;font-size:12px;color:var(--txt)}
   #pinCoordBtn{width:28px;height:28px;border-radius:50%;border:1px solid transparent;background:transparent;cursor:pointer;font-size:13px;padding:0;display:flex;align-items:center;justify-content:center;flex:none}
@@ -281,6 +286,17 @@
   .grow .gsub{font-size:10px;opacity:.55;flex:none}
   .grow .gact{border:none;background:transparent;cursor:pointer;color:var(--txt);opacity:.6;padding:3px 5px;border-radius:5px;font-size:13px;line-height:1}
   .grow .gact:hover{opacity:1;background:var(--hover)}
+  /* ── Controlli visibilità + colore (righe elenco e header sezione) ── */
+  .vtoggle{border:none;background:transparent;cursor:pointer;padding:0;width:20px;height:20px;flex:none;display:flex;align-items:center;justify-content:center;color:var(--txt);opacity:.75;border-radius:5px}
+  .vtoggle:hover{opacity:1;background:var(--hover)}
+  .vtoggle.off{opacity:.35}
+  .grow.hidden .gname,.grow.hidden .gsub{opacity:.45;text-decoration:line-through}
+  .cswatch{position:relative;width:20px;height:20px;flex:none;border:1px solid var(--line);border-radius:5px;cursor:pointer;padding:0;overflow:hidden}
+  .cswatch input[type=color]{position:absolute;inset:-4px;width:calc(100% + 8px);height:calc(100% + 8px);border:none;padding:0;margin:0;cursor:pointer;background:transparent;opacity:0}
+  .cswatch:hover{border-color:var(--accent)}
+  .gsecH .gtools{display:flex;align-items:center;gap:4px;flex:none}
+  .gsecH .gtools .vtoggle,.gsecH .gtools .cswatch{width:22px;height:22px}
+  .gsecH .gtools>*{cursor:pointer}
   #imgToolbar{position:absolute;top:60px;left:50%;transform:translateX(-50%);z-index:26;display:none;align-items:center;gap:12px;background:color-mix(in srgb,var(--panel) 92%,transparent);backdrop-filter:blur(6px);border:1px solid var(--line);border-radius:12px;padding:8px 14px;font-size:12px;color:var(--txt)}
   #imgToolbar label{display:flex;align-items:center;gap:6px}
   #imgToolbar button{margin:0}
@@ -476,11 +492,7 @@
       <button class="ghost-danger" id="imgDelBtn">Elimina</button>
     </div>
     <div id="trStack">
-      <div id="coordCtl" title="Vai a coordinate (lat, lon)">
-        <input id="coordIn" placeholder="lat, lon" aria-label="Coordinate lat, lon">
-        <button id="coordGo" class="chipbtn">Vai</button>
-        <div id="coordMsg" class="thint"></div>
-      </div>
+      <div id="searchBox"></div>
       <div id="measureCtl">
         <button id="measureBtn" class="mapchip" title="Misura" aria-label="Misura"><span class="esri-icon-measure" aria-hidden="true"></span></button>
         <div id="measurePop">
@@ -508,24 +520,25 @@
 
   <!-- ── ACTION BAR DX · strumenti accessori (brief §4.3) ── -->
   <div id="toolsPanel">
+    <div id="toolsResizer" title="Trascina per ridimensionare" role="separator" aria-orientation="vertical" aria-label="Ridimensiona pannello"></div>
     <div id="toolsHead" hidden><b>Strumenti</b><button id="toolsToggle" hidden>»</button></div>
     <div id="toolsBody">
       <div class="drawer" data-panel="elenco" id="drawerElenco">
         <div class="tlab">Elenco &amp; azioni</div>
         <div class="gsec" data-sec="parcels">
-          <div class="gsecH"><b>Particelle</b><span id="cnt" class="gcount">0</span></div>
+          <div class="gsecH"><b>Particelle</b><span class="gtools" data-sec="parcels"><button class="vtoggle" data-role="visall" title="Mostra/nascondi tutte" aria-label="Mostra/nascondi tutte le particelle"></button><span class="cswatch" data-role="colall" title="Colore di tutte le particelle"><input type="color" value="#F5A623"></span></span><span id="cnt" class="gcount">0</span></div>
           <div class="glist"><div id="listTot" class="hint"></div><div id="list"><div class="empty">Nessuna particella. Cercala o cliccala sulla mappa.</div></div></div>
         </div>
         <div class="gsec" data-sec="draw">
-          <div class="gsecH"><b>Disegni</b><span id="cntDraw" class="gcount">0</span></div>
+          <div class="gsecH"><b>Disegni</b><span class="gtools" data-sec="draw"><button class="vtoggle" data-role="visall" title="Mostra/nascondi tutti" aria-label="Mostra/nascondi tutti i disegni"></button><span class="cswatch" data-role="colall" title="Colore di tutti i disegni"><input type="color" value="#2FB6E6"></span></span><span id="cntDraw" class="gcount">0</span></div>
           <div class="glist"><div id="listDraw"><div class="empty">Nessun disegno.</div></div></div>
         </div>
         <div class="gsec" data-sec="buf">
-          <div class="gsecH"><b>Buffer</b><span id="cntBuf" class="gcount">0</span></div>
+          <div class="gsecH"><b>Buffer</b><span class="gtools" data-sec="buf"><button class="vtoggle" data-role="visall" title="Mostra/nascondi tutti" aria-label="Mostra/nascondi tutti i buffer"></button><span class="cswatch" data-role="colall" title="Colore di tutti i buffer"><input type="color" value="#79C0FF"></span></span><span id="cntBuf" class="gcount">0</span></div>
           <div class="glist"><div id="listBuf"><div class="empty">Nessun buffer.</div></div></div>
         </div>
         <div class="gsec" data-sec="geo">
-          <div class="gsecH"><b>Geoprocessi</b><span id="cntGeo" class="gcount">0</span></div>
+          <div class="gsecH"><b>Geoprocessi</b><span class="gtools" data-sec="geo"><button class="vtoggle" data-role="visall" title="Mostra/nascondi tutti" aria-label="Mostra/nascondi tutti i geoprocessi"></button><span class="cswatch" data-role="colall" title="Colore di tutti i geoprocessi"><input type="color" value="#2FB6E6"></span></span><span id="cntGeo" class="gcount">0</span></div>
           <div class="glist"><div id="listGeo"><div class="empty">Nessun output.</div></div></div>
         </div>
         <div class="gsec" data-sec="import">
@@ -598,6 +611,7 @@
     <label class="chk"><input type="checkbox" id="exParcels" checked> Particelle <span id="exNP"></span></label>
     <label class="chk"><input type="checkbox" id="exBuffers" checked> Buffer <span id="exNB"></span></label>
     <label class="chk"><input type="checkbox" id="exDrawings" checked> Disegni <span id="exND"></span></label>
+    <label class="chk"><input type="checkbox" id="exGeoproc" checked> Geoprocessi <span id="exNG"></span></label>
     <label class="chk"><input type="checkbox" id="exImports" checked> Importati <span id="exNI"></span></label>
     <label class="chk" style="margin-top:10px"><input type="checkbox" id="exDiss"> Dissolvi le particelle in un'unica area</label>
     <div id="exMsg"></div>
@@ -853,8 +867,44 @@ require([
 
   // ── Strumenti ──
   // ricerca indirizzo (widget nativo; usa il geocoder dell'org quando loggati)
-  const searchW=new Search({view, popupEnabled:false, resultGraphicEnabled:true});
-  view.ui.add(new Expand({view, content:searchW, expandTooltip:"Cerca indirizzo", expandIconClass:"esri-icon-search"}),"top-left");
+  // ── Search in alto a destra: indirizzi/luoghi + coordinate lat,lon ──
+  // sorgente custom: se il testo sono due numeri li interpreta come lat,lon
+  const coordSource={
+    name:"Coordinate (lat, lon)",
+    placeholder:"lat, lon (es. 41.9028, 12.4964)",
+    // getResults viene chiamato quando l'utente cerca; restituisco un risultato
+    // se il testo contiene due numeri validi, altrimenti niente.
+    getResults:(params)=>{
+      const m=String(params.suggestResult&&params.suggestResult.text||params.searchTerm||'')
+        .split(/[,;\s]+/).map(parseFloat).filter(n=>!isNaN(n));
+      if(m.length<2) return Promise.resolve([]);
+      const lat=m[0], lng=m[1];
+      if(Math.abs(lat)>90||Math.abs(lng)>180) return Promise.resolve([]);
+      const pt=new esriMods.Point({latitude:lat, longitude:lng});
+      const ext=pt.extent || {xmin:pt.x-0.01,ymin:pt.y-0.01,xmax:pt.x+0.01,ymax:pt.y+0.01,spatialReference:pt.spatialReference};
+      return Promise.resolve([{
+        extent:ext, feature:new esriMods.Graphic({geometry:pt}),
+        name:`${lat}, ${lng}`, target:{target:pt, zoom:17}
+      }]);
+    },
+    // suggerimento immediato mentre si digita
+    getSuggestions:(params)=>{
+      const m=String(params.suggestTerm||params.searchTerm||'')
+        .split(/[,;\s]+/).map(parseFloat).filter(n=>!isNaN(n));
+      if(m.length<2 || Math.abs(m[0])>90 || Math.abs(m[1])>180) return Promise.resolve([]);
+      return Promise.resolve([{key:"coord", text:`Vai a ${m[0]}, ${m[1]}`, sourceIndex:params.sourceIndex}]);
+    }
+  };
+  const searchW=new Search({view, container:"searchBox", popupEnabled:false, resultGraphicEnabled:true,
+    includeDefaultSources:true, allPlaceholder:"Cerca indirizzo o coordinate lat, lon"});
+  // aggiungo la sorgente coordinate accanto al geocoder di default
+  try{ searchW.sources.unshift(coordSource); }catch(e){ console.warn('coordSource:',e&&e.message); }
+  // quando un risultato coordinate viene scelto, piazzo un marker come faceva il vecchio tool
+  searchW.on("select-result", ev=>{ try{
+    const g=ev.result&&ev.result.feature; if(g&&g.geometry&&g.geometry.type==='point'){
+      toolsGL.add(new esriMods.Graphic({geometry:g.geometry, symbol:{type:'simple-marker', color:[121,192,255], size:10, outline:{color:'#fff',width:1}}}));
+    }
+  }catch(e){} });
   // misura distanza/area (widget nativo, controllato dai bottoni del pannello)
   measurement=new Measurement({view, container:"measureWidgetBox"});   // popover misura alto-dx
   // sketch per il buffer da linea
@@ -976,6 +1026,7 @@ function geojsonToEsri(g){
   return null;
 }
 const PARCEL_SYMBOL={type:"simple-fill", color:[245,166,35,0.15], outline:{color:[245,166,35],width:2}};
+const PARCEL_HEX="#F5A623";   // colore default particelle (usato dai controlli visibilità/colore)
 
 // ── token Zornade ─────────────────────────────────────────────────────────
 window.addEventListener("DOMContentLoaded",()=>{
@@ -1066,19 +1117,7 @@ function wireTools(){
       toolMsg('bufMsg',`Buffer di ${d} m generato.`,'ok'); refreshDl(); view.goTo(buf.extent.expand(1.5)).catch(()=>{}); }
     else toolMsg('bufMsg','Buffer non generato.','err');
   };
-  // vai a coordinate (lat, lon)
-  const goCoord=()=>{
-    const m=($('coordIn').value||'').split(/[,;\s]+/).map(parseFloat).filter(n=>!isNaN(n));
-    if(m.length<2){ toolMsg('coordMsg','Formato: lat, lon (es. 41.9028, 12.4964)','err'); return; }
-    const [lat,lng]=m;
-    if(Math.abs(lat)>90||Math.abs(lng)>180){ toolMsg('coordMsg','Coordinate fuori range.','err'); return; }
-    const pt=new esriMods.Point({latitude:lat, longitude:lng});
-    view.goTo({target:pt, zoom:17}).catch(()=>{});
-    toolsGL.add(new esriMods.Graphic({geometry:pt, symbol:{type:'simple-marker', color:[121,192,255], size:10, outline:{color:'#fff',width:1}}}));
-    toolMsg('coordMsg',`Vado a ${lat}, ${lng}.`,'ok');
-  };
-  $('coordGo').onclick=goCoord;
-  $('coordIn').addEventListener('keydown',e=>{ if(e.key==='Enter') goCoord(); });
+  // (ricerca coordinate lat,lon ora integrata nel widget Search in alto a destra)
   // modalità selezione particelle
   $('selModeBox').querySelectorAll('button').forEach(b=>b.onclick=()=>setSelMode(b.dataset.m));
   // sidebar destra: comprimi/espandi
@@ -1255,7 +1294,8 @@ function serializeToolGeoms(){
     let gj=null; try{ gj=esriGeomToGeojson(to4326(g.geometry)); }catch(e){}
     if(!gj) return;
     out.push({ g:gj,
-      a:{_kind:at._kind,_sub:at._sub,geomType:at.geomType,categoria:at.categoria,note:at.note,nome:at.nome,dist_m:at.dist_m,area_ha:at.area_ha,source:at.source},
+      a:{_kind:at._kind,_sub:at._sub,geomType:at.geomType,categoria:at.categoria,note:at.note,nome:at.nome,dist_m:at.dist_m,area_ha:at.area_ha,source:at.source,color:at.color,hidden:at.hidden},
+      v:(g.visible!==false),
       s:(g.symbol&&g.symbol.toJSON)?g.symbol.toJSON():null });
   });
   return out;
@@ -1280,7 +1320,9 @@ function restoreState(){
     if(Array.isArray(st.toolGeoms)&&st.toolGeoms.length&&toolsGL&&esriMods){
       st.toolGeoms.forEach(rec=>{ try{
         const geom=gjGeom(rec.g); if(!geom) return;
-        toolsGL.add(new esriMods.Graphic({geometry:geom, attributes:rec.a||{}, symbol:rec.s||undefined}));
+        const _gr=new esriMods.Graphic({geometry:geom, attributes:rec.a||{}, symbol:rec.s||undefined});
+        if(rec.v===false || (rec.a&&rec.a.hidden)) _gr.visible=false;
+        toolsGL.add(_gr);
       }catch(e){} });
       try{ refreshDl(); }catch(e){}
     }
@@ -1484,15 +1526,21 @@ function render(){
     parcels.forEach(p=>{
       const geom=geojsonToEsri(p.geometry)||geojsonToEsri({type:'Point',coordinates:[p.lng,p.lat]});
       if(!geom)return;
-      gl.add(new esriMods.Graphic({geometry:geom,
-        symbol:geom.type==='point'?{type:'simple-marker',color:[245,166,35],size:8}:PARCEL_SYMBOL}));
+      const hex=p.color||PARCEL_HEX;
+      const g=new esriMods.Graphic({geometry:geom, symbol:symbolForColor(geom.type,hex)});
+      g.visible = p.hidden?false:true;
+      gl.add(g);
     });
-    if(has && view){ view.goTo(gl.graphics.toArray()).catch(()=>{}); }
+    const vis=gl.graphics.toArray().filter(g=>g.visible!==false);
+    if(vis.length && view){ view.goTo(vis).catch(()=>{}); }
   }
   if(!has){$('list').innerHTML='<div class="empty">Nessuna particella nell\'elenco. Cercala per Foglio/Particella o cliccala sulla mappa.</div>';return;}
   const _lb=$('list'); _lb.innerHTML='';
   parcels.forEach((p,i)=>{
     const row=document.createElement('div'); row.className='grow';
+    if(p.hidden) row.classList.add('hidden');
+    row.appendChild(makeVisToggle(()=>!p.hidden, on=>{ p.hidden=!on; row.classList.toggle('hidden',!on); const gg=gl.graphics.getItemAt(i); if(gg) gg.visible=on; saveStateDebounced&&saveStateDebounced(); }));
+    row.appendChild(makeColorSwatch(()=>p.color||PARCEL_HEX, hex=>{ p.color=hex; const gg=gl.graphics.getItemAt(i); if(gg&&gg.geometry) gg.symbol=symbolForColor(gg.geometry.type,hex); saveStateDebounced&&saveStateDebounced(); }));
     const nm=document.createElement('input'); nm.className='gname'; nm.spellcheck=false;
     nm.value=p.nome||(p.comune+' · Fg '+p.foglio+' · '+p.particella); nm.title=nm.value;
     nm.onchange=function(){ p.nome=nm.value.trim()||undefined; nm.title=nm.value; saveStateDebounced&&saveStateDebounced(); };
@@ -1508,6 +1556,7 @@ function render(){
     row.appendChild(db);
     _lb.appendChild(row);
   });
+  try{ wireSectionTools(); }catch(e){}
 }
 
 // ── Fase 4: promote → AREAS COLLECTION ────────────────────────────────────
@@ -1672,17 +1721,27 @@ function to4326(geom){
 }
 // graphics locali (buffer o disegni) → feature GeoJSON 4326
 function graphicsFeatures(kind){
+  // kind: 'buffer' | 'import' | 'drawing' (SOLO disegni, geoproc esclusi) | 'geoproc'
   const out=[];
   if(!toolsGL||!esriMods) return out;
   toolsGL.graphics.toArray().forEach(g=>{
     const at=g.attributes||{};
-    if(at._kind!==kind||!g.geometry) return;
+    if(!g.geometry) return;
+    // filtro per categoria: disegni e geoprocessi condividono _kind:'drawing',
+    // li distinguo con _sub:'geoproc'
+    if(kind==='geoproc'){ if(!(at._kind==='drawing'&&at._sub==='geoproc')) return; }
+    else if(kind==='drawing'){ if(!(at._kind==='drawing'&&at._sub!=='geoproc')) return; }
+    else { if(at._kind!==kind) return; }
     const gj=esriGeomToGeojson(to4326(g.geometry));
     if(!gj) return;
-    const nome = at.nome || (kind==='buffer' ? ('Buffer'+(at.dist_m!=null?' '+at.dist_m+' m':'')) : (kind==='import' ? (at.source||'Importato') : (at.categoria||'Disegno')));
+    const nome = at.nome || (kind==='buffer' ? ('Buffer'+(at.dist_m!=null?' '+at.dist_m+' m':''))
+      : kind==='import' ? (at.source||'Importato')
+      : kind==='geoproc' ? ((at.categoria||'Geoprocesso').replace('Geoprocesso · ',''))
+      : (at.categoria||'Disegno'));
     const props = kind==='buffer' ? {nome:nome,tipo:'buffer',distanza_m:at.dist_m,area_ha:at.area_ha}
       : kind==='import' ? {nome:nome,tipo:'importato',source:at.source||''}
-      : {nome:nome,tipo:(at._sub==='geoproc'?'geoprocesso':'disegno'),categoria:at.categoria||'',nota:at.note||''};
+      : kind==='geoproc' ? {nome:nome,tipo:'geoprocesso',categoria:at.categoria||'',nota:at.note||''}
+      : {nome:nome,tipo:'disegno',categoria:at.categoria||'',nota:at.note||''};
     out.push({type:'Feature',geometry:gj,properties:props});
   });
   return out;
@@ -1756,6 +1815,7 @@ function buildFC(dissolve, incl){
   }
   if(incl.buffers) feats=feats.concat(graphicsFeatures('buffer'));
   if(incl.drawings) feats=feats.concat(graphicsFeatures('drawing'));
+  if(incl.geoproc) feats=feats.concat(graphicsFeatures('geoproc'));
   if(incl.imports) feats=feats.concat(graphicsFeatures('import'));
   return {type:'FeatureCollection',features:feats};
 }
@@ -1781,11 +1841,70 @@ function toKML(fc){
 }
 // ── finestra di export: scegli cosa includere (particelle / buffer / disegni) ──
 function countKind(k){ return toolsGL? toolsGL.graphics.toArray().filter(g=>g.attributes&&g.attributes._kind===k).length : 0; }
+function countDrawingsPure(){ return toolsGL? toolsGL.graphics.toArray().filter(g=>g.attributes&&g.attributes._kind==='drawing'&&g.attributes._sub!=='geoproc').length : 0; }
+function countGeoproc(){ return toolsGL? toolsGL.graphics.toArray().filter(g=>g.attributes&&g.attributes._kind==='drawing'&&g.attributes._sub==='geoproc').length : 0; }
 var GEOM_ZOOM_SVG='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="6"/><line x1="20" y1="20" x2="15.5" y2="15.5"/></svg>';
 function refreshDl(){ const el=$('dl'); if(el) el.disabled=!(parcels.length||countKind('buffer')||countKind('drawing')||countKind('import'));
   const _sn=$('promoteSN'); if(_sn) _sn.disabled=!((countKind('buffer')||countKind('drawing')||countKind('import')) && (typeof signedIn!=='undefined'&&signedIn));
   try{renderGeoms();}catch(e){} try{refreshSelDraw();}catch(e){} try{saveStateDebounced();}catch(e){} }
 // ── FASE 2: elenco geometrie (disegni/buffer/geoprocessi) + rinomina inline ──
+// ══ Visibilità + colore (righe elenco e header sezione) ═══════════════════
+// hex "#rrggbb" → [r,g,b]
+function hex2rgb(h){ h=String(h||'').replace('#',''); if(h.length===3) h=h.split('').map(c=>c+c).join('');
+  const n=parseInt(h,16); return [(n>>16)&255,(n>>8)&255,n&255]; }
+function rgb2hex(c){ if(!c) return '#000000'; const to=v=>('0'+Math.round(v).toString(16)).slice(-2);
+  return '#'+to(c[0])+to(c[1])+to(c[2]); }
+// colore corrente di una graphic (dal simbolo) → hex
+function graphicColorHex(g){
+  try{ const s=g.symbol; if(!s) return null;
+    const c = s.color || (s.outline&&s.outline.color); if(!c) return null;
+    return rgb2hex([c.r!=null?c.r:c[0], c.g!=null?c.g:c[1], c.b!=null?c.b:c[2]]);
+  }catch(e){ return null; }
+}
+// costruisce un simbolo del colore dato, coerente col tipo di geometria
+function symbolForColor(geomType, hex){
+  const c=hex2rgb(hex);
+  if(geomType==='polygon'||geomType==='extent')
+    return {type:'simple-fill', color:[c[0],c[1],c[2],0.18], outline:{color:c,width:2}};
+  if(geomType==='polyline')
+    return {type:'simple-line', color:c, width:2.5};
+  return {type:'simple-marker', color:c, size:9, outline:{color:'#fff',width:1}};
+}
+// applica un colore a UNA graphic (toolsGL o gl), memorizzandolo per la persistenza
+function applyGraphicColor(g, hex){
+  if(!g||!g.geometry) return;
+  const sym=symbolForColor(g.geometry.type, hex);
+  g.symbol=sym;
+  if(g.attributes){ g.attributes.color=hex; }
+  try{ saveStateDebounced(); }catch(e){}
+}
+// visibilità di UNA graphic
+function setGraphicVisible(g, on){
+  if(!g) return; g.visible=!!on;
+  if(g.attributes){ g.attributes.hidden = on?undefined:true; }
+  try{ saveStateDebounced(); }catch(e){}
+}
+// ── controlli riga: occhio (visibilità) + swatch (colore) ──
+const EYE_ON='<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M1.5 12S5 5 12 5s10.5 7 10.5 7-3.5 7-10.5 7S1.5 12 1.5 12z"/><circle cx="12" cy="12" r="3"/></svg>';
+const EYE_OFF='<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3l18 18"/><path d="M10.6 6.1A9.7 9.7 0 0 1 12 6c7 0 10.5 6 10.5 6a17 17 0 0 1-3 3.6M6.2 7.6A17 17 0 0 0 1.5 12S5 18 12 18a9.5 9.5 0 0 0 3.3-.6"/><path d="M9.4 9.5a3 3 0 0 0 4.2 4.2"/></svg>';
+function makeVisToggle(getVisible, onToggle){
+  const b=document.createElement('button'); b.className='vtoggle'; b.type='button';
+  const paint=()=>{ const v=getVisible(); b.innerHTML=v?EYE_ON:EYE_OFF; b.classList.toggle('off',!v);
+    b.title=v?'Nascondi sulla mappa':'Mostra sulla mappa'; };
+  paint();
+  b.onclick=function(e){ e.stopPropagation(); onToggle(!getVisible()); paint(); };
+  return b;
+}
+function makeColorSwatch(getHex, onPick){
+  const wrap=document.createElement('span'); wrap.className='cswatch';
+  const inp=document.createElement('input'); inp.type='color';
+  const cur=getHex()||'#888888'; inp.value=cur; wrap.style.background=cur;
+  inp.oninput=function(e){ e.stopPropagation(); wrap.style.background=inp.value; onPick(inp.value); };
+  inp.onclick=function(e){ e.stopPropagation(); };
+  wrap.onclick=function(e){ e.stopPropagation(); };
+  wrap.appendChild(inp); return wrap;
+}
+
 function geomDefName(g){ const at=g.attributes||{};
   if(at.nome) return at.nome;
   if(at._kind==='buffer') return 'Buffer'+(at.dist_m!=null?' '+at.dist_m+' m':'');
@@ -1795,6 +1914,9 @@ function geomDefName(g){ const at=g.attributes||{};
 }
 function geomRow(g, subtitle){
   const row=document.createElement('div'); row.className='grow';
+  if(g.attributes&&g.attributes.hidden) row.classList.add('hidden');
+  row.appendChild(makeVisToggle(()=>g.visible!==false, on=>{ setGraphicVisible(g,on); row.classList.toggle('hidden',!on); }));
+  row.appendChild(makeColorSwatch(()=>graphicColorHex(g), hex=>applyGraphicColor(g,hex)));
   const nm=document.createElement('input'); nm.className='gname'; nm.spellcheck=false;
   nm.value=g.attributes.nome||''; nm.title=nm.value;
   nm.onchange=function(){ g.attributes.nome=nm.value.trim()||geomDefName(g); nm.value=g.attributes.nome; nm.title=nm.value; try{saveStateDebounced();}catch(e){} };
@@ -1829,7 +1951,70 @@ function renderGeoms(){
   fill('listGeo','cntGeo',geos,'Nessun output.', function(g){ return ''; });
   fill('listImport','cntImport',imports,'Nessun import.', function(g){ return g.attributes.source||''; });
   try{ updateImportImages(); }catch(e){}
+  try{ wireSectionTools(); }catch(e){}
 }
+
+// ══ Controlli di GRUPPO negli header di sezione (visibilità + colore) ══════
+// Restituisce le graphics di una sezione: 'parcels' → gl (via parcels[]),
+// 'draw'/'buf'/'geo' → toolsGL filtrato.
+function sectionGraphics(sec){
+  if(sec==='parcels') return gl?gl.graphics.toArray():[];
+  if(!toolsGL) return [];
+  return toolsGL.graphics.toArray().filter(function(g){ var at=g.attributes||{};
+    if(sec==='buf') return at._kind==='buffer';
+    if(sec==='geo') return at._kind==='drawing'&&at._sub==='geoproc';
+    if(sec==='draw') return at._kind==='drawing'&&at._sub!=='geoproc';
+    return false; });
+}
+// La sezione è "visibile" se almeno una graphic è visibile
+function sectionAllVisible(sec){
+  if(sec==='parcels') return parcels.some(function(p){return !p.hidden;}) || parcels.length===0;
+  var gs=sectionGraphics(sec); if(!gs.length) return true;
+  return gs.some(function(g){return g.visible!==false;});
+}
+function setSectionVisible(sec,on){
+  if(sec==='parcels'){
+    parcels.forEach(function(p,i){ p.hidden=!on; var gg=gl&&gl.graphics.getItemAt(i); if(gg) gg.visible=on; });
+  } else {
+    sectionGraphics(sec).forEach(function(g){ g.visible=!!on; if(g.attributes) g.attributes.hidden=on?undefined:true; });
+  }
+  try{ saveStateDebounced(); }catch(e){}
+}
+// Colore di gruppo → sovrascrive il colore di ogni elemento della sezione
+function setSectionColor(sec,hex){
+  if(sec==='parcels'){
+    parcels.forEach(function(p,i){ p.color=hex; var gg=gl&&gl.graphics.getItemAt(i);
+      if(gg&&gg.geometry) gg.symbol=symbolForColor(gg.geometry.type,hex); });
+  } else {
+    sectionGraphics(sec).forEach(function(g){ applyGraphicColor(g,hex); });
+  }
+  try{ saveStateDebounced(); }catch(e){}
+}
+// Aggancia i controlli negli header .gsecH .gtools (idempotente: ridisegna gli handler)
+function wireSectionTools(){
+  var tools=document.querySelectorAll('#drawerElenco .gsecH .gtools');
+  Array.prototype.forEach.call(tools, function(box){
+    var sec=box.dataset.sec;
+    var vb=box.querySelector('.vtoggle[data-role=visall]');
+    var ci=box.querySelector('.cswatch[data-role=colall] input[type=color]');
+    if(vb && !vb.dataset.wired){ vb.dataset.wired='1';
+      vb.innerHTML=EYE_ON;
+      vb.onclick=function(e){ e.stopPropagation(); var on=!sectionAllVisible(sec); setSectionVisible(sec,on);
+        vb.innerHTML=on?EYE_ON:EYE_OFF; vb.classList.toggle('off',!on);
+        if(sec==='parcels') render(); else renderGeoms(); };
+    }
+    if(ci && !ci.dataset.wired){ ci.dataset.wired='1';
+      var stop=function(e){ e.stopPropagation(); };
+      ci.onclick=stop; if(ci.parentNode) ci.parentNode.onclick=stop;
+      ci.oninput=function(e){ e.stopPropagation(); if(ci.parentNode) ci.parentNode.style.background=ci.value;
+        setSectionColor(sec,ci.value); if(sec==='parcels') render(); else renderGeoms(); };
+    }
+    // sincronizza lo stato dell'occhio col contenuto attuale
+    if(vb){ var on=sectionAllVisible(sec); vb.innerHTML=on?EYE_ON:EYE_OFF; vb.classList.toggle('off',!on); }
+  });
+}
+window.wireSectionTools=wireSectionTools;
+
 window.renderGeoms=renderGeoms;
 function refreshSelDraw(){
   const sel=$('selFromDraw'); if(!sel) return;
@@ -2037,12 +2222,13 @@ async function startOneImage(file){
   }catch(e){ toolMsg('impMsg', name+': '+((e&&e.message)||e), 'err'); }
 }
 function openExport(){
-  const nB=countKind('buffer'), nD=countKind('drawing'), nI=countKind('import');
+  const nB=countKind('buffer'), nD=countDrawingsPure(), nG=countGeoproc(), nI=countKind('import');
   $('exFmt').textContent=($('fmt').value||'geojson').toUpperCase();
-  $('exNP').textContent='('+parcels.length+')'; $('exNB').textContent='('+nB+')'; $('exND').textContent='('+nD+')'; $('exNI').textContent='('+nI+')';
+  $('exNP').textContent='('+parcels.length+')'; $('exNB').textContent='('+nB+')'; $('exND').textContent='('+nD+')'; $('exNG').textContent='('+nG+')'; $('exNI').textContent='('+nI+')';
   $('exParcels').checked=parcels.length>0; $('exParcels').disabled=!parcels.length;
   $('exBuffers').checked=nB>0; $('exBuffers').disabled=!nB;
   $('exDrawings').checked=nD>0; $('exDrawings').disabled=!nD;
+  $('exGeoproc').checked=nG>0; $('exGeoproc').disabled=!nG;
   $('exImports').checked=nI>0; $('exImports').disabled=!nI;
   $('exDiss').checked=$('diss')&&$('diss').checked;
   $('exMsg').innerHTML='';
@@ -2051,8 +2237,8 @@ function openExport(){
 function closeExport(){ $('exportModal').style.display='none'; }
 async function doExport(){
   const fmt=$('fmt').value;
-  const incl={parcels:$('exParcels').checked, buffers:$('exBuffers').checked, drawings:$('exDrawings').checked, imports:$('exImports').checked};
-  if(!incl.parcels && !incl.buffers && !incl.drawings && !incl.imports){ $('exMsg').innerHTML='<div class="msg err">Seleziona almeno una categoria.</div>'; return; }
+  const incl={parcels:$('exParcels').checked, buffers:$('exBuffers').checked, drawings:$('exDrawings').checked, geoproc:$('exGeoproc').checked, imports:$('exImports').checked};
+  if(!incl.parcels && !incl.buffers && !incl.drawings && !incl.geoproc && !incl.imports){ $('exMsg').innerHTML='<div class="msg err">Seleziona almeno una categoria.</div>'; return; }
   const diss=$('exDiss').checked, base='export';
   if(fmt==='xlsx'){   // tabellare → solo particelle
     const data=diss?buildFC(true,{parcels:true}).features.map(f=>({...f.properties})):parcels.map(p=>({Comune:p.comune,Regione:p.regione,Provincia:p.provincia,Cod_Belfiore:p.belfiore,Foglio:p.foglio,Particella:p.particella,
@@ -2117,6 +2303,50 @@ function msg(t,cls){$('out').innerHTML=t?`<div class="msg ${cls}">${t}</div>`:''
   }
   icons.forEach(function(b){ b.onclick=function(){ openPanel(b.classList.contains('active')?null:b.dataset.panel); }; });
   window.openPanel=openPanel;
+
+  /* ── Sidebar destra ridimensionabile (maniglia + persistenza) ── */
+  (function(){
+    var panel=$g('toolsPanel'), body=$g('toolsBody'), rez=$g('toolsResizer');
+    if(!panel||!body||!rez) return;
+    var MINW=220, MAXW=640, KEY='axpo_tools_w';
+    function clamp(w){ var max=Math.min(MAXW, window.innerWidth-160); return Math.max(MINW, Math.min(max, w)); }
+    function setW(w){ w=clamp(w); document.documentElement.style.setProperty('--tools-w', w+'px'); return w; }
+    // ripristino larghezza salvata
+    try{ var sv=parseInt(localStorage.getItem(KEY),10); if(sv) setW(sv); }catch(e){}
+    var dragging=false;
+    function onMove(e){ if(!dragging) return;
+      var cx=(e.touches&&e.touches[0]?e.touches[0].clientX:e.clientX);
+      // il pannello è a destra: la larghezza è (bordo destro finestra - x) meno la barra icone (48px)
+      var w=setW(window.innerWidth - cx - 48);
+      e.preventDefault();
+    }
+    function onUp(){ if(!dragging) return; dragging=false;
+      panel.classList.remove('resizing'); document.body.style.userSelect='';
+      var cur=getComputedStyle(document.documentElement).getPropertyValue('--tools-w').trim();
+      var w=parseInt(cur,10); if(w){ try{ localStorage.setItem(KEY, w); }catch(e){} }
+      window.removeEventListener('mousemove',onMove); window.removeEventListener('mouseup',onUp);
+      window.removeEventListener('touchmove',onMove); window.removeEventListener('touchend',onUp);
+    }
+    function onDown(e){ if(!panel.classList.contains('open')) return; dragging=true;
+      panel.classList.add('resizing'); document.body.style.userSelect='none';
+      window.addEventListener('mousemove',onMove); window.addEventListener('mouseup',onUp);
+      window.addEventListener('touchmove',onMove,{passive:false}); window.addEventListener('touchend',onUp);
+      e.preventDefault();
+    }
+    rez.addEventListener('mousedown',onDown);
+    rez.addEventListener('touchstart',onDown,{passive:false});
+    // doppio click sulla maniglia → reset a default
+    rez.addEventListener('dblclick',function(){ setW(300); try{ localStorage.setItem(KEY,300); }catch(e){} });
+    // tastiera: frecce sx/dx per regolare (accessibilità)
+    rez.tabIndex=0;
+    rez.addEventListener('keydown',function(e){
+      var cur=parseInt(getComputedStyle(document.documentElement).getPropertyValue('--tools-w'),10)||300;
+      if(e.key==='ArrowLeft'){ var w=setW(cur+20); try{localStorage.setItem(KEY,w);}catch(x){} e.preventDefault(); }
+      else if(e.key==='ArrowRight'){ var w2=setW(cur-20); try{localStorage.setItem(KEY,w2);}catch(x){} e.preventDefault(); }
+    });
+    // se la finestra si restringe, ri-vincolo la larghezza
+    window.addEventListener('resize',function(){ var cur=parseInt(getComputedStyle(document.documentElement).getPropertyValue('--tools-w'),10); if(cur) setW(cur); });
+  })();
 
   /* schede sidebar sinistra */
   var _tabs=Array.prototype.slice.call(document.querySelectorAll('#sideRail button'));
