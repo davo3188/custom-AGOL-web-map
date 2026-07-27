@@ -153,7 +153,14 @@
   #measureBtn .esri-icon-measure{font-size:17px}
   #actionIcons button:hover{background:var(--hover);border-color:var(--line)}
   #toolsBody{width:0;overflow:hidden;transition:width .2s}
-  #toolsPanel.open #toolsBody{width:300px;overflow-y:auto}
+  #toolsPanel.open #toolsBody{width:var(--tools-w,300px);overflow-y:auto}
+  /* durante il trascinamento disattivo la transizione per un resize fluido */
+  #toolsPanel.resizing #toolsBody{transition:none}
+  /* maniglia di ridimensionamento (compare solo a pannello aperto) */
+  #toolsResizer{display:none;width:6px;flex:none;cursor:col-resize;background:transparent;position:relative}
+  #toolsPanel.open #toolsResizer{display:block}
+  #toolsResizer::before{content:'';position:absolute;top:0;bottom:0;left:2px;width:2px;background:var(--line)}
+  #toolsResizer:hover::before,#toolsPanel.resizing #toolsResizer::before{background:var(--accent)}
   .drawer{display:none;padding:14px}
   .drawer.open{display:block}
   .tlab{font-size:11px;color:var(--mut);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;font-weight:700}
@@ -221,7 +228,10 @@
   .toast.err{border-left-color:var(--err)}
 
   /* ══ WIDGET ESRI — sfoltire angoli (brief §4.4) ══ */
-  .esri-ui-top-left .esri-expand{display:none!important}   /* Search nascosto: duplicava la ricerca (coordinate nella action bar) */
+  .esri-ui-top-left .esri-expand{display:none!important}   /* vecchio Search top-left nascosto */
+  /* Search in alto a destra: indirizzi + coordinate lat,lon */
+  #searchBox{width:300px;max-width:70vw}
+  #searchBox .esri-search{width:100%}
   .esri-ui-top-right{display:flex;flex-direction:column;gap:6px}
   .esri-ui-corner .esri-expand .esri-widget--button,.esri-ui-corner .esri-widget--button{border-radius:8px}
 
@@ -233,11 +243,6 @@
   #measureCtl.open #measureBtn{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
   #measurePop{display:none;margin-top:6px;background:color-mix(in srgb, var(--panel) 92%, transparent);backdrop-filter:blur(6px);border:1px solid var(--line);border-radius:12px;padding:10px;width:250px}
   #measureCtl.open #measurePop{display:block}
-  #coordCtl{display:flex;align-items:center;gap:6px;background:color-mix(in srgb, var(--panel) 75%, transparent);backdrop-filter:blur(6px);border:1px solid var(--line);border-radius:22px;padding:4px 6px 4px 12px}
-  #coordCtl input{width:150px;background:transparent;border:none;padding:4px 0;font-size:12px}
-  #coordCtl input:focus-visible{outline:none}
-  #coordCtl .chipbtn{border:none;background:var(--accent);color:var(--on-accent);border-radius:16px;padding:5px 12px;font-size:12px;font-weight:700;cursor:pointer}
-  #coordCtl #coordMsg{display:none}
   #brStack{position:absolute;right:14px;bottom:28px;z-index:24;display:flex;flex-direction:column;align-items:flex-end;gap:6px}
   #cursorCoords{display:flex;align-items:center;gap:5px;background:color-mix(in srgb, var(--panel) 78%, transparent);backdrop-filter:blur(6px);border:1px solid var(--line);border-radius:22px;padding:3px 10px 3px 4px;font-size:12px;color:var(--txt)}
   #pinCoordBtn{width:28px;height:28px;border-radius:50%;border:1px solid transparent;background:transparent;cursor:pointer;font-size:13px;padding:0;display:flex;align-items:center;justify-content:center;flex:none}
@@ -487,11 +492,7 @@
       <button class="ghost-danger" id="imgDelBtn">Elimina</button>
     </div>
     <div id="trStack">
-      <div id="coordCtl" title="Vai a coordinate (lat, lon)">
-        <input id="coordIn" placeholder="lat, lon" aria-label="Coordinate lat, lon">
-        <button id="coordGo" class="chipbtn">Vai</button>
-        <div id="coordMsg" class="thint"></div>
-      </div>
+      <div id="searchBox"></div>
       <div id="measureCtl">
         <button id="measureBtn" class="mapchip" title="Misura" aria-label="Misura"><span class="esri-icon-measure" aria-hidden="true"></span></button>
         <div id="measurePop">
@@ -519,6 +520,7 @@
 
   <!-- ── ACTION BAR DX · strumenti accessori (brief §4.3) ── -->
   <div id="toolsPanel">
+    <div id="toolsResizer" title="Trascina per ridimensionare" role="separator" aria-orientation="vertical" aria-label="Ridimensiona pannello"></div>
     <div id="toolsHead" hidden><b>Strumenti</b><button id="toolsToggle" hidden>»</button></div>
     <div id="toolsBody">
       <div class="drawer" data-panel="elenco" id="drawerElenco">
@@ -865,8 +867,44 @@ require([
 
   // ── Strumenti ──
   // ricerca indirizzo (widget nativo; usa il geocoder dell'org quando loggati)
-  const searchW=new Search({view, popupEnabled:false, resultGraphicEnabled:true});
-  view.ui.add(new Expand({view, content:searchW, expandTooltip:"Cerca indirizzo", expandIconClass:"esri-icon-search"}),"top-left");
+  // ── Search in alto a destra: indirizzi/luoghi + coordinate lat,lon ──
+  // sorgente custom: se il testo sono due numeri li interpreta come lat,lon
+  const coordSource={
+    name:"Coordinate (lat, lon)",
+    placeholder:"lat, lon (es. 41.9028, 12.4964)",
+    // getResults viene chiamato quando l'utente cerca; restituisco un risultato
+    // se il testo contiene due numeri validi, altrimenti niente.
+    getResults:(params)=>{
+      const m=String(params.suggestResult&&params.suggestResult.text||params.searchTerm||'')
+        .split(/[,;\s]+/).map(parseFloat).filter(n=>!isNaN(n));
+      if(m.length<2) return Promise.resolve([]);
+      const lat=m[0], lng=m[1];
+      if(Math.abs(lat)>90||Math.abs(lng)>180) return Promise.resolve([]);
+      const pt=new esriMods.Point({latitude:lat, longitude:lng});
+      const ext=pt.extent || {xmin:pt.x-0.01,ymin:pt.y-0.01,xmax:pt.x+0.01,ymax:pt.y+0.01,spatialReference:pt.spatialReference};
+      return Promise.resolve([{
+        extent:ext, feature:new esriMods.Graphic({geometry:pt}),
+        name:`${lat}, ${lng}`, target:{target:pt, zoom:17}
+      }]);
+    },
+    // suggerimento immediato mentre si digita
+    getSuggestions:(params)=>{
+      const m=String(params.suggestTerm||params.searchTerm||'')
+        .split(/[,;\s]+/).map(parseFloat).filter(n=>!isNaN(n));
+      if(m.length<2 || Math.abs(m[0])>90 || Math.abs(m[1])>180) return Promise.resolve([]);
+      return Promise.resolve([{key:"coord", text:`Vai a ${m[0]}, ${m[1]}`, sourceIndex:params.sourceIndex}]);
+    }
+  };
+  const searchW=new Search({view, container:"searchBox", popupEnabled:false, resultGraphicEnabled:true,
+    includeDefaultSources:true, allPlaceholder:"Cerca indirizzo o coordinate lat, lon"});
+  // aggiungo la sorgente coordinate accanto al geocoder di default
+  try{ searchW.sources.unshift(coordSource); }catch(e){ console.warn('coordSource:',e&&e.message); }
+  // quando un risultato coordinate viene scelto, piazzo un marker come faceva il vecchio tool
+  searchW.on("select-result", ev=>{ try{
+    const g=ev.result&&ev.result.feature; if(g&&g.geometry&&g.geometry.type==='point'){
+      toolsGL.add(new esriMods.Graphic({geometry:g.geometry, symbol:{type:'simple-marker', color:[121,192,255], size:10, outline:{color:'#fff',width:1}}}));
+    }
+  }catch(e){} });
   // misura distanza/area (widget nativo, controllato dai bottoni del pannello)
   measurement=new Measurement({view, container:"measureWidgetBox"});   // popover misura alto-dx
   // sketch per il buffer da linea
@@ -1079,19 +1117,7 @@ function wireTools(){
       toolMsg('bufMsg',`Buffer di ${d} m generato.`,'ok'); refreshDl(); view.goTo(buf.extent.expand(1.5)).catch(()=>{}); }
     else toolMsg('bufMsg','Buffer non generato.','err');
   };
-  // vai a coordinate (lat, lon)
-  const goCoord=()=>{
-    const m=($('coordIn').value||'').split(/[,;\s]+/).map(parseFloat).filter(n=>!isNaN(n));
-    if(m.length<2){ toolMsg('coordMsg','Formato: lat, lon (es. 41.9028, 12.4964)','err'); return; }
-    const [lat,lng]=m;
-    if(Math.abs(lat)>90||Math.abs(lng)>180){ toolMsg('coordMsg','Coordinate fuori range.','err'); return; }
-    const pt=new esriMods.Point({latitude:lat, longitude:lng});
-    view.goTo({target:pt, zoom:17}).catch(()=>{});
-    toolsGL.add(new esriMods.Graphic({geometry:pt, symbol:{type:'simple-marker', color:[121,192,255], size:10, outline:{color:'#fff',width:1}}}));
-    toolMsg('coordMsg',`Vado a ${lat}, ${lng}.`,'ok');
-  };
-  $('coordGo').onclick=goCoord;
-  $('coordIn').addEventListener('keydown',e=>{ if(e.key==='Enter') goCoord(); });
+  // (ricerca coordinate lat,lon ora integrata nel widget Search in alto a destra)
   // modalità selezione particelle
   $('selModeBox').querySelectorAll('button').forEach(b=>b.onclick=()=>setSelMode(b.dataset.m));
   // sidebar destra: comprimi/espandi
@@ -2277,6 +2303,50 @@ function msg(t,cls){$('out').innerHTML=t?`<div class="msg ${cls}">${t}</div>`:''
   }
   icons.forEach(function(b){ b.onclick=function(){ openPanel(b.classList.contains('active')?null:b.dataset.panel); }; });
   window.openPanel=openPanel;
+
+  /* ── Sidebar destra ridimensionabile (maniglia + persistenza) ── */
+  (function(){
+    var panel=$g('toolsPanel'), body=$g('toolsBody'), rez=$g('toolsResizer');
+    if(!panel||!body||!rez) return;
+    var MINW=220, MAXW=640, KEY='axpo_tools_w';
+    function clamp(w){ var max=Math.min(MAXW, window.innerWidth-160); return Math.max(MINW, Math.min(max, w)); }
+    function setW(w){ w=clamp(w); document.documentElement.style.setProperty('--tools-w', w+'px'); return w; }
+    // ripristino larghezza salvata
+    try{ var sv=parseInt(localStorage.getItem(KEY),10); if(sv) setW(sv); }catch(e){}
+    var dragging=false;
+    function onMove(e){ if(!dragging) return;
+      var cx=(e.touches&&e.touches[0]?e.touches[0].clientX:e.clientX);
+      // il pannello è a destra: la larghezza è (bordo destro finestra - x) meno la barra icone (48px)
+      var w=setW(window.innerWidth - cx - 48);
+      e.preventDefault();
+    }
+    function onUp(){ if(!dragging) return; dragging=false;
+      panel.classList.remove('resizing'); document.body.style.userSelect='';
+      var cur=getComputedStyle(document.documentElement).getPropertyValue('--tools-w').trim();
+      var w=parseInt(cur,10); if(w){ try{ localStorage.setItem(KEY, w); }catch(e){} }
+      window.removeEventListener('mousemove',onMove); window.removeEventListener('mouseup',onUp);
+      window.removeEventListener('touchmove',onMove); window.removeEventListener('touchend',onUp);
+    }
+    function onDown(e){ if(!panel.classList.contains('open')) return; dragging=true;
+      panel.classList.add('resizing'); document.body.style.userSelect='none';
+      window.addEventListener('mousemove',onMove); window.addEventListener('mouseup',onUp);
+      window.addEventListener('touchmove',onMove,{passive:false}); window.addEventListener('touchend',onUp);
+      e.preventDefault();
+    }
+    rez.addEventListener('mousedown',onDown);
+    rez.addEventListener('touchstart',onDown,{passive:false});
+    // doppio click sulla maniglia → reset a default
+    rez.addEventListener('dblclick',function(){ setW(300); try{ localStorage.setItem(KEY,300); }catch(e){} });
+    // tastiera: frecce sx/dx per regolare (accessibilità)
+    rez.tabIndex=0;
+    rez.addEventListener('keydown',function(e){
+      var cur=parseInt(getComputedStyle(document.documentElement).getPropertyValue('--tools-w'),10)||300;
+      if(e.key==='ArrowLeft'){ var w=setW(cur+20); try{localStorage.setItem(KEY,w);}catch(x){} e.preventDefault(); }
+      else if(e.key==='ArrowRight'){ var w2=setW(cur-20); try{localStorage.setItem(KEY,w2);}catch(x){} e.preventDefault(); }
+    });
+    // se la finestra si restringe, ri-vincolo la larghezza
+    window.addEventListener('resize',function(){ var cur=parseInt(getComputedStyle(document.documentElement).getPropertyValue('--tools-w'),10); if(cur) setW(cur); });
+  })();
 
   /* schede sidebar sinistra */
   var _tabs=Array.prototype.slice.call(document.querySelectorAll('#sideRail button'));
