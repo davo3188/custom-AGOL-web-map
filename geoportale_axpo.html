@@ -299,6 +299,10 @@
   .gsecH .gtools>*{cursor:pointer}
   #imgToolbar{position:absolute;top:60px;left:50%;transform:translateX(-50%);z-index:26;display:none;align-items:center;gap:12px;background:color-mix(in srgb,var(--panel) 92%,transparent);backdrop-filter:blur(6px);border:1px solid var(--line);border-radius:12px;padding:8px 14px;font-size:12px;color:var(--txt)}
   #imgToolbar label{display:flex;align-items:center;gap:6px}
+  /* selettore numerico opacità (toolbar immagine + righe elenco Importati) */
+  .opnum{width:62px;flex:none;padding:4px 6px;text-align:right;font-variant-numeric:tabular-nums}
+  .grow .opnum{width:56px;font-size:12px;padding:3px 5px;background:var(--bg);border:1px solid var(--line);border-radius:5px;color:var(--txt)}
+  .opsuf{font-size:11px;color:var(--mut);margin-left:-2px}
   #imgToolbar button{margin:0}
   #imgToolbar #imgTbName{font-weight:700;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
@@ -487,7 +491,7 @@
     <div id="modeBanner" role="status" hidden></div>
     <div id="imgToolbar">
       <span id="imgTbName"></span>
-      <label>Opacità <input type="range" id="imgOpacity" min="0" max="100" value="85"></label>
+      <label>Opacità <input type="number" id="imgOpacity" class="opnum" min="0" max="100" step="5" value="85" inputmode="numeric" aria-label="Opacità immagine in percentuale"><span class="opsuf">%</span></label>
       <button class="sec" id="imgDoneBtn">Fatto</button>
       <button class="ghost-danger" id="imgDelBtn">Elimina</button>
     </div>
@@ -1145,7 +1149,13 @@ function wireTools(){
   if($('impImg')) $('impImg').onchange=e=>{ startImageFiles(e.target.files); e.target.value=''; };
   if($('imgDoneBtn')) $('imgDoneBtn').onclick=()=>imgDone();
   if($('imgDelBtn')) $('imgDelBtn').onclick=()=>{ if(imgEditing) removeImage(imgEditing); };
-  if($('imgOpacity')) $('imgOpacity').oninput=e=>{ if(imgEditing) imgEditing.layer.opacity=e.target.value/100; };
+  if($('imgOpacity')){
+    const applyTbOp=()=>{ const el=$('imgOpacity'); let v=parseInt(el.value,10); if(isNaN(v)) v=100;
+      v=Math.max(0,Math.min(100,v)); el.value=v;
+      if(imgEditing){ imgEditing.layer.opacity=v/100; try{ renderGeoms(); }catch(x){} } };
+    $('imgOpacity').oninput=applyTbOp; $('imgOpacity').onchange=applyTbOp;
+    $('imgOpacity').onkeydown=e=>{ if(e.key==='Enter'){ e.preventDefault(); applyTbOp(); e.target.blur(); } };
+  }
   if($('impFile')) $('impFile').onchange=e=>{ onImportFiles(e.target.files); e.target.value=''; };
   if($('selDrawGo')) $('selDrawGo').onclick=()=>{ const v=$('selFromDraw').value; if(v==='') return;
     const g=(window.__selDrawList||[])[+v]; if(g&&g.geometry){ try{ view.goTo(g.geometry.extent?g.geometry.extent.expand(1.4):g.geometry).catch(()=>{}); }catch(e){} selectByGeometry(g.geometry); } };
@@ -2189,9 +2199,16 @@ function imgRow(im){
   var nm=document.createElement('input'); nm.className='gname'; nm.spellcheck=false; nm.value=im.name; nm.title=im.name;
   nm.onchange=function(){ im.name=nm.value.trim()||im.name; im.layer.title=im.name; }; row.appendChild(nm);
   var tag=document.createElement('span'); tag.className='gsub'; tag.textContent='immagine'; row.appendChild(tag);
-  var op=document.createElement('input'); op.type='range'; op.min=0; op.max=100; op.title='Opacità';
-  op.value=Math.round((im.layer.opacity==null?0.85:im.layer.opacity)*100); op.style.width='52px';
-  op.oninput=function(){ im.layer.opacity=op.value/100; }; row.appendChild(op);
+  var op=document.createElement('input'); op.type='number'; op.className='opnum'; op.min=0; op.max=100; op.step=5;
+  op.title='Opacità (0-100%)'; op.setAttribute('aria-label','Opacità immagine in percentuale');
+  op.value=Math.round((im.layer.opacity==null?0.85:im.layer.opacity)*100);
+  var applyOp=function(){ var v=parseInt(op.value,10); if(isNaN(v)) v=100;
+    v=Math.max(0,Math.min(100,v)); op.value=v; im.layer.opacity=v/100;
+    if(imgEditing===im && $('imgOpacity')) $('imgOpacity').value=v; };
+  op.oninput=applyOp; op.onchange=applyOp;
+  op.onkeydown=function(e){ if(e.key==='Enter'){ e.preventDefault(); applyOp(); op.blur(); } };
+  row.appendChild(op);
+  var suf=document.createElement('span'); suf.className='opsuf'; suf.textContent='%'; row.appendChild(suf);
   var eb=document.createElement('button'); eb.className='gact'; eb.title='Riposiziona (angoli)'; eb.textContent='⤢';
   eb.onclick=function(){ editImage(im); }; row.appendChild(eb);
   var db=document.createElement('button'); db.className='gact'; db.title='Elimina'; db.textContent='×';
