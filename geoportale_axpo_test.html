@@ -609,6 +609,7 @@
     <label class="chk"><input type="checkbox" id="exParcels" checked> Particelle <span id="exNP"></span></label>
     <label class="chk"><input type="checkbox" id="exBuffers" checked> Buffer <span id="exNB"></span></label>
     <label class="chk"><input type="checkbox" id="exDrawings" checked> Disegni <span id="exND"></span></label>
+    <label class="chk"><input type="checkbox" id="exGeoproc" checked> Geoprocessi <span id="exNG"></span></label>
     <label class="chk"><input type="checkbox" id="exImports" checked> Importati <span id="exNI"></span></label>
     <label class="chk" style="margin-top:10px"><input type="checkbox" id="exDiss"> Dissolvi le particelle in un'unica area</label>
     <div id="exMsg"></div>
@@ -1694,17 +1695,27 @@ function to4326(geom){
 }
 // graphics locali (buffer o disegni) → feature GeoJSON 4326
 function graphicsFeatures(kind){
+  // kind: 'buffer' | 'import' | 'drawing' (SOLO disegni, geoproc esclusi) | 'geoproc'
   const out=[];
   if(!toolsGL||!esriMods) return out;
   toolsGL.graphics.toArray().forEach(g=>{
     const at=g.attributes||{};
-    if(at._kind!==kind||!g.geometry) return;
+    if(!g.geometry) return;
+    // filtro per categoria: disegni e geoprocessi condividono _kind:'drawing',
+    // li distinguo con _sub:'geoproc'
+    if(kind==='geoproc'){ if(!(at._kind==='drawing'&&at._sub==='geoproc')) return; }
+    else if(kind==='drawing'){ if(!(at._kind==='drawing'&&at._sub!=='geoproc')) return; }
+    else { if(at._kind!==kind) return; }
     const gj=esriGeomToGeojson(to4326(g.geometry));
     if(!gj) return;
-    const nome = at.nome || (kind==='buffer' ? ('Buffer'+(at.dist_m!=null?' '+at.dist_m+' m':'')) : (kind==='import' ? (at.source||'Importato') : (at.categoria||'Disegno')));
+    const nome = at.nome || (kind==='buffer' ? ('Buffer'+(at.dist_m!=null?' '+at.dist_m+' m':''))
+      : kind==='import' ? (at.source||'Importato')
+      : kind==='geoproc' ? ((at.categoria||'Geoprocesso').replace('Geoprocesso · ',''))
+      : (at.categoria||'Disegno'));
     const props = kind==='buffer' ? {nome:nome,tipo:'buffer',distanza_m:at.dist_m,area_ha:at.area_ha}
       : kind==='import' ? {nome:nome,tipo:'importato',source:at.source||''}
-      : {nome:nome,tipo:(at._sub==='geoproc'?'geoprocesso':'disegno'),categoria:at.categoria||'',nota:at.note||''};
+      : kind==='geoproc' ? {nome:nome,tipo:'geoprocesso',categoria:at.categoria||'',nota:at.note||''}
+      : {nome:nome,tipo:'disegno',categoria:at.categoria||'',nota:at.note||''};
     out.push({type:'Feature',geometry:gj,properties:props});
   });
   return out;
@@ -1778,6 +1789,7 @@ function buildFC(dissolve, incl){
   }
   if(incl.buffers) feats=feats.concat(graphicsFeatures('buffer'));
   if(incl.drawings) feats=feats.concat(graphicsFeatures('drawing'));
+  if(incl.geoproc) feats=feats.concat(graphicsFeatures('geoproc'));
   if(incl.imports) feats=feats.concat(graphicsFeatures('import'));
   return {type:'FeatureCollection',features:feats};
 }
@@ -1803,6 +1815,8 @@ function toKML(fc){
 }
 // ── finestra di export: scegli cosa includere (particelle / buffer / disegni) ──
 function countKind(k){ return toolsGL? toolsGL.graphics.toArray().filter(g=>g.attributes&&g.attributes._kind===k).length : 0; }
+function countDrawingsPure(){ return toolsGL? toolsGL.graphics.toArray().filter(g=>g.attributes&&g.attributes._kind==='drawing'&&g.attributes._sub!=='geoproc').length : 0; }
+function countGeoproc(){ return toolsGL? toolsGL.graphics.toArray().filter(g=>g.attributes&&g.attributes._kind==='drawing'&&g.attributes._sub==='geoproc').length : 0; }
 var GEOM_ZOOM_SVG='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="6"/><line x1="20" y1="20" x2="15.5" y2="15.5"/></svg>';
 function refreshDl(){ const el=$('dl'); if(el) el.disabled=!(parcels.length||countKind('buffer')||countKind('drawing')||countKind('import'));
   const _sn=$('promoteSN'); if(_sn) _sn.disabled=!((countKind('buffer')||countKind('drawing')||countKind('import')) && (typeof signedIn!=='undefined'&&signedIn));
@@ -2182,12 +2196,13 @@ async function startOneImage(file){
   }catch(e){ toolMsg('impMsg', name+': '+((e&&e.message)||e), 'err'); }
 }
 function openExport(){
-  const nB=countKind('buffer'), nD=countKind('drawing'), nI=countKind('import');
+  const nB=countKind('buffer'), nD=countDrawingsPure(), nG=countGeoproc(), nI=countKind('import');
   $('exFmt').textContent=($('fmt').value||'geojson').toUpperCase();
-  $('exNP').textContent='('+parcels.length+')'; $('exNB').textContent='('+nB+')'; $('exND').textContent='('+nD+')'; $('exNI').textContent='('+nI+')';
+  $('exNP').textContent='('+parcels.length+')'; $('exNB').textContent='('+nB+')'; $('exND').textContent='('+nD+')'; $('exNG').textContent='('+nG+')'; $('exNI').textContent='('+nI+')';
   $('exParcels').checked=parcels.length>0; $('exParcels').disabled=!parcels.length;
   $('exBuffers').checked=nB>0; $('exBuffers').disabled=!nB;
   $('exDrawings').checked=nD>0; $('exDrawings').disabled=!nD;
+  $('exGeoproc').checked=nG>0; $('exGeoproc').disabled=!nG;
   $('exImports').checked=nI>0; $('exImports').disabled=!nI;
   $('exDiss').checked=$('diss')&&$('diss').checked;
   $('exMsg').innerHTML='';
@@ -2196,8 +2211,8 @@ function openExport(){
 function closeExport(){ $('exportModal').style.display='none'; }
 async function doExport(){
   const fmt=$('fmt').value;
-  const incl={parcels:$('exParcels').checked, buffers:$('exBuffers').checked, drawings:$('exDrawings').checked, imports:$('exImports').checked};
-  if(!incl.parcels && !incl.buffers && !incl.drawings && !incl.imports){ $('exMsg').innerHTML='<div class="msg err">Seleziona almeno una categoria.</div>'; return; }
+  const incl={parcels:$('exParcels').checked, buffers:$('exBuffers').checked, drawings:$('exDrawings').checked, geoproc:$('exGeoproc').checked, imports:$('exImports').checked};
+  if(!incl.parcels && !incl.buffers && !incl.drawings && !incl.geoproc && !incl.imports){ $('exMsg').innerHTML='<div class="msg err">Seleziona almeno una categoria.</div>'; return; }
   const diss=$('exDiss').checked, base='export';
   if(fmt==='xlsx'){   // tabellare → solo particelle
     const data=diss?buildFC(true,{parcels:true}).features.map(f=>({...f.properties})):parcels.map(p=>({Comune:p.comune,Regione:p.regione,Provincia:p.provincia,Cod_Belfiore:p.belfiore,Foglio:p.foglio,Particella:p.particella,
