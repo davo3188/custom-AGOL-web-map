@@ -22,6 +22,7 @@
 <script src="https://unpkg.com/@tmcw/togeojson@5.8.1/dist/togeojson.umd.js"></script>
 <script src="https://unpkg.com/shpjs@4.0.4/dist/shp.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/geotiff@2.1.3/dist-browser/geotiff.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>window.define=window.__define;delete window.__define;</script>
 <style>
   /* ══ TOKEN AXPO — deriva tutto da qui (brief §6.2) ══ */
@@ -327,9 +328,8 @@
 <body>
 <header id="topbar">
   <div class="brand">
-    <!-- TODO branding: sostituire wordmark con asset ufficiale (es. assets/axpo-logo.svg) -->
-    <img id="axpoLogo" src="assets/axpo-logo.svg" alt="Axpo" style="height:24px" onerror="this.remove()">
-    <span class="wordmark">axpo</span>
+    <!-- logo ufficiale Axpo: SVG inline (vedi AXPO_LOGO_SVG nello script) -->
+    <img id="axpoLogo" alt="Axpo" style="height:26px">
     <h1>Geoportale · AxpoSolar Italia</h1>
   </div>
   <div class="topbar-right">
@@ -591,6 +591,11 @@
       <div class="drawer" data-panel="print">
         <div class="tlab">Stampa</div>
         <div id="printBox" class="wbox"></div>
+        <div class="tlab" style="margin-top:16px">Scheda sito (layout Axpo)</div>
+        <label class="tlab2" for="pdfTitle">Titolo</label>
+        <input id="pdfTitle" placeholder="es. Sito Prospezione - Comune XX" maxlength="80">
+        <button class="sec" id="pdfGenBtn" style="width:100%;margin-top:8px">🖨 Genera scheda PDF (A3)</button>
+        <div id="pdfMsg" class="thint">Includerà mappa, legenda (solo layer accesi), scalimetro, nord e tabella particelle.</div>
       </div>
     </div>
     <nav id="actionIcons" aria-label="Strumenti">
@@ -2271,6 +2276,318 @@ async function doExport(){
   closeExport();
 }
 function msg(t,cls){$('out').innerHTML=t?`<div class="msg ${cls}">${t}</div>`:'';}
+
+// ══ LOGO AXPO ufficiale (SVG inline) ══════════════════════════════════════
+// Inline nel sorgente: nessuna dipendenza da assets/ e nessun problema di CORS
+// quando lo rasterizzo su canvas per il PDF (jsPDF non accetta SVG).
+const AXPO_LOGO_SVG = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 395 188"><style type="text/css">.st0{fill:url(#SVGID_1_);}.st1{fill:#3D3D3D;}</style><g><linearGradient id="SVGID_1_" gradientUnits="userSpaceOnUse" x1="96.9922" y1="152.5667" x2="214.2209" y2="35.3381" gradientTransform="matrix(1 0 0 -1 -0.2589 188.5334)"><stop offset="0" style="stop-color:#FFED57"/><stop offset="0.1318" style="stop-color:#FF5D64"/><stop offset="0.3588" style="stop-color:#FF3254"/><stop offset="0.5455" style="stop-color:#FF416A"/><stop offset="0.578" style="stop-color:#E54278"/><stop offset="0.6904" style="stop-color:#8F43A7"/><stop offset="0.7697" style="stop-color:#5A45C4"/><stop offset="0.8081" style="stop-color:#4545CF"/></linearGradient><path class="st0" d="M186.4,93.8c-0.2-5.6,9.3-15.1,16.2-22.1c9.4-9.5,17.5-17.6,17.2-26.4c-0.1-3.6-1.7-6.9-4.8-9.7c-12.1-10.1-24.2,1.5-34.9,14.2c-10.2,12.1-21.6,28.6-33.6,28.1c-6.1-0.1-13.6-4.4-21-12.3c-7.5-8.1-12.2-16.6-14.2-21.8c5.8,2.9,15.8,10.5,24.9,20.2c2.2,2.2,3.7,3.4,5,4.2c0.2,0.1,0.4,0.2,0.7,0.4c0.1,0.1,0.3,0.1,0.4,0.2c1.3,0.6,2.8,1,4.4,0.9c2.5-0.2,5-1.8,7.4-4.6c-11.6-14.9-32.9-34.3-45.3-35.4c-4.4-0.4-7.1,1.3-8.7,2.9c-5.1,5.1-1.5,14.1-0.3,17c6.7,16.5,26.2,41,46.4,41.1c18,0.8,32.3-19,43.8-32.6c4.8-5.6,13.6-13.4,16.4-12.9c0,0,0.5,0.1,0.6,0.4c0.4,3-8.7,12.1-13.5,17c-9.9,10-20,20.2-19.9,31.2l0,0l0,0l0,0l0,0c-0.1,10.9,10.1,21.2,19.9,31.2c4.8,4.9,13.9,14,13.5,17c0,0.4-0.6,0.4-0.6,0.4c-2.8,0.5-11.7-7.2-16.4-12.9C178.5,116,161.3,96.1,143.3,97c-20.2,0.2-39.6,24.7-46.4,41.1c-1.2,2.9-4.9,11.9,0.3,17c1.5,1.5,4.3,3.2,8.7,2.9c12.4-1.1,33.7-20.5,45.3-35.4c-2.4-2.8-4.9-4.4-7.4-4.6c-1.6-0.1-3.1,0.3-4.4,0.9c-0.1,0.1-0.3,0.1-0.4,0.2c-0.2,0.1-0.4,0.2-0.7,0.4c-1.2,0.8-2.8,2-5,4.2c-9.1,9.7-19.1,17.3-24.9,20.2c2-5.1,6.7-13.7,14.2-21.8c7.4-7.9,14.8-12.3,21-12.3c12-0.5,26.3,16,36.5,28.1c10.7,12.7,22.8,24.3,34.9,14.2c3.1-2.7,4.7-6,4.8-9.7c0.3-8.8-7.8-16.9-17.2-26.4C195.6,109,186.2,99.4,186.4,93.8z"/><path class="st1" d="M330.9,57c11.7,0,21.2,10,21.2,22.4s-9.5,22.4-21.2,22.4s-21.2-10-21.2-22.4S319.2,57,330.9,57 M330.9,44.2c-18.8,0-34.1,15.8-34.1,35.2s15.3,35.2,34.1,35.2c18.8,0,34.1-15.8,34.1-35.2S349.7,44.2,330.9,44.2L330.9,44.2z"/><path class="st1" d="M98.6,80.9C97.9,62.1,82.9,47,64.6,47c-18.8,0-34.1,15.8-34.1,35.2s15.3,35.2,34.1,35.2c8,0,15.4-2.9,21.2-7.7v1.7c0,3.6,2.9,6.4,6.4,6.4c3.6,0,6.4-2.9,6.4-6.4V83v-1.7L98.6,80.9z M64.6,104.6c-11.7,0-21.2-10-21.2-22.4c0-12.3,9.5-22.4,21.2-22.4c11.5,0,20.8,9.6,21.2,21.5v1.6C85.3,95,76,104.6,64.6,104.6z"/><path class="st1" d="M221.1,81.5v40.4c0,3.5,2.9,6.4,6.4,6.4s6.4-2.8,6.4-6.4v-14.7c5.8,4.7,13.2,7.6,21.2,7.6c18.8,0,34.1-15.6,34.1-34.8s-15.3-34.8-34.1-34.8S221,60.8,221,80L221.1,81.5z M255.2,102.1c-11.7,0-21.2-9.9-21.2-22.1s9.5-22.1,21.2-22.1s21.2,9.9,21.2,22.1S266.9,102.1,255.2,102.1z"/></g></svg>`;
+const AXPO_LOGO_RATIO = 395/188;          // proporzioni originali del file
+let _axpoLogoUrl=null, _axpoLogoPng=null;
+function axpoLogoUrl(){
+  if(!_axpoLogoUrl){
+    try{ _axpoLogoUrl=URL.createObjectURL(new Blob([AXPO_LOGO_SVG],{type:'image/svg+xml;charset=utf-8'})); }
+    catch(e){ _axpoLogoUrl='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(AXPO_LOGO_SVG); }
+  }
+  return _axpoLogoUrl;
+}
+// rasterizza il logo a PNG (dataURL) all'altezza richiesta in px — cache singola
+function axpoLogoPng(hPx){
+  if(_axpoLogoPng && _axpoLogoPng.h>=hPx) return Promise.resolve(_axpoLogoPng.dataUrl);
+  return new Promise(res=>{
+    const img=new Image();
+    img.onload=()=>{ try{
+      const h=hPx, w=Math.round(hPx*AXPO_LOGO_RATIO);
+      const cv=document.createElement('canvas'); cv.width=w; cv.height=h;
+      const ctx=cv.getContext('2d');
+      ctx.clearRect(0,0,w,h);                  // sfondo trasparente
+      ctx.drawImage(img,0,0,w,h);
+      const d=cv.toDataURL('image/png');
+      _axpoLogoPng={h:hPx, dataUrl:d};
+      res(d);
+    }catch(e){ console.warn('logo raster:', e&&e.message); res(null); } };
+    img.onerror=()=>{ console.warn('logo SVG non caricato'); res(null); };
+    img.src=axpoLogoUrl();
+  });
+}
+// topbar: uso il logo inline (il wordmark testuale diventa ridondante)
+window.addEventListener('DOMContentLoaded',()=>{
+  const el=document.getElementById('axpoLogo');
+  if(el){ el.onerror=()=>{ el.onerror=null; el.src=AXPO_LOGO_PNG; }; el.src=axpoLogoUrl(); }
+});
+
+// ══ Scheda sito PDF — layout Axpo custom (mappa + legenda + tabella) ═══════
+// Nessun servizio di stampa Esri: screenshot client-side + composizione jsPDF.
+const AXPO_LOGO_PNG = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPMAAABkCAMAAABkS/b2AAAB/lBMVEVmXP7uZez+ZWf+BAv+X6j+CA/+EB3+nWCfY/4sLC9bW1v8Cmj9/v7+HC/+LE/+1WIOCPz9Bf0OC/4DA178ZGn9JKcaG/5wav75b/kmJi7+HltjB/7/E1nxhvcD//z8agf/WqksK/7/N4pKO/+eEfz/7G9oaAn/LJX+TZNkofn/moT0qP///wmvJv6bT/+nre3/VFj/pw3/pagdYv8H73tWDP+iXPD+4oBjJv5y//CsYqKezvLxGtc+Rv6xcWOrq6v/Qzz/liX/sWP/y1MzNTgfFqQAagAAf384QP8A/wB/AH9pK6dgQv+0Hx+/P3+0H7SFLv+0ah+0/x+h5V3/CY7+Tyz+pmH+0V//67g/SUY3RP8//79/AABGKzZ2em1JQk5BUP9m/zO2BfmZQP+ZmWb9JNf/UQD8We7/vi3/hkb/xi//1TIAAAAtLTD+RW/+OFr+O2P+AABWVf7+Vm7+SYk4ODj+RlssLC/+V44BAP4sLC8sKy8pKS4sLC8sLC8wMDMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADYSXCPAAAAgHRSTlP8/Ptc/CKf/f5PAwwB2OL7HwJhAwQLoAQEF6oOYv4BCATc5O9UDwObpwb+BwERrgqsGQcJA1cG/qcEBQhU5wQE51oDaM0MAgKdAQIGpgMEBdsDAwRIjaS5DJx4BAJee7x4BZB+BaFFuc9IbJMA/P7+/gf+/v4G/dD9BmwuErCP/lQM9TkAABLYSURBVHja5ZyHe9tGssAhgoAEAqRJiVSxbEl23Evs2InTk0veveu93+u9LkGsIJAA679+M1uwCxAEQeU+H+/LfqfY0hni/nZmp+0sDHLdkSQJ+escxnUfpPTbxHx0mpwCMoW/vn6dfEuYk+TUgz+9++ckaT9+/K3Q7S/Tv/2hS67PDKpCLYtyjdlq5qPOL8l79///xo3/+ep//+ubzJYW/nU7mT1y/8aHH97Asfs7k15zxtSFL8uEAZIm7rbr9lc3BPHuhx/u7gJ1d3PtxKWym4Oh7w+HTRuhe3RrmZ/96qsbYuzieLL70rzGx3rUbIa+7wfwFYYtk/Z67tYy3ye/14jZqNnUohvN2PvaagJvMIARBIEf+7ZF3n9/S5nf895bQt7dHYKCV9fvrkXtlu8jLnCzEfo2/em2Mj8j/5dHZgO2pFV1J3ctexAGXMSMGr5i3yTU3U7m++RvipBrtaaJdikhnbW/wrJsFLLQa0TGEbfenvW+FnMOOQxD+K9JvNOj5+uZqe2HAzkUdWxXWK+/HPMyclgL60Ow3+7zdcBdavOtHKTEnDpu0mJPf9BoHGwI1YjSh6M/gw0j72nMTyQyw4ZN/ZR65F9/uOrhv/8+sTiyovXlH2FgLTNHDfXXqOoc+T+MpifTg+IHN2QGpt+nzN+pPWHMQtK1ECwZfeqVRdjnduArnQ5AywPupeF/VpGcH0wnOKabTHI6ccaz2Wg0ms3HzkkFOWtLqy+bEvTvUuZa8ztiM7MNPQxrTYt0X5WYbGqHDHnIqcMhxGKAi9xXWWYmoglOvY8Dp48TaaxRanxoPuov+mIs4MnxRPy6EjnDMs1hlfBzHLbAjcy8zScS+UnTtLl243+HQ59Bn0JMXjyjDjgpbrGZevs+xF+wCMJwZ5jhI6fjUV+ffL8/c6brkB84s35uwJPzSbmcnflooT8yz37QjxKqmS+TWELUvg/QTNJ/+OT0zSvyq/zv7bnnnjmQiu0HAz8E/2bCPmbIfj3I2LCTeb9gjGAyZaKezPrFYzxdzQzLtMgv00h/IHlMf6v5ZRC7jdAYNSO0XwcQlxyTX+fTxp5FzFYYpJvZh9ALfhJzYv+qblNP7abxirn3R5OSfbzyKdCRyQpmZ7Tigxy1I86JJYlDFPQ5NYfMjg1x+Ex69FnWHFl8MzdViI3RJsGfyBHHpvLPk9HqyfdhXzcK9TqaLfplz6UIGvN0vvqB+VRLiV4+UaEIhc1rNmtMyBwaQjKPkl4vb78siYzM4QBCGIxOeEBydVVvuZ4rFsopm3p/MSve1aULxRiW5TwZlS0TiFpY/e6r893UL9dst91m0EM5QNJgjToXuYgz45gZsoXIXLGv4vot8tTlij1eM/di/Z701455nnntMjnyX35NUNAiEAnNdrtLLFuDHjLorJQ7MsjGFBIV2/KI6YdiL4OYH9Fj8W/H6ydfAD3NTX/BRjG0ZHbWf5KEps+sNPqqoXeiv0THC9A+Qx4MWXCiU3fAWvlpgA1uGQhTZNTsu2KVGlUm0l+McuodTXMGezR2YIznhQhGoWawFVpaJkcYjy75rQy/YCPbxOPRBmQODBnAQptllmde6tRhM6d7GS12igxCjkGzrWd0eSLgM+aTKQ5nNirem2Jk4eZp3DbN+esTxZzXjNl8Ph6P53lvN0ntUa0OwEP0T2HNpJ0OZenSUDCDBtuWRXX7halUwF0zIrvgmCXyVb1+U/rmaJSdu+aws7MfZ0y2s+yLIxgN7n412c3wZ5x5ltWLiXQGk+wHjRoy7TeZp0JBD2tD0+v1aDZH9Ie2JbWbKUEgyyJg4lDKgzCQyHGq2bCZF9lde7DS/erara/UyMmlZSQa5zyWsbSZmVvCVYqmSz57zrWbdq2mdFfDIXrp7usfn1F7GHIxw0DLTAXyecZkN80LUOxYStlnm9ld3mI4j4NsLK27lrn2f4zLzFs2whkxOTfISalJjGYZ7Y7EBsUImzMPay2L/PjoE7TNStLhAIV3BBpAbRQwR+Y/NoPYV5p9ZZ53RNqrtuViPi0IO/TYcpKGJpE2/ULffTDObAojYwDQ3y+lmw3NQMz4j77/CeHeyR9iclFrgf66XSbplNk3z/7j6fGxS2wAlckjit/FiDNIvVR8K3VTk6UPKgk8lKCdRd7iLA2FMDpB5qm2TNGaJzQz1hTQ6JBBYc+6HrlvoXoPBq3WIMBa6ItPIRyDxCI12Wjb4AdpkI3Ipqr9zRfl8iJTfVlSvlGhZcuUWjQj7SDzuL9umbQn5PpTC4IvHncNfRFlf/qF14U8AmUYDmTKgNYqEMUv/8qmGSnHdfBSqmA6Wg6AltQ7Xf/FWCj3yRrNzgZ3izkwZ5YgKv4gtbqLF0Q4XQ9tN4uwUdZhyyQXaLQsu9mqNdE/d1EbWFmX174Gfgw+yZLI3Evd0gp/jtpiJclTTin1WHVMVheQRuoxQzPas1U1J211YRtFskrEYq+hjL1gp0KSTF1+vkq8zgE6KVRsmUyhl7KaOnIMaSdNZTFft/g5Iz0Vjy3WiTnrmyaGtolKUlPlAf/ZE4IGMB0aDJVtucepU+64PQAMeC4FMg6CGPSfYF0kUOaLdLUQ9btKR1cWBg40nXNyG29eWiRT2mCcpGHKqKyyOM+Gb8KOidRiwKB9H08YWQzCySHg9KWQsWpvutSupz7qClNmlYvAUn43r0trln+eM/ZOKbN6zJisM3pk6TdHaRGUMmgs6rEw2x808TjZ5TYO3bIs3ftB3LIu0IGnyPX45tMXrwqNxri0kpsq5ox96xSGZgXbM33McJYFWKoai38k38sUMlXshaIeNJumCVsaLJnvp/YakU1yBgYtzStAsS25TUhu8pNS5nRDj/hjiyrMkQprR0a1R8hJGgH9k54Xn0H2oGIvju23ms0BCJRrtThtbZmeh35MkzJdNanS1V/NPKrI3DfGWoBCqmzoP+o//SSbWgxaIvTwBa/YzGC+XnVpM1Z7GVIpj66aVLmSKn04YN9WZU4fM1KWWXm9fLwojApBvc1BVtIILgMvKWUL9rgpivcCmdCVk9qAWZdzVFXO80qWPlrFjDMHnR0UDHX+hrUUj7bqajO3lg5qdOZy3Xa+4X7WdPuazIT+mqgTZR1ZHKr7A6wUdYmJVXAhZXRbJcq3mQ3b1G6PFHOpbh9kPcTyORRY5FSnFTXqdc3EkolFWfmeI1+ZrzplG86p7qsaVf2zSonnVe22KrIVxML0DOKPYRi0WhlgcFK89uVa9NwOU5Ndv9UjH5cxl8Yk+bhr0zhsMdaYJ6XLVJrZNrqs3ctPXTKz1mEYNFl3Df3RBbkZpyb7EfHKU5/RSbRaR3Nyjchsw3jb2TwOK855fgpops1Ok33ZIzK4iW2CEHd7XxBU7Ssu5iu3qHMkU8svzTGyQqqWmuh56sRQ4eusknsu+2cYcKK0wVoFLds0WSbiuiw0D2Kh2PWH5GKNA62YS05z4ljMHjTWOrjFrFExr5qurdrIxII3cZom/4byL5fcuoqZXsNwO+4a5tVTydYMouVSQzF0NNVrKUamghCtD2JK5UzdrvrO5YuAde5jcisWUgbmwgahLPOKrRkV1obWFnr0/B9+s6GL8IQcrBVzCbOQtOcxUv3wBpljydyrwLzqU060KlVUUN5eEYs5mRMQQy/oz6Zrd/Oq2WQ1m59hcEHj1wXXbSTeqaTboHRRgbj0YylNj9X21FaiGBk1wdBN8mK+LmxbxcwqYWDBWuIcGiwYcp+J9m6w1PUYkXdgPCQ/X8+8QU0/e/SEDQUaNzaIOZlzjAarb89KK+kPcpMpiklopwueqsk7k9mAjNI26XlHiJ+QR0yvkXmnt9ZXpccL0YE6jWhkjlQmxTUy3nMiqRuNXCsBsxNGxstz9W5kFvcgd6BZrNumPQxVWSTgHcotDMKoBV8Qkyjm//y5V4U51++z+owud+C2mGlB6GS8fLRqZK2aOLyJ2PqyMujSWfxSLklRxsPQz+dTQI3d6OifQbCmJIbxHBuqKjAv+rOxOIud585iG6WNFdgUNplOxnqrmFopI2cN2eqq/TBZ7jGZFWQYLRZ86U1Bvuji9CFRxkNLYqXEO7d3ThV0UsJc+cy9UaW1Asgi7cx96aR77JxMsDWuvyhjTo6wBcpqYivM0mBRqB/XaybvNHB3FPS7p6l2y9t4mzAXNZRU6E+YTQ8aWp+Bs9Q7p/2xWs4JPaasojtY7luVTVB4CPfUJZ776LaC/vfnxwnJXD7cgLm4R8wZrUXO9NBsssizfGVIrxfk5MxL9/WHPWJdkJ4S9M7ePfJl9pZp9SmsiiLWdAEph28UmfuqzJhB6sR4TsNRNWSA3nnokuNj8lkq6L09gP440aH1+sekrLttHq1qf4xmVdqeVN9QtG5DFKVfT9OiUMDL2CGvXw/BYouDRx5w7tz9Dbm46Pz3bUkM44PO6eqaz7ikT60sSV4l6kx4ZlTTjZGzXA+jHs1uZawYQPzF4jFIHXlLEI+xb+98BkF3Z+e2Yt77gLwp1u3RA+YwCmSNrael5VnWDLzs8ZyVfb2rekQXGAc6ufg0eXBGbOmgBrxO0DQtlUj7mFWw5BEdM0J7D36jyXnP2NeTDf2goUFEH3ZOWE6FXn3WHZW2eS1EZBOt7mVe/hy2TPBQY6I2BsYrXue+aEAP2GEr9gPhofMx3nPFZglqtmIeY9eFU75HuvTfJDAg7xmHbS+V9EmemU0H+8hlz/p0fc86h5uO8blRfzSaQWyy3Oqe79+ejJc66iaZFFTsDCoLvKI5Bot9GH10ZCKN1HdVvMmh33Te3UmJYRwSCZ38rabbevALYYIDMdWmd8shdoMIrlgvjKVlijBkw+XFCw3jkzRgj5gOSEdB0557cVoDav2+516wW814kI5tcuajHS3i3AFoL3mXI/Pxzr500u12gZxVilFwZ6KsmJ02D0SV7t1E8oLCdKpyE6kD44m6otDSWpPxbJnQ978A4ds3X96E1OJnZ96XEGs93NnRmMFsCWhDh0bqzgo5M4CNLxuVj+u9w4GZbHW47Lcst0fZKY4PpjqOa1ja/JjQY+uhFojs3N7bJ1773RT58tK4s0+OEpGyLgqZ//xjI2ahKXjFxA4DWboHZMobTMBshTzIvnuL1QrAmH22o0LOvb1fgE8GSQtiGMbn+zzN0O022SJmPs4eu+dmeuXR50dwrutRW14oweMZfgjX8cg9Cc028i8gu2gzA3bJB6p3vhoTbRmza5F/wAs0LX5niB20op3uEdtPO4LwSIoxJ+TT1x9kIpGfgFT33zGy0J8e6engbPvkzG6TqBOaAXaoAp/t640TZk8ctiaPEwad+uWftJPXAH2ZDtjTR7hdDmSU7WwdM/XOxTVPjmySn1HspglDvdXNOtYqvajeaSSy91HbIxLa4NBtUIjvkcZIJBGNrWMmVku2TmAD5zmWdKl2nwS7CLQmqIQcd+/t3ZbMGH4lb8i+oSQNsUnCYpMpBgbjA7Jtcu6mbopVvNgNXnaN21c96DdzXQRH5F6KjBv5kLwA6MuUGn9yRN7a2Ji5g30h6dWKltXNSTlGZDfLnHinH+nh1+U+OU0OhWJzSaN2s0D+YAuZiRLzACJOjDEtedGT3yeBAGXpUu+b9kda9GVASnX0bB95DWnHsFTU3k45U7DP6iUbsJld2N71LHKRdjxHSaehCMr1ghwamnbDKpBkK5l50BlIzTa/ZjmjvpcfWQWv7fC8My95Z08go3hR0omExh/8IPGS7dzPkFsMJTNruofgKw4Cdbni7qrXTySkjdByCyM0AWhlvPfbL7aSGcUcyk43bMfm1zxV+HXXLXwRA6ZOp8I/pbL9O8gg7yjtxh29lczsDjNrCcIbgF3w1GFGsd2Sl4wckf1L41KZLeOw/Xw/dVhby+xSW74uBy9K2QNtKyMyLXuxVuK1Dy/1mBOCznaq3cJdbRszbFWrJZmxazlUV4ZY6X7Nq2QQWgu/WCxyx0gdVns75WyZsS9OZ/wm3rAJ9ICTrnt9WkKSHLT+XbKdcmbRhzqbETcg5T1Pb+2rpQDrTgZawW8tM2ZUKXIgz2gwEolNq8orkhI01cZlFptb8ztbyswCEkEcqLQCfFQ1ZHRauT2dgh8mR9vJ3PJ9XbPlwSNkFT1Czn5YgXkFtPF5m7S3Vc7LzHjADOnWGfn4jFRT78PLPDRmk+S0vZ37OdSYebkvvnuLeO4Gb7yEwHr/Mt3UIjY7fGu7eUNfBWGY6tplx8wg5IfVX/CmqPYzluztIm/I7PHipjDa2Ddx0yXV32knj9gTj+wfaoklRKGIvIV5lctevNOMYyHrOI6DW4Q8u8Zr/JIzctT+wedMsQ3jX9oJM19byMy7dCEsiWN2QFNvmZa61nqN0d5no03e8ti8TkLNm61W6+VL1oR/cW3kBBRcjBdv+e3lG9fDKH+JNGUdNN/sHbvgrI+Sv8Ar6v8ELdHn0aj40oAAAAAASUVORK5CYII=';   // logo Axpo (PNG trasparente, per jsPDF che non accetta SVG)
+const AXPO_GRADIENT_HEX = ['#3945CF', '#0CE6CD'];   // gradient del wordmark (brief §6.2)
+const PDF_MAX_LEGEND = 26;                          // voci di legenda massime in colonna
+
+// ── carica un modulo AMD su richiesta ──
+function pdfRequire(mods){ return new Promise((res,rej)=>{ try{ require(mods, (...m)=>res(m)); }catch(e){ rej(e); } }); }
+
+// ── URL immagine (remota) → dataURL PNG; null se CORS/errore ──
+function pdfImgToDataUrl(url){
+  return new Promise(res=>{
+    if(!url) return res(null);
+    const img=new Image(); img.crossOrigin='anonymous';
+    img.onload=()=>{ try{
+      const cv=document.createElement('canvas');
+      cv.width=img.naturalWidth||24; cv.height=img.naturalHeight||24;
+      cv.getContext('2d').drawImage(img,0,0);
+      res(cv.toDataURL('image/png'));
+    }catch(e){ console.warn('legend img taint:', url, e&&e.message); res(null); } };
+    img.onerror=()=>{ console.warn('legend img non caricata:', url); res(null); };
+    img.src=url;
+  });
+}
+// ── nodo HTML di renderPreviewHTML → dataURL (cerca img/canvas dentro) ──
+async function pdfNodeToDataUrl(node){
+  if(!node) return null;
+  try{
+    if(node.tagName==='IMG') return node.src && node.src.startsWith('data:') ? node.src : await pdfImgToDataUrl(node.src);
+    if(node.tagName==='CANVAS') return node.toDataURL('image/png');
+    const inner=node.querySelector && (node.querySelector('img')||node.querySelector('canvas'));
+    if(inner) return pdfNodeToDataUrl(inner);
+  }catch(e){ console.warn('preview node:', e&&e.message); }
+  return null;
+}
+// ── swatch reale da un simbolo esri (renderPreviewHTML: API corretta) ──
+async function pdfSwatchFromSymbol(symbol){
+  try{
+    const [symbolUtils]=await pdfRequire(["esri/symbols/support/symbolUtils"]);
+    const node=await symbolUtils.renderPreviewHTML(symbol, {size:18});
+    return await pdfNodeToDataUrl(node);
+  }catch(e){ console.warn('symbolUtils:', e&&e.message); return null; }
+}
+// ── legenda ufficiale dei servizi ArcGIS (hosted / REST / map-image) ──
+// L'endpoint /legend restituisce imageData in base64: nessun problema di CORS
+// per jsPDF, perché l'immagine è già incorporata nel JSON.
+async function pdfEsriServiceLegend(layer){
+  try{
+    if(!layer.url) return null;
+    const [esriRequest]=await pdfRequire(["esri/request"]);
+    let svc=String(layer.url).replace(/\/+$/,'');
+    const mId=svc.match(/\/(\d+)$/);
+    let layerId = (layer.layerId!=null) ? layer.layerId : (mId? +mId[1] : null);
+    if(mId) svc=svc.replace(/\/(\d+)$/,'');
+    const r=await esriRequest(svc+'/legend', {query:{f:'json'}, responseType:'json'});
+    const groups=(r.data&&r.data.layers)||[];
+    if(!groups.length) return null;
+    let picked=groups;
+    if(layerId!=null){ const g=groups.filter(x=>x.layerId===layerId); if(g.length) picked=g; }
+    else if(layer.type==='map-image' && layer.sublayers){
+      const visIds=layer.sublayers.toArray().filter(s=>s.visible).map(s=>s.id);
+      if(visIds.length) picked=groups.filter(x=>visIds.indexOf(x.layerId)>=0);
+    }
+    const out=[];
+    picked.forEach(g=>{
+      (g.legend||[]).forEach(it=>{
+        if(!it.imageData) return;
+        out.push({ label: it.label || g.layerName || '', dataUrl:'data:'+(it.contentType||'image/png')+';base64,'+it.imageData });
+      });
+    });
+    return out.length? out : null;
+  }catch(e){ console.warn('legend REST:', e&&e.message); return null; }
+}
+// ── costruisce le voci di legenda per i SOLI layer visibili ──
+async function pdfBuildLegendEntries(){
+  const entries=[];
+  if(!view || !view.map) return entries;
+  const layers = view.map.allLayers ? view.map.allLayers.toArray() : [];
+  for(const l of layers){
+    if(!l.visible || l===gl || l===toolsGL || l.listMode==='hide') continue;
+    if(l.type==='group') continue;                      // i figli sono già in allLayers
+    const title=l.title||l.id||'Layer';
+    if(l.type==='wms'){
+      let dataUrl=null;
+      try{
+        const subs=l.sublayers? l.sublayers.toArray():[];
+        const sub=subs.find(s=>s.visible)||subs[0];
+        dataUrl=await pdfImgToDataUrl(sub && sub.legendUrl);
+      }catch(e){}
+      entries.push({title, dataUrl, color:'#5B6B7B'});
+      continue;
+    }
+    if(l.type==='wfs'){                                  // nessuna legenda nativa: swatch generico
+      entries.push({title, dataUrl:null, color:'#2FB6E6'});
+      continue;
+    }
+    const rest=await pdfEsriServiceLegend(l);
+    if(rest){
+      if(rest.length===1) entries.push({title, dataUrl:rest[0].dataUrl, color:'#2FB6E6'});
+      else rest.slice(0,8).forEach((it,i)=>entries.push({title:(i===0?title+' — ':'   ')+(it.label||''), dataUrl:it.dataUrl, color:'#2FB6E6'}));
+      continue;
+    }
+    let dataUrl=null;                                    // fallback: simbolo del renderer
+    try{ const r=l.renderer; if(r&&r.symbol) dataUrl=await pdfSwatchFromSymbol(r.symbol); }catch(e){}
+    entries.push({title, dataUrl, color:'#2FB6E6'});
+  }
+  // layer interni dell'app, col colore scelto dall'utente nell'elenco
+  if(gl && gl.graphics.toArray().some(g=>g.visible!==false))
+    entries.push({title:'Particelle selezionate', dataUrl:null, color:PARCEL_HEX});
+  if(toolsGL){
+    const arr=toolsGL.graphics.toArray();
+    [['Disegni', g=>g.attributes&&g.attributes._kind==='drawing'&&g.attributes._sub!=='geoproc'],
+     ['Buffer', g=>g.attributes&&g.attributes._kind==='buffer'],
+     ['Geoprocessi', g=>g.attributes&&g.attributes._kind==='drawing'&&g.attributes._sub==='geoproc'],
+     ['Importati', g=>g.attributes&&g.attributes._kind==='import']
+    ].forEach(([label,pred])=>{
+      const vis=arr.filter(pred).filter(g=>g.visible!==false);
+      if(vis.length) entries.push({title:label, dataUrl:null, color:graphicColorHex(vis[0])||'#2FB6E6'});
+    });
+  }
+  return entries;
+}
+// ── freccia del nord (i widget HTML non entrano nello screenshot) ──
+function pdfNorthArrow(doc,cx,cy,size){
+  doc.setDrawColor(15,23,32); doc.setFillColor(15,23,32);
+  doc.triangle(cx,cy-size, cx-size*0.42,cy+size*0.55, cx+size*0.42,cy+size*0.55, 'F');
+  doc.setFontSize(8); doc.text('N', cx, cy-size-1.5, {align:'center'});
+}
+// ── scalimetro: derivato dai metri realmente coperti dall'immagine stampata ──
+function pdfScaleBar(doc,x,y,drawnWidthMm,groundWidthM){
+  if(!groundWidthM||!drawnWidthMm) return;
+  const metersPerMm=groundWidthM/drawnWidthMm;
+  const pow10=Math.pow(10, Math.floor(Math.log10(40*metersPerMm)));
+  let nice=pow10;
+  [1,2,5,10].forEach(k=>{ if(k*pow10 <= 40*metersPerMm) nice=k*pow10; });
+  const barMm=nice/metersPerMm;
+  doc.setFillColor(255,255,255); doc.rect(x-1.5, y-5.5, barMm+3, 9, 'F');
+  doc.setDrawColor(15,23,32); doc.setLineWidth(0.4);
+  doc.line(x,y,x+barMm,y); doc.line(x,y-1.5,x,y+1.5); doc.line(x+barMm,y-1.5,x+barMm,y+1.5);
+  doc.setFontSize(7.5); doc.setTextColor(15,23,32);
+  doc.text(nice>=1000?(nice/1000)+' km':Math.round(nice)+' m', x+barMm/2, y+3.6, {align:'center'});
+}
+// ── larghezza in metri dell'extent corrente (haversine sulla mediana) ──
+function pdfExtentWidthMeters(){
+  try{
+    const e=to4326(view.extent); if(!e) return null;
+    const midLat=(e.ymin+e.ymax)/2;
+    return haversineKm(midLat, e.xmin, midLat, e.xmax)*1000;
+  }catch(err){ return null; }
+}
+// ── genera la scheda sito (A3 orizzontale) ──
+async function generateSitePDF(){
+  const btn=$('pdfGenBtn'); if(!btn || btn.disabled) return;
+  btn.disabled=true; const lbl=btn.textContent; btn.textContent='Genero…';
+  try{
+    if(!window.jspdf || !window.jspdf.jsPDF) throw new Error('jsPDF non caricata');
+    if(!view) throw new Error('mappa non pronta');
+    const { jsPDF }=window.jspdf;
+    const doc=new jsPDF({orientation:'landscape', unit:'mm', format:'a3'});
+    const PW=420, PH=297, M=10;
+
+    // ── header: logo SVG ufficiale rasterizzato (jsPDF non accetta SVG) ──
+    let titleX=M;
+    const LOGO_H=10, LOGO_W=LOGO_H*AXPO_LOGO_RATIO;          // proporzioni 395:188
+    let logoData=null;
+    try{ logoData=await axpoLogoPng(Math.round(LOGO_H*12)); }  // ~300 dpi
+    catch(err){ console.warn('[PDF] raster logo:', err&&err.message); }
+    if(!logoData) logoData=AXPO_LOGO_PNG;                      // fallback: PNG incorporato
+    try{ doc.addImage(logoData, 'PNG', M, M, LOGO_W, LOGO_H); titleX=M+LOGO_W+6; }
+    catch(err){ console.warn('[PDF] logo:', err&&err.message);
+      doc.setFont('helvetica','bold'); doc.setFontSize(17); doc.setTextColor(61,61,61);
+      doc.text('axpo', M, M+8); titleX=M+26; }
+    const titolo=(($('pdfTitle')&&$('pdfTitle').value)||'').trim() || 'Geoportale AxpoSolar Italia — Scheda sito';
+    doc.setFont('helvetica','bold'); doc.setFontSize(13); doc.setTextColor(15,23,32);
+    doc.text(titolo, titleX, M+7);
+    const now=new Date();
+    doc.setFont('helvetica','normal'); doc.setFontSize(8.5); doc.setTextColor(91,107,123);
+    doc.text('Generato il '+now.toLocaleDateString('it-IT')+' '+now.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'})
+             +'  ·  '+(username||'utente non connesso'), titleX, M+12);
+    // barra gradient
+    const gy=M+16, seg=(PW-2*M)/120, c1=hex2rgb(AXPO_GRADIENT_HEX[0]), c2=hex2rgb(AXPO_GRADIENT_HEX[1]);
+    for(let i=0;i<120;i++){ const t=i/119;
+      doc.setFillColor(Math.round(c1[0]+(c2[0]-c1[0])*t), Math.round(c1[1]+(c2[1]-c1[1])*t), Math.round(c1[2]+(c2[2]-c1[2])*t));
+      doc.rect(M+i*seg, gy, seg+0.2, 1.2, 'F'); }
+    const top=gy+7;
+
+    // ── spazio: riservo l'altezza della tabella prima di dimensionare la mappa ──
+    const rowsWanted=Math.min(parcels.length, 14);
+    const tableH = parcels.length ? (12 + 4.6*rowsWanted + 4) : 0;
+    const mapBoxW=265, mapBoxH=PH - top - M - 4 - tableH;
+    const legendX=M+mapBoxW+8, legendW=PW-M-legendX;
+    if(mapBoxH < 60) throw new Error('troppe particelle per una pagina: riduci l\u2019elenco');
+
+    // ── screenshot: SOLO width, così l'aspect ratio della view è preservato ──
+    toolMsg('pdfMsg','Catturo la mappa…');
+    const shot=await view.takeScreenshot({width:Math.min(2400, Math.round(mapBoxW*4)), format:'jpg', quality:92});
+    const iw=(shot.data&&shot.data.width)||view.width, ih=(shot.data&&shot.data.height)||view.height;
+    const k=Math.min(mapBoxW/iw, mapBoxH/ih);          // fit senza distorsione
+    const dw=iw*k, dh=ih*k, dx=M+(mapBoxW-dw)/2, dy=top+(mapBoxH-dh)/2;
+    doc.addImage(shot.dataUrl, 'JPEG', dx, dy, dw, dh);
+    doc.setDrawColor(225,230,235); doc.setLineWidth(0.3); doc.rect(dx,dy,dw,dh);
+
+    pdfNorthArrow(doc, dx+dw-10, dy+11, 4.5);
+    pdfScaleBar(doc, dx+5, dy+dh-6, dw, pdfExtentWidthMeters());
+
+    // coordinate centro + scala numerica
+    try{
+      const c=view.center;
+      doc.setFontSize(8); doc.setTextColor(91,107,123);
+      doc.text('Centro '+c.latitude.toFixed(5)+', '+c.longitude.toFixed(5)
+               +'   ·   Scala a schermo ~1:'+Math.round(view.scale).toLocaleString('it-IT'), dx, dy+dh+4.5);
+    }catch(e){}
+
+    // ── legenda (solo layer accesi) ──
+    toolMsg('pdfMsg','Costruisco la legenda…');
+    let ly=top+4;
+    doc.setFont('helvetica','bold'); doc.setFontSize(11); doc.setTextColor(15,23,32);
+    doc.text('Legenda', legendX, ly); ly+=3;
+    doc.setDrawColor(31,153,204); doc.setLineWidth(0.6); doc.line(legendX, ly, legendX+legendW, ly); ly+=5;
+    doc.setFont('helvetica','normal'); doc.setFontSize(8);
+    const entries=await pdfBuildLegendEntries();
+    const legendBottom=top+mapBoxH, sw=4.5;
+    if(!entries.length){ doc.setTextColor(91,107,123); doc.text('Nessun layer visibile.', legendX, ly); }
+    let shown=0;
+    for(const e of entries){
+      if(ly>legendBottom-4 || shown>=PDF_MAX_LEGEND) break;
+      let drew=false;
+      if(e.dataUrl){ try{ doc.addImage(e.dataUrl, legendX, ly-sw+0.8, sw, sw); drew=true; }catch(err){ drew=false; } }
+      if(!drew){ const c=hex2rgb(e.color||'#2FB6E6');
+        doc.setFillColor(c[0],c[1],c[2]); doc.setDrawColor(c[0],c[1],c[2]);
+        doc.rect(legendX, ly-sw+0.8, sw, sw, 'FD'); }
+      doc.setTextColor(15,23,32);
+      doc.text(doc.splitTextToSize(String(e.title), legendW-sw-4)[0], legendX+sw+2.5, ly);
+      ly+=6; shown++;
+    }
+    if(shown<entries.length){ doc.setTextColor(91,107,123); doc.setFontSize(7.5);
+      doc.text('… e altre '+(entries.length-shown)+' voci', legendX+sw+2.5, ly); }
+
+    // ── tabella particelle ──
+    if(parcels.length){
+      toolMsg('pdfMsg','Compilo la tabella…');
+      let ty=top+mapBoxH+9;
+      doc.setFont('helvetica','bold'); doc.setFontSize(10); doc.setTextColor(15,23,32);
+      const totHa=parcels.reduce((s,p)=>s+(p.area_m2||0),0)/10000;
+      doc.text('Particelle selezionate: '+parcels.length+'  ·  '+totHa.toFixed(2)+' ha totali', M, ty); ty+=5;
+      const cols=[['Comune',42],['Foglio',18],['Particella',24],['Ha',16],['Uso del suolo',34],['OMI',26],['Regione',32],['Provincia',28]];
+      const tw=cols.reduce((s,c)=>s+c[1],0);
+      doc.setFillColor(237,242,246); doc.rect(M, ty-3.6, tw, 5.2, 'F');
+      doc.setFontSize(7.5); doc.setTextColor(91,107,123);
+      let cx=M; cols.forEach(([t,w])=>{ doc.text(t, cx+1.2, ty); cx+=w; }); ty+=5;
+      doc.setFont('helvetica','normal'); doc.setTextColor(15,23,32);
+      for(let i=0;i<rowsWanted;i++){
+        const p=parcels[i]; cx=M;
+        [p.comune, p.foglio, p.particella, p.area_m2?(p.area_m2/10000).toFixed(2):'', p.land_use, p.omi, p.regione, p.provincia]
+          .forEach((v,vi)=>{ doc.text(doc.splitTextToSize(String(v==null?'':v), cols[vi][1]-2)[0]||'', cx+1.2, ty); cx+=cols[vi][1]; });
+        ty+=4.6;
+      }
+      if(parcels.length>rowsWanted){ doc.setTextColor(91,107,123); doc.setFontSize(7.5);
+        doc.text('… e altre '+(parcels.length-rowsWanted)+' particelle (usa Esporta per l\u2019elenco completo)', M, ty+1.5); }
+    }
+
+    doc.setFontSize(7); doc.setTextColor(91,107,123);
+    doc.text('Geoportale AxpoSolar Italia  ·  Dati catastali AdE via Zornade  ·  ArcGIS Online', M, PH-4);
+
+    const fname=(titolo.replace(/[^\w\s\-]+/g,'').trim().replace(/\s+/g,'_')||'scheda_sito').slice(0,60)+'.pdf';
+    doc.save(fname);
+    toolMsg('pdfMsg','Scheda generata: '+fname, 'ok');
+  }catch(e){ console.error('[PDF]', e); toolMsg('pdfMsg','Errore: '+((e&&e.message)||e), 'err'); }
+  finally{ btn.disabled=false; btn.textContent=lbl||'🖨 Genera scheda PDF (A3)'; }
+}
+if($('pdfGenBtn')) $('pdfGenBtn').onclick=generateSitePDF;
+
+
 </script>
 
 <script>
