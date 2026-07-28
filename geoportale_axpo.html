@@ -47,10 +47,18 @@
     --font-head:'Open Sans','Segoe UI',Arial,sans-serif;   /* scelta utente: sans moderno anche per i titoli */
   }
   [data-theme="dark"]{
-    --bg:#0F1720; --panel:#17212B; --line:#2A3947;
-    --txt:#E6EDF3; --mut:#8AA0B3;
-    --accent:#2FB6E6;
-    --hover:#1F2C38;
+    /* contrasto calibrato: bordi discreti (1.54), testo secondario 7:1, accento 7.5:1 */
+    --bg:#0B1219; --panel:#18232E; --line:#334250;
+    --txt:#F2F7FB; --mut:#99AFC2;
+    --accent:#4EBEEF;
+    --hover:#22303D;
+    /* nessun separatore "marcato": allineato a --line per evitare l'effetto griglia */
+    --line-strong:#334250;
+    --panel-head:#1E2A36;       /* testata pannelli: stacco morbido, senza linee extra */
+  }
+  :root{
+    --line-strong:var(--line);  /* tema chiaro: separatori uniformi */
+    --panel-head:var(--hover);
   }
   *{box-sizing:border-box}
   html,body{margin:0;height:100%}
@@ -60,8 +68,30 @@
   *:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
   @media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
 
+
+  /* ══ CONTRASTO TEMA SCURO — campi, hint e bordi ══════════════════════════ */
+  [data-theme="dark"] select,[data-theme="dark"] input{
+    background:#121D27; border-color:var(--line); color:var(--txt);
+  }
+  [data-theme="dark"] select:focus,[data-theme="dark"] input:focus{border-color:var(--accent)}
+  [data-theme="dark"] select:disabled,[data-theme="dark"] input:disabled{opacity:.6;color:var(--mut)}
+  [data-theme="dark"] .hint,[data-theme="dark"] .thint{color:#99AFC2}
+  [data-theme="dark"] .empty{color:#99AFC2}
+  [data-theme="dark"] button.sec{border-color:var(--line-strong)}
+  [data-theme="dark"] .tb{border-color:var(--line-strong)}
+  [data-theme="dark"] .segbtns button{background:#121D27;border-color:var(--line)}
+  [data-theme="dark"] #sideTabs button{border-color:var(--line-strong)}
+  [data-theme="dark"] .grow .gname:hover{border-color:var(--line-strong)}
+  [data-theme="dark"] .item,[data-theme="dark"] .subrow,[data-theme="dark"] .resItem{border-bottom-color:var(--line)}
+  [data-theme="dark"] .card{border-color:var(--line-strong)}
+  [data-theme="dark"] .toast{border-color:var(--line-strong)}
+  [data-theme="dark"] #list,[data-theme="dark"] #itemResults:not(:empty){border-color:var(--line-strong)}
+  [data-theme="dark"] .step>header h2{color:var(--txt)}
+  [data-theme="dark"] code{background:#121D27;color:var(--txt)}
+  [data-theme="dark"] .cswatch{border-color:var(--line-strong)}
+
   /* ══ TOP BAR ══ */
-  #topbar{display:flex;align-items:center;gap:14px;height:46px;padding:0 14px;background:var(--panel);border-bottom:1px solid var(--line);flex:none;position:relative}
+  #topbar{display:flex;align-items:center;gap:14px;height:46px;padding:0 14px;background:var(--panel-head);border-bottom:1px solid var(--line-strong);flex:none;position:relative}
   #topbar::after{content:'';position:absolute;left:0;right:0;bottom:-1px;height:2px;background:var(--axpo-gradient)}
   .brand{display:flex;align-items:center;gap:10px;min-width:0}
   .wordmark{font-family:var(--font-head);font-size:20px;font-weight:700;background:var(--axpo-gradient);-webkit-background-clip:text;background-clip:text;color:transparent;letter-spacing:.5px}
@@ -81,8 +111,8 @@
   #viewDiv{position:absolute;inset:0}
 
   /* ══ SIDEBAR SX — flusso primario ══ */
-  #side{width:352px;min-width:352px;background:var(--panel);border-right:1px solid var(--line);display:flex;flex-direction:row;overflow:hidden}
-  #sideRail{width:46px;flex:none;display:flex;flex-direction:column;gap:4px;padding:9px 5px;border-right:1px solid var(--line)}
+  #side{width:352px;min-width:352px;background:var(--panel);border-right:1px solid var(--line-strong);display:flex;flex-direction:row;overflow:hidden}
+  #sideRail{width:46px;flex:none;display:flex;flex-direction:column;gap:4px;padding:9px 5px;border-right:1px solid var(--line-strong)}
   #sideRail button{width:36px;height:36px;padding:0;background:transparent;border:1px solid transparent;border-radius:8px;color:var(--txt);cursor:pointer;display:flex;align-items:center;justify-content:center}
   #sideRail button:hover{background:var(--hover);border-color:var(--line)}
   #sideRail button.active{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
@@ -93,16 +123,15 @@
   body.side-collapsed #sideContent{display:none}
   body.side-collapsed #side{width:auto;min-width:0}
   #sideOpen{display:none !important}
-  #sideHead{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid var(--line)}
-  #sideHead b{font-size:11px;text-transform:uppercase;letter-spacing:.6px;color:var(--mut)}
+  #sideHead{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--panel-head);border-bottom:1px solid var(--line-strong)}
+  #sideHead b{font-size:11px;text-transform:uppercase;letter-spacing:.6px;color:var(--txt);font-weight:700}
   #sideToggle,#sideOpen{background:var(--panel);border:1px solid var(--line);border-radius:6px;color:var(--txt);cursor:pointer;padding:4px 9px;font-size:13px}
-  .step{border-bottom:1px solid var(--line);transition:opacity .25s}
-  .step.dim{opacity:.45}
+  .step{border-bottom:1px solid var(--line-strong)}
   .step>header{display:flex;align-items:center;gap:9px;padding:11px 14px 6px}
   .step>header .n{width:20px;height:20px;border-radius:50%;background:var(--axpo-gradient);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex:none}
   .step>header h2{font-size:13px;margin:0}
   .step-body{padding:2px 14px 13px}
-  label,.lbl-block{display:block;font-size:11px;color:var(--mut);text-transform:uppercase;letter-spacing:.5px;margin:9px 0 4px}
+  label,.lbl-block{display:block;font-size:11px;color:var(--mut);text-transform:uppercase;letter-spacing:.5px;margin:9px 0 4px;font-weight:600}
   select,input{width:100%;padding:8px 10px;background:var(--bg);border:1px solid var(--line);border-radius:6px;color:var(--txt);font-size:13px}
   select:disabled,input:disabled{opacity:.45}
   .row{display:flex;gap:8px}
@@ -145,9 +174,9 @@
   code{background:var(--bg);padding:1px 4px;border-radius:4px;font-size:11px}
 
   /* ══ ACTION BAR DX + drawer (brief §4.3) ══ */
-  #toolsPanel{flex:none;display:flex;flex-direction:row-reverse;background:var(--panel);border-left:1px solid var(--line);position:relative}
+  #toolsPanel{flex:none;display:flex;flex-direction:row-reverse;background:var(--panel);border-left:1px solid var(--line-strong);position:relative}
   #toolsHead{display:none}
-  #actionIcons{width:48px;flex:none;display:flex;flex-direction:column;gap:6px;padding:10px 6px;border-left:1px solid var(--line)}
+  #actionIcons{width:48px;flex:none;display:flex;flex-direction:column;gap:6px;padding:10px 6px;border-left:1px solid var(--line-strong)}
   #actionIcons button{width:36px;height:36px;padding:0;background:transparent;border:1px solid transparent;border-radius:8px;font-size:16px;cursor:pointer;color:var(--txt);display:flex;align-items:center;justify-content:center}
   #actionIcons button [class^=esri-icon]{font-size:17px}
   #actionIcons button svg,#elevDockToggle svg,#pinCoordBtn svg{display:block}
@@ -164,7 +193,7 @@
   #toolsResizer:hover::before,#toolsPanel.resizing #toolsResizer::before{background:var(--accent)}
   .drawer{display:none;padding:14px}
   .drawer.open{display:block}
-  .tlab{font-size:11px;color:var(--mut);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;font-weight:700}
+  .tlab{font-size:11px;color:var(--txt);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;font-weight:700;opacity:.9}
   .tlab2{display:block;font-size:10px;color:var(--mut);text-transform:uppercase;letter-spacing:.4px;margin-bottom:3px}
   .drawer .btns{display:flex;gap:6px;flex-wrap:wrap;margin-top:0}
   .drawer .btns button{flex:1;min-width:64px}
@@ -264,15 +293,15 @@
   #editorBox .esri-editor__scroller{max-height:60vh}
 
   /* ══ RIORG 2026-07-24 FASE 1: schede SX + sezioni elenco DX ══ */
-  #sideTabs{display:flex;gap:5px;overflow-x:auto;padding:9px 12px;border-bottom:1px solid var(--line);flex:none}
+  #sideTabs{display:flex;gap:5px;overflow-x:auto;padding:9px 12px;border-bottom:1px solid var(--line-strong);flex:none}
   #sideTabs button{flex:0 0 auto;padding:6px 12px;border:1px solid var(--line);background:transparent;border-radius:16px;font-size:12px;font-weight:600;color:var(--txt);cursor:pointer;white-space:nowrap}
   #sideTabs button:hover{background:var(--hover)}
   #sideTabs button.active{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
   .tabpane{display:none}
   .tabpane.active{display:block}
   .paneBody{padding:12px 14px}
-  .gsec{border:1px solid var(--line);border-radius:10px;margin-bottom:9px;overflow:hidden}
-  .gsecH{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 11px;cursor:pointer;background:var(--hover);font-size:12.5px;user-select:none}
+  .gsec{border:1px solid var(--line-strong);border-radius:10px;margin-bottom:9px;overflow:hidden}
+  .gsecH{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 11px;cursor:pointer;background:var(--panel-head);font-size:12.5px;user-select:none}
   .gsecH::before{content:"\25be";font-size:10px;opacity:.55;margin-right:4px;transition:transform .15s}
   .gsec.collapsed .gsecH::before{transform:rotate(-90deg)}
   .gsecH b{flex:1}
@@ -2599,7 +2628,7 @@ if($('pdfGenBtn')) $('pdfGenBtn').onclick=generateSitePDF;
    4) Banner modalità + cursore crosshair (poll su selMode/drawType/subActive/sketchPurpose)
    5) Una sola modalità mappa: la disattivazione riusa i toggle ESISTENTI (setSelMode, click sui pulsanti)
    6) Esc: chiude modali/drawer/modalità; click sul backdrop chiude le modali
-   7) Gating visivo step 2/3 (solo opacità, nessun blocco funzionale)
+   7) (rimosso) gating visivo step 2/3: i pannelli restano sempre pienamente leggibili
 */
 (function(){
   var $g=function(id){return document.getElementById(id);};
@@ -2766,12 +2795,11 @@ if($('pdfGenBtn')) $('pdfGenBtn').onclick=generateSitePDF;
     var m=modeInfo();
     if(banner){ if(m){banner.innerHTML=m;banner.hidden=false;} else banner.hidden=true; }
     if(vd) vd.classList.toggle('mode-on', !!m);
+    // gating visivo rimosso: i pannelli restano sempre a colorazione piena
     try{
       var s2=$g('step2'), s3=$g('step3');
-      var hasCom=$g('com')&&$g('com').value;
-      var n=(typeof parcels!=='undefined'&&parcels)?parcels.length:0;
-      if(s2) s2.classList.toggle('dim', !hasCom&&n===0);
-      if(s3) s3.classList.toggle('dim', n===0);
+      if(s2) s2.classList.remove('dim');
+      if(s3) s3.classList.remove('dim');
     }catch(e){}
   },350);
 
