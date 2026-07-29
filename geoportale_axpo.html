@@ -373,6 +373,14 @@
   .llopts .lllegend .esri-legend__message{display:none}          /* niente "Nessuna legenda": box vuoto e basta */
   .llopts .lllegend img{max-width:100%;display:block}
   .llopts .lllegend .wmsleg{display:flex;align-items:center;gap:7px;margin-bottom:5px;font-size:11px;opacity:.9}
+  /* menu contestuale della mappa (tasto destro) */
+  #ctxMenu{position:fixed;z-index:1500;display:none;min-width:216px;background:var(--panel);border:1px solid var(--line);
+    border-radius:10px;padding:5px;box-shadow:0 12px 32px #0008}
+  #ctxHead{font-size:10.5px;opacity:.6;padding:5px 9px 6px;border-bottom:1px solid var(--line);margin-bottom:4px;font-variant-numeric:tabular-nums}
+  #ctxMenu button{display:flex;align-items:center;gap:9px;width:100%;text-align:left;background:transparent;border:none;
+    color:var(--txt);padding:8px 9px;border-radius:7px;font-size:12.5px;cursor:pointer;margin:0}
+  #ctxMenu button:hover{background:var(--hover)}
+  #ctxMenu button .ci{width:16px;text-align:center;flex:none;opacity:.85}
 </style>
 </head>
 <body>
@@ -581,7 +589,9 @@
         <div class="tlab">Elenco &amp; azioni</div>
         <div class="gsec" data-sec="parcels">
           <div class="gsecH"><b>Particelle</b><span class="gtools" data-sec="parcels"><button class="vtoggle" data-role="visall" title="Mostra/nascondi tutte" aria-label="Mostra/nascondi tutte le particelle"></button><span class="cswatch" data-role="colall" title="Colore di tutte le particelle"><input type="color" value="#F5A623"></span></span><span id="cnt" class="gcount">0</span></div>
-          <div class="glist"><div id="listTot" class="hint"></div><div id="list"><div class="empty">Nessuna particella. Cercala o cliccala sulla mappa.</div></div></div>
+          <div class="glist"><div id="listTot" class="hint"></div>
+            <label class="chk" style="margin:2px 0 7px"><input type="checkbox" id="lblParcels" checked> Etichette sulla mappa</label>
+            <div id="list"><div class="empty">Nessuna particella. Cercala o cliccala sulla mappa.</div></div></div>
         </div>
         <div class="gsec" data-sec="draw">
           <div class="gsecH"><b>Disegni</b><span class="gtools" data-sec="draw"><button class="vtoggle" data-role="visall" title="Mostra/nascondi tutti" aria-label="Mostra/nascondi tutti i disegni"></button><span class="cswatch" data-role="colall" title="Colore di tutti i disegni"><input type="color" value="#2FB6E6"></span></span><span id="cntDraw" class="gcount">0</span></div>
@@ -762,6 +772,15 @@
     <button class="menuopt" id="hmGuide">📖&nbsp; Guida rapida (testo)</button>
   </div>
 </div>
+<div id="ctxMenu" role="menu">
+  <div id="ctxHead">—</div>
+  <button id="ctxParcel"><span class="ci">📍</span> Aggiungi particella qui</button>
+  <button id="ctxCtx"><span class="ci">🔎</span> Contesto sito qui</button>
+  <button id="ctxBuf"><span class="ci">⬡</span> Buffer qui</button>
+  <button id="ctxCopy"><span class="ci">📋</span> Copia coordinate</button>
+  <button id="ctxGmaps"><span class="ci">🗺</span> Apri in Google Maps</button>
+  <button id="ctxCenter"><span class="ci">🎯</span> Centra qui</button>
+</div>
 <div id="uiTip"></div>
 <div id="toasts" aria-live="polite"></div>
 
@@ -852,7 +871,7 @@ let parcels=[], signedIn=false, username=null, initialMapLoaded=false, portal=nu
 const ADDABLE=new Set(["Feature Service","Map Service","Image Service","Vector Tile Service","WMS","WFS","KML","GeoJson","CSV","Feature Collection","Tiled Imagery Layer","Map Image Layer","Scene Service"]);
 
 // ── stato ArcGIS ──────────────────────────────────────────────────────────
-let view, gl, catasto, esriMods, basemapLayers, layerListExpand;
+let view, gl, labelsGL, catasto, esriMods, basemapLayers, layerListExpand;
 let toolsGL, measurement, sketchVM, bufferGeom=null;   // strumenti (misura/buffer)
 let areasEditorExpand=null, areasLayer=null, recomputingArea=false;   // edit AREAS COLLECTION
 let subActive=false;      // modalità "contesto sito" (click su mappa)
@@ -893,6 +912,8 @@ require([
     minScale:25000, opacity:.7, title:"Catasto AdE"
   });
   gl=new GraphicsLayer({title:"Particelle selezionate", listMode:"hide"});
+  // etichette particelle: layer separato -> si spengono e spariscono a scala piccola
+  labelsGL=new GraphicsLayer({title:"Etichette particelle", listMode:"hide", minScale:150000, maxScale:0});
   toolsGL=new GraphicsLayer({title:"Strumenti (misura/buffer)", listMode:"hide"});
 
   // Basemap da servizi Esri PUBBLICI (no token, non bloccate come i tile OSM volontari)
@@ -900,9 +921,10 @@ require([
   const bmTopo=bm("Topografica","https://services.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer","topo");
   const bmImg=bm("Satellite","https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer","img");
   const bmStreets=bm("Stradale","https://services.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer","streets");
-  const map=new Map({basemap:bmTopo, ground:{layers:[new ElevationLayer({url:WORLD_ELEV})]}, layers:[catasto, gl, toolsGL]});
+  const map=new Map({basemap:bmTopo, ground:{layers:[new ElevationLayer({url:WORLD_ELEV})]}, layers:[catasto, gl, labelsGL, toolsGL]});
   view=new MapView({container:"viewDiv", map, center:[12.5,42.0], zoom:6});
   window.view=view;
+  wireContextMenu();   // tasto destro sulla mappa
   // popup ancorato a SINISTRA (di default si ancorava in alto a destra)
   view.popup.dockEnabled=true;
   view.popup.dockOptions={buttonEnabled:true, breakpoint:false, position:"top-left"};
@@ -938,14 +960,36 @@ require([
       states.forEach(st=>{ const l=byId[st.id]||byT[st.t]; if(l) l.visible=!!st.v; });
     }catch(e){}
   };
+  window.__bmW=bookmarksW;    // hook debug (come window.view)
+  let bmByName={};           // backup per NOME: regge anche se il widget ricrea gli oggetti Bookmark
   try{ const sv=JSON.parse(localStorage.getItem('cat_bookmarks')||'[]');
-    if(Array.isArray(sv)&&sv.length) bookmarksW.bookmarks=sv.map(b=>{
-      const bk=new Bookmark({name:b.name, viewpoint:b.viewpoint}); bk._layers=b.layers||null; return bk; }); }catch(e){}
-  bookmarksW.bookmarks.on('change', ()=>{ try{
-    // un bookmark appena creato non ha ancora lo stato: gli assegno quello corrente
-    bookmarksW.bookmarks.forEach(b=>{ if(!b._layers) b._layers=window.__bmCapture(); });
-    localStorage.setItem('cat_bookmarks', JSON.stringify(bookmarksW.bookmarks.toArray().map(b=>({name:b.name, viewpoint:b.viewpoint&&b.viewpoint.toJSON(), layers:b._layers||null})))); }catch(e){} });
-  try{ bookmarksW.on('bookmark-select', ev=>{ const b=ev&&ev.bookmark; if(b&&b._layers) window.__bmApply(b._layers); }); }catch(e){}
+    if(Array.isArray(sv)&&sv.length){
+      sv.forEach(b=>{ if(b&&b.name&&b.layers&&b.layers.length) bmByName[b.name]=b.layers; });
+      bookmarksW.bookmarks=sv.map(b=>{
+        const bk=new Bookmark({name:b.name, viewpoint:b.viewpoint});
+        if(b.layers&&b.layers.length) bk._layers=b.layers;
+        return bk; });
+    } }catch(e){}
+  const bmPersist=()=>{ try{
+    localStorage.setItem('cat_bookmarks', JSON.stringify(bookmarksW.bookmarks.toArray().map(b=>{
+      const st=b._layers||bmByName[b.name]||null;
+      if(st&&st.length) bmByName[b.name]=st;
+      return {name:b.name, viewpoint:b.viewpoint&&b.viewpoint.toJSON(), layers:(st&&st.length)?st:null};
+    }))); }catch(e){} };
+  bookmarksW.bookmarks.on('change', ev=>{ try{
+    // SOLO i segnalibri appena creati prendono lo stato corrente dei layer (i vecchi restano intatti)
+    ((ev&&ev.added)||[]).forEach(b=>{ if(b._layers) return;
+      const st=window.__bmCapture();
+      if(st.length){ b._layers=st; bmByName[b.name]=st;
+        try{ msg('Segnalibro salvato: posizione + '+st.length+' layer.','ok'); }catch(e){} } });
+    bmPersist(); }catch(e){} });
+  const bmRestore=b=>{ try{ if(!b) return; const st=b._layers||bmByName[b.name];
+    if(st&&st.length) window.__bmApply(st); }catch(e){} };
+  try{ bookmarksW.on('bookmark-select', ev=>bmRestore(ev&&ev.bookmark)); }catch(e){}
+  // il click sulla lista non emette sempre 'bookmark-select' (widget Calcite 4.30): intercetto
+  // anche viewModel.goTo, che è il percorso usato SEMPRE per navigare a un segnalibro.
+  try{ const _vm=bookmarksW.viewModel, _goTo=_vm.goTo.bind(_vm);
+    _vm.goTo=function(bk){ bmRestore(bk); return _goTo(bk); }; }catch(e){}
 
   // ── Auto-resume: mappa/elenco "restano come lasciati" ──
   BM_BY_ID={topo:bmTopo, img:bmImg, streets:bmStreets};
@@ -1137,6 +1181,46 @@ async function loadRegions(){
     $('reg').innerHTML='<option value="">— seleziona —</option>'+d.data.sort((a,b)=>a.name.localeCompare(b.name)).map(r=>`<option>${r.name}</option>`).join('');
   }catch(e){msg('Chiave non valida o API irraggiungibile: '+e.message,'err');}
 }
+// ── menu contestuale della mappa (tasto destro): agisce sul punto cliccato ──
+function wireContextMenu(){
+  const vd=$('viewDiv'), menu=$('ctxMenu');
+  if(!vd||!menu) return;
+  let pt=null, ll=null;
+  const close=()=>{ menu.style.display='none'; };
+  vd.addEventListener('contextmenu', e=>{
+    e.preventDefault();                      // sostituisco il menu del browser
+    if(!view) return;
+    const r=vd.getBoundingClientRect();
+    pt=view.toMap({x:e.clientX-r.left, y:e.clientY-r.top});
+    if(!pt){ return; }
+    const g=to4326(pt);
+    ll=g? {lat:(g.latitude!=null?g.latitude:g.y), lng:(g.longitude!=null?g.longitude:g.x)} : null;
+    $('ctxHead').textContent= ll ? ll.lat.toFixed(5)+', '+ll.lng.toFixed(5) : '—';
+    menu.style.display='block';
+    const mw=menu.offsetWidth, mh=menu.offsetHeight;
+    menu.style.left=Math.max(6, Math.min(e.clientX, window.innerWidth-mw-8))+'px';
+    menu.style.top =Math.max(6, Math.min(e.clientY, window.innerHeight-mh-8))+'px';
+  });
+  document.addEventListener('click', close);
+  document.addEventListener('keydown', e=>{ if(e.key==='Escape') close(); });
+  try{ view.on('drag', close); view.on('mouse-wheel', close); }catch(e){}
+
+  $('ctxParcel').onclick=()=>{ close(); if(ll) addByClick(ll.lat, ll.lng); };
+  $('ctxCtx').onclick=()=>{ close(); if(!pt) return;
+    try{ window.showTab&&window.showTab('contesto'); }catch(e){}
+    querySubstations(pt); };
+  $('ctxBuf').onclick=()=>{ close(); if(!pt) return;      // riuso il generatore di buffer esistente
+    try{ window.showTab&&window.showTab('geoproc'); }catch(e){}
+    bufferGeom=pt; $('bufGen').disabled=false; $('bufGen').click(); };
+  $('ctxCopy').onclick=()=>{ close(); if(!ll) return;
+    const t=ll.lat.toFixed(6)+', '+ll.lng.toFixed(6);
+    try{ navigator.clipboard.writeText(t).then(()=>msg('Coordinate copiate: '+t,'ok'), ()=>msg('Coordinate: '+t)); }
+    catch(e){ msg('Coordinate: '+t); } };
+  $('ctxGmaps').onclick=()=>{ close(); if(!ll) return;      // nuova scheda sul punto cliccato
+    const q=ll.lat.toFixed(6)+','+ll.lng.toFixed(6);
+    window.open('https://www.google.com/maps/search/?api=1&query='+q, '_blank', 'noopener'); };
+  $('ctxCenter').onclick=()=>{ close(); if(ll&&view) view.goTo({center:[ll.lng, ll.lat]}).catch(()=>{}); };
+}
 function wireUI(){
   $('reg').addEventListener('change',async()=>{
     $('prov').disabled=$('com').disabled=true;$('com').innerHTML='<option value="">—</option>';checkReady();
@@ -1156,6 +1240,7 @@ function wireUI(){
   $('com').addEventListener('change',checkReady);
   $('go').addEventListener('click',search);
   $('par').addEventListener('keydown',e=>{if(e.key==='Enter'&&!$('go').disabled)search();});
+  if($('lblParcels')) $('lblParcels').onchange=()=>{ if(labelsGL) labelsGL.visible=$('lblParcels').checked; };
   $('dl').onclick=openExport;
   $('reset').onclick=()=>{if(parcels.length&&confirm('Svuotare l\'elenco?')){parcels=[];render();msg('','');}};
   $('searchItem').onclick=searchPortalItems;
@@ -1516,7 +1601,7 @@ async function loadWebMap(id, hideLayers, label){
       try{ view.map&&view.map.remove(catasto); }catch(e){}
       wm.add(catasto);
     }
-    wm.add(gl); wm.add(toolsGL);       // particelle + strumenti sempre SOPRA il catasto
+    wm.add(gl); wm.add(labelsGL); wm.add(toolsGL);       // particelle + etichette + strumenti sempre SOPRA il catasto
     view.map=wm;
     if(parcels.length) view.goTo(gl.graphics.toArray()).catch(()=>{});
     setTimeout(setupAreasEditor, 800);                  // abilita l'edit se AREAS COLLECTION è nella mappa
@@ -1687,6 +1772,22 @@ async function addByClick(lat,lng){
 }
 
 // ── elenco + disegno ──────────────────────────────────────────────────────
+// ── etichette delle particelle: TextSymbol sul centroide (layer labelsGL) ──
+function renderLabels(){
+  if(!labelsGL||!esriMods) return;
+  labelsGL.removeAll();
+  parcels.forEach(p=>{
+    if(p.hidden) return;                                   // particella nascosta: niente etichetta
+    const geom=geojsonToEsri(p.geometry)||geojsonToEsri({type:'Point',coordinates:[p.lng,p.lat]});
+    if(!geom) return;
+    let anchor=geom; try{ if(geom.centroid) anchor=geom.centroid; }catch(e){}
+    const txt=p.nome||('Fg '+(p.foglio!=null?p.foglio:'?')+' \u00b7 '+(p.particella!=null?p.particella:'?'));
+    labelsGL.add(new esriMods.Graphic({geometry:anchor, symbol:{
+      type:'text', text:String(txt), color:'#ffffff',
+      haloColor:[0,0,0,0.85], haloSize:1.6, font:{size:10, weight:'bold'}
+    }}));
+  });
+}
 function render(){
   $('cnt').textContent=parcels.length;
   const has=parcels.length>0;
@@ -1708,16 +1809,17 @@ function render(){
     const vis=gl.graphics.toArray().filter(g=>g.visible!==false);
     if(vis.length && view){ view.goTo(vis).catch(()=>{}); }
   }
+  renderLabels();
   if(!has){$('list').innerHTML='<div class="empty">Nessuna particella nell\'elenco. Cercala per Foglio/Particella o cliccala sulla mappa.</div>';return;}
   const _lb=$('list'); _lb.innerHTML='';
   parcels.forEach((p,i)=>{
     const row=document.createElement('div'); row.className='grow';
     if(p.hidden) row.classList.add('hidden');
-    row.appendChild(makeVisToggle(()=>!p.hidden, on=>{ p.hidden=!on; row.classList.toggle('hidden',!on); const gg=gl.graphics.getItemAt(i); if(gg) gg.visible=on; saveStateDebounced&&saveStateDebounced(); }));
+    row.appendChild(makeVisToggle(()=>!p.hidden, on=>{ p.hidden=!on; row.classList.toggle('hidden',!on); const gg=gl.graphics.getItemAt(i); if(gg) gg.visible=on; renderLabels(); saveStateDebounced&&saveStateDebounced(); }));
     row.appendChild(makeColorSwatch(()=>p.color||PARCEL_HEX, hex=>{ p.color=hex; const gg=gl.graphics.getItemAt(i); if(gg&&gg.geometry) gg.symbol=symbolForColor(gg.geometry.type,hex); saveStateDebounced&&saveStateDebounced(); }));
     const nm=document.createElement('input'); nm.className='gname'; nm.spellcheck=false;
     nm.value=p.nome||(p.comune+' · Fg '+p.foglio+' · '+p.particella); nm.title=nm.value;
-    nm.onchange=function(){ p.nome=nm.value.trim()||undefined; nm.title=nm.value; saveStateDebounced&&saveStateDebounced(); };
+    nm.onchange=function(){ p.nome=nm.value.trim()||undefined; nm.title=nm.value; renderLabels(); saveStateDebounced&&saveStateDebounced(); };
     nm.onkeydown=function(e){ if(e.key==='Enter'){ e.preventDefault(); nm.blur(); } };
     row.appendChild(nm);
     const st=(p.area_m2?(p.area_m2/10000).toFixed(2)+' ha':'')+(p.land_use?' · '+p.land_use:'');
