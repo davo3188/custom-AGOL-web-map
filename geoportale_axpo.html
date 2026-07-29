@@ -352,6 +352,14 @@
   #helpMenu .menuopt{display:block;width:100%;text-align:left;margin-top:8px;padding:11px 13px;border:1px solid var(--line);border-radius:10px;background:transparent;color:var(--txt);cursor:pointer;font-size:13px}
   #helpMenu .menuopt:hover{background:var(--hover);border-color:var(--accent)}
   #uiTip{position:fixed;z-index:2100;display:none;max-width:230px;background:var(--panel);color:var(--txt);border:1px solid var(--line);border-radius:8px;padding:6px 10px;font-size:11.5px;line-height:1.4;box-shadow:0 6px 20px #0007;pointer-events:none}
+  /* pannello opzioni per-layer nella LayerList (trasparenza + popup) */
+  .llopts{padding:7px 6px 9px;font-size:11.5px;color:var(--txt)}
+  .llopts .llrow{display:flex;align-items:center;gap:8px;margin-bottom:7px}
+  .llopts .lllab{flex:none;opacity:.75}
+  .llopts .llrange{flex:1;min-width:60px;accent-color:var(--accent)}
+  .llopts .llval{flex:none;width:36px;text-align:right;font-variant-numeric:tabular-nums;opacity:.7}
+  .llopts .llchk{display:flex;align-items:center;gap:7px;cursor:pointer}
+  .llopts .llchk input{accent-color:var(--accent)}
 </style>
 </head>
 <body>
@@ -784,6 +792,10 @@ const LINE_LAYERS=[{url:POWER_GRID+"0",volt:'380 kV'},{url:POWER_GRID+"1",volt:'
 // Progetti FV in iter (DB_PV_procedures) — SOLO campi non sensibili
 const PV_PROC_URL="https://services-eu1.arcgis.com/Kxsn3iT6KEQ7OlSW/arcgis/rest/services/IT_elemens_DB_PV_procedures/FeatureServer/0";
 const PV_PROC_FIELDS=["plant_name","capacity_mw","status","status_detail","procedure_type"];
+// catasto AdE nazionale gia' presente nelle webmap del portale (18 mappe): se c'e', uso quello
+// e NON aggiungo il mio WMS interno, per non avere due volte lo stesso layer in legenda.
+const CATASTO_ITEM_ID="382d9c13039446e4b17a19a4a226313d";   // IT - AdE - Cartografia Catastale (Web Mercator)
+const CATASTO_ITEM_ID_ALT="05ccc51fc6e64c5f84e4032faad754dc";   // IT - Cartografia Catastale (variante)
 
 // Lookup Regione (Zornade) → item id "IT - PORTALE CHECK VINCOLI - …"
 // Match normalizzato (spazi/trattini ignorati). Mancano: Liguria, Molise,
@@ -883,7 +895,7 @@ require([
   view.popup.dockOptions={buttonEnabled:true, breakpoint:false, position:"top-left"};
 
   new BasemapGallery({view, source:[bmTopo,bmImg,bmStreets], container:document.getElementById("bmGalleryBox")});   // drawer "basemaps" (elemento, non stringa: con l'id la gallery non renderizza)
-  new LayerList({view, container:"layerListBox"});                                          // drawer "layers"
+  new LayerList({view, container:"layerListBox", listItemCreatedFunction:layerListItem});   // drawer "layers" (+ pannello trasparenza/popup)
   layerListExpand={expanded:false};   // shim: la LayerList vive nella sidebar
 
   // ── Fase B: Stampa (basso-sx), Sottostazioni (basso-dx), Profilo elevazione (sidebar) ──
@@ -1377,6 +1389,48 @@ function restoreState(){
   }catch(e){}
 }
 
+// ── catasto della webmap: match per ITEM ID (i titoli "catast*" sono decine: regioni/province) ──
+function findWebmapCatasto(wm){
+  let f=null;
+  wm.layers.forEach(l=>{ if(f||l===catasto) return;
+    const pid=(l.portalItem&&l.portalItem.id)||'';
+    if(pid===CATASTO_ITEM_ID||pid===CATASTO_ITEM_ID_ALT) f=l; });
+  if(!f) wm.layers.forEach(l=>{ if(f||l===catasto) return;      // fallback stretto: serve "AdE" nel titolo
+    if(/\bade\b[^]*catast|catast[^]*\bade\b/i.test(l.title||'')) f=l; });
+  return f;
+}
+// ── LayerList: pannello per-layer con trasparenza e popup ──────────────────
+function layerListItem(ev){
+  const item=ev&&ev.item, layer=item&&item.layer;
+  if(!item||!layer) return;
+  const hasOp=('opacity' in layer), hasPop=('popupEnabled' in layer);
+  if(!hasOp&&!hasPop) return;
+  const box=document.createElement('div'); box.className='llopts';
+  if(hasOp){
+    const row=document.createElement('div'); row.className='llrow';
+    const lab=document.createElement('span'); lab.className='lllab'; lab.textContent='Trasparenza';
+    const sl=document.createElement('input'); sl.type='range'; sl.min='0'; sl.max='100'; sl.className='llrange';
+    const val=document.createElement('span'); val.className='llval';
+    const tr=100-Math.round((layer.opacity==null?1:layer.opacity)*100);
+    sl.value=tr; val.textContent=tr+'%';
+    sl.oninput=function(){ layer.opacity=(100-sl.value)/100; val.textContent=sl.value+'%'; };
+    row.appendChild(lab); row.appendChild(sl); row.appendChild(val); box.appendChild(row);
+  }
+  if(hasPop){
+    const lb=document.createElement('label'); lb.className='llchk';
+    const ck=document.createElement('input'); ck.type='checkbox'; ck.checked=layer.popupEnabled!==false;
+    ck.onchange=function(){
+      layer.popupEnabled=ck.checked;
+      // se il layer non ha un popup configurato, ne genero uno di default (tutti i campi)
+      if(ck.checked&&!layer.popupTemplate&&typeof layer.createPopupTemplate==='function'){
+        try{ const t=layer.createPopupTemplate(); if(t) layer.popupTemplate=t; }catch(e){}
+      }
+    };
+    lb.appendChild(ck); lb.appendChild(document.createTextNode(' Popup al click'));
+    box.appendChild(lb);
+  }
+  item.panel={ content:box, className:'esri-icon-sliders-horizontal', title:'Trasparenza e popup', open:false };
+}
 // ── caricamento di una web map del portale (General Map o CV) ──────────────
 // hideLayers=true → spegne i layer operativi (per le CV, che caricano lazy quando
 // l'utente li accende). NO loadAll: caricherebbe avidamente i WMS regionali (CORS).
@@ -1386,7 +1440,15 @@ async function loadWebMap(id, hideLayers, label){
     await wm.load();
     if(hideLayers) wm.layers.forEach(l=>{ l.visible=false; });
     try{ wm.ground={layers:[new esriMods.ElevationLayer({url:WORLD_ELEV})]}; }catch(e){}   // profilo elevazione dopo lo swap
-    wm.add(catasto); wm.add(gl); wm.add(toolsGL);       // ri-aggancio catasto + particelle + strumenti
+    const wmCat=findWebmapCatasto(wm);
+    if(wmCat){                                         // la webmap ha gia' il catasto AdE: uso quello
+      try{ wm.reorder(wmCat, wm.layers.length-1); }catch(e){}   // in cima alla legenda
+      wmCat.visible=true;                              // acceso anche sulle CV (dove spengo tutto)
+    }else{                                             // fallback: webmap senza catasto -> il mio WMS
+      try{ view.map&&view.map.remove(catasto); }catch(e){}
+      wm.add(catasto);
+    }
+    wm.add(gl); wm.add(toolsGL);       // particelle + strumenti sempre SOPRA il catasto
     view.map=wm;
     if(parcels.length) view.goTo(gl.graphics.toArray()).catch(()=>{});
     setTimeout(setupAreasEditor, 800);                  // abilita l'edit se AREAS COLLECTION è nella mappa
