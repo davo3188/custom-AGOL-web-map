@@ -358,8 +358,21 @@
   .llopts .lllab{flex:none;opacity:.75}
   .llopts .llrange{flex:1;min-width:60px;accent-color:var(--accent)}
   .llopts .llval{flex:none;width:36px;text-align:right;font-variant-numeric:tabular-nums;opacity:.7}
-  .llopts .llchk{display:flex;align-items:center;gap:7px;cursor:pointer}
-  .llopts .llchk input{accent-color:var(--accent)}
+  .llopts .llchk{display:flex!important;flex-direction:row!important;align-items:center!important;justify-content:flex-start!important;
+    gap:8px!important;width:auto!important;margin:0!important;padding:0!important;cursor:pointer;
+    text-transform:none!important;letter-spacing:normal!important;font-size:11.5px!important;font-weight:400!important;
+    line-height:1.3!important;color:var(--txt)!important;text-align:left!important}
+  .llopts .llchk input{accent-color:var(--accent);flex:none!important;margin:0!important;width:14px;height:14px}
+  .llopts .llchk span{flex:0 1 auto!important;text-transform:none!important;letter-spacing:normal!important;
+    font-size:11.5px!important;font-weight:400!important;text-align:left!important;white-space:nowrap}
+  .llopts .lllab{flex:none;opacity:.75;text-transform:none!important;letter-spacing:normal!important;font-size:11.5px!important;font-weight:400!important}
+  .llopts .lllegend{margin:0 0 9px;max-height:240px;overflow:auto}
+  .llopts .lllegend .esri-legend{background:transparent;padding:0}
+  .llopts .lllegend .esri-legend__service{padding:0}
+  .llopts .lllegend .esri-legend__service-label{display:none}   /* il titolo è già nella riga del layer */
+  .llopts .lllegend .esri-legend__message{display:none}          /* niente "Nessuna legenda": box vuoto e basta */
+  .llopts .lllegend img{max-width:100%;display:block}
+  .llopts .lllegend .wmsleg{display:flex;align-items:center;gap:7px;margin-bottom:5px;font-size:11px;opacity:.9}
 </style>
 </head>
 <body>
@@ -895,7 +908,7 @@ require([
   view.popup.dockOptions={buttonEnabled:true, breakpoint:false, position:"top-left"};
 
   new BasemapGallery({view, source:[bmTopo,bmImg,bmStreets], container:document.getElementById("bmGalleryBox")});   // drawer "basemaps" (elemento, non stringa: con l'id la gallery non renderizza)
-  new LayerList({view, container:"layerListBox", listItemCreatedFunction:layerListItem});   // drawer "layers" (+ pannello trasparenza/popup)
+  new LayerList({view, container:"layerListBox", listItemCreatedFunction:layerListItem, dragEnabled:true});   // drawer "layers" (+ pannello simbologia/trasparenza/popup, riordino drag&drop)
   layerListExpand={expanded:false};   // shim: la LayerList vive nella sidebar
 
   // ── Fase B: Stampa (basso-sx), Sottostazioni (basso-dx), Profilo elevazione (sidebar) ──
@@ -906,10 +919,33 @@ require([
 
   // ── Segnalibri (persistiti in localStorage) ──
   const bookmarksW=new Bookmarks({view, editingEnabled:true, container:"bookmarksBox"});   // drawer "bookmarks"
+  // Bookmark di Esri salva SOLO viewpoint/scala/rotazione: l'accensione dei layer la gestisco io
+  // (stato su ogni bookmark in `_layers`, riapplicato alla selezione).
+  window.__bmCapture=function(){
+    const out=[], skip=new Set();
+    // allLayers include anche basemap e terreno: non sono "layer della mappa", li escludo
+    try{ const b=view.map.basemap; if(b){ b.baseLayers&&b.baseLayers.forEach(l=>skip.add(l));
+      b.referenceLayers&&b.referenceLayers.forEach(l=>skip.add(l)); } }catch(e){}
+    try{ view.map.ground&&view.map.ground.layers&&view.map.ground.layers.forEach(l=>skip.add(l)); }catch(e){}
+    try{ view.map.allLayers.forEach(l=>{ if(l===gl||l===toolsGL||l.listMode==='hide'||skip.has(l)) return;
+      out.push({id:l.id, t:l.title||'', v:l.visible!==false}); }); }catch(e){}
+    return out;
+  };
+  window.__bmApply=function(states){
+    if(!Array.isArray(states)||!states.length) return;
+    try{ const byId={}, byT={};
+      view.map.allLayers.forEach(l=>{ byId[l.id]=l; if(l.title) byT[l.title]=l; });
+      states.forEach(st=>{ const l=byId[st.id]||byT[st.t]; if(l) l.visible=!!st.v; });
+    }catch(e){}
+  };
   try{ const sv=JSON.parse(localStorage.getItem('cat_bookmarks')||'[]');
-    if(Array.isArray(sv)&&sv.length) bookmarksW.bookmarks=sv.map(b=>new Bookmark({name:b.name, viewpoint:b.viewpoint})); }catch(e){}
+    if(Array.isArray(sv)&&sv.length) bookmarksW.bookmarks=sv.map(b=>{
+      const bk=new Bookmark({name:b.name, viewpoint:b.viewpoint}); bk._layers=b.layers||null; return bk; }); }catch(e){}
   bookmarksW.bookmarks.on('change', ()=>{ try{
-    localStorage.setItem('cat_bookmarks', JSON.stringify(bookmarksW.bookmarks.toArray().map(b=>({name:b.name, viewpoint:b.viewpoint&&b.viewpoint.toJSON()})))); }catch(e){} });
+    // un bookmark appena creato non ha ancora lo stato: gli assegno quello corrente
+    bookmarksW.bookmarks.forEach(b=>{ if(!b._layers) b._layers=window.__bmCapture(); });
+    localStorage.setItem('cat_bookmarks', JSON.stringify(bookmarksW.bookmarks.toArray().map(b=>({name:b.name, viewpoint:b.viewpoint&&b.viewpoint.toJSON(), layers:b._layers||null})))); }catch(e){} });
+  try{ bookmarksW.on('bookmark-select', ev=>{ const b=ev&&ev.bookmark; if(b&&b._layers) window.__bmApply(b._layers); }); }catch(e){}
 
   // ── Auto-resume: mappa/elenco "restano come lasciati" ──
   BM_BY_ID={topo:bmTopo, img:bmImg, streets:bmStreets};
@@ -1406,6 +1442,10 @@ function layerListItem(ev){
   const hasOp=('opacity' in layer), hasPop=('popupEnabled' in layer);
   if(!hasOp&&!hasPop) return;
   const box=document.createElement('div'); box.className='llopts';
+  // simbologia: widget Legend montato SOLO all'apertura del pannello (e solo sui layer di primo
+  // livello: per le sublayer la legenda del padre le contiene già)
+  let legWrap=null;
+  if(!item.parent){ legWrap=document.createElement('div'); legWrap.className='lllegend'; box.appendChild(legWrap); }
   if(hasOp){
     const row=document.createElement('div'); row.className='llrow';
     const lab=document.createElement('span'); lab.className='lllab'; lab.textContent='Trasparenza';
@@ -1426,10 +1466,38 @@ function layerListItem(ev){
         try{ const t=layer.createPopupTemplate(); if(t) layer.popupTemplate=t; }catch(e){}
       }
     };
-    lb.appendChild(ck); lb.appendChild(document.createTextNode(' Popup al click'));
+    const tx=document.createElement('span'); tx.textContent='Popup al click';
+    lb.appendChild(ck); lb.appendChild(tx);
     box.appendChild(lb);
   }
-  item.panel={ content:box, className:'esri-icon-sliders-horizontal', title:'Trasparenza e popup', open:false };
+  item.panel={ content:box, className:'esri-icon-sliders-horizontal', title:'Simbologia, trasparenza, popup', open:false };
+  // Legend è pesante: lo creo alla prima apertura del pannello, non per ogni layer della lista
+  if(legWrap){ let mounted=false;
+    try{ item.panel.watch('open', function(op){
+      if(!op||mounted) return; mounted=true;
+      require(["esri/widgets/Legend"], function(Legend){
+        try{ new Legend({view, container:legWrap, layerInfos:[{layer:layer}], respectLayerVisibility:false}); }catch(e){}
+        // il widget Legend non copre i WMS: se non ha prodotto simboli, uso GetLegendGraphic
+        setTimeout(function(){
+          try{
+            if(legWrap.querySelector('.esri-legend__layer')) return;      // legenda nativa ok
+            if(layer.type!=='wms') return;
+            const subs=layer.sublayers?layer.sublayers.toArray():[];
+            subs.forEach(function(sub){
+              let u=sub.legendUrl;
+              if(!u&&layer.url&&sub.name)                                  // costruisco la richiesta standard
+                u=layer.url+(layer.url.indexOf('?')>=0?'&':'?')+'service=WMS&request=GetLegendGraphic&version=1.3.0&format=image/png&layer='+encodeURIComponent(sub.name);
+              if(!u) return;
+              const row=document.createElement('div'); row.className='wmsleg';
+              const im=document.createElement('img'); im.src=u; im.alt=sub.title||sub.name||'';
+              im.onerror=function(){ row.remove(); };
+              row.appendChild(im); legWrap.appendChild(row);
+            });
+          }catch(e){}
+        }, 1500);
+      });
+    }); }catch(e){}
+  }
 }
 // ── caricamento di una web map del portale (General Map o CV) ──────────────
 // hideLayers=true → spegne i layer operativi (per le CV, che caricano lazy quando
