@@ -313,7 +313,11 @@
   .grow .gname{flex:1;min-width:0;font-size:12px;border:1px solid transparent;border-radius:5px;padding:3px 5px;background:transparent;color:var(--txt);text-overflow:ellipsis}
   .grow .gname:hover{border-color:var(--line)}
   .grow .gname:focus{border-color:var(--accent);background:var(--panel);outline:none}
-  .grow .gsub{font-size:10px;opacity:.55;flex:none}
+  /* il sottotitolo (tipo/area/nota) va a capo: con 7 controlli in riga il nome resterebbe illeggibile */
+  .grow{flex-wrap:wrap}
+  .grow .gsub{font-size:10px;opacity:.55;order:10;flex:0 0 100%;padding-left:56px;margin-top:-3px;
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .grow .gname{flex:1 1 80px}
   .grow .gact{border:none;background:transparent;cursor:pointer;color:var(--txt);opacity:.6;padding:3px 5px;border-radius:5px;font-size:13px;line-height:1}
   .grow .gact:hover{opacity:1;background:var(--hover)}
   /* ── Controlli visibilità + colore (righe elenco e header sezione) ── */
@@ -372,6 +376,10 @@
   .llopts .lllegend .esri-legend__service-label{display:none}   /* il titolo è già nella riga del layer */
   .llopts .lllegend .esri-legend__message{display:none}          /* niente "Nessuna legenda": box vuoto e basta */
   .llopts .lllegend img{max-width:100%;display:block}
+  .grow .gsel{flex:none;width:14px;height:14px;margin:0 1px 0 0;accent-color:var(--accent);cursor:pointer}
+  .grow.sel{background:color-mix(in srgb, var(--accent) 14%, transparent);
+    box-shadow:inset 2px 0 0 var(--accent)}
+  #gpSelInfo{margin-top:3px}
   .llopts .lllegend .wmsleg{display:flex;align-items:center;gap:7px;margin-bottom:5px;font-size:11px;opacity:.9}
   /* menu contestuale della mappa (tasto destro) */
   #ctxMenu{position:fixed;z-index:1500;display:none;min-width:216px;background:var(--panel);border:1px solid var(--line);
@@ -481,31 +489,35 @@
     </div></div>
 
     <div class="tabpane" data-tab="geoproc"><div class="paneBody">
-        <div class="tlab">Geoprocessi · Buffer</div>
-        <div class="btns">
-          <button class="sec" id="bufPoint">• Punto</button>
-          <button class="sec" id="bufLine">╱ Linea</button>
-          <button class="sec" id="bufArea">▱ Area</button>
-        </div>
-        <div class="row" style="margin-top:8px;align-items:flex-end">
-          <div style="flex:2"><label class="tlab2">Distanza (m)</label><input id="bufDist" type="number" value="100" min="1"></div>
-          <div style="flex:0 0 auto"><button class="sec" id="bufGen" disabled style="margin-top:0">Genera</button></div>
-        </div>
-        <div class="btns" style="margin-top:8px"><button class="sec" id="bufClear">Pulisci</button></div>
-        <div id="bufMsg" class="thint"></div>
-        <div class="tlab" style="margin-top:16px">Operazioni geometriche</div>
+        <div class="tlab">Geoprocessi</div>
         <div class="row">
-          <div><label class="tlab2">Sorgente A</label><select id="gpA"><option value="parcels">Particelle</option><option value="drawings">Disegni</option><option value="buffers">Buffer</option></select></div>
-          <div><label class="tlab2">Sorgente B</label><select id="gpB"><option value="buffers">Buffer</option><option value="drawings">Disegni</option><option value="parcels">Particelle</option></select></div>
+          <div><label class="tlab2">Sorgente A</label><select id="gpA">
+            <option value="parcels">Particelle</option><option value="drawings">Disegni</option>
+            <option value="geoproc">Geoprocessi</option><option value="imports">Importati</option>
+            <option value="sel">Selezionati</option></select></div>
+          <div><label class="tlab2">Sorgente B</label><select id="gpB">
+            <option value="drawings">Disegni</option><option value="parcels">Particelle</option>
+            <option value="geoproc">Geoprocessi</option><option value="imports">Importati</option>
+            <option value="sel">Selezionati</option></select></div>
         </div>
-        <div class="btns" style="margin-top:8px">
+        <div id="gpSelInfo" class="thint">«Selezionati» usa gli elementi spuntati nell'elenco.</div>
+
+        <label class="tlab2" style="margin-top:12px">Buffer attorno alla Sorgente A</label>
+        <div class="row" style="align-items:flex-end">
+          <div style="flex:2"><label class="tlab2">Distanza (m)</label><input id="bufDist" type="number" value="100" min="1"></div>
+          <div style="flex:0 0 auto"><button class="sec" id="bufGen" style="margin-top:0">⬡ Genera buffer</button></div>
+        </div>
+
+        <div class="tlab" style="margin-top:14px">Operazioni sulla Sorgente A</div>
+        <div class="btns">
           <button class="sec" id="gpUnion" title="Fondi tutte le geometrie di A">Union</button>
           <button class="sec" id="gpHull" title="Perimetro convesso di A">Convex hull</button>
           <button class="sec" id="gpSimplify" title="Semplifica A (meno vertici)">Simplify</button>
         </div>
-        <div class="thint" style="margin-top:2px">↑ usano solo la Sorgente A</div>
-        <div class="btns" style="margin-top:8px"><button class="sec" id="gpClip" title="Ritaglia A con un poligono disegnato">Clip · A ∩ area disegnata</button></div>
-        <div class="btns" style="margin-top:6px">
+        <div class="btns" style="margin-top:6px"><button class="sec" id="gpClip" title="Ritaglia A con un poligono disegnato al momento">Clip · A ∩ area disegnata</button></div>
+
+        <div class="tlab" style="margin-top:14px">Operazioni tra A e B</div>
+        <div class="btns">
           <button class="sec" id="gpIntersect" title="Parte comune tra A e B">Intersect · A ∩ B</button>
           <button class="sec" id="gpDiff" title="Sottrai B da A">Difference · A − B</button>
         </div>
@@ -596,10 +608,6 @@
         <div class="gsec" data-sec="draw">
           <div class="gsecH"><b>Disegni</b><span class="gtools" data-sec="draw"><button class="vtoggle" data-role="visall" title="Mostra/nascondi tutti" aria-label="Mostra/nascondi tutti i disegni"></button><span class="cswatch" data-role="colall" title="Colore di tutti i disegni"><input type="color" value="#2FB6E6"></span></span><span id="cntDraw" class="gcount">0</span></div>
           <div class="glist"><div id="listDraw"><div class="empty">Nessun disegno.</div></div></div>
-        </div>
-        <div class="gsec" data-sec="buf">
-          <div class="gsecH"><b>Buffer</b><span class="gtools" data-sec="buf"><button class="vtoggle" data-role="visall" title="Mostra/nascondi tutti" aria-label="Mostra/nascondi tutti i buffer"></button><span class="cswatch" data-role="colall" title="Colore di tutti i buffer"><input type="color" value="#79C0FF"></span></span><span id="cntBuf" class="gcount">0</span></div>
-          <div class="glist"><div id="listBuf"><div class="empty">Nessun buffer.</div></div></div>
         </div>
         <div class="gsec" data-sec="geo">
           <div class="gsecH"><b>Geoprocessi</b><span class="gtools" data-sec="geo"><button class="vtoggle" data-role="visall" title="Mostra/nascondi tutti" aria-label="Mostra/nascondi tutti i geoprocessi"></button><span class="cswatch" data-role="colall" title="Colore di tutti i geoprocessi"><input type="color" value="#2FB6E6"></span></span><span id="cntGeo" class="gcount">0</span></div>
@@ -743,7 +751,7 @@
     <ol style="margin:0;padding-left:18px;font-size:13px;line-height:1.7">
       <li><b>Sidebar sinistra (rail di icone)</b> — Ricerca (ambito + foglio/particella + selezione mappa), Disegno, Geoprocessi, Contesto sito, Import.</li>
       <li><b>Ricerca particelle</b> — per Foglio/Particella, con la selezione su mappa (punto/rettangolo/poligono/linea) o da un disegno esistente.</li>
-      <li><b>Action bar destra</b> — <b>Elenco &amp; azioni</b> (Particelle · Disegni · Buffer · Geoprocessi · Importati, con rinomina), poi Layer, Basemap, Segnalibri, Modifica AREAS, Stampa.</li>
+      <li><b>Action bar destra</b> — <b>Elenco &amp; azioni</b> (Particelle · Disegni · Geoprocessi · Importati): ogni riga si rinomina, si colora, si nasconde e si <b>spunta</b> per usarla nei geoprocessi. Poi Layer, Basemap, Segnalibri, Modifica AREAS, Stampa.</li>
       <li><b>Esporta / Promuovi</b> — GeoJSON/KML/KMZ/SHP/XLSX; oppure promuovi in <b>AREAS COLLECTION</b> o <b>Sites Notes</b>.</li>
     </ol>
     <div class="hint" style="margin-top:10px">Sulla mappa: misura e coordinate in alto a destra; scalimetro e coordinate del puntatore (con pin) in basso a destra; profilo di elevazione in basso a sinistra. <kbd>Esc</kbd> esce da qualsiasi modalità. Riapri i tour dal <b>?</b>.</div>
@@ -872,6 +880,9 @@ const ADDABLE=new Set(["Feature Service","Map Service","Image Service","Vector T
 
 // ── stato ArcGIS ──────────────────────────────────────────────────────────
 let view, gl, labelsGL, catasto, esriMods, basemapLayers, layerListExpand;
+// inquadratura ripristinata al boot: finche' e' valorizzata gli auto-zoom sulle particelle
+// vengono soppressi (sennò l'animazione asincrona sovrascrive la vista salvata).
+let bootVP=null;
 let toolsGL, measurement, sketchVM, bufferGeom=null;   // strumenti (misura/buffer)
 let areasEditorExpand=null, areasLayer=null, recomputingArea=false;   // edit AREAS COLLECTION
 let subActive=false;      // modalità "contesto sito" (click su mappa)
@@ -896,12 +907,13 @@ require([
   "esri/widgets/Search","esri/widgets/Measurement","esri/widgets/Sketch/SketchViewModel","esri/widgets/Editor",
   "esri/widgets/ElevationProfile","esri/widgets/Print","esri/widgets/Bookmarks","esri/webmap/Bookmark","esri/widgets/ScaleBar",
   "esri/geometry/geometryEngine","esri/geometry/Point","esri/geometry/support/webMercatorUtils",
-  "esri/identity/OAuthInfo","esri/identity/IdentityManager","esri/portal/Portal","esri/portal/PortalQueryParams"
+  "esri/identity/OAuthInfo","esri/identity/IdentityManager","esri/portal/Portal","esri/portal/PortalQueryParams",
+  "esri/Viewpoint"
 ],(esriConfig,Map,MapView,WebMap,Basemap,GraphicsLayer,WMSLayer,FeatureLayer,Layer,TileLayer,ElevationLayer,Graphic,Polygon,projection,
    BasemapGallery,LayerList,Expand,Search,Measurement,SketchViewModel,Editor,ElevationProfile,Print,Bookmarks,Bookmark,ScaleBar,geometryEngine,Point,webMercatorUtils,
-   OAuthInfo,IdentityManager,Portal,PortalQueryParams)=>{
+   OAuthInfo,IdentityManager,Portal,PortalQueryParams,Viewpoint)=>{
 
-  esriMods={Graphic,Polygon,projection,FeatureLayer,Layer,WebMap,LayerList,Expand,Editor,IdentityManager,Portal,PortalQueryParams,geometryEngine,Point,webMercatorUtils,ElevationLayer};
+  esriMods={Graphic,Polygon,projection,FeatureLayer,Layer,WebMap,LayerList,Expand,Editor,IdentityManager,Portal,PortalQueryParams,geometryEngine,Point,webMercatorUtils,ElevationLayer,Viewpoint};
 
   catasto=new WMSLayer({
     url:"https://webgis.regione.sardegna.it/geoserver/dbu/wms",
@@ -944,11 +956,7 @@ require([
   // Bookmark di Esri salva SOLO viewpoint/scala/rotazione: l'accensione dei layer la gestisco io
   // (stato su ogni bookmark in `_layers`, riapplicato alla selezione).
   window.__bmCapture=function(){
-    const out=[], skip=new Set();
-    // allLayers include anche basemap e terreno: non sono "layer della mappa", li escludo
-    try{ const b=view.map.basemap; if(b){ b.baseLayers&&b.baseLayers.forEach(l=>skip.add(l));
-      b.referenceLayers&&b.referenceLayers.forEach(l=>skip.add(l)); } }catch(e){}
-    try{ view.map.ground&&view.map.ground.layers&&view.map.ground.layers.forEach(l=>skip.add(l)); }catch(e){}
+    const out=[], skip=baseGroundSet();   // esclude basemap e terreno (vedi baseGroundSet)
     try{ view.map.allLayers.forEach(l=>{ if(l===gl||l===toolsGL||l.listMode==='hide'||skip.has(l)) return;
       out.push({id:l.id, t:l.title||'', v:l.visible!==false}); }); }catch(e){}
     return out;
@@ -1061,9 +1069,8 @@ require([
       e.graphic.attributes={_kind:'drawing', geomType:geom.type, categoria:$('drwCat').value||'', note:$('drwNote').value||''};
       const cat=$('drwCat').value; toolMsg('drwMsg','Disegnato'+(cat?' · '+cat:'')+'. Continua o cambia tipo.','ok'); refreshDl();
       if(drawType){ sketchPurpose='drawing'; sketchVM.create(drawType); }   // ri-armo per un altro disegno
-    }else{                                // buffer
-      bufferGeom=geom; $('bufGen').disabled=false;
-      toolMsg('bufMsg','Geometria disegnata. Imposta la distanza e genera il buffer.','ok');
+    }else{                                // nessuno scopo noto: non lascio geometrie senza elenco
+      toolsGL.remove(e.graphic);
     }
   });
   // (il pannello Strumenti ora è la sidebar destra collassabile, non più un Expand)
@@ -1209,9 +1216,9 @@ function wireContextMenu(){
   $('ctxCtx').onclick=()=>{ close(); if(!pt) return;
     try{ window.showTab&&window.showTab('contesto'); }catch(e){}
     querySubstations(pt); };
-  $('ctxBuf').onclick=()=>{ close(); if(!pt) return;      // riuso il generatore di buffer esistente
+  $('ctxBuf').onclick=()=>{ close(); if(!pt) return;
     try{ window.showTab&&window.showTab('geoproc'); }catch(e){}
-    bufferGeom=pt; $('bufGen').disabled=false; $('bufGen').click(); };
+    makeBuffer([pt], parseFloat($('bufDist').value)||100); };
   $('ctxCopy').onclick=()=>{ close(); if(!ll) return;
     const t=ll.lat.toFixed(6)+', '+ll.lng.toFixed(6);
     try{ navigator.clipboard.writeText(t).then(()=>msg('Coordinate copiate: '+t,'ok'), ()=>msg('Coordinate: '+t)); }
@@ -1267,27 +1274,8 @@ function wireTools(){
   $('msDist').onclick=()=>{ measurement.activeTool='distance'; };
   $('msArea').onclick=()=>{ measurement.activeTool='area'; };
   $('msClear').onclick=()=>{ measurement.clear(); };
-  // strumenti per buffer: disegna punto/linea/area, poi genera
-  const startBuf=(shape,label)=>{ try{sketchVM.cancel();}catch(e){} bufferGeom=null; $('bufGen').disabled=true;
-    sketchPurpose='buffer'; toolMsg('bufMsg','Disegna '+label+' sulla mappa.'); sketchVM.create(shape); };
-  $('bufPoint').onclick=()=>startBuf('point','il punto');
-  $('bufLine').onclick=()=>startBuf('polyline','la linea (doppio click per finire)');
-  $('bufArea').onclick=()=>startBuf('polygon','l\'area (doppio click per finire)');
-  $('bufClear').onclick=()=>{ try{sketchVM.cancel();}catch(e){}
-    toolsGL.graphics.toArray().filter(g=>g.attributes&&g.attributes._kind==='buffer').forEach(g=>toolsGL.remove(g));
-    bufferGeom=null; $('bufGen').disabled=true; toolMsg('bufMsg',''); refreshDl(); };
-  $('bufGen').onclick=()=>{
-    if(!bufferGeom){ toolMsg('bufMsg','Prima disegna punto, linea o area.','err'); return; }
-    const d=parseFloat($('bufDist').value)||0;
-    if(d<=0){ toolMsg('bufMsg','Distanza non valida.','err'); return; }
-    const buf=esriMods.geometryEngine.geodesicBuffer(bufferGeom, d, 'meters');
-    if(buf){ const areaHa=Math.abs(esriMods.geometryEngine.geodesicArea(buf,'hectares')||0);
-      toolsGL.add(new esriMods.Graphic({geometry:buf,
-        attributes:{_kind:'buffer', dist_m:d, area_ha:+areaHa.toFixed(4)},   // tag per l'export
-        symbol:{type:'simple-fill', color:[121,192,255,0.2], outline:{color:[121,192,255],width:1.5}}}));
-      toolMsg('bufMsg',`Buffer di ${d} m generato.`,'ok'); refreshDl(); view.goTo(buf.extent.expand(1.5)).catch(()=>{}); }
-    else toolMsg('bufMsg','Buffer non generato.','err');
-  };
+  // buffer: ora è un'operazione dei geoprocessi sulla Sorgente A (niente disegno estemporaneo)
+  $('bufGen').onclick=()=>makeBuffer(gpSrcGeometries($('gpA').value), parseFloat($('bufDist').value)||0);
   // (ricerca coordinate lat,lon ora integrata nel widget Search in alto a destra)
   // modalità selezione particelle
   $('selModeBox').querySelectorAll('button').forEach(b=>b.onclick=()=>setSelMode(b.dataset.m));
@@ -1489,10 +1477,17 @@ function saveState(){
   }catch(e){}
 }
 let _saveT; function saveStateDebounced(){ clearTimeout(_saveT); _saveT=setTimeout(saveState,800); }
+// ⚠️ `view.viewpoint = <JSON>` NON fa autocast (la mappa resta ferma): serve fromJSON.
+function vpFromJSON(j){
+  if(!j) return null;
+  try{ if(j.declaredClass||typeof j.clone==='function') return j; }catch(e){}
+  try{ return esriMods&&esriMods.Viewpoint ? esriMods.Viewpoint.fromJSON(j) : null; }catch(e){ return null; }
+}
 function restoreState(){
   let st; try{ st=JSON.parse(localStorage.getItem('cat_state')||'null'); }catch(e){}
   if(!st) return;
   try{
+    bootVP = st.viewpoint || null;      // impostato PRIMA di render(): sopprime l'auto-zoom
     if(Array.isArray(st.parcels)&&st.parcels.length){ parcels=st.parcels; render(); }
     if(Array.isArray(st.toolGeoms)&&st.toolGeoms.length&&toolsGL&&esriMods){
       st.toolGeoms.forEach(rec=>{ try{
@@ -1503,7 +1498,7 @@ function restoreState(){
       }catch(e){} });
       try{ refreshDl(); }catch(e){}
     }
-    if(st.viewpoint&&view) view.viewpoint=st.viewpoint;
+    const _vp=vpFromJSON(st.viewpoint); if(_vp&&view) view.viewpoint=_vp;
     if(st.basemap&&BM_BY_ID[st.basemap]&&view&&view.map) view.map.basemap=BM_BY_ID[st.basemap];
     addedPortalItems = Array.isArray(st.addedItems)? st.addedItems : [];
     // i layer del portale si ri-aggiungono dopo il login (onSignedIn)
@@ -1603,7 +1598,8 @@ async function loadWebMap(id, hideLayers, label){
     }
     wm.add(gl); wm.add(labelsGL); wm.add(toolsGL);       // particelle + etichette + strumenti sempre SOPRA il catasto
     view.map=wm;
-    if(parcels.length) view.goTo(gl.graphics.toArray()).catch(()=>{});
+    if(bootVP){ try{ const _b=vpFromJSON(bootVP); if(_b) view.viewpoint=_b; }catch(e){} }   // post-login: vista com'era
+    else if(parcels.length) view.goTo(gl.graphics.toArray()).catch(()=>{});
     setTimeout(setupAreasEditor, 800);                  // abilita l'edit se AREAS COLLECTION è nella mappa
     return true;
   }catch(e){ if(label) $('cvNote').innerHTML=`<span style="color:var(--err)">Impossibile caricare ${label}: ${e.message}</span>`; return false; }
@@ -1656,6 +1652,7 @@ function setupAreasEditor(){
 // ── Fase 2: cambio regione → Check Vincoli (layer spenti) ─────────────────
 async function swapCheckVincoli(region){
   if(!view) return;
+  bootVP=null;                        // cambio regione: l'utente vuole vedere la nuova area
   $('cvNote').textContent='';
   if(!region){ if(signedIn) loadWebMap(GENERAL_MAP,false,'la General Map'); return; }  // regione deselezionata → torna alla General Map
   const id=cvIdFor(region);
@@ -1713,6 +1710,7 @@ function trueAreaM2(geojson){
   return null;
 }
 async function addByFid(fid, hintComune, hintFoglio, hintPart, centroid){
+  bootVP=null;                      // azione utente: da qui l'auto-zoom torna attivo
   try{
     const prof=(await z('/parcels/'+fid)).data;
     const cad=prof.cadastral||{};
@@ -1807,7 +1805,7 @@ function render(){
       gl.add(g);
     });
     const vis=gl.graphics.toArray().filter(g=>g.visible!==false);
-    if(vis.length && view){ view.goTo(vis).catch(()=>{}); }
+    if(vis.length && view && !bootVP){ view.goTo(vis).catch(()=>{}); }   // al boot rispetto la vista salvata
   }
   renderLabels();
   if(!has){$('list').innerHTML='<div class="empty">Nessuna particella nell\'elenco. Cercala per Foglio/Particella o cliccala sulla mappa.</div>';return;}
@@ -1815,6 +1813,12 @@ function render(){
   parcels.forEach((p,i)=>{
     const row=document.createElement('div'); row.className='grow';
     if(p.hidden) row.classList.add('hidden');
+    const psc=document.createElement('input'); psc.type='checkbox'; psc.className='gsel';
+    psc.title='Seleziona per i geoprocessi'; psc.checked=!!p.sel;
+    row.classList.toggle('sel', !!p.sel);
+    psc.onchange=function(e){ e.stopPropagation(); p.sel=psc.checked;
+      row.classList.toggle('sel', psc.checked); gpSelInfo(); };
+    row.appendChild(psc);
     row.appendChild(makeVisToggle(()=>!p.hidden, on=>{ p.hidden=!on; row.classList.toggle('hidden',!on); const gg=gl.graphics.getItemAt(i); if(gg) gg.visible=on; renderLabels(); saveStateDebounced&&saveStateDebounced(); }));
     row.appendChild(makeColorSwatch(()=>p.color||PARCEL_HEX, hex=>{ p.color=hex; const gg=gl.graphics.getItemAt(i); if(gg&&gg.geometry) gg.symbol=symbolForColor(gg.geometry.type,hex); saveStateDebounced&&saveStateDebounced(); }));
     const nm=document.createElement('input'); nm.className='gname'; nm.spellcheck=false;
@@ -2024,10 +2028,34 @@ function graphicsFeatures(kind){
 }
 
 // ── GEOPROCESSI (turf, client-side) ───────────────────────────────────────
+// graphics di una sorgente ('drawings' esclude i geoprocessi, 'geoproc' include i buffer)
+function gpSrcGraphics(src){
+  const all=toolsGL?toolsGL.graphics.toArray():[];
+  if(src==='drawings') return all.filter(g=>{const a=g.attributes||{}; return a._kind==='drawing'&&a._sub!=='geoproc';});
+  if(src==='geoproc')  return all.filter(g=>{const a=g.attributes||{}; return a._kind==='buffer'||a._sub==='geoproc';});
+  if(src==='imports')  return all.filter(g=>(g.attributes||{})._kind==='import');
+  if(src==='sel')      return all.filter(g=>(g.attributes||{})._sel);
+  return [];
+}
+// geometrie esri di una sorgente (per il buffer servono anche punti e linee)
+function gpSrcGeometries(src){
+  const out=[];
+  if(src==='parcels'||src==='sel'){
+    parcels.forEach(p=>{ if(src==='sel'&&!p.sel) return;
+      const g=geojsonToEsri(p.geometry)||geojsonToEsri({type:'Point',coordinates:[p.lng,p.lat]});
+      if(g) out.push(g); });
+  }
+  if(src!=='parcels') gpSrcGraphics(src).forEach(g=>{ if(g.geometry) out.push(g.geometry); });
+  return out;
+}
 function gpFeats(src){   // → feature GeoJSON poligonali (winding corretto per turf)
-  let feats;
-  if(src==='parcels') feats=parcels.filter(p=>p.geometry&&/Polygon/.test(p.geometry.type)).map(p=>({type:'Feature',geometry:p.geometry,properties:{}}));
-  else feats=graphicsFeatures(src==='buffers'?'buffer':'drawing').filter(f=>/Polygon/.test(f.geometry.type));
+  let feats=[];
+  if(src==='parcels'||src==='sel')
+    feats=parcels.filter(p=>(src!=='sel'||p.sel)&&p.geometry&&/Polygon/.test(p.geometry.type))
+                 .map(p=>({type:'Feature',geometry:p.geometry,properties:{}}));
+  if(src!=='parcels') gpSrcGraphics(src).forEach(g=>{
+    const gj=esriGeomToGeojson(to4326(g.geometry));
+    if(gj&&/Polygon/.test(gj.type)) feats.push({type:'Feature',geometry:gj,properties:{}}); });
   return feats.map(f=>{ try{ return turf.rewind(f,{mutate:false}); }catch(e){ return f; } });
 }
 function gpUnionFeat(feats){ if(!feats.length) return null; let u=feats[0];
@@ -2040,7 +2068,26 @@ function gpAddResult(feat, label){
     attributes:{_kind:'drawing', _sub:'geoproc', geomType:'polygon', categoria:'Geoprocesso · '+label, note:''},
     symbol:{type:'simple-fill', color:[47,182,230,0.22], outline:{color:[47,182,230],width:2}}}));
   refreshDl(); try{ view.goTo(geom.extent.expand(1.4)); }catch(e){}
-  toolMsg('gpMsg', label+' → risultato aggiunto ai disegni (esportabile).','ok');
+  const _a=Math.abs(esriMods.geometryEngine.geodesicArea(geom,'hectares')||0);
+  toolMsg('gpMsg', label+' → in Geoprocessi'+(_a?' ('+_a.toFixed(2)+' ha)':'')+', esportabile.','ok');
+}
+// buffer: unico punto di generazione (pannello geoprocessi e menu contestuale)
+function makeBuffer(geoms, d, msgId){
+  const mid=msgId||'gpMsg';
+  if(!geoms||!geoms.length){ toolMsg(mid,'Sorgente A vuota: niente da bufferizzare.','err'); return null; }
+  if(!(d>0)){ toolMsg(mid,'Distanza non valida.','err'); return null; }
+  const bufs=[];
+  geoms.forEach(g=>{ try{ const b=esriMods.geometryEngine.geodesicBuffer(g,d,'meters'); if(b) bufs.push(b); }catch(e){} });
+  if(!bufs.length){ toolMsg(mid,'Buffer non generato.','err'); return null; }
+  let buf=bufs[0];
+  if(bufs.length>1){ try{ buf=esriMods.geometryEngine.union(bufs)||buf; }catch(e){} }
+  const areaHa=Math.abs(esriMods.geometryEngine.geodesicArea(buf,'hectares')||0);
+  toolsGL.add(new esriMods.Graphic({geometry:buf,
+    attributes:{_kind:'buffer', dist_m:d, area_ha:+areaHa.toFixed(4), nome:'Buffer '+d+' m'},
+    symbol:{type:'simple-fill', color:[121,192,255,0.2], outline:{color:[121,192,255],width:1.5}}}));
+  refreshDl(); try{ view.goTo(buf.extent.expand(1.5)).catch(()=>{}); }catch(e){}
+  toolMsg(mid,'Buffer di '+d+' m generato ('+areaHa.toFixed(2)+' ha).','ok');
+  return buf;
 }
 function gpRun(op){
   const A=gpFeats($('gpA').value);
@@ -2181,6 +2228,29 @@ function makeColorSwatch(getHex, onPick){
   wrap.appendChild(inp); return wrap;
 }
 
+// area in ettari di una graphic (usa il valore memorizzato se c'è, sennò la calcola geodetica)
+function geomAreaHa(g){
+  try{
+    const at=g.attributes||{};
+    if(at.area_ha!=null) return +at.area_ha;
+    if(g.geometry&&/polygon/i.test(g.geometry.type))
+      return Math.abs(esriMods.geometryEngine.geodesicArea(g.geometry,'hectares')||0);
+  }catch(e){}
+  return null;
+}
+// elementi spuntati nell'elenco (graphics + particelle) → sorgente "Selezionati"
+function gpSelCount(){
+  let k=0;
+  try{ if(toolsGL) toolsGL.graphics.forEach(g=>{ if(g.attributes&&g.attributes._sel) k++; }); }catch(e){}
+  try{ k+=parcels.filter(p=>p.sel).length; }catch(e){}
+  return k;
+}
+function gpSelInfo(){
+  const el=$('gpSelInfo'); if(!el) return;
+  const k=gpSelCount();
+  el.textContent = k ? (k+' element'+(k>1?'i':'o')+' selezionat'+(k>1?'i':'o')+' nell\'elenco.')
+                     : '«Selezionati» usa gli elementi spuntati nell\'elenco.';
+}
 function geomDefName(g){ const at=g.attributes||{};
   if(at.nome) return at.nome;
   if(at._kind==='buffer') return 'Buffer'+(at.dist_m!=null?' '+at.dist_m+' m':'');
@@ -2191,6 +2261,12 @@ function geomDefName(g){ const at=g.attributes||{};
 function geomRow(g, subtitle){
   const row=document.createElement('div'); row.className='grow';
   if(g.attributes&&g.attributes.hidden) row.classList.add('hidden');
+  const sc=document.createElement('input'); sc.type='checkbox'; sc.className='gsel';
+  sc.title='Seleziona per i geoprocessi'; sc.checked=!!(g.attributes&&g.attributes._sel);
+  row.classList.toggle('sel', sc.checked);
+  sc.onchange=function(e){ e.stopPropagation(); g.attributes._sel=sc.checked;
+    row.classList.toggle('sel', sc.checked); gpSelInfo(); };
+  row.appendChild(sc);
   row.appendChild(makeVisToggle(()=>g.visible!==false, on=>{ setGraphicVisible(g,on); row.classList.toggle('hidden',!on); }));
   row.appendChild(makeColorSwatch(()=>graphicColorHex(g), hex=>applyGraphicColor(g,hex)));
   const nm=document.createElement('input'); nm.className='gname'; nm.spellcheck=false;
@@ -2209,11 +2285,10 @@ function geomRow(g, subtitle){
 }
 function renderGeoms(){
   if(!toolsGL) return;
-  const draws=[],bufs=[],geos=[],imports=[];
+  const draws=[],geos=[],imports=[];
   toolsGL.graphics.forEach(function(g){ const at=g.attributes||{}; if(!at._kind) return;
-    if(at._kind==='buffer') bufs.push(g);
-    else if(at._kind==='import') imports.push(g);
-    else if(at._sub==='geoproc') geos.push(g);
+    if(at._kind==='import') imports.push(g);
+    else if(at._kind==='buffer'||at._sub==='geoproc') geos.push(g);   // i buffer sono geoprocessi
     else if(at._kind==='drawing') draws.push(g); });
   function fill(boxId,cntId,arr,emptyTxt,subFn){
     const box=$(boxId), cnt=$(cntId); if(!box) return;
@@ -2222,12 +2297,18 @@ function renderGeoms(){
     if(!arr.length){ box.innerHTML='<div class="empty">'+emptyTxt+'</div>'; return; }
     arr.forEach(function(g){ if(!g.attributes.nome) g.attributes.nome=geomDefName(g); box.appendChild(geomRow(g, subFn?subFn(g):'')); });
   }
-  fill('listDraw','cntDraw',draws,'Nessun disegno.', function(g){ const at=g.attributes; const t={point:'punto',polyline:'linea',polygon:'area'}[at.geomType]||at.geomType||''; return at.note?((t?t+' · ':'')+at.note):t; });
-  fill('listBuf','cntBuf',bufs,'Nessun buffer.', function(g){ return g.attributes.area_ha!=null?g.attributes.area_ha+' ha':''; });
-  fill('listGeo','cntGeo',geos,'Nessun output.', function(g){ return ''; });
+  fill('listDraw','cntDraw',draws,'Nessun disegno.', function(g){ const at=g.attributes;
+    const t={point:'punto',polyline:'linea',polygon:'area'}[at.geomType]||at.geomType||'';
+    const a=geomAreaHa(g), pezzi=[]; if(t) pezzi.push(t); if(a!=null) pezzi.push(a.toFixed(2)+' ha');
+    if(at.note) pezzi.push(at.note); return pezzi.join(' · '); });
+  fill('listGeo','cntGeo',geos,'Nessun output.', function(g){ const at=g.attributes, pezzi=[];
+    if(at._kind==='buffer'&&at.dist_m!=null) pezzi.push('buffer '+at.dist_m+' m');
+    const a=geomAreaHa(g); if(a!=null) pezzi.push(a.toFixed(2)+' ha');
+    return pezzi.join(' · '); });
   fill('listImport','cntImport',imports,'Nessun import.', function(g){ return g.attributes.source||''; });
   try{ updateImportImages(); }catch(e){}
   try{ wireSectionTools(); }catch(e){}
+  try{ gpSelInfo(); }catch(e){}
 }
 
 // ══ Controlli di GRUPPO negli header di sezione (visibilità + colore) ══════
@@ -2237,8 +2318,7 @@ function sectionGraphics(sec){
   if(sec==='parcels') return gl?gl.graphics.toArray():[];
   if(!toolsGL) return [];
   return toolsGL.graphics.toArray().filter(function(g){ var at=g.attributes||{};
-    if(sec==='buf') return at._kind==='buffer';
-    if(sec==='geo') return at._kind==='drawing'&&at._sub==='geoproc';
+    if(sec==='geo') return at._kind==='buffer'||(at._kind==='drawing'&&at._sub==='geoproc');
     if(sec==='draw') return at._kind==='drawing'&&at._sub!=='geoproc';
     return false; });
 }
@@ -2311,6 +2391,37 @@ function gjGeom(g){ const sr={wkid:4326}; if(!g) return null;
   if(g.type==='MultiPolygon'){ const rings=[]; g.coordinates.forEach(p=>p.forEach(r=>rings.push(r.map(c=>[c[0],c[1]])))); return {type:'polygon', rings, spatialReference:sr}; }
   return null;
 }
+// ── coordinate: WGS84 atteso. Se sono proiettate (shapefile senza .prj, GeoJSON in 3857)
+// provo la conversione da Web Mercator, altrimenti rifiuto invece di importare fuori dal mondo.
+function gjEachCoord(geom, fn){
+  if(!geom) return;
+  const walk=a=>{ if(!Array.isArray(a)) return;
+    if(typeof a[0]==='number'){ fn(a); return; }
+    a.forEach(walk); };
+  walk(geom.coordinates);
+}
+function gjCheckCoords(fc){
+  let mx=0, my=0, count=0, first=null;
+  (fc.features||[]).forEach(f=>gjEachCoord(f.geometry, p=>{
+    if(!first) first=[p[0],p[1]];
+    mx=Math.max(mx, Math.abs(p[0])); my=Math.max(my, Math.abs(p[1])); count++; }));
+  if(!count) return {ok:false, reason:'nessuna coordinata leggibile'};
+  if(mx<=180 && my<=90) return {ok:true};                       // gia' in gradi
+  // ⚠️ NON basta il range di Web Mercator: anche le UTM ci rientrano (es. 500000,4600000) e
+  // verrebbero convertite in un punto plausibile ma SBAGLIATO. Converto solo se il risultato
+  // cade davvero sull'Italia, altrimenti è un altro sistema proiettato e rifiuto.
+  if(mx<=20037509 && my<=20048967 && first){
+    let ll=null; try{ ll=esriMods.webMercatorUtils.xyToLngLat(first[0], first[1]); }catch(e){}
+    if(ll && ll[0]>=6 && ll[0]<=19 && ll[1]>=35 && ll[1]<=47.5){
+      (fc.features||[]).forEach(f=>gjEachCoord(f.geometry, p=>{
+        try{ const c=esriMods.webMercatorUtils.xyToLngLat(p[0],p[1]); if(c){ p[0]=c[0]; p[1]=c[1]; } }catch(e){}
+      }));
+      return {ok:true, converted:'convertito da Web Mercator'};
+    }
+  }
+  return {ok:false, reason:'coordinate proiettate non riconosciute (probabile UTM/Gauss-Boaga, X max '
+    +Math.round(mx)+'): riesporta in WGS84 oppure includi il file .prj nello ZIP'};
+}
 function impAdd(fc, srcName){
   const col=IMP_COLORS[impColorIdx++ % IMP_COLORS.length];
   const feats=(fc&&fc.features)||[]; let added=0; const zoom=[];
@@ -2342,7 +2453,9 @@ async function importOne(file){
     if(fc&&fc.type==='Feature') fc={type:'FeatureCollection',features:[fc]};
     else if(Array.isArray(fc)) fc={type:'FeatureCollection',features:fc.reduce((a,x)=>a.concat(x.features||[]),[])};
     if(!fc||!fc.features) throw new Error('nessuna geometria');
-    return {name, n:impAdd(fc,name)};
+    const chk=gjCheckCoords(fc);                     // niente import "fuori dal mondo"
+    if(!chk.ok) throw new Error(chk.reason);
+    return {name, n:impAdd(fc,name), note:chk.converted||''};
   }catch(e){ return {name, err:(e&&e.message)||String(e)}; }
 }
 async function onImportFiles(files){
@@ -2350,7 +2463,7 @@ async function onImportFiles(files){
   toolMsg('impMsg','Importo…');
   const res=[]; for(const f of arr){ res.push(await importOne(f)); }
   const ok=res.filter(r=>!r.err), bad=res.filter(r=>r.err);
-  let m=ok.map(r=>`${r.name}: ${r.n} geometrie`).join(' · ');
+  let m=ok.map(r=>`${r.name}: ${r.n} geometrie${r.note?' ('+r.note+')':''}`).join(' · ');
   if(bad.length) m+=(m?' · ':'')+bad.map(r=>`${r.name}: errore (${r.err})`).join(' · ');
   toolMsg('impMsg', m||'Nessuna geometria importata.', (bad.length&&!ok.length)?'err':'ok');
   try{ if(window.openPanel) window.openPanel('elenco'); }catch(e){}
@@ -2649,13 +2762,22 @@ async function pdfEsriServiceLegend(layer){
     return out.length? out : null;
   }catch(e){ console.warn('legend REST:', e&&e.message); return null; }
 }
+// layer di sfondo e terreno: sono dentro map.allLayers ma non sono "layer della mappa"
+function baseGroundSet(){
+  const skip=new Set();
+  try{ const b=view.map.basemap; if(b){ b.baseLayers&&b.baseLayers.forEach(l=>skip.add(l));
+    b.referenceLayers&&b.referenceLayers.forEach(l=>skip.add(l)); } }catch(e){}
+  try{ view.map.ground&&view.map.ground.layers&&view.map.ground.layers.forEach(l=>skip.add(l)); }catch(e){}
+  return skip;
+}
 // ── costruisce le voci di legenda per i SOLI layer visibili ──
 async function pdfBuildLegendEntries(){
   const entries=[];
   if(!view || !view.map) return entries;
   const layers = view.map.allLayers ? view.map.allLayers.toArray() : [];
+  const skip = baseGroundSet();                       // via basemap e terreno dalla legenda
   for(const l of layers){
-    if(!l.visible || l===gl || l===toolsGL || l.listMode==='hide') continue;
+    if(!l.visible || l===gl || l===toolsGL || l===labelsGL || l.listMode==='hide' || skip.has(l)) continue;
     if(l.type==='group') continue;                      // i figli sono già in allLayers
     const title=l.title||l.id||'Layer';
     if(l.type==='wms'){
@@ -3103,14 +3225,14 @@ if($('pdfGenBtn')) $('pdfGenBtn').onclick=generateSitePDF;
     {sel:'#signin', title:'1 · Accedi ad AGOL', body:"Accedi col tuo account: serve per cercare le particelle, promuovere aree e salvare sul portale.", placement:'below'},
     {sel:'#step1', title:'2 · Ambito', body:"Scegli Regione, Provincia e Comune. La regione carica anche la mappa Check Vincoli della zona.", open:function(){openTab('ricerca');}, placement:'right'},
     {sel:'#step2', title:'3 · Ricerca particelle', body:"Cerca per Foglio/Particella, oppure attiva la selezione su mappa (punto, rettangolo, poligono, linea). Puoi anche partire da un disegno esistente.", open:function(){openTab('ricerca');}, placement:'right'},
-    {sel:'#drawerElenco', title:'4 · Elenco & azioni', body:"Tutto ciò che raccogli finisce qui, diviso in Particelle · Disegni · Buffer · Geoprocessi · Importati. Ogni riga si rinomina, si zooma e si elimina.", open:function(){openDrawer('elenco');}, placement:'left'},
+    {sel:'#drawerElenco', title:'4 · Elenco & azioni', body:"Tutto ciò che raccogli finisce qui, diviso in <b>Particelle · Disegni · Geoprocessi · Importati</b>. Ogni riga si rinomina, si colora, si nasconde, si zooma — e la <b>casella a sinistra</b> la seleziona per usarla nei geoprocessi.", open:function(){openDrawer('elenco');}, placement:'left'},
     {sel:'.colbtns', title:'5 · Esporta e promuovi', body:"Esporta in GeoJSON/KML/KMZ/SHP/XLSX, oppure promuovi in <b>AREAS COLLECTION</b> o <b>Sites Notes</b>.", open:function(){openDrawer('elenco');}, placement:'left'},
     {title:'Pronto!', body:"Questo è il flusso base. Riapri i tour quando vuoi dal <b>?</b> in alto a destra. Per gli strumenti avanzati, prova il tour <i>Tutti gli strumenti</i>."}
   ];
   var TOUR_ALL=[
     {sel:'#sideRail', title:'Le schede a sinistra', body:"Il rail di icone: Ricerca, Disegno, Geoprocessi, Contesto sito, Import. Cliccando l'icona già attiva, la sidebar si comprime a colonna.", placement:'right'},
     {sel:'.tabpane[data-tab=disegno]', title:'Disegno', body:"Punti, linee e aree con categoria e nota. Avanzati: <b>snapping</b>, <b>rettangolo/cerchio</b>, <b>quote distanza/angolo</b> con input digitato (90° = perpendicolare).", open:function(){openTab('disegno');}, placement:'right'},
-    {sel:'.tabpane[data-tab=geoproc]', title:'Geoprocessi', body:"Buffer + operazioni geometriche: Union, Clip, Intersect, Difference, Convex hull, Simplify. Il risultato è un output esportabile.", open:function(){openTab('geoproc');}, placement:'right'},
+    {sel:'.tabpane[data-tab=geoproc]', title:'Geoprocessi', body:"Scegli le <b>Sorgenti</b> (particelle, disegni, geoprocessi, importati o «<b>Selezionati</b>», cioè le righe spuntate nell'elenco) e applica: <b>Buffer</b>, Union, Convex hull, Simplify, Clip, Intersect, Difference. Ogni risultato finisce in <b>Geoprocessi</b> con la sua area ed è riutilizzabile come nuova sorgente.", open:function(){openTab('geoproc');}, placement:'right'},
     {sel:'.tabpane[data-tab=contesto]', title:'Contesto sito', body:"Attiva e clicca un punto sulla mappa: trovi sottostazioni, linea AT e progetti FV vicini.", open:function(){openTab('contesto');}, placement:'right'},
     {sel:'.tabpane[data-tab=import]', title:'Import file esterni', body:"Carica GeoJSON, KML, KMZ, Shapefile — e immagini/GeoTIFF georeferenziate con gli angoli trascinabili.", open:function(){openTab('import');}, placement:'right'},
     {sel:'#actionIcons', title:'Strumenti mappa e portale', body:"A destra: Elenco & azioni, Layer (anche dal portale), Basemap, Segnalibri, Modifica AREAS COLLECTION, Stampa.", placement:'left'},
