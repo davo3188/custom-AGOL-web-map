@@ -1092,7 +1092,7 @@ require([
     IdentityManager.registerOAuthInfos([ new OAuthInfo({appId:CLIENT_ID, portalUrl:PORTAL, popup:false, flowType:"implicit"}) ]);
     // Il ritorno dal redirect crea una credenziale: aggancio l'evento così lo
     // stato "connesso" si applica anche se checkSignInStatus corre prima.
-    IdentityManager.on("credential-create", ()=>{ console.log('[OAuth] credenziale creata'); onSignedIn(); });
+    IdentityManager.on("credential-create", ()=>onSignedIn());   // il log ora è dentro onSignedIn (1 riga invece di ~20)
     IdentityManager.checkSignInStatus(PORTAL+"/sharing")
       .then(()=>onSignedIn())
       .catch(err=>{
@@ -1119,6 +1119,11 @@ require([
 });
 
 async function onSignedIn(){
+  // IdentityManager emette 'credential-create' UNA VOLTA PER SERVIZIO autenticato (nella General Map
+  // erano ~20): senza guardia rifacevamo 20 volte portal.load() + render(). Riprovo solo se il
+  // portale non è davvero caricato (login parziale); il logout azzera signedIn/portal.
+  if(signedIn && portal && portal.loaded) return;
+  console.log('[OAuth] sessione inizializzata');
   signedIn=true;
   try{ portal=new esriMods.Portal({authMode:"immediate"}); await portal.load(); username=portal.user&&portal.user.username; }catch(e){}
   $('authDot').classList.add('on');
