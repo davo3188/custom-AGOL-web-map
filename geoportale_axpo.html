@@ -1233,23 +1233,96 @@ function wireContextMenu(){
     window.open('https://www.google.com/maps/search/?api=1&query='+q, '_blank', 'noopener'); };
   $('ctxCenter').onclick=()=>{ close(); if(ll&&view) view.goTo({center:[ll.lng, ll.lat]}).catch(()=>{}); };
 }
+// ── Correzioni ai nomi provincia sbagliati nella sorgente Zornade ─────────
+// Per la Liguria /admin/provinces restituisce '-' invece di "Genova" (hanno letto
+// il campo ISTAT DEN_PROV, che vale '-' per le città metropolitane, invece di
+// DEN_UTS). Con '-' la successiva /admin/municipalities torna 0 comuni: la
+// provincia è inutilizzabile e un'eventuale promote scriverebbe PROVINCIA='-'.
+// Le altre 13 città metropolitane arrivano invece con il nome corretto.
+const ZB_PROV_FIX={ "Liguria":{ "-":"Genova" } };
+function fixProvName(region,name){ const m=ZB_PROV_FIX[region]; return (m&&m[name])||name; }
+
+// ══ ZOOM sull'ambito scelto (regione / provincia / comune) ════════════════
+// I nomi arrivano da Zornade, le geometrie dal layer ISTAT del portale, e i due
+// elenchi non coincidono sempre: nomi bilingui ("Bolzano" vs "Bolzano/Bozen"),
+// accenti ("Forli'-Cesena" vs "Forlì-Cesena"), trattini ("Massa Carrara" vs
+// "Massa-Carrara"). Per questo il match è normalizzato lato client e NON in SQL.
+// Nota: il layer ISTAT è protetto → lo zoom funziona solo da loggati (senza
+// login una query aprirebbe il popup di autenticazione: meglio non fare nulla).
+const ISTAT_FS="https://services-eu1.arcgis.com/Kxsn3iT6KEQ7OlSW/arcgis/rest/services/IT_ISTAT_Confini_amministrativi_e_statistiche/FeatureServer/";
+const ISTAT_LV={
+  reg :{url:ISTAT_FS+"2", field:"DEN_REG"},
+  prov:{url:ISTAT_FS+"1", field:"DEN_UTS"},   // DEN_PROV vale '-' per le 14 città metropolitane
+  com :{url:ISTAT_FS+"0", field:"COMUNE"}
+};
+const _istatLayer={}, _istatList={};   // cache: FeatureLayer per livello + elenchi nomi
+let provExtent=null;                   // estensione della provincia scelta (filtra i comuni omonimi)
+
+function istatNorm(s){
+  return String(s||'').split('/')[0]                       // "Bolzano/Bozen" → "Bolzano"
+    .normalize('NFD').replace(/[̀-ͯ]/g,'')         // via gli accenti
+    .toLowerCase().replace(/[^a-z0-9]/g,'');               // via apostrofi, spazi, trattini
+}
+function istatLayer(lv){
+  if(!_istatLayer[lv]) _istatLayer[lv]=new esriMods.FeatureLayer({url:ISTAT_LV[lv].url});
+  return _istatLayer[lv];
+}
+// elenco {oid,n} del livello, ristretto al padre quando serve (comuni omonimi)
+async function istatList(lv, parentExt){
+  const ck=lv+'|'+(parentExt?[parentExt.xmin,parentExt.ymin,parentExt.xmax].map(v=>Math.round(v)).join(','):'');
+  if(_istatList[ck]) return _istatList[ck];
+  const f=ISTAT_LV[lv].field;
+  const q={where:"1=1", outFields:["OBJECTID",f], returnGeometry:false};
+  if(parentExt){ q.geometry=parentExt; q.spatialRelationship="intersects"; }
+  const r=await istatLayer(lv).queryFeatures(q);
+  _istatList[ck]=r.features.map(x=>({oid:x.attributes.OBJECTID, n:istatNorm(x.attributes[f])}));
+  return _istatList[ck];
+}
+function istatPick(list, name){
+  const t=istatNorm(name); if(!t) return null;
+  let hit=list.filter(x=>x.n===t);                         // esatto
+  if(!hit.length) hit=list.filter(x=>x.n.indexOf(t)===0);  // "Bolzano" → "bolzanobozen"
+  if(!hit.length) hit=list.filter(x=>x.n.indexOf(t)>=0);   // "Aosta"   → "valledaostavalleedaoste"
+  return hit.length? hit[0].oid : null;
+}
+// Zoom all'ambito. Silenzioso quando non si è loggati o quando il nome non trova
+// riscontro (es. Zornade restituisce '-' al posto di "Genova"). Torna l'estensione.
+async function zoomToAdmin(lv, name){
+  if(!signedIn||!view||!esriMods||!name) return null;
+  try{
+    const oid=istatPick(await istatList(lv, lv==='com'?provExtent:null), name);
+    if(oid==null) return null;
+    const r=await istatLayer(lv).queryExtent({objectIds:[oid], outSpatialReference:view.spatialReference});
+    const ext=r&&r.extent; if(!ext) return null;
+    await view.goTo(ext.expand(1.06)).catch(()=>{});
+    return ext;
+  }catch(e){ console.warn('zoom ambito '+lv+':', e&&e.message); return null; }
+}
+
 function wireUI(){
   $('reg').addEventListener('change',async()=>{
     $('prov').disabled=$('com').disabled=true;$('com').innerHTML='<option value="">—</option>';checkReady();
     const region=$('reg').value;
-    swapCheckVincoli(region);        // Fase 2
+    provExtent=null;
+    const cv=swapCheckVincoli(region);        // Fase 2 (non blocca la cascata)
     if(!region)return;
     const d=await z('/admin/provinces',{region});
-    $('prov').innerHTML='<option value="">— seleziona —</option>'+d.data.map(p=>`<option>${p.name}</option>`).join('');$('prov').disabled=false;
+    $('prov').innerHTML='<option value="">— seleziona —</option>'+d.data.map(p=>`<option>${fixProvName(region,p.name)}</option>`).join('');$('prov').disabled=false;
+    // Lo zoom parte DOPO lo swap della Check Vincoli: loadWebMap sostituisce la
+    // mappa e può muovere la vista (goTo sulle particelle), sovrascrivendo
+    // l'inquadratura appena impostata.
+    try{ await cv; }catch(e){}
+    zoomToAdmin('reg',region);
   });
   $('prov').addEventListener('change',async()=>{
-    $('com').disabled=true;$('com').innerHTML='<option value="">—</option>';checkReady();
+    $('com').disabled=true;$('com').innerHTML='<option value="">—</option>';checkReady();provExtent=null;
     if(!$('prov').value)return;
     const d=await z('/admin/municipalities',{province:$('prov').value});
     $('com').innerHTML='<option value="">— seleziona —</option>'+d.data.sort((a,b)=>a.name.localeCompare(b.name)).map(c=>`<option>${c.name}</option>`).join('');$('com').disabled=false;
+    provExtent=await zoomToAdmin('prov',$('prov').value);   // serve anche a filtrare i comuni omonimi
   });
   ['fog','par'].forEach(id=>$(id).addEventListener('input',checkReady));
-  $('com').addEventListener('change',checkReady);
+  $('com').addEventListener('change',()=>{ checkReady(); if($('com').value) zoomToAdmin('com',$('com').value); });
   $('go').addEventListener('click',search);
   $('par').addEventListener('keydown',e=>{if(e.key==='Enter'&&!$('go').disabled)search();});
   if($('lblParcels')) $('lblParcels').onchange=()=>{ if(labelsGL) labelsGL.visible=$('lblParcels').checked; };
