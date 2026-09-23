@@ -90,12 +90,38 @@ after 20 s with a message, instead of leaving the UI waiting forever.
   or with a whole category. On A: buffer (one per object, or merged), union, convex hull, simplify, clip
   against a polygon drawn on the spot; between A and B: intersect, difference. Every result lands in
   *Geoprocessi* with its area and can go back into A or B.
+- The tab has the same layout as *Importa dati* (since 2026-09-23), in working order. Each section
+  shows a title and one plain line, and each operation is a button with a line saying what it does:
+  - *Scegli gli oggetti* (slot A);
+  - *Buffer*;
+  - *Unisci, contorna, semplifica*;
+  - *Ritaglia*;
+  - *Confronta A con B* (slot B, *Parte comune*, *Sottrai B da A*).
+
+  Button and result names are in plain Italian (Unione, Contorno, Semplificazione, Ritaglio, Parte
+  comune, Differenza); the GIS term stays in the tooltip. Each **i** opens an **example**: a small
+  "before → after" SVG drawing in the map colours (A orange, B purple, result blue), a real scouting
+  case, then how to use it and what to know (`GP_INFO`/`DIA` in the UI glue). A closed title shows
+  "A: n" / "B: n". *Buffer qui* in the right-click menu opens the Buffer section.
+- **Features of the map's own layers as sources** (since 2026-09-23). In *Dalla mappa*, a click on a
+  vector layer adds its feature to the slot: web map feature layers, REST services, WFS, GeoJSON, and
+  map-service sublayers (the last through identify). The feature is copied into *Importati* with its
+  **full geometry** and its original attributes, which go into exports, so it works with every
+  operation, the export and the promotion. The same feature is copied only once. WMS layers are images
+  and have no geometry to use.
 - Per-geometry **colour and visibility**, plus per-section colour/visibility, all persisted.
 
 **Site context**
 Nearby substations (380/220/150/132 kV), HV lines and PV projects, pulled live from the portal layers.
 
-**Import**
+**Import** (the *Importa dati* tab)
+- Since 2026-09-23 the tab is five **collapsible sections**, one per module: files, CAD drawings,
+  images, web services, coordinates without a system. Each section shows a title and one plain line,
+  and remembers whether it is open (`axpo_import_aperte`). The complex modules have an **i** button that
+  opens a "how it works" window (`IMP_INFO` in the UI glue): steps, then things to know. A closed title
+  shows a counter ("2 in mappa") for DWGs, images and services. The code opens the right section when
+  it sends you there: a DWG picked through the generic file button, or a file without `.prj`
+  (`window.impOpen`). The tour steps do the same.
 - Vectors: GeoJSON, KML, KMZ, SHP.
 - Georeferenced **images and GeoTIFF** — images get four draggable corner handles, GeoTIFFs are
   auto-placed from their bounding box and geokeys, reprojected into the view SR.
@@ -120,6 +146,11 @@ Nearby substations (380/220/150/132 kV), HV lines and PV projects, pulled live f
   through the same engine. The file is converted automatically only when Web Mercator is the *only*
   reading that lands on Italian soil; otherwise the import stops, the candidates appear in the
   coordinates module, and the whole file is reprojected with the system the user picks.
+- **Web services by URL** (since 2026-09-23): WMS, WFS and ArcGIS REST (MapServer, FeatureServer, a
+  single layer, ImageServer…) go straight onto the map, without creating an item on the portal. The type
+  is guessed from the URL, the service is read, and you tick the layers you want. The list has a text
+  filter for services with hundreds of layers. The added layers are kept by the browser auto-save and by
+  projects, and are removed from the Layer panel.
 - The **top search box** takes addresses and coordinates: `lat, lon` (decimal comma and DMS included)
   or projected `X Y`, whose system it guesses and flies to. A coordinate pair wins over the geocoder;
   anything with letters in it (an address with house number and postcode) goes to the geocoder.
@@ -138,7 +169,11 @@ The shapefile comes as one zip with a layer per geometry type (`_punti`, `_linee
 
 **Map & reporting**
 - Loads the 17 regional *Check Vincoli* web maps (16 of 20 regions covered) plus the General Map.
-- LayerList with per-layer legend, transparency, popup toggle and drag-and-drop reordering.
+- LayerList with per-layer legend, transparency, popup toggle and drag-and-drop reordering, a search box
+  by layer name, and an **attribute filter**, like QGIS *Filter…*: field, condition and value (values
+  suggested from the data, domain values as a menu), `+ E` / `+ O` to combine, editable SQL, live count.
+  The panel icon turns into a funnel while a filter is on. Layers you added (portal items, web services,
+  DWGs, images) get a **…** menu with *Zoom al layer* and *Rimuovi dalla mappa*.
 - Bookmarks that also restore **layer visibility** (Esri's own bookmarks do not).
 - Right-click context menu acting on the clicked point: add parcel here, site context here, buffer here,
   copy coordinates, open in Google Maps, centre here.
@@ -150,8 +185,25 @@ The shapefile comes as one zip with a layer per geometry type (`_punti`, `_linee
 - Auto-resume from `localStorage`, guided spotlight tour, per-icon tooltips.
 - **Browser storage** panel (in *Impostazioni avanzate*): shows what is saved, *Svuota il lavoro*
   (parcels, drawings, results, imports, DWGs, added layers — preferences kept) and *Ripristina tutto*
-  (every key of the app, then reload). DWGs are never saved; `localStorage` is capped at ~5 MB per
-  site, and hitting the cap now shows a warning instead of failing silently.
+  (every key of the app, then reload). DWGs and images are never saved there; `localStorage` is capped
+  at ~5 MB per site, and hitting the cap now shows a warning instead of failing silently.
+
+**Projects** (top bar, since 2026-09-23)
+- **💾 Salva progetto** writes the whole working state to one `.axpo` file, like a QGIS `.qgz`:
+  view (with rotation), basemap, work area (region/province/comune), the portal web map and every
+  layer's visibility, transparency, popup toggle, attribute filter and order, the portal layers added by
+  search, the web services added by URL, parcels,
+  drawings, geoprocessing output, imports, label toggle — and the **original DWG and image files** with
+  their placement (reference system, scale, two-point alignment, layer visibility and colours; image
+  corners and transparency).
+- **📂 Apri progetto** replaces the current work (after a confirmation) and rebuilds all of it; the DWGs
+  are re-read from the file without the confirmation dialog. `Ctrl+S` saves again to the same file,
+  `Ctrl+Shift+S` or Shift+click is *save as*, `Ctrl+O` opens. The project name shows in the top bar and
+  in the tab title.
+- The portal part needs a session: opened while signed out, the project restores everything local,
+  says so, and keeps the web map pending — it is applied if the sign-in completes without a reload.
+- Bookmarks, theme and the Zornade key are personal preferences and stay out of the file; no token is
+  ever written.
 
 ## 5. Architecture notes
 
@@ -339,6 +391,104 @@ so it never touches the AMD loader. Worth knowing before editing:
   layer. A layer's colour in the list is the most frequent colour of its entities, not its table
   colour, because that is what the user actually sees.
 
+**Project files (`.axpo`).**
+- **Format.** A zip: `progetto.json` plus `file/dwg-<n>-<name>` and `file/img-<n>-<name>`, the
+  originals as they were imported. The JSON is the auto-resume state (`captureWork`: parcels, `toolGeoms`,
+  basemap, viewpoint, added items) plus `webmap`, `area`, `labels`, `layers`, `order`, `images`
+  (corners in the view SR) and `dwg` (`wkid`, `sc`, the affine matrix `M`, `drop`, `manual`, per-layer
+  visibility and user colour). `formato: "geoportale-axpo-progetto"`, `versione: 1`: bump the version
+  when the meaning of a field changes, and keep reading the old ones.
+- **Keeping the originals.** The source `File` is kept on each DWG (`f.file`) and image (`im.file`) at
+  import. A browser `File` points at the disk, so this costs no memory until saving.
+- **Layer keys.** Web map layers are matched by their web map id, which is stable. The layers the app
+  creates get a new random id on every page load, so they are keyed by role: `app:catasto`, `dwg:<n>`,
+  `img:<n>`, `item:<portal item id>`. On opening, the DWG/image keys map to the layers actually rebuilt
+  (`keyMap`): if one file fails, the others keep their own state.
+- **Order.** Order is restored by permuting the found layers among the slots they already occupy, per
+  container (the map and each group). Internal layers (`listMode: 'hide'`) never move.
+- **Sublayers.** Sublayer visibility (WMS, map services) is applied on `layer.when()` without forcing a
+  load: the Check Vincoli maps must read their regional WMS only when switched on.
+- **Save and open dialogs.** Saving uses the File System Access API (`showSaveFilePicker`,
+  `showOpenFilePicker`) in Chrome/Edge, with a download as fallback. The picker and the write permission
+  are requested *before* the zip is built: after a few seconds of work the click no longer counts as a
+  user gesture.
+- **Measured** on two real project DWGs (3.9 MB + 0.14 MB, 78,100 + 47,495 elements): the file is
+  2.9 MB, saving takes 0.3 s, reopening 8.6 s. The vertices come back identical to 1e-7°. Memory peaks
+  around 800 MB right after opening and falls back to ~360 MB within seconds. It is stable over
+  repeated opens.
+- **Web map swap.** `loadWebMap` now also moves the images, the added portal layers, the web services
+  and the image handles into the new map. Before, they vanished from the map on a region change or at
+  sign-in while staying in the list; the DWGs already moved (`cadReattach`).
+
+**Web services (WMS / WFS / ArcGIS REST).**
+- **The browser's two rules, not AGOL's.** An https page cannot load http resources (mixed content:
+  blocked, no way around it from the page). Capabilities and data are read only if the server allows
+  cross-origin reads (**CORS**). An `http://` URL is tried as `https://` automatically; if that fails, the
+  message says why. Tested on 2026-09-23:
+  - the Sardinia GeoServer (the catasto one) works;
+  - the **national PCN WMS** (`wms.pcn.minambiente.it`) has **no CORS** and cannot be read.
+
+  Serving such services needs a proxy on the server side, e.g. an Azure Function on the future host,
+  which would also fix http-only services. The future CSP must then allow `connect-src`/`img-src` to the
+  services in use.
+- **Recipes, not layers.** Each added layer carries a recipe (`_projSvc`: type, url, chosen layers)
+  kept in `addedServices`. The recipe goes into the auto-save (`services`) and the project, and
+  `svcCreate` rebuilds the layer from it. A service that no longer answers at start-up is dropped from
+  the auto-save with a message.
+- **WMS.** The layer is created with only the chosen sublayers. As for the catasto, when the
+  capabilities list EPSG:3857 it is forced, because GeoServer rejects 102100. For zooming, the extent is
+  that of the chosen sublayers: the service's own extent is often all of Italy.
+- **WFS.** ArcGIS `WFSLayer` wants WFS 2.0 with GeoJSON output, and before loading it also asks for a
+  GML sample. Some GeoServers refuse that GML request: GeoBretagne serves GeoJSON fine and fails the
+  GML one. When `WFSLayer` fails, the fallback runs a `GetFeature` in GeoJSON/WGS84 (2.0, then 1.1) of
+  up to 20,000 features and shows them as a local `GeoJSONLayer`. The axis order is checked against
+  the WGS84 box from the capabilities. The result is a snapshot: it does not refresh when panning, but
+  it filters and queries like any layer. The choice is kept in the recipe (`mode: 'geojson'`).
+- **ArcGIS REST.** `Layer.fromArcGISServerUrl` decides the kind:
+  - map service: one `MapImageLayer`, with only the chosen sublayers switched on (and their groups);
+  - feature service: one `FeatureLayer` per chosen layer, with names read from the service JSON;
+  - anything else: the layer as it is.
+
+**Map-layer features as geoprocessing sources** (`gpPickLayerFeature`).
+- Our own objects (parcels, drawings, results) keep priority. Only when the click hits none of them
+  does it look at the map's layers:
+  - `hitTest`, then a query by OBJECTID, for feature/WFS/GeoJSON/CSV layers. Only what is drawn gets
+    hit, so filters apply;
+  - `identify` on visible, in-scale sublayers for map services.
+- The geometry of the click is **not** used: it is generalized for drawing (Finistère: 5,598 vertices
+  against 192,532). It is re-read in full, in WGS84.
+- `_srcKey` (layer URL + OBJECTID; the title for local layers, whose blob URL changes) prevents
+  duplicates. `src_attrs` keeps the original simple-valued attributes (at most 80) for the export.
+  Both go into the auto-save and projects.
+- **Heavy geometries.** The ArcGIS geometry engine is synchronous and costs about 0.3–1 ms per vertex.
+  Measured on Finistère (192,532 vertices), every one of these was far too slow:
+
+  | Method | Time |
+  |---|---|
+  | geodesic buffer | ~3 min |
+  | 4.34 `geodesicBufferOperator` on 65,819 vertices | 28 s |
+  | planar buffer in UTM | 54 s, plus 8 s of projection |
+  | ArcGIS `generalize` alone | 17 s |
+
+  So above `GP_HEAVY` (5,000) vertices, `makeBuffer` first simplifies with its own Douglas-Peucker in
+  metres, which takes a few ms. turf's simplify rejects polygons whose islets collapse. The tolerance is
+  capped at 1/10 of the buffer distance; the simplification is stated in the message and in the result
+  name, and the message shows *before* the synchronous work.
+  - 500 m: 50 m, 6,070 vertices, 4.6 s;
+  - 100 m: 10 m, 28,965 vertices, about 25 s, area within 0.02% of the exact buffer.
+
+  The other operations only warn beforehand above 20,000 vertices.
+
+**Attribute filter.**
+- Available on layers with `definitionExpression` and `queryFeatures`: feature layers, WFS,
+  GeoJSON/CSV, and map-service sublayers. WMS has no filter in the protocol.
+- The expression is tried with a count before being applied, so a wrong SQL leaves the previous
+  filter in place with a message instead of an empty, broken layer.
+- `contiene` / `inizia con` use `UPPER(field) LIKE`, so they ignore case. A date typed as dd/mm/yyyy
+  covers the whole day.
+- Filters go into projects (`def`, and `sdef` for sublayers), not into the auto-save. After a reload
+  the layers come back unfiltered, like their visibility.
+
 ## 6. Security & distribution
 
 - The Zornade key is a read-only token **embedded in the source** (`DEFAULT_KEY`). This is a deliberate,
@@ -401,6 +551,37 @@ loose in `backups/`.)
   for elements that no longer exist (`#sideTabs`, `#listHead`, `.wordmark`, the old Expand search) and the
   bottom-centre elevation dock rules that the bottom-left ones overrode. Backup before the change:
   `geoportale_axpo_pre-434-codice-morto_2026-09-23.html` (in `backups/`, then in `archive_2026-09-23.zip`).
+- 2026-09-23: **Save / open project** (`.axpo`, §4 and §5), and images and added portal layers no longer
+  lost on a web map swap. Backup before the change: `geoportale_axpo_pre-salva-apri-progetto_2026-09-23.html`.
+  Tested signed out with a public Esri web map and a public item standing in for the portal. The real
+  sign-in branch still has to be exercised.
+- 2026-09-23: **DWG layer list** no longer jumps back to the first layer on every on/off click. The
+  list is rebuilt on each change, and its own scroll box was recreated at the top; the scroll position
+  is now kept. Also added:
+  - web services by URL (WMS/WFS/REST);
+  - the attribute filter;
+  - the layer search box;
+  - *Rimuovi dalla mappa* for added layers, which could not be removed at all before.
+
+  Backup: `geoportale_axpo_pre-layer-servizi-filtro_2026-09-23.html`.
+- 2026-09-23: **map-layer features as geoprocessing sources**, plus the guard for heavy geometries in
+  the buffer. Tested with real clicks:
+  - a REST polygon (9 vertices, buffer contains the source);
+  - Texas through identify (847 vertices);
+  - Finistère from the GeoJSON WFS (192,532 vertices, see §5);
+  - the WMS-only message.
+
+  Backup: `geoportale_axpo_pre-fonti-da-layer_2026-09-23.html`. That backup was first copied after the
+  edit by mistake, then rebuilt by reverting it; it matches the pre-change file in lines and bytes
+  (5,148 / 396,623).
+- 2026-09-23: **Import tab reorganised** into collapsible sections with plain text and an *i* window per
+  complex module (see §4). Also fixed a race: *Svuota il lavoro* during the start-up restore of web
+  services got the services back afterwards. `svcGen` now drops what arrives after a clear. Backup:
+  `geoportale_axpo_pre-import-sezioni_2026-09-23.html`.
+- 2026-09-23: **Geoprocessi tab reorganised** the same way, with drawn examples in each *i* (§4). The
+  open/closed memory of both tabs now uses the key `axpo_sezioni_aperte` (the old `axpo_import_aperte`
+  is still read). All operations were re-run after the change: Parte comune 24.24 ha + Differenza
+  127.27 ha = Unione 151.52 ha. Backup: `geoportale_axpo_pre-geoprocessi-sezioni_2026-09-23.html`.
 
 **Checked and not a problem** (do not reopen): `projection.project` applies the default datum
 transformation by itself, so Monte Mario GeoTIFFs are placed right; the AREAS `edits` handler gets the

@@ -102,6 +102,9 @@
   .tb:hover{background:var(--hover)}
   .tb.icon{width:32px;height:32px;padding:0;font-size:15px;line-height:1}
   #signin{border-color:var(--accent);color:var(--accent);font-weight:600}
+  .tb:disabled{opacity:.5;cursor:progress}
+  #projName{font-size:13px;color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:280px}
+  @media (max-width:1180px){ .tb .tbl{display:none} #projName{max-width:140px} }
 
   /* ══ LAYOUT 3 ZONE ══ */
   #appBody{flex:1;display:flex;min-height:0}
@@ -233,7 +236,7 @@
   .subsec:first-child{margin-top:0}
 
   /* ══ MODALI unificate (export / promote / help) ══ */
-  #promoteModal,#exportModal,#helpModal,#snModal,#helpMenu,#cadModal{position:fixed;inset:0;background:#000a;display:none;align-items:center;justify-content:center;z-index:1000}
+  #promoteModal,#exportModal,#helpModal,#snModal,#helpMenu,#cadModal,#infoModal{position:fixed;inset:0;background:#000a;display:none;align-items:center;justify-content:center;z-index:1000}
   .card{position:relative;background:var(--panel);border:1px solid var(--line);border-radius:12px;width:440px;max-width:92vw;max-height:90vh;overflow-y:auto;padding:18px 20px;border-top:3px solid transparent;border-image:var(--axpo-gradient) 1 0 0 0}
   .card h2{margin:0 0 4px;font-size:16px}
   .card .sub{color:var(--mut);font-size:12px;margin-bottom:12px}
@@ -363,6 +366,72 @@
   .grow.sel{background:color-mix(in srgb, var(--accent) 14%, transparent);
     box-shadow:inset 2px 0 0 var(--accent)}
   .llopts .lllegend .wmsleg{display:flex;align-items:center;gap:7px;margin-bottom:5px;font-size:11px;opacity:.9}
+  /* filtro per attributo nel pannello del layer */
+  .llopts .llflt{border-top:1px solid var(--line);margin-top:8px;padding-top:8px}
+  .llopts .llflt .llft{font-weight:700;margin-bottom:6px}
+  .llopts .llflt select,.llopts .llflt input,.llopts .llflt textarea{width:100%;padding:5px 7px;font-size:11.5px;margin:0 0 5px;box-sizing:border-box}
+  .llopts .llflt textarea{min-height:52px;font-family:Consolas,monospace}
+  .llopts .llflt .llfb{display:flex;gap:5px;flex-wrap:wrap;margin:2px 0 5px}
+  .llopts .llflt .llfb button{padding:5px 8px;font-size:11px;margin:0;width:auto}
+  .llopts .llflt .llfst{font-size:11px;line-height:1.35;word-break:break-word;opacity:.85}
+  .llopts .llflt .llfst.on{color:var(--accent);opacity:1}
+  .llopts .llflt .llfst.err{color:var(--err);opacity:1}
+  .llopts .llflt summary{cursor:pointer;opacity:.8;font-size:11px;margin:5px 0 4px}
+  /* scheda Import: un modulo per sezione collassabile (titolo + una riga), spiegazioni nella finestra «i» */
+  .imod{border:1px solid var(--line);border-radius:10px;margin:0 0 8px}
+  .imod[open]{border-color:var(--line-strong)}
+  .imod>summary{list-style:none;display:flex;align-items:center;gap:10px;padding:9px 10px;cursor:pointer;border-radius:9px;user-select:none}
+  .imod>summary::-webkit-details-marker{display:none}
+  .imod>summary:hover{background:var(--hover)}
+  .imod>summary:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+  .imod>summary::after{content:'';flex:none;width:6px;height:6px;margin:0 4px 2px 2px;border-right:2px solid var(--mut);border-bottom:2px solid var(--mut);transform:rotate(45deg);transition:transform .15s}
+  .imod[open]>summary::after{transform:rotate(-135deg);margin-bottom:-3px}
+  .imod .im-ico{flex:none;width:28px;height:28px;display:grid;place-items:center;font-size:15px;border-radius:7px;background:var(--hover)}
+  .imod .im-t{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px;line-height:1.25}
+  .imod .im-t b{font-size:13px;font-weight:600;color:var(--txt)}
+  .imod .im-t small{font-size:11px;color:var(--mut)}
+  .imod .im-n{flex:none;font-size:10.5px;font-weight:700;padding:1px 7px;border-radius:9px;color:var(--accent);background:color-mix(in srgb, var(--accent) 15%, transparent)}
+  .imod .im-n:empty{display:none}
+  .imod .im-info{flex:none;width:22px;height:22px;margin:0;padding:0;border-radius:50%;border:1px solid var(--line-strong);background:transparent;
+    color:var(--mut);font:italic 700 12px Georgia,'Times New Roman',serif;line-height:1;cursor:pointer;display:grid;place-items:center}
+  .imod .im-info:hover,.imod .im-info:focus-visible{color:var(--accent);border-color:var(--accent);outline:none}
+  .imod .im-body{padding:2px 10px 11px}
+  .imod .im-main{width:100%;margin-top:0}
+  /* scheda Geoprocessi: stesse sezioni; ogni operazione = pulsante + una riga che dice cosa fa */
+  .imod .im-ico.im-a{background:#FF8C1A;color:#fff;font-weight:700;font-size:13px}
+  .gpbuf{display:flex;align-items:center;gap:7px}
+  .gpbuf input{flex:0 0 84px;width:84px}
+  .gpbuf span{font-size:12px;color:var(--mut)}
+  .gpbuf button{flex:1;margin:0}
+  .gpop{display:flex;align-items:center;gap:9px;margin-top:6px}
+  .gpop:first-child{margin-top:0}
+  .gpop button{flex:0 0 112px;margin:0;padding:7px 6px}
+  .gpop span{font-size:11.5px;color:var(--mut);line-height:1.3}
+  .gpslot.gpB+.gpop{margin-top:10px}
+  .imod .chk{font-weight:400;font-size:12px;margin-top:8px;align-items:flex-start;line-height:1.35}   /* non il grassetto delle etichette */
+  .imod .chk input{margin-top:1px}
+  /* esempi «prima → dopo» nella finestra «i» dei geoprocessi */
+  .gpdia{margin:4px 0 8px;padding:8px 6px 4px;border:1px solid var(--line);border-radius:8px;background:var(--hover)}
+  .gpdia svg{display:block;width:100%;height:auto;max-height:110px}
+  .gpdia figcaption{font-size:11px;color:var(--mut);text-align:center;margin-top:2px}
+  /* finestra «come funziona» dei moduli */
+  #infoModal .card{width:500px}
+  .infobody{font-size:13px;line-height:1.55;color:var(--txt)}
+  .infobody h3{font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--mut);margin:14px 0 6px;font-weight:700}
+  .infobody h3:first-child{margin-top:4px}
+  .infobody ol,.infobody ul{margin:0;padding-left:20px}
+  .infobody li{margin-bottom:6px}
+  .infobody p{margin:0 0 8px}
+  /* servizi web (scheda Import) */
+  .svbar{display:flex;gap:6px;align-items:center;margin-top:6px}
+  .svbar[hidden]{display:none}
+  .svbar button.sec{flex:none;padding:7px 9px}
+  #svcList{margin-top:6px;max-height:260px;overflow-y:auto;border:1px solid var(--line);border-radius:6px;padding:3px 7px}
+  #svcList:empty{display:none}
+  #svcList .svrow{display:flex;align-items:flex-start;gap:7px;padding:3px 0;margin:0;font-size:12px;cursor:pointer;line-height:1.3;
+    text-transform:none;letter-spacing:normal;font-weight:400;color:var(--txt)}   /* non l'etichetta maiuscola dei moduli */
+  #svcList .svrow input{width:14px;height:14px;flex:none;margin:1px 0 0;padding:0;accent-color:var(--accent)}
+  #svcList .svrow small{opacity:.55;word-break:break-all}
   /* menu contestuale della mappa (tasto destro) */
   #ctxMenu{position:fixed;z-index:1500;display:none;min-width:216px;background:var(--panel);border:1px solid var(--line);
     border-radius:10px;padding:5px;box-shadow:0 12px 32px #0008}
@@ -430,8 +499,12 @@
     <!-- logo ufficiale Axpo: SVG inline (vedi AXPO_LOGO_SVG nello script) -->
     <img id="axpoLogo" alt="Axpo" style="height:26px">
     <h1>Geoportale · AxpoSolar Italia</h1>
+    <span id="projName" hidden></span>
   </div>
   <div class="topbar-right">
+    <button class="tb" id="projOpenBtn" title="Apri un progetto salvato (.axpo) · Ctrl+O">📂<span class="tbl"> Apri progetto</span></button>
+    <button class="tb" id="projSaveBtn" title="Salva tutto il lavoro in un file di progetto (.axpo) · Ctrl+S · Maiusc+clic o Ctrl+Maiusc+S: salva con nome">💾<span class="tbl"> Salva progetto</span></button>
+    <input type="file" id="projFile" accept=".axpo" hidden>
     <span class="authbar"><span class="dot" id="authDot"></span><span class="t" id="authTxt">Non connesso</span></span>
     <button class="tb" id="signin">Accedi</button>
     <button class="tb icon" id="themeToggle" aria-label="Cambia tema chiaro/scuro" title="Tema chiaro/scuro">☾</button>
@@ -447,7 +520,7 @@
       <button data-tab="disegno" title="Disegno" aria-label="Disegno"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20 L10 8 L16 14 L20 5"/><circle cx="4" cy="20" r="1.7" fill="currentColor" stroke="none"/><circle cx="10" cy="8" r="1.7" fill="currentColor" stroke="none"/><circle cx="16" cy="14" r="1.7" fill="currentColor" stroke="none"/><circle cx="20" cy="5" r="1.7" fill="currentColor" stroke="none"/></svg></button>
       <button data-tab="geoproc" title="Geoprocessi" aria-label="Geoprocessi"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3.5" y="3.5" width="12" height="12" rx="1.5"/><rect x="8.5" y="8.5" width="12" height="12" rx="1.5"/></svg></button>
       <button data-tab="contesto" title="Contesto sito" aria-label="Contesto sito"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><path d="M5.5 6 L18.5 6 M6 7.4 L11.2 16 M18 7.4 L12.8 16"/><circle cx="5.5" cy="6" r="2" fill="currentColor" stroke="none"/><circle cx="18.5" cy="6" r="2" fill="currentColor" stroke="none"/><circle cx="12" cy="17.5" r="2.2" fill="currentColor" stroke="none"/></svg></button>
-      <button data-tab="import" title="Import file esterni" aria-label="Import file esterni"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v10"/><polyline points="8,9 12,13 16,9"/><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg></button>
+      <button data-tab="import" title="Importa dati: file, disegni, immagini, servizi web" aria-label="Importa dati"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v10"/><polyline points="8,9 12,13 16,9"/><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg></button>
     </nav>
     <div id="sideContent">
     <div id="sideHead"><b id="sideTitle">Ricerca particelle</b><button id="sideToggle" aria-label="Comprimi pannello" title="Comprimi">«</button></div>
@@ -522,44 +595,72 @@
     </div></div>
 
     <div class="tabpane" data-tab="geoproc"><div class="paneBody">
-        <div class="tlab">Geoprocessi</div>
-        <div class="thint" style="margin-top:0">Scegli gli <b>oggetti</b> su cui lavorare: cliccandoli sulla mappa, prendendo le righe spuntate nell'elenco o aggiungendo una categoria intera.</div>
-        <div class="gpslot gpA" id="gpSlotA">
+        <!-- Come la scheda Importa dati: prima si sceglie A, poi l'operazione. Titolo + una riga per sezione;
+             gli esempi (con disegni prima → dopo) stanno nella finestra «i» (GP_INFO nello script). -->
+        <details class="imod" id="gpSecA" open>
+          <summary><span class="im-ico im-a" aria-hidden="true">A</span><span class="im-t"><b>Scegli gli oggetti</b><small>Quelli su cui lavorare: vanno in A</small></span>
+            <span class="im-n" id="gpSumA"></span><button type="button" class="im-info" data-info="gpA" title="Come funziona, con un esempio" aria-label="Come si scelgono gli oggetti">i</button></summary>
+          <div class="im-body">
+        <div class="gpslot gpA" id="gpSlotA" style="margin-top:0">
           <div class="gpslot-h"><span class="gpslot-k">A</span><span class="gpslot-n" id="gpNA">vuota</span><button class="gact" id="gpClrA" title="Svuota A" aria-label="Svuota A">×</button></div>
           <div class="gpchips" id="gpChipsA"></div>
           <div class="gpadd">
-            <button class="sec" id="gpPickA" title="Clicca gli oggetti sulla mappa per metterli in A (di nuovo per toglierli)">👆 Dalla mappa</button>
+            <button class="sec" id="gpPickA" title="Clicca gli oggetti sulla mappa per metterli in A (di nuovo per toglierli): particelle, disegni, risultati, elementi dei layer vettoriali">👆 Dalla mappa</button>
             <button class="sec" id="gpSelA" title="Usa le righe spuntate nell'elenco">☑ Spuntati</button>
             <select id="gpCatA" title="Aggiungi a A una categoria intera" aria-label="Aggiungi a A una categoria intera"><option value="">＋ Categoria…</option><option value="parcels">Tutte le particelle</option><option value="drawings">Tutti i disegni</option><option value="geoproc">Tutti i geoprocessi</option><option value="imports">Tutti gli importati</option></select>
           </div>
         </div>
-        <div class="tlab2" style="margin-top:10px">Operazioni su A</div>
-        <div class="row" style="align-items:flex-end">
-          <div style="flex:1"><label class="tlab2" for="bufDist">Buffer, distanza (m)</label><input id="bufDist" type="number" value="100" min="1"></div>
-          <div style="flex:0 0 auto"><button class="sec" id="bufGen" style="margin-top:0">⬡ Buffer</button></div>
-        </div>
-        <label class="chk"><input type="checkbox" id="bufEach" checked> Un buffer per ogni oggetto (altrimenti un'unica area)</label>
-        <div class="btns">
-          <button class="sec" id="gpUnion" title="Fonde gli oggetti di A in un'unica area">Union</button>
-          <button class="sec" id="gpHull" title="Perimetro convesso di A">Convex hull</button>
-          <button class="sec" id="gpSimplify" title="Semplifica A (meno vertici)">Simplify</button>
-        </div>
-        <div class="btns" style="margin-top:6px"><button class="sec" id="gpClip" title="Ritaglia A con un poligono disegnato al momento">Clip · A ∩ area disegnata</button></div>
-        <div class="gpslot gpB" id="gpSlotB" style="margin-top:16px">
+          </div>
+        </details>
+        <details class="imod" id="gpSecBuf" open>
+          <summary><span class="im-ico" aria-hidden="true"><svg viewBox="0 0 20 20" width="18" height="18"><rect x="7" y="7" width="6" height="6" fill="currentColor"/><rect x="2.5" y="2.5" width="15" height="15" rx="5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="2.5 2"/></svg></span>
+            <span class="im-t"><b>Buffer</b><small>Una fascia di tot metri intorno agli oggetti</small></span>
+            <button type="button" class="im-info" data-info="gpBuf" title="Come funziona, con un esempio" aria-label="Come funziona il buffer">i</button></summary>
+          <div class="im-body">
+            <div class="gpbuf"><input id="bufDist" type="number" value="100" min="1" aria-label="Larghezza del buffer in metri"><span>metri</span>
+              <button class="sec" id="bufGen">Crea buffer</button></div>
+            <label class="chk"><input type="checkbox" id="bufEach" checked> Uno per ogni oggetto (senza spunta: un'unica fascia)</label>
+          </div>
+        </details>
+        <details class="imod" id="gpSecShape">
+          <summary><span class="im-ico" aria-hidden="true"><svg viewBox="0 0 20 20" width="18" height="18"><path d="M3 4h8v4h6v8H9v-4H3z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg></span>
+            <span class="im-t"><b>Unisci, contorna, semplifica</b><small>Una nuova area a partire da A</small></span>
+            <button type="button" class="im-info" data-info="gpShape" title="Come funziona, con un esempio" aria-label="Come funzionano Unisci, Contorno e Semplifica">i</button></summary>
+          <div class="im-body">
+            <div class="gpop"><button class="sec" id="gpUnion" title="Union">Unisci</button><span>Fonde le aree di A in una sola.</span></div>
+            <div class="gpop"><button class="sec" id="gpHull" title="Convex hull (inviluppo convesso)">Contorno</button><span>Il perimetro che racchiude tutto A.</span></div>
+            <div class="gpop"><button class="sec" id="gpSimplify" title="Simplify">Semplifica</button><span>La forma di A con meno vertici.</span></div>
+          </div>
+        </details>
+        <details class="imod" id="gpSecClip">
+          <summary><span class="im-ico" aria-hidden="true"><svg viewBox="0 0 20 20" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="5.5" cy="14.5" r="2.5"/><circle cx="14.5" cy="14.5" r="2.5"/><path d="M7.3 12.6 15 3M12.7 12.6 5 3"/></svg></span>
+            <span class="im-t"><b>Ritaglia</b><small>Tieni solo la parte di A dentro un'area che disegni</small></span>
+            <button type="button" class="im-info" data-info="gpClip" title="Come funziona, con un esempio" aria-label="Come funziona Ritaglia">i</button></summary>
+          <div class="im-body">
+            <button class="sec im-main" id="gpClip" title="Clip">✂ Disegna l'area e ritaglia</button>
+            <div class="thint">Un clic per ogni vertice, doppio clic per finire.</div>
+          </div>
+        </details>
+        <details class="imod" id="gpSecAB">
+          <summary><span class="im-ico" aria-hidden="true"><svg viewBox="0 0 20 20" width="18" height="18" fill="none" stroke-width="1.6"><circle cx="7.5" cy="10" r="5.3" stroke="#FF8C1A"/><circle cx="12.5" cy="10" r="5.3" stroke="#8250DC"/></svg></span>
+            <span class="im-t"><b>Confronta A con B</b><small>Parte in comune, oppure A senza B</small></span>
+            <span class="im-n" id="gpSumB"></span><button type="button" class="im-info" data-info="gpAB" title="Come funziona, con un esempio" aria-label="Come funziona il confronto tra A e B">i</button></summary>
+          <div class="im-body">
+            <div class="thint" style="margin-top:0">Metti in B gli oggetti con cui confrontare A.</div>
+        <div class="gpslot gpB" id="gpSlotB">
           <div class="gpslot-h"><span class="gpslot-k">B</span><span class="gpslot-n" id="gpNB">vuota</span><button class="gact" id="gpClrB" title="Svuota B" aria-label="Svuota B">×</button></div>
           <div class="gpchips" id="gpChipsB"></div>
           <div class="gpadd">
-            <button class="sec" id="gpPickB" title="Clicca gli oggetti sulla mappa per metterli in B (di nuovo per toglierli)">👆 Dalla mappa</button>
+            <button class="sec" id="gpPickB" title="Clicca gli oggetti sulla mappa per metterli in B (di nuovo per toglierli): particelle, disegni, risultati, elementi dei layer vettoriali">👆 Dalla mappa</button>
             <button class="sec" id="gpSelB" title="Usa le righe spuntate nell'elenco">☑ Spuntati</button>
             <select id="gpCatB" title="Aggiungi a B una categoria intera" aria-label="Aggiungi a B una categoria intera"><option value="">＋ Categoria…</option><option value="parcels">Tutte le particelle</option><option value="drawings">Tutti i disegni</option><option value="geoproc">Tutti i geoprocessi</option><option value="imports">Tutti gli importati</option></select>
           </div>
         </div>
-        <div class="tlab2" style="margin-top:10px">Operazioni tra A e B</div>
-        <div class="btns">
-          <button class="sec" id="gpIntersect" title="Parte comune tra A e B">Intersect · A ∩ B</button>
-          <button class="sec" id="gpDiff" title="Sottrai B da A">Difference · A − B</button>
-        </div>
-        <div id="gpMsg" class="thint">Ogni risultato finisce in <b>Geoprocessi</b> nell'elenco, e si può a sua volta mettere in A o in B.</div>
+            <div class="gpop"><button class="sec" id="gpIntersect" title="Intersect">Parte comune</button><span>Dove A e B si sovrappongono.</span></div>
+            <div class="gpop"><button class="sec" id="gpDiff" title="Difference">Sottrai B da A</button><span>A senza le parti coperte da B.</span></div>
+          </div>
+        </details>
+        <div id="gpMsg" class="thint">Ogni risultato va nell'<b>Elenco</b>, sezione <b>Geoprocessi</b>, e si può rimettere in A o in B.</div>
     </div></div>
 
     <div class="tabpane" data-tab="contesto"><div class="paneBody">
@@ -571,36 +672,78 @@
     </div></div>
 
     <div class="tabpane" data-tab="import"><div class="paneBody">
-        <div class="tlab">Import file esterni</div>
-        <input type="file" id="impFile" accept=".geojson,.json,.kml,.kmz,.zip,.dwg" multiple hidden>
-        <button class="sec" id="impBtn" style="margin-top:0">📂 Scegli file…</button>
-        <div class="thint">GeoJSON · KML · KMZ · Shapefile (.zip). Le geometrie vanno nella sezione <b>Importati</b> dell'elenco: rinominabili, esportabili e promuovibili. Un file senza sistema di riferimento (shapefile senza .prj) passa da «Trova il sistema» qui sotto.</div>
-        <div id="impMsg" class="thint"></div>
-        <div class="tlab" style="margin-top:14px">Immagini georeferenziate</div>
-        <input type="file" id="impImg" accept=".png,.jpg,.jpeg,.tif,.tiff,.geotiff" hidden>
-        <button class="sec" id="impImgBtn" style="margin-top:0">🖼 Immagine / GeoTIFF…</button>
-        <div class="thint">PNG · JPG: posizioni con gli <b>angoli trascinabili</b>. GeoTIFF: posizionato in automatico dai suoi metadati (bbox + CRS), ritoccabile. Ridimensionate a max 4096 px per evitare crash.</div>
-        <div class="tlab" style="margin-top:14px">Disegni CAD</div>
-        <input type="file" id="impCad" accept=".dwg" multiple hidden>
-        <button class="sec" id="impCadBtn" style="margin-top:0">📐 Disegno DWG…</button>
-        <div class="thint">Letto nel browser: il file non lascia il PC. Il sistema di riferimento viene <b>stimato dalle coordinate</b> e lo confermi tu; layer e colori restano quelli del CAD. Vale per la sessione: non viene salvato.</div>
-        <div id="impCadMsg" class="thint"></div>
-        <div id="cadList"></div>
-        <div class="tlab" style="margin-top:14px">Coordinate · trova il sistema di riferimento</div>
-        <textarea id="srIn" rows="3" spellcheck="false" placeholder="769101,23   4471592,45&#10;una coppia X Y per riga (anche con un nome davanti)"></textarea>
-        <div class="btns" style="margin-top:6px">
-          <button class="sec" id="srFind" style="margin-top:0">🔎 Trova il sistema</button>
-          <button class="sec" id="srRefBtn" style="margin-top:0" title="Clicca sulla mappa dove queste coordinate dovrebbero cadere: i candidati vengono ordinati per errore">📍 Dove dovrebbe stare</button>
-          <button class="sec" id="srClear" style="margin-top:0">Pulisci</button>
-        </div>
-        <div class="thint">Incolla coordinate proiettate (Gauss-Boaga, UTM…) o in gradi: le provo nei sistemi usati in Italia e ti mostro dove cadono. Riconosce la virgola decimale e prova anche con <b>X e Y invertiti</b>.</div>
-        <div id="srRefTxt" class="thint" style="display:none"></div>
-        <div id="srList"></div>
-        <div class="btns" id="srActRow" style="display:none">
-          <button class="primary" id="srAdd" style="margin-top:0">Aggiungi agli Importati</button>
-        </div>
-        <label class="chk" id="srPolyRow" style="display:none"><input type="checkbox" id="srPoly"> Unisci i punti in un'unica area</label>
-        <div id="srMsg" class="thint"></div>
+        <!-- Cinque moduli in sezioni collassabili: titolo e una riga semplice sempre visibili, il resto dentro.
+             Le spiegazioni lunghe stanno nella finestra «i» (IMP_INFO nello script), non qui. -->
+        <details class="imod" id="impSecFile" open>
+          <summary><span class="im-ico" aria-hidden="true">📂</span><span class="im-t"><b>File di geometrie</b><small>GeoJSON, KML, KMZ, Shapefile (.zip)</small></span></summary>
+          <div class="im-body">
+            <input type="file" id="impFile" accept=".geojson,.json,.kml,.kmz,.zip,.dwg" multiple hidden>
+            <button class="sec im-main" id="impBtn">📂 Scegli uno o più file…</button>
+            <div class="thint">Le geometrie finiscono nell'<b>Elenco</b>, sezione <b>Importati</b>. Se il file non dice in che sistema di coordinate è, ti propongo io quelli possibili.</div>
+            <div id="impMsg" class="thint"></div>
+          </div>
+        </details>
+        <details class="imod" id="impSecCad">
+          <summary><span class="im-ico" aria-hidden="true">📐</span><span class="im-t"><b>Disegni CAD</b><small>Layout e rilievi in formato DWG</small></span>
+            <span class="im-n" id="impNCad"></span><button type="button" class="im-info" data-info="cad" title="Come funziona" aria-label="Come funzionano i disegni CAD">i</button></summary>
+          <div class="im-body">
+            <input type="file" id="impCad" accept=".dwg" multiple hidden>
+            <button class="sec im-main" id="impCadBtn">📐 Scegli un disegno DWG…</button>
+            <div class="thint">Ti propongo il sistema di coordinate del disegno e tu confermi. Se il disegno non è georeferenziato, lo posizioni a mano con 2 punti.</div>
+            <div id="impCadMsg" class="thint"></div>
+            <div id="cadList"></div>
+          </div>
+        </details>
+        <details class="imod" id="impSecImg">
+          <summary><span class="im-ico" aria-hidden="true">🖼</span><span class="im-t"><b>Immagini sulla mappa</b><small>GeoTIFF, foto e planimetrie (PNG, JPG)</small></span>
+            <span class="im-n" id="impNImg"></span><button type="button" class="im-info" data-info="img" title="Come funziona" aria-label="Come funzionano le immagini">i</button></summary>
+          <div class="im-body">
+            <input type="file" id="impImg" accept=".png,.jpg,.jpeg,.tif,.tiff,.geotiff" hidden>
+            <button class="sec im-main" id="impImgBtn">🖼 Scegli un'immagine…</button>
+            <div class="thint">Il GeoTIFF si posiziona da solo. Una foto o una planimetria la sistemi trascinando i 4 angoli.</div>
+          </div>
+        </details>
+        <details class="imod" id="impSecSvc">
+          <summary><span class="im-ico" aria-hidden="true">🔗</span><span class="im-t"><b>Servizi web</b><small>WMS, WFS e ArcGIS REST da un indirizzo</small></span>
+            <span class="im-n" id="impNSvc"></span><button type="button" class="im-info" data-info="svc" title="Come funziona" aria-label="Come funzionano i servizi web">i</button></summary>
+          <div class="im-body">
+            <div class="svbar" style="margin-top:0">
+              <select id="svcType" aria-label="Tipo di servizio" style="flex:0 0 112px;padding:7px 6px">
+                <option value="auto">Automatico</option><option value="wms">WMS</option><option value="wfs">WFS</option><option value="rest">ArcGIS REST</option></select>
+              <input id="svcUrl" type="url" spellcheck="false" autocomplete="url" placeholder="Incolla l'indirizzo…" aria-label="Indirizzo del servizio">
+            </div>
+            <button class="sec im-main" id="svcRead" style="margin-top:6px">🔗 Leggi il servizio</button>
+            <div id="svcMsg" class="thint"></div>
+            <div class="svbar" id="svcTools" hidden>
+              <input id="svcFilter" placeholder="Filtra l'elenco…" aria-label="Filtra l'elenco dei layer del servizio" spellcheck="false">
+              <button class="sec" id="svcAll" title="Spunta tutti i layer visibili nell'elenco">Tutti</button>
+              <button class="sec" id="svcNone" title="Togli tutte le spunte">Nessuno</button>
+            </div>
+            <div id="svcList"></div>
+            <button class="sec im-main" id="svcAdd" style="margin-top:6px" hidden>➕ Aggiungi alla mappa</button>
+            <div class="thint">I layer aggiunti li trovi nel pannello <b>Layer</b>, a destra.</div>
+          </div>
+        </details>
+        <details class="imod" id="impSecSr">
+          <summary><span class="im-ico" aria-hidden="true">🧭</span><span class="im-t"><b>Coordinate senza sistema</b><small>Scopri in che sistema sono delle coordinate</small></span>
+            <button type="button" class="im-info" data-info="sr" title="Come funziona" aria-label="Come funziona la ricerca del sistema di coordinate">i</button></summary>
+          <div class="im-body">
+            <textarea id="srIn" rows="3" spellcheck="false" placeholder="769101,23   4471592,45&#10;una coppia X Y per riga (anche con un nome davanti)"></textarea>
+            <div class="btns" style="margin-top:6px">
+              <button class="sec" id="srFind" style="margin-top:0">🔎 Trova il sistema</button>
+              <button class="sec" id="srRefBtn" style="margin-top:0" title="Clicca sulla mappa dove queste coordinate dovrebbero cadere: i candidati vengono ordinati per errore">📍 Dove dovrebbe stare</button>
+              <button class="sec" id="srClear" style="margin-top:0">Pulisci</button>
+            </div>
+            <div class="thint">Ti mostro in quali sistemi le coordinate cadono in Italia, e dove.</div>
+            <div id="srRefTxt" class="thint" style="display:none"></div>
+            <div id="srList"></div>
+            <div class="btns" id="srActRow" style="display:none">
+              <button class="primary" id="srAdd" style="margin-top:0">Aggiungi agli Importati</button>
+            </div>
+            <label class="chk" id="srPolyRow" style="display:none"><input type="checkbox" id="srPoly"> Unisci i punti in un'unica area</label>
+            <div id="srMsg" class="thint"></div>
+          </div>
+        </details>
     </div></div>
 
 
@@ -615,7 +758,7 @@
         <button class="sec" id="resetWork" title="Toglie particelle, disegni, geoprocessi, import, immagini, DWG e layer aggiunti">🧹 Svuota il lavoro</button>
         <button class="ghost-danger" id="resetAll" title="Cancella anche preferenze, segnalibri e posizionamenti DWG, poi ricarica">Ripristina tutto</button>
       </div>
-      <div class="hint">«Svuota il lavoro» riparte da una mappa pulita e tiene tema, segnalibri e posizionamenti DWG salvati. «Ripristina tutto» cancella ogni dato del geoportale in questo browser e ricarica la pagina.</div>
+      <div class="hint">«Svuota il lavoro» riparte da una mappa pulita e tiene tema, segnalibri e posizionamenti DWG salvati. «Ripristina tutto» cancella ogni dato del geoportale in questo browser e ricarica la pagina. Il salvataggio nel browser tiene particelle e geometrie ma non DWG e immagini: per conservare tutto, o passarlo a un collega, usa <b>💾 Salva progetto</b> in alto (file .axpo).</div>
     </details>
   </div>
   </aside>
@@ -844,12 +987,25 @@
     <h2>Guida rapida</h2>
     <div class="sub">Geoportale AxpoSolar Italia — dati catastali AdE via Zornade · portale ArcGIS Online interno.</div>
     <ol style="margin:0;padding-left:18px;font-size:13px;line-height:1.7">
-      <li><b>Sidebar sinistra (rail di icone)</b> — Ricerca (ambito + foglio/particella + selezione mappa), Disegno, Geoprocessi, Contesto sito, Import (anche disegni DWG, con stima del sistema di riferimento).</li>
+      <li><b>Sidebar sinistra (rail di icone)</b> — Ricerca (ambito + foglio/particella + selezione mappa), Disegno, Geoprocessi, Contesto sito, Importa dati (file, disegni DWG, immagini, servizi web, coordinate: una sezione per modulo, con la <b>i</b> che spiega come funziona).</li>
       <li><b>Ricerca particelle</b> — per Foglio/Particella, con la selezione su mappa (punto/rettangolo/poligono/linea) o da un disegno esistente.</li>
       <li><b>Action bar destra</b> — <b>Elenco &amp; azioni</b> (Particelle · Disegni · Geoprocessi · Importati): ogni riga si rinomina, si colora, si nasconde e si <b>spunta</b> per usarla nei geoprocessi. Poi Layer, Basemap, Segnalibri, Modifica AREAS, Stampa.</li>
+      <li><b>Layer</b> — cerca un layer per nome; dal pannello di ogni layer (icona a cursori) trasparenza, popup e <b>filtro per attributo</b> (l'icona diventa un imbuto quando è attivo). I layer aggiunti da te (dal portale, servizi web, DWG, immagini) hanno il menu <b>…</b> con Zoom e <b>Rimuovi dalla mappa</b>.</li>
+      <li><b>Servizi web</b> (scheda Importa dati) — WMS, WFS e ArcGIS REST per indirizzo, senza creare item sul portale. Il browser accetta solo servizi <b>https</b> che permettono la lettura da altri siti (CORS).</li>
       <li><b>Esporta / Promuovi</b> — GeoJSON/KML/KMZ/SHP/XLSX; oppure promuovi in <b>AREAS COLLECTION</b> o <b>Sites Notes</b>.</li>
+      <li><b>Progetto</b> (in alto) — <b>💾 Salva progetto</b> mette tutto in un file .axpo, come un progetto QGIS: vista, basemap, area di lavoro, mappa e layer del portale (accesi, trasparenza, ordine), particelle, disegni, geoprocessi, import, e i file di <b>DWG e immagini</b> con il loro posizionamento. <b>📂 Apri progetto</b> lo ripristina (sostituisce il lavoro corrente). <kbd>Ctrl</kbd>+<kbd>S</kbd> risalva sullo stesso file, <kbd>Ctrl</kbd>+<kbd>Maiusc</kbd>+<kbd>S</kbd> salva con nome.</li>
     </ol>
     <div class="hint" style="margin-top:10px">Sulla mappa: ricerca di indirizzi e coordinate (lat, lon oppure X Y proiettate) e misura in alto a destra; scalimetro e coordinate del puntatore (con pin) in basso a destra; profilo di elevazione in basso a sinistra. <kbd>Esc</kbd> esce da qualsiasi modalità e interrompe la selezione su area. Riapri i tour dal <b>?</b>.</div>
+  </div>
+</div>
+
+<!-- ── FINESTRA «COME FUNZIONA» dei moduli della scheda Import (testi in IMP_INFO) ── -->
+<div id="infoModal" role="dialog" aria-modal="true" aria-labelledby="infoTitle">
+  <div class="card">
+    <button id="infoClose" class="mclose" title="Chiudi" aria-label="Chiudi">×</button>
+    <h2 id="infoTitle"></h2>
+    <div class="sub" id="infoSub"></div>
+    <div class="infobody" id="infoBody"></div>
   </div>
 </div>
 
@@ -1038,7 +1194,12 @@ require([
   view.popup.dockOptions={buttonEnabled:true, breakpoint:false, position:"top-left"};
 
   new BasemapGallery({view, source:[bmTopo,bmImg,bmStreets], container:document.getElementById("bmGalleryBox")});   // drawer "basemaps" (elemento, non stringa: con l'id la gallery non renderizza)
-  new LayerList({view, container:"layerListBox", listItemCreatedFunction:layerListItem, dragEnabled:true});   // drawer "layers" (+ pannello simbologia/trasparenza/popup, riordino drag&drop)
+  // drawer "layers": pannello simbologia/trasparenza/popup/filtro, riordino drag&drop, ricerca per nome
+  // (le Check Vincoli hanno decine di layer), zoom e rimozione dei layer aggiunti da noi
+  const layerListW=new LayerList({view, container:"layerListBox", listItemCreatedFunction:layerListItem, dragEnabled:true,
+    visibleElements:{filter:true}, filterPlaceholder:"Cerca un layer per nome"});
+  layerListW.on("trigger-action", llAction);
+  window.__llW=layerListW;   // hook debug (come window.view)
 
   // ── Stampa (drawer), scalimetro (basso-dx), profilo di elevazione (basso-sx) ──
   try{ new Print({view, container:"printBox"}); }catch(e){ console.warn('Print:',e&&e.message); }   // drawer "print"
@@ -1243,6 +1404,12 @@ async function onSignedIn(){
   $('itemQ').disabled=false; $('searchItem').disabled=false;
   render();
   // mappa di default all'apertura: General Map (una sola volta) + ripristino layer salvati
+  if(!initialMapLoaded&&projPortalPending){   // progetto aperto prima che il login finisse: la sua mappa, non la General Map
+    initialMapLoaded=true; const st=projPortalPending, w=[]; projPortalPending=null; addedPortalItems=[];
+    bootVP=view&&view.viewpoint? view.viewpoint.toJSON() : null;
+    projApplyPortal(st,w).then(()=>{ projApplyLayers(st.layers, st.order, null, w, true);
+      if(w.length) msg('Progetto: '+w.join('; ')+'.','err'); }).finally(()=>{ bootVP=null; });
+  }
   if(!initialMapLoaded){ initialMapLoaded=true;
     const restore=addedPortalItems.slice(); addedPortalItems=[];
     const p = (!$('reg').value) ? loadWebMap(GENERAL_MAP,false,'la General Map') : Promise.resolve();
@@ -1355,7 +1522,7 @@ function wireContextMenu(){
     try{ window.showTab&&window.showTab('contesto'); }catch(e){}
     querySubstations(pt); };
   $('ctxBuf').onclick=()=>{ close(); if(!pt) return;
-    try{ window.showTab&&window.showTab('geoproc'); }catch(e){}
+    try{ window.showTab&&window.showTab('geoproc'); window.impOpen&&window.impOpen('gpSecBuf'); }catch(e){}
     makeBuffer([pt], parseFloat($('bufDist').value)||100); };
   $('ctxCopy').onclick=()=>{ close(); if(!ll) return;
     const t=ll.lat.toFixed(6)+', '+ll.lng.toFixed(6);
@@ -1432,6 +1599,18 @@ async function zoomToAdmin(lv, name){
   }catch(e){ console.warn('zoom ambito '+lv+':', e&&e.message); return null; }
 }
 
+// cascata regione → province → comuni: la usano i menu e la riapertura di un progetto (che non cambia
+// mappa né sposta la vista). false = nel frattempo è stata scelta un'altra voce, risposta da scartare.
+async function admLoadProv(region){
+  const d=await z('/admin/provinces',{region});
+  if($('reg').value!==region) return false;
+  $('prov').innerHTML='<option value="">— seleziona —</option>'+d.data.map(p=>`<option>${esc(fixProvName(region,p.name))}</option>`).join('');$('prov').disabled=false;
+  return true; }
+async function admLoadCom(prov){
+  const d=await z('/admin/municipalities',{province:prov});
+  if($('prov').value!==prov) return false;
+  $('com').innerHTML='<option value="">— seleziona —</option>'+d.data.sort((a,b)=>a.name.localeCompare(b.name)).map(c=>`<option>${esc(c.name)}</option>`).join('');$('com').disabled=false;
+  return true; }
 function wireUI(){
   $('reg').addEventListener('change',async()=>{
     $('prov').disabled=$('com').disabled=true;$('com').innerHTML='<option value="">—</option>';checkReady();
@@ -1439,9 +1618,7 @@ function wireUI(){
     provExtent=null;
     const cv=swapCheckVincoli(region);        // Fase 2 (non blocca la cascata)
     if(!region)return;
-    let d; try{ d=await z('/admin/provinces',{region}); }catch(e){ msg('Province non caricate: '+e.message,'err'); return; }
-    if($('reg').value!==region) return;   // nel frattempo è stata scelta un'altra regione
-    $('prov').innerHTML='<option value="">— seleziona —</option>'+d.data.map(p=>`<option>${esc(fixProvName(region,p.name))}</option>`).join('');$('prov').disabled=false;
+    try{ if(!await admLoadProv(region)) return; }catch(e){ msg('Province non caricate: '+e.message,'err'); return; }
     // Lo zoom parte DOPO lo swap della Check Vincoli: loadWebMap sostituisce la
     // mappa e può muovere la vista (goTo sulle particelle), sovrascrivendo
     // l'inquadratura appena impostata.
@@ -1451,9 +1628,7 @@ function wireUI(){
   $('prov').addEventListener('change',async()=>{
     $('com').disabled=true;$('com').innerHTML='<option value="">—</option>';checkReady();provExtent=null;
     const prov=$('prov').value; if(!prov)return;
-    let d; try{ d=await z('/admin/municipalities',{province:prov}); }catch(e){ msg('Comuni non caricati: '+e.message,'err'); return; }
-    if($('prov').value!==prov) return;
-    $('com').innerHTML='<option value="">— seleziona —</option>'+d.data.sort((a,b)=>a.name.localeCompare(b.name)).map(c=>`<option>${esc(c.name)}</option>`).join('');$('com').disabled=false;
+    try{ if(!await admLoadCom(prov)) return; }catch(e){ msg('Comuni non caricati: '+e.message,'err'); return; }
     provExtent=await zoomToAdmin('prov',$('prov').value);   // serve anche a filtrare i comuni omonimi
   });
   ['fog','par'].forEach(id=>$(id).addEventListener('input',checkReady));
@@ -1464,6 +1639,12 @@ function wireUI(){
     try{ if(localStorage.getItem('axpo_labels')==='0') $('lblParcels').checked=false; }catch(e){}
     const applyLbl=()=>{ if(labelsGL) labelsGL.visible=$('lblParcels').checked; }; applyLbl();
     $('lblParcels').onchange=()=>{ applyLbl(); try{ localStorage.setItem('axpo_labels', $('lblParcels').checked?'1':'0'); }catch(e){} }; }
+  // progetto: apri / salva — anche Ctrl+O, Ctrl+S, e Ctrl+Maiusc+S o Maiusc+clic per «salva con nome»
+  if($('projOpenBtn')) $('projOpenBtn').onclick=()=>projOpenPick();
+  if($('projSaveBtn')) $('projSaveBtn').onclick=e=>projSave(!!e.shiftKey);
+  if($('projFile')) $('projFile').onchange=e=>{ const f=e.target.files&&e.target.files[0]; e.target.value=''; if(f) projOpenFile(f,null); };
+  document.addEventListener('keydown',e=>{ if(!(e.ctrlKey||e.metaKey)||e.altKey) return; const k=String(e.key||'').toLowerCase();
+    if(k==='s'){ e.preventDefault(); projSave(e.shiftKey); } else if(k==='o'){ e.preventDefault(); projOpenPick(); } });
   $('dl').onclick=openExport;
   $('reset').onclick=()=>{if(parcels.length&&confirm('Togliere tutte le particelle dall\'elenco? Disegni, geoprocessi e import restano.')){parcels=[];render();msg('','');}};
   $('searchItem').onclick=searchPortalItems;
@@ -1540,6 +1721,11 @@ function wireTools(){
     $('imgOpacity').onkeydown=e=>{ if(e.key==='Enter'){ e.preventDefault(); applyTbOp(); e.target.blur(); } };
   }
   if($('impFile')) $('impFile').onchange=e=>{ onImportFiles(e.target.files); e.target.value=''; };
+  // servizi web (WMS, WFS, ArcGIS REST) per indirizzo
+  if($('svcRead')){ $('svcRead').onclick=svcRead; $('svcAdd').onclick=svcAdd; $('svcFilter').oninput=svcFilterList;
+    $('svcUrl').onkeydown=e=>{ if(e.key==='Enter'){ e.preventDefault(); svcRead(); } };
+    $('svcAll').onclick=()=>$('svcList').querySelectorAll('.svrow').forEach(r=>{ if(r.style.display!=='none') r.querySelector('input').checked=true; });
+    $('svcNone').onclick=()=>$('svcList').querySelectorAll('input').forEach(c=>{ c.checked=false; }); }
   if($('selDrawGo')) $('selDrawGo').onclick=()=>{ const v=$('selFromDraw').value; if(v==='') return;
     const g=(window.__selDrawList||[])[+v]; if(g&&g.geometry){ try{ view.goTo(g.geometry.extent?g.geometry.extent.expand(1.4):g.geometry).catch(()=>{}); }catch(e){} selectByGeometry(g.geometry); } };
   $('drwClear').onclick=()=>{ try{sketchVM.cancel();}catch(e){} drawType=null; setDrawBtns();
@@ -1697,19 +1883,26 @@ function serializeToolGeoms(){
     let gj=null; try{ gj=esriGeomToGeojson(to4326(g.geometry)); }catch(e){}
     if(!gj) return;
     out.push({ g:gj,
-      a:{_kind:at._kind,_sub:at._sub,geomType:at.geomType,categoria:at.categoria,note:at.note,nome:at.nome,dist_m:at.dist_m,area_ha:at.area_ha,source:at.source,color:at.color,hidden:at.hidden},
+      a:{_kind:at._kind,_sub:at._sub,geomType:at.geomType,categoria:at.categoria,note:at.note,nome:at.nome,dist_m:at.dist_m,area_ha:at.area_ha,source:at.source,color:at.color,hidden:at.hidden,
+         _srcKey:at._srcKey, src_attrs:at.src_attrs},   // elementi presi dai layer della mappa: da dove vengono e i loro attributi
       v:(g.visible!==false),
       s:(g.symbol&&g.symbol.toJSON)?g.symbol.toJSON():null });
   });
   return out;
 }
+// lo stesso stato serve al salvataggio automatico e al file di progetto (projCapture)
+function captureWork(){
+  const base={
+    basemap: view.map&&view.map.basemap? view.map.basemap.id:null,
+    viewpoint: view.viewpoint? view.viewpoint.toJSON():null,
+    parcels, addedItems:addedPortalItems,
+    services: svcBooting||addedServices };   // durante il ripristino all'avvio vale ancora l'elenco salvato
+  let geoms=[]; try{ geoms=serializeToolGeoms(); }catch(e){}
+  return {base:base, toolGeoms:geoms};
+}
 function saveState(){
   try{ if(!view) return;
-    const base={
-      basemap: view.map&&view.map.basemap? view.map.basemap.id:null,
-      viewpoint: view.viewpoint? view.viewpoint.toJSON():null,
-      parcels, addedItems:addedPortalItems };
-    let geoms=[]; try{ geoms=serializeToolGeoms(); }catch(e){}
+    const w=captureWork(), base=w.base, geoms=w.toolGeoms;
     try{ localStorage.setItem('cat_state', JSON.stringify(Object.assign({toolGeoms:geoms}, base))); }
     catch(quota){ try{ localStorage.setItem('cat_state', JSON.stringify(base)); }catch(e2){}   // quota → salva senza geometrie
       // prima era silenzioso: disegni e import smettevano di sopravvivere al ricaricamento senza che nessuno lo sapesse
@@ -1729,6 +1922,19 @@ function restoreState(){
   if(!st) return;
   try{
     bootVP = st.viewpoint || null;      // impostato PRIMA di render(): sopprime l'auto-zoom
+    applyWork(st);
+    const _vp=vpFromJSON(st.viewpoint); if(_vp&&view) view.viewpoint=_vp;
+    if(st.basemap&&BM_BY_ID[st.basemap]&&view&&view.map) view.map.basemap=BM_BY_ID[st.basemap];
+    addedPortalItems = Array.isArray(st.addedItems)? st.addedItems : [];
+    // i layer del portale si ri-aggiungono dopo il login (onSignedIn); i servizi web subito
+    if(Array.isArray(st.services)&&st.services.length){ svcBooting=st.services;
+      svcRestoreAll(st.services).then(bad=>{ svcBooting=null; saveStateDebounced();
+        if(bad.length) msg('Servizi web non più raggiungibili, tolti dal lavoro: '+bad.join(' · '),'err'); }); }
+  }catch(e){}
+}
+let svcBooting=null;
+// particelle e geometrie (disegni, buffer, geoprocessi, import): da salvataggio automatico o da progetto
+function applyWork(st){
     if(Array.isArray(st.parcels)&&st.parcels.length){ parcels=st.parcels; render(); }
     if(Array.isArray(st.toolGeoms)&&st.toolGeoms.length&&toolsGL&&esriMods){
       st.toolGeoms.forEach(rec=>{ try{
@@ -1744,11 +1950,6 @@ function restoreState(){
       }catch(e){} });
       try{ refreshDl(); }catch(e){}
     }
-    const _vp=vpFromJSON(st.viewpoint); if(_vp&&view) view.viewpoint=_vp;
-    if(st.basemap&&BM_BY_ID[st.basemap]&&view&&view.map) view.map.basemap=BM_BY_ID[st.basemap];
-    addedPortalItems = Array.isArray(st.addedItems)? st.addedItems : [];
-    // i layer del portale si ri-aggiungono dopo il login (onSignedIn)
-  }catch(e){}
 }
 
 // ── dati salvati nel browser: quanto pesano, e come ripartire da zero ─────────
@@ -1767,23 +1968,262 @@ function storeInfo(){
     +(work+pref>4*1048576? ' — <b style="color:var(--err)">quasi pieno</b>' : ''); }
 function resetWork(){
   if(!confirm('Svuotare il lavoro? Tolgo particelle, disegni, buffer, geoprocessi, import, immagini, DWG e layer aggiunti. Tema, segnalibri e posizionamenti DWG restano.')) return;
+  clearWork(); projSetName(null);
+  msg('Lavoro svuotato: la mappa è pulita.','ok'); }
+// toglie tutto il lavoro senza chiedere (lo usano «Svuota il lavoro» e l'apertura di un progetto)
+function clearWork(){
   try{ if(typeof cadAlignOn==='function'&&cadAlignOn()) cadAlignEnd(true); }catch(e){}
   try{ gpPickEnd(); }catch(e){}
   try{ srRefEnd(); srReset(); }catch(e){}
   try{ [...cadFiles].forEach(cadRemove); }catch(e){}
   try{ importedImages.slice().forEach(removeImage); imgDone(); }catch(e){}
-  try{ view.map.layers.toArray().filter(l=>l.portalItem&&addedPortalItems.includes(l.portalItem.id)).forEach(l=>view.map.remove(l)); }catch(e){}
-  addedPortalItems=[];
+  try{ view.map.layers.toArray().filter(l=>l._projSvc||(l.portalItem&&addedPortalItems.includes(l.portalItem.id))).forEach(l=>{ view.map.remove(l); if(l._projSvc) try{ if(l._blobUrl) URL.revokeObjectURL(l._blobUrl); l.destroy(); }catch(e){} }); }catch(e){}
+  addedPortalItems=[]; addedServices=[]; svcBooting=null; svcGen++;   // un ripristino di servizi in corso si ferma
   parcels=[]; try{ toolsGL.removeAll(); }catch(e){} try{ window.__searchGL&&window.__searchGL.removeAll(); }catch(e){}
   try{ gpSlots.A=[]; gpSlots.B=[]; }catch(e){}
   render(); renderGeoms(); refreshDl();
   try{ localStorage.removeItem('cat_state'); }catch(e){}
-  saveState._warned=false; storeInfo();
-  msg('Lavoro svuotato: la mappa è pulita.','ok'); }
+  saveState._warned=false; storeInfo(); impCounts(); }
 function resetAll(){
   if(!confirm('Ripristinare tutto? Cancello ogni dato del geoportale in questo browser — lavoro, tema, segnalibri, posizionamenti DWG, preferenze — e ricarico la pagina.')) return;
   try{ Object.keys(localStorage).filter(k=>APP_KEYS.test(k)).forEach(k=>localStorage.removeItem(k)); }catch(e){}
   location.reload(); }
+
+// ══ Progetto: salva e riapri tutto il lavoro in un file .axpo ═════════════════════════════
+// Come il .qgz di QGIS: uno zip con progetto.json (vista, basemap, area di lavoro, web map del portale e
+// suoi layer con accensione/trasparenza/popup/ordine, layer aggiunti, particelle, disegni, geoprocessi,
+// import, etichette) più i FILE ORIGINALI di DWG e immagini, che si riaprono posizionati come al
+// salvataggio (sistema, scala e allineamento dei DWG, colori e layer accesi; angoli e trasparenza delle
+// immagini). Il salvataggio automatico nel browser resta com'è: questo è il salvataggio voluto, da
+// archiviare o passare a un collega. Nel file non entrano chiavi né token. Con Chrome/Edge si scrive
+// direttamente sul file e Ctrl+S lo sovrascrive, come in QGIS; altrove il progetto si scarica.
+const PROJ_EXT='.axpo', PROJ_FMT='geoportale-axpo-progetto', PROJ_VER=1, PROJ_TITLE=document.title;
+let projCur=null, projHandle=null, projBusy=false, projPortalPending=null;
+function projSetName(name, handle){
+  projCur=name||null; projHandle=projCur? (handle||null) : null;
+  const el=$('projName');
+  if(el){ el.hidden=!projCur; el.textContent=projCur? '· '+projCur : ''; el.title=projCur? 'Progetto aperto: '+projCur+PROJ_EXT : ''; }
+  document.title=projCur? projCur+' · '+PROJ_TITLE : PROJ_TITLE; }
+function projUi(){ ['projOpenBtn','projSaveBtn'].forEach(id=>{ const b=$(id); if(b) b.disabled=projBusy; }); }
+function projSize(b){ return b<1048576? Math.max(1,Math.round(b/1024))+' KB' : (b/1048576).toFixed(1)+' MB'; }
+function projSafe(s){ return String(s||'').replace(/[\\/:*?"<>|]+/g,' ').replace(/\s+/g,' ').trim(); }
+function projHasWork(){
+  return parcels.length>0 || cadFiles.length>0 || importedImages.length>0 || addedPortalItems.length>0 || addedServices.length>0
+    || !!(toolsGL&&toolsGL.graphics.some(g=>g.attributes&&g.attributes._kind)); }
+function projSuggest(){
+  if(projCur) return projCur;
+  const d=new Date(), p=n=>('0'+n).slice(-2), c=projSafe($('com')&&$('com').value);
+  return (c? c+'_' : 'Progetto_')+d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate()); }
+
+// ── layer: chiave stabile tra salvataggio e riapertura. L'id dei layer di una web map è fisso; quello dei
+// layer creati qui (catasto WMS, DWG, immagini, item aggiunti) cambia a ogni apertura della pagina ──
+function projKey(l){
+  if(l===catasto) return 'app:catasto';
+  const d=cadFiles.findIndex(f=>f.group===l); if(d>=0) return 'dwg:'+d;
+  const i=importedImages.findIndex(im=>im.layer===l); if(i>=0) return 'img:'+i;
+  if(l._projSvc){ const s=addedServices.indexOf(l._projSvc); if(s>=0) return 'svc:'+s; }
+  if(l._projItem&&l.portalItem&&l.portalItem.id) return 'item:'+l.portalItem.id;
+  return 'id:'+l.id; }
+function projLayers(){   // quelli della lista Layer: niente basemap, terreno, layer interni, pezzi dei DWG
+  const skip=baseGroundSet();
+  cadFiles.forEach(f=>f.layers.forEach(L=>skip.add(L.grp)));
+  return view.map.allLayers.toArray().filter(l=>l.listMode!=='hide'&&!skip.has(l)); }
+function projSubKey(l,sl){ return (l.type==='wms'&&sl.name)? sl.name : (sl.id!=null? String(sl.id) : sl.name); }
+function projCaptureLayers(){
+  return projLayers().map(l=>{ const s={k:projKey(l), t:l.title||'', v:l.visible!==false};
+    if('opacity' in l&&l.opacity!=null) s.op=Math.round(l.opacity*1000)/1000;
+    if('popupEnabled' in l) s.pop=l.popupEnabled!==false;
+    if(llFilterable(l)) s.def=l.definitionExpression||'';   // filtro per attributo (anche "nessuno", se la web map ne aveva uno)
+    const subs=l.loaded&&(l.allSublayers||l.sublayers);   // sottolayer (WMS, map service): solo se già letti
+    if(subs&&subs.length){ s.sub={}; subs.forEach(sl=>{ const k=projSubKey(l,sl); if(k==null) return; s.sub[k]=sl.visible!==false;
+      if(sl.definitionExpression) (s.sdef||(s.sdef={}))[k]=sl.definitionExpression; }); }
+    return s; }); }
+function projCaptureOrder(){   // ordine dei layer della lista, per contenitore (mappa e gruppi)
+  const ks=new Set(projLayers()), out={};
+  const walk=(parent,pk)=>{ const ch=parent.layers? parent.layers.toArray().filter(l=>ks.has(l)) : [];
+    if(ch.length>1) out[pk]=ch.map(projKey);
+    ch.forEach(l=>{ if(l.layers&&!cadFiles.some(f=>f.group===l)) walk(l, projKey(l)); }); };
+  walk(view.map,'map'); return out; }
+// keyMap: chiavi DWG/immagini del file → layer riaperti (se un DWG non si apre, gli indici non combaciano più)
+function projApplyLayers(states, order, keyMap, warn, countMiss){
+  const byK=new Map(), byT=new Map();
+  projLayers().forEach(l=>{ const k=projKey(l); if(!(keyMap&&/^(dwg|img|svc):/.test(k))) byK.set(k,l);
+    const t=l.title||''; byT.set(t, byT.has(t)? null : l); });
+  if(keyMap) keyMap.forEach((l,k)=>byK.set(k,l));
+  let miss=0;
+  (states||[]).forEach(s=>{
+    const l=byK.get(s.k)||(/^id:/.test(s.k)&&s.t? byT.get(s.t) : null);
+    if(!l){ if(/^id:/.test(s.k)) miss++; return; }
+    try{ l.visible=!!s.v; if(s.op!=null&&'opacity' in l) l.opacity=s.op; if(s.pop!=null&&'popupEnabled' in l) l.popupEnabled=s.pop; }catch(e){}
+    try{ if(s.def!=null&&'definitionExpression' in l) l.definitionExpression=s.def||null; }catch(e){}
+    if(s.sub){ const put=()=>{ try{ (l.allSublayers||l.sublayers).forEach(sl=>{ const k=projSubKey(l,sl); if(k in s.sub) sl.visible=!!s.sub[k];
+        if(s.sdef&&(k in s.sdef)) sl.definitionExpression=s.sdef[k]; }); }catch(e){} };
+      if(l.loaded) put(); else if(l.when) l.when(put).catch(()=>{}); } });   // non lo carico io: le CV leggono i WMS solo se accesi
+  if(miss&&countMiss) warn.push(miss+(miss>1? ' layer della mappa non ci sono più' : ' layer della mappa non c\'è più'));
+  Object.keys(order||{}).forEach(pk=>{ const parent= pk==='map'? view.map : byK.get(pk);
+    if(!parent||!parent.layers) return;
+    // i layer ritrovati riprendono l'ordine salvato nelle posizioni che occupano (gli altri restano dove sono)
+    const arr=parent.layers.toArray(), pres=order[pk].map(k=>byK.get(k)).filter(l=>l&&arr.indexOf(l)>=0);
+    if(pres.length<2) return;
+    const slots=pres.map(l=>arr.indexOf(l)).sort((a,b)=>a-b);
+    pres.forEach((l,i)=>{ try{ parent.layers.reorder(l, slots[i]); }catch(e){} }); }); }
+
+// ── salva ──
+async function projBuild(name){
+  const zip=new JSZip(), w=captureWork(), fn=(pre,i,n)=>'file/'+pre+'-'+(i+1)+'-'+String(n||'file').replace(/[\\/:*?"<>|]+/g,'_');
+  const st=Object.assign({formato:PROJ_FMT, versione:PROJ_VER, nome:name, salvato:new Date().toISOString(), utente:username||null,
+    webmap:null, area:{reg:$('reg').value||'', prov:$('prov').value||'', com:$('com').value||''},
+    labels:$('lblParcels')? !!$('lblParcels').checked : true,
+    layers:projCaptureLayers(), order:projCaptureOrder(), images:[], dwg:[]}, w.base, {toolGeoms:w.toolGeoms});
+  try{ const pi=view.map.portalItem; if(pi&&pi.id) st.webmap={id:pi.id, title:pi.title||''}; }catch(e){}
+  const miss=[];
+  importedImages.forEach((im,i)=>{ const cps=(im.el&&im.el.georeference&&im.el.georeference.controlPoints)||[];
+    const r={name:im.name, orig:im.file? im.file.name : null, file:im.file? fn('img',i,im.file.name) : null,
+      corners:cps.map(c=>{ const p=c.mapPoint||{}, sr=p.spatialReference||{}; return {x:p.x, y:p.y, wkid:sr.wkid||sr.latestWkid||102100}; })};
+    if(im.file) zip.file(r.file, im.file); else miss.push('immagine «'+im.name+'»');
+    st.images.push(r); });
+  cadFiles.forEach((f,i)=>{ const r={name:f.name, file:f.file? fn('dwg',i,f.name) : null, wkid:f.ch.wkid, sc:f.ch.sc, M:f.ch.M||null,
+      drop:!!f.ch.drop, manual:/^Posizionato a mano/.test(f.srLabel||''), open:f.open!==false, layers:{}};
+    f.layers.forEach(L=>{ r.layers[L.name]={v:L.grp.visible!==false, col:L.userCol? L.col : null}; });
+    if(f.file) zip.file(r.file, f.file); else miss.push('DWG «'+f.name+'»');
+    st.dwg.push(r); });
+  zip.file('progetto.json', JSON.stringify(st));
+  const blob=await zip.generateAsync({type:'blob', compression:'DEFLATE', compressionOptions:{level:6}, mimeType:'application/octet-stream'});
+  return {blob:blob, miss:miss}; }
+function projDownload(blob, name){
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name;
+  document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href), 60000); }
+async function projSave(asNew){
+  if(projBusy){ msg('Attendi: sto già salvando o aprendo un progetto.','err'); return; }
+  if(!view||!esriMods){ msg('La mappa non è ancora pronta: riprova tra un attimo.','err'); return; }
+  // permesso di scrittura e finestra «Salva» vanno chiesti SUBITO, finché vale il clic: dopo lo zip non più
+  let handle=(!asNew&&projHandle)? projHandle : null, name;
+  if(handle){ try{ if(handle.queryPermission&&await handle.queryPermission({mode:'readwrite'})!=='granted'
+      &&await handle.requestPermission({mode:'readwrite'})!=='granted') handle=null; }catch(e){ handle=null; } }
+  if(!handle&&window.showSaveFilePicker){
+    try{ handle=await window.showSaveFilePicker({suggestedName:projSuggest()+PROJ_EXT,
+      types:[{description:'Progetto del Geoportale Axpo', accept:{'application/octet-stream':[PROJ_EXT]}}]}); }
+    catch(e){ if(e&&e.name==='AbortError') return; handle=null; } }
+  if(handle) name=handle.name.replace(/\.axpo$/i,'');
+  else { name=prompt('Nome del progetto (il file si scarica nella cartella Download):', projSuggest());
+    if(name==null) return; name=projSafe(name.replace(/\.axpo$/i,''))||projSuggest(); }
+  projBusy=true; projUi();
+  try{ msg('Salvo il progetto «'+name+'»…');
+    const r=await projBuild(name);
+    if(handle){ const wr=await handle.createWritable(); await wr.write(r.blob); await wr.close(); }
+    else projDownload(r.blob, name+PROJ_EXT);
+    projSetName(name, handle);
+    msg('Progetto «'+name+'» salvato'+(handle? '' : ' nei Download')+' ('+projSize(r.blob.size)+').'
+      +(r.miss.length? ' Senza il file di: '+r.miss.join(', ')+'.' : ''), r.miss.length? 'err' : 'ok');
+  }catch(e){ console.warn('[progetto]',e); msg('Progetto non salvato: '+((e&&e.message)||e),'err'); }
+  finally{ projBusy=false; projUi(); } }
+
+// ── apri ──
+async function projOpenPick(){
+  if(projBusy){ msg('Attendi: sto già salvando o aprendo un progetto.','err'); return; }
+  if(window.showOpenFilePicker){
+    try{ const hs=await window.showOpenFilePicker({multiple:false,
+        types:[{description:'Progetto del Geoportale Axpo', accept:{'application/octet-stream':[PROJ_EXT]}}]});
+      if(hs&&hs[0]) return projOpenFile(await hs[0].getFile(), hs[0]); }
+    catch(e){ if(e&&e.name==='AbortError') return; } }   // altro errore: selettore classico
+  $('projFile').click(); }
+async function projZipFile(zip, rec){
+  const zf=rec.file&&zip.file(rec.file); if(!zf) throw new Error('il file non è nel progetto');
+  return new File([await zf.async('blob')], rec.orig||rec.name||'file'); }
+async function projImgRestore(file, rec){
+  const r=/\.(tif|tiff|geotiff)$/i.test(file.name)? await loadGeoTIFF(file) : await loadPlainImage(file);
+  const cs=(rec.corners||[]).length===4? rec.corners.map(c=>new esriMods.Point({x:c.x, y:c.y, spatialReference:{wkid:c.wkid||102100}})) : r.corners;
+  const im=await createGeorefImage(r.image, r.w, r.h, rec.name||file.name, cs, true);
+  im.file=file; return im; }
+async function projCadRestore(file, rec){   // come cadImportOne, ma con il sistema e il posizionamento salvati: niente finestra
+  const buf=await file.arrayBuffer(), ver=String.fromCharCode.apply(null, new Uint8Array(buf,0,Math.min(6,buf.byteLength)));
+  if(!/^AC\d{4}$/.test(ver)) throw new Error('non è un file DWG');
+  const L=await cadLib(); await cadMods(); await esriMods.projection.load(); await cadYield();
+  const st=cadBuild(cadRead(L, buf), rec.name||file.name, ver);
+  st.fkey=(rec.name||file.name)+'|'+file.size;
+  if(!st.items.length) throw new Error('nessuna geometria disegnabile');
+  cadStats(st);
+  const f=await cadCommit(st, {wkid:rec.wkid, sc:rec.sc||1, M:rec.M||null, drop:!!rec.drop, saved:!!rec.manual}, {noZoom:true});
+  f.file=file; f.open=rec.open!==false;
+  f.layers.forEach(L=>{ const r=(rec.layers||{})[L.name]; if(!r) return; L.grp.visible=r.v!==false; if(r.col) cadLayerColor(L, r.col); });
+  cadRenderList(); return f; }
+// web map e layer aggiunti dal portale (serve l'accesso)
+async function projApplyPortal(st, warn){
+  const id=st.webmap&&st.webmap.id;
+  if(id){ const reg=Object.keys(CV_MAPS).find(k=>CV_MAPS[k]===id), lab='la mappa «'+(st.webmap.title||id)+'»';
+    initialMapLoaded=true;
+    if(!await loadWebMap(id, !!reg, lab)) warn.push(lab+' non si carica');
+    else $('cvNote').innerHTML= reg? `Vincoli di <b>${esc(reg)}</b> caricati.` : ''; }
+  for(const it of (st.addedItems||[])){ if(!await addPortalLayer(it, it, true)) warn.push('il layer del portale '+it+' non si aggiunge'); } }
+// area di lavoro (regione/provincia/comune) senza cambiare mappa né spostare la vista
+async function projSetAdmin(a){
+  a=a||{}; const R=$('reg'), P=$('prov'), C=$('com');
+  P.disabled=C.disabled=true; P.innerHTML=C.innerHTML='<option value="">—</option>'; provExtent=null;
+  const done=()=>{ checkReady(); };
+  if(!a.reg||![...R.options].some(o=>o.value===a.reg)){ R.value=''; return done(); }
+  R.value=a.reg;
+  if(!await admLoadProv(a.reg)||!a.prov) return done();
+  P.value=a.prov; if(P.value!==a.prov) return done();
+  if(!await admLoadCom(a.prov)||!a.com) return done();
+  C.value=a.com; done(); }
+async function projOpenFile(file, handle){
+  if(!file) return;
+  if(projBusy){ msg('Attendi: sto già salvando o aprendo un progetto.','err'); return; }
+  if(cadBusy){ msg('Attendi: sto leggendo un disegno DWG.','err'); return; }
+  if(!view||!esriMods){ msg('La mappa non è ancora pronta: riprova tra un attimo.','err'); return; }
+  let zip, st;
+  projBusy=true; projUi();
+  try{ try{ zip=await JSZip.loadAsync(file); }
+    catch(e){ console.warn('[progetto]',e); throw new Error('il file non è un progetto del geoportale, o è danneggiato'); }
+    const pj=zip.file('progetto.json'); if(!pj) throw new Error('non è un progetto del geoportale');
+    st=JSON.parse(await pj.async('text'));
+    if(!st||st.formato!==PROJ_FMT) throw new Error('non è un progetto del geoportale'); }
+  catch(e){ projBusy=false; projUi(); msg('Progetto non aperto: '+((e&&e.message)||e),'err'); return; }
+  const name=projSafe(file.name.replace(/\.axpo$/i,''))||projSafe(st.nome)||'Progetto';   // il nome del file, anche se rinominato
+  if(projHasWork()&&!confirm('Aprire il progetto «'+name+'»? Il lavoro attuale (particelle, disegni, geoprocessi, import, DWG, immagini, layer aggiunti) viene sostituito: se ti serve, annulla e salvalo prima.')){
+    projBusy=false; projUi(); return; }
+  const warn=[], keyMap=new Map(), imgs=st.images||[], dwgs=st.dwg||[];
+  cadBusy=true;
+  try{
+    msg('Apro il progetto «'+name+'»…');
+    if((st.versione||0)>PROJ_VER) warn.push('il progetto viene da una versione più recente del geoportale: qualcosa potrebbe mancare');
+    clearWork(); projPortalPending=null;
+    bootVP=st.viewpoint||null;   // niente zoom automatici sulle particelle: la vista è quella salvata
+    const needPortal=!!((st.webmap&&st.webmap.id)||(st.addedItems||[]).length);
+    if(needPortal){
+      if(signedIn) await projApplyPortal(st, warn);
+      else { projPortalPending=st; addedPortalItems=(st.addedItems||[]).slice();
+        warn.push('la mappa e i layer del portale si caricano solo dopo l\'accesso ad AGOL: accedi (la pagina si ricarica), poi riapri il progetto'); } }
+    const adm=projSetAdmin(st.area).catch(()=>{});
+    if(st.basemap&&BM_BY_ID[st.basemap]) view.map.basemap=BM_BY_ID[st.basemap];
+    if((st.services||[]).length){ msg('Apro il progetto: servizi web…');
+      (await svcRestoreAll(st.services, (i,l)=>keyMap.set('svc:'+i, l))).forEach(b=>warn.push('il servizio web '+b+' non si apre')); }
+    applyWork(st);
+    for(let j=0;j<imgs.length;j++){ const rec=imgs[j];
+      try{ msg('Apro il progetto: immagine '+(j+1)+' di '+imgs.length+'…');
+        keyMap.set('img:'+j, (await projImgRestore(await projZipFile(zip,rec), rec)).layer); }
+      catch(e){ warn.push('l\'immagine «'+rec.name+'» non si apre ('+((e&&e.message)||e)+')'); } }
+    for(let i=0;i<dwgs.length;i++){ const rec=dwgs[i];
+      try{ msg('Apro il progetto: DWG '+(i+1)+' di '+dwgs.length+' («'+rec.name+'»)…');
+        keyMap.set('dwg:'+i, (await projCadRestore(await projZipFile(zip,rec), rec)).group); }
+      catch(e){ console.warn('[progetto] DWG',e); warn.push('il DWG «'+rec.name+'» non si apre ('+((e&&e.message)||e)+')'); } }
+    projApplyLayers(st.layers, st.order, keyMap, warn, signedIn&&!!(st.webmap&&view.map.portalItem&&view.map.portalItem.id===st.webmap.id));
+    if(typeof st.labels==='boolean'&&$('lblParcels')&&$('lblParcels').checked!==st.labels){
+      $('lblParcels').checked=st.labels; try{ $('lblParcels').onchange(); }catch(e){} }
+    const vp=vpFromJSON(st.viewpoint); if(vp) view.viewpoint=vp;   // per ultima: DWG e immagini non spostano la vista
+    toolMsg('impMsg',''); toolMsg('impCadMsg', cadFiles.length? 'Riaperti dal progetto «'+name+'».' : '');
+    await adm;
+    projSetName(name, handle||null);
+    const ng=toolsGL.graphics.filter(g=>g.attributes&&g.attributes._kind).length, parts=[];
+    if(parcels.length) parts.push(parcels.length+(parcels.length>1? ' particelle' : ' particella'));
+    if(ng) parts.push(ng+(ng>1? ' geometrie' : ' geometria'));
+    if(cadFiles.length) parts.push(cadFiles.length+' DWG');
+    if(importedImages.length) parts.push(importedImages.length+(importedImages.length>1? ' immagini' : ' immagine'));
+    if(addedServices.length) parts.push(addedServices.length+(addedServices.length>1? ' servizi web' : ' servizio web'));
+    if(warn.length) console.warn('[progetto] '+name+':', warn);
+    msg('Progetto «'+name+'» aperto'+(parts.length? ': '+parts.join(', ') : '')+'.'+(warn.length? ' Attenzione: '+warn.join('; ')+'.' : ''), warn.length? 'err' : 'ok');
+  }catch(e){ console.warn('[progetto]',e); msg('Progetto aperto solo in parte: '+((e&&e.message)||e),'err'); }
+  finally{ cadBusy=false; projBusy=false; bootVP=null; projUi(); try{ saveStateDebounced(); }catch(e){} } }
 
 // ── catasto della webmap: match per ITEM ID (i titoli "catast*" sono decine: regioni/province) ──
 function findWebmapCatasto(wm){
@@ -1796,11 +2236,31 @@ function findWebmapCatasto(wm){
   return f;
 }
 // ── LayerList: pannello per-layer con trasparenza e popup ──────────────────
+// ── layer aggiunti da noi (item del portale, servizi web, DWG, immagini): zoom e rimozione dalla lista ──
+function llMine(l){ return !!(l&&(l._projItem||l._projSvc||l._cad||cadFiles.some(f=>f.group===l)||importedImages.some(im=>im.layer===l))); }
+function llAction(ev){
+  const id=ev&&ev.action&&ev.action.id, l=ev&&ev.item&&ev.item.layer; if(!l) return;
+  if(id==='ll-zoom'){ const f=cadFiles.find(x=>x.group===l); if(f){ cadZoom(f); return; }
+    svcExtent(l).then(e=>{ if(e) view.goTo(e.expand(1.1)).catch(()=>{}); else msg('«'+(l.title||'layer')+'»: estensione non disponibile.','err'); })
+      .catch(()=>msg('«'+(l.title||'layer')+'»: estensione non disponibile.','err')); }
+  else if(id==='ll-remove') llRemove(l); }
+function llRemove(l){
+  const f=cadFiles.find(x=>x.group===l); if(f){ cadRemove(f); return; }
+  const im=importedImages.find(x=>x.layer===l); if(im){ removeImage(im); return; }
+  const t=l.title||'layer';
+  try{ if(l.parent&&l.parent.remove) l.parent.remove(l); else view.map.remove(l); }catch(e){}
+  if(l._projItem){ const pid=l.portalItem&&l.portalItem.id;   // l'id resta se lo stesso item è in mappa un'altra volta
+    if(pid&&!view.map.allLayers.some(x=>x._projItem&&x.portalItem&&x.portalItem.id===pid)) addedPortalItems=addedPortalItems.filter(x=>x!==pid); }
+  if(l._projSvc) addedServices=addedServices.filter(r=>r!==l._projSvc);
+  try{ if(l._blobUrl) URL.revokeObjectURL(l._blobUrl); l.destroy(); }catch(e){}
+  impCounts(); saveStateDebounced(); msg('Tolto dalla mappa: '+t,'ok'); }
 function layerListItem(ev){
   const item=ev&&ev.item, layer=item&&item.layer;
   if(!item||!layer) return;
-  const hasOp=('opacity' in layer), hasPop=('popupEnabled' in layer);
-  if(!hasOp&&!hasPop) return;
+  if(!item.parent&&llMine(layer))
+    item.actionsSections=[[{title:'Zoom al layer', icon:'zoom-to-object', id:'ll-zoom'}, {title:'Rimuovi dalla mappa', icon:'trash', id:'ll-remove'}]];
+  const hasOp=('opacity' in layer), hasPop=('popupEnabled' in layer), hasFlt=llFilterable(layer);
+  if(!hasOp&&!hasPop&&!hasFlt) return;
   const box=document.createElement('div'); box.className='llopts';
   // simbologia: widget Legend montato SOLO all'apertura del pannello (e solo sui layer di primo
   // livello: per le sublayer la legenda del padre le contiene già)
@@ -1830,11 +2290,18 @@ function layerListItem(ev){
     lb.appendChild(ck); lb.appendChild(tx);
     box.appendChild(lb);
   }
-  item.panel={ content:box, className:'esri-icon-sliders-horizontal', title:'Simbologia, trasparenza, popup', open:false };
-  // Legend è pesante: lo creo alla prima apertura del pannello, non per ogni layer della lista
-  if(legWrap){ let mounted=false;
+  let fltWrap=null;
+  if(hasFlt){ fltWrap=document.createElement('div'); fltWrap.className='llflt'; box.appendChild(fltWrap); }
+  item.panel={ content:box, className:llFilterOn(layer)? 'esri-icon-filter' : 'esri-icon-sliders-horizontal',
+    title:'Simbologia, trasparenza, popup'+(hasFlt?', filtro':''), open:false };
+  // l'icona del pannello diventa un imbuto quando il layer è filtrato (anche da progetto o da web map)
+  if(hasFlt){ try{ watchProp(layer,'definitionExpression', ()=>{ try{ item.panel.className=llFilterOn(layer)? 'esri-icon-filter' : 'esri-icon-sliders-horizontal'; }catch(e){} }); }catch(e){} }
+  // Legend e filtro sono pesanti: si montano alla prima apertura del pannello, non per ogni layer della lista
+  if(legWrap||fltWrap){ let mounted=false;
     try{ watchProp(item.panel,'open', function(op){
       if(!op||mounted) return; mounted=true;
+      if(fltWrap) llFilterUi(fltWrap, layer);
+      if(!legWrap) return;
       require(["esri/widgets/Legend"], function(Legend){
         try{ new Legend({view, container:legWrap, layerInfos:[{layer:layer}], respectLayerVisibility:false}); }catch(e){}
         // il widget Legend non copre i WMS: se non ha prodotto simboli, uso GetLegendGraphic
@@ -1859,6 +2326,93 @@ function layerListItem(ev){
     }); }catch(e){}
   }
 }
+// ══ Filtro per attributo (definitionExpression), come il «Filtro…» di QGIS ════════════════════════
+// Per i layer vettoriali interrogabili: feature layer delle web map e dei servizi REST, WFS, GeoJSON/CSV e
+// sottolayer dei map service. I WMS no: il protocollo non prevede filtri. L'espressione è l'SQL dei
+// servizi ArcGIS; prima di applicarla la provo con un conteggio, così un errore non lascia il layer
+// vuoto e rotto. Resta nel progetto (projCaptureLayers).
+const LLF_OPS=[['=','è uguale a'],['<>','è diverso da'],['like','contiene','s'],['start','inizia con','s'],['in','è uno tra (valori separati da ;)'],
+  ['>','maggiore di','nd'],['>=','maggiore o uguale a','nd'],['<','minore di','nd'],['<=','minore o uguale a','nd'],['null','è vuoto'],['notnull','non è vuoto']];
+let llfSeq=0;
+function llFilterable(l){ return !!l&&l.type!=='wms'&&('definitionExpression' in l)&&typeof l.queryFeatures==='function'; }
+function llFilterOn(l){ try{ return !!(l&&l.definitionExpression&&String(l.definitionExpression).trim()); }catch(e){ return false; } }
+function llFType(f){ const t=String(f&&f.type||''); return /date|timestamp/i.test(t)? 'd' : /integer|double|single|long|oid/i.test(t)? 'n' : 's'; }
+function llDate(v){ v=String(v).trim(); let m=/^(\d{4})-(\d{1,2})-(\d{1,2})/.exec(v);
+  if(m) return m[1]+'-'+('0'+m[2]).slice(-2)+'-'+('0'+m[3]).slice(-2);
+  m=/^(\d{1,2})[\/.\-](\d{1,2})[\/.\-](\d{4})$/.exec(v); return m? m[3]+'-'+('0'+m[2]).slice(-2)+'-'+('0'+m[1]).slice(-2) : null; }
+function llSql(f, op, raw){
+  const n=f.name, t=llFType(f), s=String(raw==null?'':raw).trim(), q=v=>String(v).replace(/'/g,"''");
+  if(op==='null') return n+' IS NULL';
+  if(op==='notnull') return n+' IS NOT NULL';
+  if(s==='') throw new Error('scrivi o scegli un valore');
+  const lit=v=>{ v=String(v).trim();
+    if(t==='s') return "'"+q(v)+"'";
+    if(t==='n'){ const x=Number(v.replace(/\s/g,'').replace(',','.')); if(v===''||!isFinite(x)) throw new Error('«'+v+'» non è un numero'); return String(x); }
+    const d=llDate(v); if(!d) throw new Error('«'+v+'» non è una data (gg/mm/aaaa)'); return "TIMESTAMP '"+d+" 00:00:00'"; };
+  if(op==='like') return 'UPPER('+n+") LIKE '%"+q(s.toUpperCase())+"%'";
+  if(op==='start') return 'UPPER('+n+") LIKE '"+q(s.toUpperCase())+"%'";
+  if(op==='in'){ const vs=s.split(';').map(x=>x.trim()).filter(Boolean); if(!vs.length) throw new Error('scrivi i valori separati da ;'); return n+' IN ('+vs.map(lit).join(', ')+')'; }
+  if(t==='d'&&op==='='){ const d=llDate(s); if(!d) throw new Error('«'+s+'» non è una data (gg/mm/aaaa)');   // tutto il giorno, non la mezzanotte
+    const x=new Date(d+'T00:00:00Z'); x.setUTCDate(x.getUTCDate()+1);
+    return '('+n+" >= TIMESTAMP '"+d+" 00:00:00' AND "+n+" < TIMESTAMP '"+x.toISOString().slice(0,10)+" 00:00:00')"; }
+  return n+' '+op+' '+lit(s); }
+async function llCount(l){ try{ return await l.queryFeatureCount(l.definitionExpression? {where:l.definitionExpression} : {where:'1=1'}); }catch(e){ return null; } }
+// prova l'espressione, poi la applica: '' o null = nessun filtro
+async function llApply(l, expr){
+  expr=String(expr||'').trim();
+  if(expr){ try{ await l.queryFeatureCount({where:expr}); }
+    catch(e){ throw new Error('espressione non valida per questo layer'+((e&&e.details&&e.details.messages&&e.details.messages[0])? ' ('+e.details.messages[0]+')' : (e&&e.message? ' ('+e.message+')' : ''))); } }
+  l.definitionExpression=expr||null;
+  try{ saveStateDebounced(); }catch(e){} }
+async function llFilterUi(wrap, layer){
+  const mk=(tag,cls,txt)=>{ const e=document.createElement(tag); if(cls) e.className=cls; if(txt!=null) e.textContent=txt; return e; };
+  wrap.innerHTML=''; wrap.appendChild(mk('div','llft','Filtro')); const wait=mk('div','llfst','Leggo i campi…'); wrap.appendChild(wait);
+  try{ if(layer.load) await layer.load(); }catch(e){ wait.textContent='Campi non leggibili: '+((e&&e.message)||e); wait.className='llfst err'; return; }
+  const fields=(layer.fields||[]).filter(f=>!/geometry|blob|raster|xml/i.test(f.type||'')&&!/^__/.test(f.name));   // __OBJECTID: interno dei layer locali
+  if(!fields.length){ wait.textContent='Questo layer non espone campi da filtrare.'; return; }
+  wait.remove();
+  const fs=mk('select'), os=mk('select'), vi=mk('input'), vs=mk('select'), dl=mk('datalist');
+  fs.setAttribute('aria-label','Campo'); os.setAttribute('aria-label','Condizione'); vi.setAttribute('aria-label','Valore'); vs.setAttribute('aria-label','Valore');
+  dl.id='llfdl'+(++llfSeq); vi.setAttribute('list', dl.id); vi.placeholder='valore'; vi.spellcheck=false;
+  fields.forEach(f=>fs.add(new Option(f.alias&&f.alias!==f.name? f.alias+' · '+f.name : f.name, f.name)));
+  const bSet=mk('button','sec','Filtra'), bAnd=mk('button','sec','+ E'), bOr=mk('button','sec','+ O'), bOff=mk('button','sec','Togli filtro');
+  bSet.title='Il filtro diventa questa condizione'; bAnd.title='Aggiunge la condizione al filtro attuale (devono valere entrambe)';
+  bOr.title='Aggiunge la condizione in alternativa al filtro attuale (basta una)'; bOff.title='Mostra di nuovo tutti gli elementi';
+  const bb=mk('div','llfb'); [bSet,bAnd,bOr,bOff].forEach(b=>{ b.type='button'; bb.appendChild(b); });
+  const st=mk('div','llfst'), det=mk('details'), ta=mk('textarea'), bSql=mk('button','sec','Applica SQL');
+  det.appendChild(mk('summary',null,'SQL del filtro (modificabile)')); ta.spellcheck=false; ta.setAttribute('aria-label','SQL del filtro');
+  bSql.type='button'; det.appendChild(ta); const b2=mk('div','llfb'); b2.appendChild(bSql); det.appendChild(b2);
+  [fs,os,vi,vs,dl,bb,st,det].forEach(e=>wrap.appendChild(e));
+  const fld=()=>fields.find(f=>f.name===fs.value);
+  const dom=f=>f&&f.domain&&f.domain.type==='coded-value'&&f.domain.codedValues&&f.domain.codedValues.length? f.domain.codedValues : null;
+  const show=async()=>{ ta.value=layer.definitionExpression||''; const on=llFilterOn(layer);
+    st.className='llfst'+(on?' on':''); st.textContent=(on? 'Filtro attivo' : 'Nessun filtro')+' · conto…';
+    const n=await llCount(layer); st.textContent=(on? 'Filtro attivo' : 'Nessun filtro')+(n!=null? ' · '+n.toLocaleString('it-IT')+(n===1?' elemento':' elementi') : ''); };
+  const err=e=>{ st.className='llfst err'; st.textContent=(e&&e.message)||String(e); };
+  const onField=async()=>{ const f=fld(), t=llFType(f), d=dom(f);
+    os.innerHTML=''; LLF_OPS.forEach(o=>{ if(o[2]&&o[2].indexOf(t)<0) return; if(d&&(o[0]==='like'||o[0]==='start')) return; os.add(new Option(o[1],o[0])); });
+    vs.innerHTML=''; dl.innerHTML=''; vi.value='';
+    vs.style.display=d? '' : 'none'; vi.style.display=d? 'none' : '';
+    vi.placeholder= t==='d'? 'data (gg/mm/aaaa)' : t==='n'? 'numero' : 'valore (i suggerimenti arrivano dai dati)';
+    if(d){ d.forEach(c=>vs.add(new Option(c.name+(String(c.code)!==c.name? ' ('+c.code+')' : ''), c.code))); return; }
+    try{ const r=await layer.queryFeatures({where:'1=1', outFields:[f.name], returnDistinctValues:true, returnGeometry:false, orderByFields:[f.name], num:300});
+      if(fs.value!==f.name) return;
+      r.features.forEach(x=>{ let v=x.attributes[f.name]; if(v==null||v==='') return;
+        if(t==='d'){ const dd=new Date(v); v=('0'+dd.getDate()).slice(-2)+'/'+('0'+(dd.getMonth()+1)).slice(-2)+'/'+dd.getFullYear(); }
+        dl.appendChild(new Option(String(v))); }); }catch(e){} };
+  const onOp=()=>{ const no=os.value==='null'||os.value==='notnull'; vi.disabled=vs.disabled=no; };
+  const cond=()=>{ const f=fld(); return llSql(f, os.value, dom(f)&&vs.style.display!=='none'? vs.value : vi.value); };
+  const run=async(fn)=>{ try{ [bSet,bAnd,bOr,bOff,bSql].forEach(b=>b.disabled=true); await llApply(layer, fn()); await show(); }
+    catch(e){ err(e); } finally{ [bSet,bAnd,bOr,bOff,bSql].forEach(b=>b.disabled=false); } };
+  const cur=()=>String(layer.definitionExpression||'').trim();
+  fs.onchange=()=>{ onField(); onOp(); }; os.onchange=onOp;
+  bSet.onclick=()=>run(()=>cond());
+  bAnd.onclick=()=>run(()=>{ const c=cond(); return cur()? '('+cur()+') AND ('+c+')' : c; });
+  bOr.onclick=()=>run(()=>{ const c=cond(); return cur()? '('+cur()+') OR ('+c+')' : c; });
+  bOff.onclick=()=>run(()=>'');
+  bSql.onclick=()=>run(()=>ta.value);
+  vi.onkeydown=e=>{ if(e.key==='Enter'){ e.preventDefault(); bSet.click(); } };
+  onField(); onOp(); show(); }
 // ── caricamento di una web map del portale (General Map o CV) ──────────────
 // hideLayers=true → spegne i layer operativi (per le CV, che caricano lazy quando
 // l'utente li accende). NO loadAll: caricherebbe avidamente i WMS regionali (CORS).
@@ -1877,6 +2431,13 @@ async function loadWebMap(id, hideLayers, label){
       wm.add(catasto);
     }
     try{ cadReattach(wm); }catch(e){}                    // disegni CAD importati: seguono la mappa, sotto le particelle
+    // anche immagini e layer aggiunti dal portale stavano nella mappa vecchia: al cambio di regione o al
+    // login sparivano dalla mappa restando nell'elenco (e nel salvataggio automatico)
+    try{ const old=view.map, mv=(l,i)=>{ try{ if(old&&old!==wm) old.remove(l); }catch(e){} try{ i==null? wm.add(l) : wm.add(l,i); }catch(e){} };
+      if(old&&old!==wm){ const imgs=new Set(importedImages.map(im=>im.layer));
+        old.layers.toArray().filter(l=>imgs.has(l)).reverse().forEach(l=>mv(l,0));   // in fondo, nell'ordine di prima
+        old.layers.toArray().filter(l=>l._projItem||l._projSvc).forEach(l=>mv(l));
+        if(imgHandlesGL&&old.layers.includes(imgHandlesGL)) mv(imgHandlesGL); } }catch(e){}
     wm.add(gl); wm.add(labelsGL); wm.add(toolsGL);       // particelle + etichette + strumenti sempre SOPRA il catasto
     view.map=wm;
     if(bootVP){ try{ const _b=vpFromJSON(bootVP); if(_b) view.viewpoint=_b; }catch(e){} }   // post-login: vista com'era
@@ -1969,17 +2530,19 @@ async function searchPortalItems(){
     $('itemResults').querySelectorAll('.resItem').forEach(el=>el.onclick=()=>addPortalLayer(el.dataset.id, el.dataset.title));
   }catch(e){ $('itemResults').innerHTML=`<div class="hint" style="color:var(--err)">Errore ricerca: ${esc(e.message)}</div>`; }
 }
-async function addPortalLayer(id, title){
-  if(!signedIn){ msg('Accedi ad AGOL.','err'); return; }
-  msg(`Aggiungo «${title}»…`,'');
+async function addPortalLayer(id, title, quiet){   // quiet: riapertura di un progetto (niente drawer né avvisi)
+  if(!signedIn){ if(!quiet) msg('Accedi ad AGOL.','err'); return null; }
+  if(!quiet) msg(`Aggiungo «${title}»…`,'');
   try{
     const layer=await esriMods.Layer.fromPortalItem({portalItem:{id}});
+    layer._projItem=true;   // chiave stabile nel progetto, e segue la mappa al cambio di web map
     view.map.add(layer);
-    try{window.openPanel&&window.openPanel('layers');}catch(e){}   // apre il drawer Layer
+    if(!quiet){ try{window.openPanel&&window.openPanel('layers');}catch(e){} }   // apre il drawer Layer
     if(!addedPortalItems.includes(id)) addedPortalItems.push(id);   // auto-resume
     saveStateDebounced();
-    msg('Layer aggiunto: '+(layer.title||title),'ok');
-  }catch(e){ msg('Item non aggiungibile ('+e.message+'). Verifica permessi/tipo.','err'); }
+    if(!quiet) msg('Layer aggiunto: '+(layer.title||title),'ok');
+    return layer;
+  }catch(e){ if(!quiet) msg('Item non aggiungibile ('+e.message+'). Verifica permessi/tipo.','err'); return null; }
 }
 
 // ── aggiunta particelle (fid / ricerca / click) ───────────────────────────
@@ -2353,7 +2916,7 @@ function graphicsFeatures(kind){
       : kind==='geoproc' ? ((at.categoria||'Geoprocesso').replace('Geoprocesso · ',''))
       : (at.categoria||'Disegno'));
     const props = kind==='buffer' ? {nome:nome,tipo:'buffer',distanza_m:at.dist_m,area_ha:at.area_ha}
-      : kind==='import' ? {nome:nome,tipo:'importato',source:at.source||''}
+      : kind==='import' ? Object.assign({}, at.src_attrs||{}, {nome:nome,tipo:'importato',source:at.source||''})   // + attributi originali se viene da un layer
       : kind==='geoproc' ? {nome:nome,tipo:'geoprocesso',categoria:at.categoria||'',nota:at.note||''}
       : {nome:nome,tipo:'disegno',categoria:at.categoria||'',nota:at.note||''};
     out.push({type:'Feature',geometry:gj,properties:props});
@@ -2410,7 +2973,8 @@ function gpRenderSlots(){
     const k=gpSlots[s].length, na=gpSlots[s].filter(o=>{ const g=gpGeom(o); return g&&g.type==='polygon'; }).length;
     n.textContent= k? k+' oggett'+(k>1?'i':'o')+(na<k? ' · '+na+' aree' : '') : 'vuota';
     const pb=$('gpPick'+s); if(pb) pb.classList.toggle('active', gpPick===s); });
-  const k=gpSelCount(); ['A','B'].forEach(s=>{ const b=$('gpSel'+s); if(b) b.textContent='☑ Spuntati'+(k?' ('+k+')':''); });
+  const k=gpSelCount(); ['A','B'].forEach(s=>{ const b=$('gpSel'+s); if(b) b.textContent='☑ Spuntati'+(k?' ('+k+')':'');
+    const su=$('gpSum'+s); if(su) su.textContent=gpSlots[s].length? s+': '+gpSlots[s].length : ''; });   // anche a sezione chiusa
   gpDrawSlots(); }
 function gpDrawSlots(){   // contorno tratteggiato degli oggetti in A (arancio) e B (viola)
   if(!view||!view.map||!toolsGL) return;
@@ -2437,7 +3001,7 @@ function gpPickStart(s){
   cadModesOff();   // una sola modalità mappa alla volta
   gpPick=s; gpPickState={popup:view.popupEnabled, cursor:view.container.style.cursor, sk:sketchClickPause(), h:view.on('click', gpPickClick)};
   view.popupEnabled=false; view.container.style.cursor='pointer'; gpRenderSlots();
-  toolMsg('gpMsg','Clicca particelle, disegni o risultati sulla mappa per metterli in '+s+' (di nuovo per toglierli). Esc o «Dalla mappa» per finire.'); }
+  toolMsg('gpMsg','Clicca particelle, disegni, risultati o elementi dei layer vettoriali della mappa per metterli in '+s+' (di nuovo per toglierli). Esc o «Dalla mappa» per finire.'); }
 function gpPickEnd(){
   if(!gpPick) return; const st=gpPickState; gpPick=null; gpPickState=null;
   try{ st.h.remove(); }catch(e){} sketchClickResume(st.sk);
@@ -2450,7 +3014,7 @@ async function gpPickClick(e){
   const objs=[];           // oggetti sotto il cursore, dal più alto al più basso
   (r.results||[]).forEach(x=>{ if(!x.graphic||x.graphic.visible===false) return;
     const o= x.graphic.layer===gl? gpParcelOf.get(x.graphic) : x.graphic; if(o&&objs.indexOf(o)<0) objs.push(o); });
-  if(!objs.length){ toolMsg('gpMsg','Nessun oggetto in quel punto: clicca su una particella, un disegno o un risultato.'); return; }
+  if(!objs.length){ await gpPickLayerFeature(s, e); return; }   // niente dei nostri: un elemento dei layer della mappa
   // Oggetti sovrapposti (es. un risultato sopra le sue sorgenti): cliccando di nuovo nello stesso punto si passa
   // al successivo della pila, altrimenti quelli sotto sarebbero raggiungibili solo dall'elenco.
   const L=gpPickState&&gpPickState.last, n=objs.length;
@@ -2464,6 +3028,77 @@ async function gpPickClick(e){
   if(gpPickState) gpPickState.last= on? {s:s, x:e.x, y:e.y, o:o} : null;
   toolMsg('gpMsg','«'+gpItemName(o)+'» '+(on?'aggiunto a ':'tolto da ')+s+'.'
     +(on&&n>1? ' Qui ci sono '+n+' oggetti sovrapposti: clicca di nuovo nello stesso punto per passare a quello sotto.' : ''), 'ok'); }
+// ── elementi dei layer della mappa come oggetti dei geoprocessi ──────────────────────────────────────
+// Si copiano negli Importati, così valgono per buffer, union, clip, export e promozione senza altro codice,
+// con la geometria COMPLETA riletta dal layer: quella del clic è generalizzata per il disegno (Finistère:
+// 5.598 vertici contro 192.532) e darebbe un buffer sbagliato. Feature layer, WFS, GeoJSON, CSV: hitTest e
+// query per OBJECTID (si colpisce solo ciò che è disegnato, quindi i filtri valgono). Map service: identify
+// sul server, solo sui sottolayer accesi e in scala. WMS: sono immagini, niente geometrie.
+let _idMods=null;
+function idMods(){ return _idMods? Promise.resolve(_idMods) : new Promise(res=>require(["esri/rest/identify","esri/rest/support/IdentifyParameters"],
+  (identify,IdentifyParameters)=>{ _idMods={identify:identify, IdentifyParameters:IdentifyParameters}; res(_idMods); })); }
+function gpFeatName(a, df, fields, oid){   // nome leggibile: campo di visualizzazione, poi un campo «nome», poi il primo testo
+  a=a||{}; const ok=v=>v!=null&&String(v).trim()&&String(v).trim()!=='Null';
+  if(df&&ok(a[df])&&isNaN(+a[df])) return String(a[df]).trim();
+  const skip=/^(objectid|fid|oid|globalid|shape|created_|last_edited_|__)/i, pref=/^(nome|name|denom|libelle|titolo|title|label|comune|descr)/i;
+  const keys=fields? fields.filter(f=>/string/i.test(f.type)).map(f=>f.name) : Object.keys(a).filter(x=>typeof a[x]==='string');
+  const cand=keys.filter(k=>!skip.test(k)&&ok(a[k])&&isNaN(+a[k]));   // i codici numerici ("29") non sono nomi
+  const k=cand.find(x=>pref.test(x))||cand[0]||(df&&ok(a[df])? df : null);
+  return k? String(a[k]).trim() : 'Elemento '+(oid!=null? oid : ''); }
+async function gpFeatureFromLayer(l, gr){
+  const oid=gr.attributes&&gr.attributes[l.objectIdField];
+  if(oid==null) return {err:'Quell\'elemento non ha un identificativo: non posso rileggerne la geometria completa.'};
+  const q=await l.queryFeatures({objectIds:[oid], outFields:['*'], returnGeometry:true, outSpatialReference:{wkid:4326}});
+  const f=q&&q.features&&q.features[0]; if(!f||!f.geometry) return {err:'Geometria dell\'elemento non disponibile.'};
+  // chiave stabile anche dopo una riapertura: i layer locali (WFS in GeoJSON) hanno un indirizzo blob che cambia
+  const base=l._blobUrl? 'layer:'+(l.title||'') : (l.url||'layer:'+(l.title||l.id))+(l.layerId!=null? '/'+l.layerId : (l.name? '/'+l.name : ''));
+  return {key:base+'#'+oid, geometry:f.geometry, attrs:f.attributes, layerTitle:l.title||'layer', name:gpFeatName(f.attributes, l.displayField, l.fields, oid)}; }
+async function gpIdentifyAt(mp){
+  const lays=view.map.allLayers.toArray().filter(l=>l.type==='map-image'&&l.visible&&l.listMode!=='hide'&&l.url).reverse();   // dall'alto
+  if(!mp||!lays.length) return null;
+  const M=await idMods(), sc=view.scale;
+  const onChain=sl=>{ for(let p=sl; p&&p.allSublayers===undefined&&p.parent!==undefined; p=p.parent) if(p.visible===false) return false; return true; };
+  const inSc=sl=>(!sl.minScale||sc<=sl.minScale)&&(!sl.maxScale||sc>=sl.maxScale);
+  for(const l of lays){
+    const leaf=l.allSublayers.toArray().filter(sl=>!(sl.sublayers&&sl.sublayers.length)&&onChain(sl)&&inSc(sl));
+    if(!leaf.length) continue;
+    const res=await M.identify.identify(l.url, new M.IdentifyParameters({geometry:mp, mapExtent:view.extent, width:view.width, height:view.height,
+      tolerance:4, returnGeometry:true, layerOption:'all', layerIds:leaf.map(sl=>sl.id), sublayers:leaf, spatialReference:view.spatialReference}));
+    const hit=(res.results||[]).find(x=>x.feature&&x.feature.geometry); if(!hit) continue;
+    const a=hit.feature.attributes||{}, sub=l.findSublayerById? l.findSublayerById(hit.layerId) : null;
+    const oid=['OBJECTID','objectid','ObjectID','FID'].map(k=>a[k]).find(v=>v!=null);
+    let geom=hit.feature.geometry; try{ geom=to4326(geom)||geom; }catch(e){}
+    return {key:l.url+'/'+hit.layerId+'#'+(oid!=null? oid : JSON.stringify(a).slice(0,80)), geometry:geom, attrs:a,
+      layerTitle:(sub&&sub.title)||hit.layerName||l.title||'layer', name:gpFeatName(a, hit.displayFieldName, null, oid)}; }
+  return null; }
+async function gpLayerFeatureAt(e){
+  const skip=new Set([gl,toolsGL,labelsGL]);
+  const r=await view.hitTest(e);
+  for(const x of (r.results||[])){ const l=x.layer||(x.graphic&&x.graphic.layer);
+    if(!x.graphic||!l||skip.has(l)||l.listMode==='hide'||typeof l.queryFeatures!=='function'||!l.objectIdField) continue;   // layer interni e DWG esclusi
+    return gpFeatureFromLayer(l, x.graphic); }
+  return gpIdentifyAt(e.mapPoint); }
+function gpImportFeature(got){   // una sola copia per elemento: il secondo clic riusa quella già negli Importati
+  const ex=toolsGL.graphics.find(g=>g.attributes&&g.attributes._srcKey===got.key); if(ex) return ex;
+  const gm=got.geometry, src={}; let n=0;
+  Object.keys(got.attrs||{}).forEach(k=>{ const v=got.attrs[k];   // attributi originali (per l'export), solo valori semplici
+    if(n>=80||/^(shape|__)/i.test(k)) return; if(v==null||['string','number','boolean'].indexOf(typeof v)>=0){ src[k]=v; n++; } });
+  const gr=new esriMods.Graphic({geometry:gm, symbol:impSym(gm.type, IMP_COLORS[impColorIdx++ % IMP_COLORS.length]),
+    attributes:{_kind:'import', geomType:gm.type, nome:String(got.name).slice(0,120), source:got.layerTitle, _srcKey:got.key, src_attrs:src}});
+  toolsGL.add(gr); refreshDl(); return gr; }
+async function gpPickLayerFeature(s, e){
+  toolMsg('gpMsg','Cerco un elemento dei layer in quel punto…');
+  let got=null; try{ got=await gpLayerFeatureAt(e); }
+  catch(err){ console.warn('[geoprocessi] elemento da layer',err); got={err:'Elemento non leggibile ('+((err&&err.message)||err)+').'}; }
+  if(gpPick!==s) return;   // modalità chiusa nel frattempo
+  if(got&&got.err){ toolMsg('gpMsg',got.err,'err'); return; }
+  if(!got){ const wms=view.map.allLayers.some(l=>l.type==='wms'&&l.visible);
+    toolMsg('gpMsg','Nessun oggetto in quel punto: clicca su una particella, un disegno, un risultato o un elemento di un layer vettoriale.'
+      +(wms? ' I WMS sono solo immagini: per usarne gli elementi serve il WFS o il feature layer dello stesso dato.' : '')); return; }
+  const had=toolsGL.graphics.some(g=>g.attributes&&g.attributes._srcKey===got.key);
+  const g=gpImportFeature(got), on=gpSlotToggle(s,g); gpRenderSlots();
+  if(gpPickState) gpPickState.last=null;
+  toolMsg('gpMsg','«'+gpItemName(g)+'» ('+got.layerTitle+') '+(on? 'aggiunto a ' : 'tolto da ')+s+(had||!on? '.' : ', copiato negli Importati.'),'ok'); }
 function gpUnionFeat(feats){ if(!feats.length) return null; let u=feats[0];
   for(let i=1;i<feats.length;i++){ try{ u=turf.union(u,feats[i]); }catch(e){} } return u; }
 function gpAddResult(feat, label){
@@ -2479,10 +3114,44 @@ function gpAddResult(feat, label){
 }
 // buffer: unico punto di generazione (pannello geoprocessi e menu contestuale).
 // opts.each = un buffer per ogni geometria (con il nome dell'oggetto), altrimenti un'unica area fusa.
+// ── geometrie molto dettagliate (es. un elemento preso da un layer: il Finistère ha 192.532 vertici) ──
+// Il motore geometrico di ArcGIS costa ~0,3-1 ms per vertice ed è sincrono: 192k vertici tenevano fermo
+// il browser per minuti (buffer geodetico ~3 min; piano in UTM 54 s più 8 s di proiezione; l'operatore
+// nuovo della 4.34 uguale). Sopra GP_HEAVY vertici semplifico con Douglas-Peucker in metri (pochi ms), con
+// tolleranza al massimo 1/10 della distanza del buffer, e lo dichiaro nel messaggio e nel nome.
+const GP_HEAVY=5000;
+function geomVerts(g){ return g? (g.rings||g.paths||[]).reduce((a,r)=>a+r.length,0) : 0; }
+function dpPts(pts, tol){   // Douglas-Peucker iterativo (niente ricorsione: anelli da 100k punti)
+  const n=pts.length; if(n<3) return pts.slice();
+  const keep=new Uint8Array(n), st=[[0,n-1]], t2=tol*tol; keep[0]=keep[n-1]=1;
+  while(st.length){ const ab=st.pop(), a=ab[0], b=ab[1], ax=pts[a][0], ay=pts[a][1], dx=pts[b][0]-ax, dy=pts[b][1]-ay, L=dx*dx+dy*dy;
+    let md=-1, mi=-1;
+    for(let i=a+1;i<b;i++){ const px=pts[i][0]-ax, py=pts[i][1]-ay;
+      let dd; if(L===0) dd=px*px+py*py; else { const t=Math.max(0,Math.min(1,(px*dx+py*dy)/L)), qx=px-t*dx, qy=py-t*dy; dd=qx*qx+qy*qy; }
+      if(dd>md){ md=dd; mi=i; } }
+    if(md>t2){ keep[mi]=1; st.push([a,mi],[mi,b]); } }
+  const out=[]; for(let i=0;i<n;i++) if(keep[i]) out.push(pts[i]); return out; }
+function simplifyM(g, m){   // semplificazione in metri su WGS84 (longitudine riscalata col coseno); via gli anelli degeneri
+  const g4=to4326(g)||g, c=g4.clone(), lat=g4.extent? g4.extent.center.y : 0, k=Math.cos(lat*Math.PI/180)||1, tol=m/111320;
+  const f=r=>dpPts(r.map(p=>[p[0]*k,p[1]]), tol).map(p=>[p[0]/k,p[1]]);
+  if(g4.rings){ const rs=g4.rings.map(f).filter(r=>r.length>=4); if(rs.length) c.rings=rs; }
+  else if(g4.paths){ const ps=g4.paths.map(f).filter(p=>p.length>=2); if(ps.length) c.paths=ps; }
+  return c; }
 function makeBuffer(geoms, d, msgId, opts){
   const mid=msgId||'gpMsg', o=opts||{}, GE=esriMods.geometryEngine;
   if(!geoms||!geoms.length){ toolMsg(mid,'A è vuota: scegli prima gli oggetti da bufferizzare.','err'); return null; }
   if(!(d>0)){ toolMsg(mid,'Distanza non valida.','err'); return null; }
+  if(!o._ready){ const cap=Math.max(0.5, d/10), notes=[]; let slow=false;
+    const gs=geoms.map((g,i)=>{ const n=geomVerts(g); if(n<=GP_HEAVY) return g;
+      let s=g, used=null; for(const m of [0.5,1,2,5,10,20,50]){ if(m>cap) break; s=simplifyM(g,m); used=m; if(geomVerts(s)<=GP_HEAVY) break; }
+      if(used==null) return g;
+      const ns=geomVerts(s); if(ns>GP_HEAVY*3) slow=true;
+      notes.push('«'+((o.names&&o.names[i])||'oggetto')+'» semplificato a '+String(used).replace('.',',')+' m ('+n.toLocaleString('it-IT')+' → '+ns.toLocaleString('it-IT')+' vertici)');
+      if(o.names) o.names[i]=(o.names[i]||'')+' · semplif. '+String(used).replace('.',',')+' m';
+      return s; });
+    if(notes.length){   // il messaggio va a schermo PRIMA del calcolo, che è sincrono
+      toolMsg(mid,'Calcolo il buffer'+(slow? ' (geometria molto dettagliata: può volerci qualche decina di secondi)' : '')+'… '+notes.join('; ')+'.');
+      setTimeout(()=>{ makeBuffer(gs, d, mid, Object.assign({}, o, {_ready:true, _notes:notes})); }, 60); return null; } }
   const bufs=[];
   geoms.forEach((g,i)=>{ try{ const b=GE.geodesicBuffer(g,d,'meters'); if(b) bufs.push({b:b, name:o.names&&o.names[i]}); }catch(e){} });
   if(!bufs.length){ toolMsg(mid,'Buffer non generato.','err'); return null; }
@@ -2494,17 +3163,22 @@ function makeBuffer(geoms, d, msgId, opts){
       attributes:{_kind:'buffer', dist_m:d, area_ha:+ha.toFixed(4), nome:'Buffer '+d+' m'+(x.name?' · '+x.name:'')},
       symbol:{type:'simple-fill', color:[121,192,255,0.2], outline:{color:[121,192,255],width:1.5}}})); });
   refreshDl(); try{ view.goTo(ext.expand(1.5)).catch(()=>{}); }catch(e){}
-  toolMsg(mid, out.length>1? out.length+' buffer di '+d+' m generati ('+tot.toFixed(2)+' ha in tutto).' : 'Buffer di '+d+' m generato ('+tot.toFixed(2)+' ha).','ok');
+  toolMsg(mid, (out.length>1? out.length+' buffer di '+d+' m generati ('+tot.toFixed(2)+' ha in tutto).' : 'Buffer di '+d+' m generato ('+tot.toFixed(2)+' ha).')
+    +(o._notes&&o._notes.length? ' '+o._notes.join('; ')+'.' : ''),'ok');
   return out[0].b;
 }
 function gpRun(op){
+  if(!gpRun._go&&op!=='clip'){   // geometrie enormi: prima il messaggio, poi il calcolo (sincrono)
+    const n=['A','B'].reduce((a,s)=>a+gpSlots[s].reduce((b,o)=>b+geomVerts(gpGeom(o)),0),0);
+    if(n>GP_HEAVY*4){ toolMsg('gpMsg','Geometrie molto dettagliate ('+n.toLocaleString('it-IT')+' vertici): l\'operazione può richiedere qualche decina di secondi…');
+      setTimeout(()=>{ gpRun._go=true; try{ gpRun(op); } finally{ gpRun._go=false; } }, 60); return; } }
   if(!gpSlots.A.length){ toolMsg('gpMsg','A è vuota: scegli prima gli oggetti (dalla mappa, dagli spuntati o una categoria).','err'); return; }
   const A=gpSlotFeats('A');
   if(!A.length){ toolMsg('gpMsg','Questa operazione lavora su aree, e in A ci sono solo linee o punti: fai prima un buffer.','err'); return; }
-  if(op==='union'){ gpAddResult(gpUnionFeat(A),'Union'); return; }
-  if(op==='hull'){ try{ gpAddResult(turf.convex(turf.featureCollection(A)),'Convex hull'); }catch(e){ toolMsg('gpMsg','Convex hull: '+e.message,'err'); } return; }
+  if(op==='union'){ gpAddResult(gpUnionFeat(A),'Unione'); return; }
+  if(op==='hull'){ try{ gpAddResult(turf.convex(turf.featureCollection(A)),'Contorno'); }catch(e){ toolMsg('gpMsg','Contorno: '+e.message,'err'); } return; }
   if(op==='simplify'){ const u=gpUnionFeat(A);
-    try{ gpAddResult(turf.simplify(u,{tolerance:0.0002,highQuality:true,mutate:false}),'Simplify'); }catch(e){ toolMsg('gpMsg','Simplify: '+e.message,'err'); } return; }
+    try{ gpAddResult(turf.simplify(u,{tolerance:0.0002,highQuality:true,mutate:false}),'Semplificazione'); }catch(e){ toolMsg('gpMsg','Semplifica: '+e.message,'err'); } return; }
   if(op==='clip'){ gpPickEnd(); gpPendingClip=gpUnionFeat(A); sketchPurpose='geoproc'; try{sketchVM.cancel();}catch(e){}
     toolMsg('gpMsg','Disegna il poligono di ritaglio (doppio click per finire).'); sketchVM.create('polygon'); return; }
   // binari A/B
@@ -2514,14 +3188,14 @@ function gpRun(op){
   const ua=gpUnionFeat(A), ub=gpUnionFeat(Bf);
   try{
     const res = op==='intersect'? turf.intersect(ua,ub) : turf.difference(ua,ub);
-    gpAddResult(res, op==='intersect'?'Intersect':'Difference');
-  }catch(e){ toolMsg('gpMsg',(op==='intersect'?'Intersect':'Difference')+': '+e.message,'err'); }
+    gpAddResult(res, op==='intersect'?'Parte comune':'Differenza');
+  }catch(e){ toolMsg('gpMsg',(op==='intersect'?'Parte comune':'Sottrai B da A')+': '+e.message,'err'); }
 }
 function gpDoClip(sketchGeom){
   const bgj=esriGeomToGeojson(to4326(sketchGeom));
   if(!bgj||!gpPendingClip){ gpPendingClip=null; return; }
-  try{ gpAddResult(turf.intersect(gpPendingClip,{type:'Feature',geometry:bgj,properties:{}}),'Clip'); }
-  catch(e){ toolMsg('gpMsg','Clip: '+e.message,'err'); }
+  try{ gpAddResult(turf.intersect(gpPendingClip,{type:'Feature',geometry:bgj,properties:{}}),'Ritaglio'); }
+  catch(e){ toolMsg('gpMsg','Ritaglia: '+e.message,'err'); }
   gpPendingClip=null;
 }
 
@@ -2717,6 +3391,7 @@ function renderGeoms(){
   try{ updateImportImages(); }catch(e){}
   try{ wireSectionTools(); }catch(e){}
   try{ gpSelInfo(); }catch(e){}
+  impCounts();
 }
 
 // ══ Controlli di GRUPPO negli header di sezione (visibilità + colore) ══════
@@ -2790,6 +3465,10 @@ function refreshSelDraw(){
 // ── FASE 4a: import file vettoriali ───────────────────────────────────────
 const IMP_COLORS=[[47,182,230],[245,166,35],[130,80,220],[40,180,110],[220,70,120],[0,150,180],[200,120,0]];
 let impColorIdx=0;
+function impSym(type, col){   // stile degli importati (da file e da layer della mappa): un colore per sorgente
+  return type==='polygon'? {type:'simple-fill',color:[col[0],col[1],col[2],0.18],outline:{color:col,width:2}}
+    : type==='polyline'? {type:'simple-line',color:col,width:2.5}
+    : {type:'simple-marker',color:col,size:8,outline:{color:'#fff',width:1}}; }
 function gjGeom(g){ const sr={wkid:4326}; if(!g) return null;
   if(g.type==='Point') return {type:'point', x:g.coordinates[0], y:g.coordinates[1], spatialReference:sr};
   if(g.type==='MultiPoint') return {type:'multipoint', points:g.coordinates.map(c=>[c[0],c[1]]), spatialReference:sr};
@@ -2832,7 +3511,7 @@ async function gjCheckCoords(fc){
   }
   return {ok:false, proj:true, reason:'coordinate proiettate senza sistema dichiarato (X max '+Math.round(mx)
     +(plaus.length>1? ', '+plaus.length+' letture possibili' : '')
-    +'): scegli il sistema qui sotto, in «Coordinate · trova il sistema di riferimento»'};
+    +'): scegli il sistema qui sotto, nella sezione «Coordinate senza sistema»'};
 }
 function impAdd(fc, srcName){
   const col=IMP_COLORS[impColorIdx++ % IMP_COLORS.length];
@@ -2841,10 +3520,7 @@ function impAdd(fc, srcName){
     const gm=gjGeom(f.geometry); if(!gm) return;
     const pr=f.properties||{};
     const nome=pr.name||pr.nome||pr.NOME||pr.Name||pr.title||pr.LABEL||(srcName.replace(/\.[^.]+$/,'')+' '+(i+1));
-    const sym = gm.type==='polygon'?{type:'simple-fill',color:[col[0],col[1],col[2],0.18],outline:{color:col,width:2}}
-      : gm.type==='polyline'?{type:'simple-line',color:col,width:2.5}
-      : {type:'simple-marker',color:col,size:8,outline:{color:'#fff',width:1}};
-    const gr=new esriMods.Graphic({geometry:gm, attributes:{_kind:'import', geomType:gm.type, nome:String(nome).slice(0,120), source:srcName}, symbol:sym});
+    const gr=new esriMods.Graphic({geometry:gm, attributes:{_kind:'import', geomType:gm.type, nome:String(nome).slice(0,120), source:srcName}, symbol:impSym(gm.type,col)});
     toolsGL.add(gr); zoom.push(gr); added++;
   });
   refreshDl();
@@ -2882,6 +3558,187 @@ async function onImportFiles(files){
   toolMsg('impMsg', m||'Nessuna geometria importata.', (bad.length&&!ok.length)?'err':'ok');
   try{ if(window.openPanel) window.openPanel('elenco'); }catch(e){}
 }
+
+// ══ Servizi web: WMS, WFS e ArcGIS REST aggiunti per indirizzo, senza item sul portale ═══════════════
+// Il browser ha però regole sue, uguali per tutti e che da qui non si aggirano: da una pagina https niente
+// servizi http (contenuto misto: bloccato), e capabilities e dati si leggono solo se il server lo permette
+// (CORS). Per quei servizi serve un proxy sul server (es. una Azure Function sul futuro host). Ogni layer
+// aggiunto porta la sua ricetta (_projSvc: tipo, indirizzo, layer scelti) che va nel salvataggio
+// automatico e nel progetto, e da cui si ricrea uguale (svcCreate).
+let addedServices=[], svcFound=null, _svcM=null;
+// contatori sui titoli delle sezioni della scheda Import: si vedono anche a sezione chiusa
+function impCounts(){ try{ [['impNCad',cadFiles.length],['impNImg',importedImages.length],['impNSvc',addedServices.length]].forEach(p=>{
+  const e=$(p[0]); if(e) e.textContent=p[1]? p[1]+' in mappa' : ''; }); }catch(e){} }
+const SVC_LBL={wms:'WMS', wfs:'WFS', rest:'ArcGIS REST'};
+function svcMods(){ return _svcM? Promise.resolve(_svcM) : new Promise((res,rej)=>{ try{
+  require(["esri/layers/WMSLayer","esri/layers/WFSLayer","esri/layers/ogc/wfsUtils","esri/layers/Layer","esri/layers/FeatureLayer","esri/layers/MapImageLayer","esri/layers/GeoJSONLayer","esri/request"],
+    (WMSLayer,WFSLayer,wfsUtils,Layer,FeatureLayer,MapImageLayer,GeoJSONLayer,request)=>{ _svcM={WMSLayer,WFSLayer,wfsUtils,Layer,FeatureLayer,MapImageLayer,GeoJSONLayer,request}; res(_svcM); }); }catch(e){ rej(e); } }); }
+// l'errore utile è spesso annidato (es. «getWFSLayerTypeInfo-error» → «Failed to fetch», http 0)
+function svcMsgs(e,d){ d=d||0; if(!e||d>5) return ''; const x=e.details||{};
+  return String(e.message||e.name||'')+(x.httpStatus!=null? ' [http '+x.httpStatus+']' : '')+(x.error? ' | '+svcMsgs(x.error,d+1) : ''); }
+function svcHost(u){ try{ return new URL(u).host; }catch(e){ return u; } }
+function svcGuess(u){ const s=u.toLowerCase();
+  if(/\/rest\/services\b|\/(mapserver|featureserver|imageserver|vectortileserver)\b/.test(s)) return 'rest';
+  if(/[?&]service=wfs\b|\bwfs\b/.test(s)) return 'wfs';
+  return 'wms'; }
+function svcBase(u, drop){   // via i parametri che il layer aggiunge da sé (service, request, version…), gli altri restano
+  try{ const x=new URL(u); [...x.searchParams.keys()].forEach(k=>{ if(drop.indexOf(k.toLowerCase())>=0) x.searchParams.delete(k); });
+    return x.toString().replace(/\?$/,''); }catch(e){ return u; } }
+function svcErr(e, type, upg){
+  const m=(e&&typeof e==='object'? svcMsgs(e) : String(e||'')), hs=/\[http (\d+)\]/.exec(m), st=hs? +hs[1] : null;
+  if(upg&&/fetch|network|cors|load failed|timeout|request/i.test(m)) return 'il servizio sembra esistere solo in http: da una pagina https il browser lo blocca (contenuto misto). Serve l\'indirizzo https, o un proxy sul server.';
+  if(st===401||st===403||/token|authoriz|permission|not allowed/i.test(m)) return 'il servizio chiede credenziali o non è accessibile a questo account.';
+  if(st===404) return 'indirizzo non trovato (404): controlla l\'URL.';
+  if(/failed to fetch|networkerror|load failed|cors/i.test(m)) return 'il server non risponde o non permette la lettura da altri siti (CORS): da qui non si legge senza un proxy sul server.';
+  if(type==='wfs'&&/geojson|output|unsupported|version/i.test(m)) return 'WFS non leggibile: il server non restituisce GeoJSON.';
+  return 'servizio non leggibile ('+m.split(' | ')[0].replace(/\s*\[http \d+\]/,'').slice(0,160)+'): controlla indirizzo e tipo.'; }
+// WFS senza WFSLayer. Il WFSLayer di ArcGIS vuole WFS 2.0 in GeoJSON e prima di caricare chiede anche un
+// campione in GML: diversi GeoServer quella richiesta la rifiutano (GeoBretagne sì al GeoJSON, no al GML).
+// Qui: GetFeature in GeoJSON e WGS84, tutto in una volta (al massimo SVC_WFS_MAX elementi), come layer
+// locale. È una fotografia: non si aggiorna spostando la mappa, ma si filtra e si interroga come gli altri.
+const SVC_WFS_MAX=20000;
+function svcSwapXY(gj){ const sw=c=>{ if(typeof c[0]==='number'){ const t=c[0]; c[0]=c[1]; c[1]=t; } else c.forEach(sw); };
+  (gj.features||[]).forEach(f=>{ if(f&&f.geometry&&f.geometry.coordinates) sw(f.geometry.coordinates); }); }
+function svcWfsSwapped(gj, bb){   // assi invertiti (lat, lon)? lo dice il riquadro WGS84 dichiarato nelle capabilities
+  let a=0, b=0, n=0; const inb=(x,y)=>x>=bb[0]&&x<=bb[2]&&y>=bb[1]&&y<=bb[3];
+  const first=c=>typeof c[0]==='number'? c : first(c[0]);
+  for(const f of (gj.features||[])){ if(n>=50) break; const g=f&&f.geometry; if(!g||!g.coordinates) continue;
+    const p=first(g.coordinates); n++; if(inb(p[0],p[1])) a++; if(inb(p[1],p[0])) b++; }
+  return b>a; }
+async function svcWfsGeojson(M, rec){
+  let gj=null, lastErr=null;
+  for(const v of ['2.0.0','1.1.0']){
+    const u=new URL(rec.url), p=u.searchParams;
+    p.set('service','WFS'); p.set('request','GetFeature'); p.set('version',v); p.set(v==='2.0.0'?'typeNames':'typeName',rec.name);
+    p.set('outputFormat','application/json'); p.set('srsName','EPSG:4326'); p.set(v==='2.0.0'?'count':'maxFeatures',String(SVC_WFS_MAX));
+    try{ const r=await fetch(u.toString()); if(!r.ok) throw new Error('GetFeature: HTTP '+r.status);
+      const t=await r.text(); try{ gj=JSON.parse(t); }catch(e){ throw new Error('il server non restituisce GeoJSON'); }
+      if(!gj||!Array.isArray(gj.features)) throw new Error('il server non restituisce GeoJSON');
+      break; }catch(e){ lastErr=e; gj=null; } }
+  if(!gj) throw lastErr||new Error('GetFeature non riuscito');
+  if(rec.bbox&&svcWfsSwapped(gj, rec.bbox)) svcSwapXY(gj);
+  const url=URL.createObjectURL(new Blob([JSON.stringify(gj)], {type:'application/json'}));
+  const l=new M.GeoJSONLayer({url:url, title:rec.title||rec.name});
+  l._blobUrl=url; l._wfsTrunc=gj.features.length>=SVC_WFS_MAX||(gj.numberMatched>gj.features.length);
+  return l; }
+async function svcReadWms(M, url){
+  const base=svcBase(url,['service','request','version']), l=new M.WMSLayer({url:base});
+  try{ await l.load();
+    const srs=(l.spatialReferences||[]).map(Number);
+    return {type:'wms', url:base, title:l.title||svcHost(base),
+      items:l.allSublayers.toArray().filter(s=>s.name).map(s=>({id:s.name, title:s.title||s.name})),
+      srs:(srs.indexOf(3857)>=0||srs.indexOf(900913)>=0)? 3857 : null};   // come il catasto: GeoServer rifiuta il 102100
+  } finally{ try{ l.destroy(); }catch(e){} } }
+async function svcReadWfs(M, url){
+  const base=svcBase(url,['service','request','version','typename','typenames','outputformat']);
+  const caps=await M.wfsUtils.getCapabilities(base);
+  const bb=ft=>{ const e=ft.extent; return e&&isFinite(e.xmin)? [e.xmin,e.ymin,e.xmax,e.ymax] : null; };   // riquadro WGS84 delle capabilities
+  return {type:'wfs', url:base, title:svcHost(base),
+    items:(caps.featureTypes||[]).map(ft=>({id:ft.typeName, title:ft.title||ft.typeName, bbox:bb(ft)}))}; }
+async function svcReadRest(M, url){
+  const base=url.replace(/[?#].*$/,'').replace(/\/+$/,''), l=await M.Layer.fromArcGISServerUrl({url:base});
+  try{ await l.load(); let items;
+    if(l.type==='map-image'){ const dep=s=>{ let d=0, p=s.parent; while(p&&p!==l){ d++; p=p.parent; } return d; };
+      items=l.allSublayers.toArray().sort((a,b)=>a.id-b.id).map(s=>({id:s.id, title:s.title||('Layer '+s.id), pre:' '.repeat(dep(s))})); }
+    else if(l.type==='group'){   // feature service: i nomi veri stanno nella sua descrizione (i layer del gruppo non sono ancora letti)
+      let names={}; try{ const j=(await M.request(base,{query:{f:'json'}})).data||{}; (j.layers||[]).forEach(x=>{ names[x.id]=x.name; }); }catch(e){}
+      items=l.layers.toArray().map(x=>({id:x.layerId, title:names[x.layerId]||x.title||('Layer '+x.layerId)})).sort((a,b)=>a.id-b.id); }
+    else items=[{id:null, title:l.title||svcHost(base)}];
+    return {type:'rest', url:base, title:l.title||svcHost(base), items:items, kind:l.type};
+  } finally{ try{ l.destroy(); }catch(e){} } }
+async function svcRead(){
+  const raw=($('svcUrl').value||'').trim();
+  if(!raw){ toolMsg('svcMsg','Incolla l\'indirizzo del servizio.','err'); return; }
+  let url=/^https?:\/\//i.test(raw)? raw : 'https://'+raw.replace(/^\/+/,''), upg=false;
+  if(location.protocol==='https:'&&/^http:/i.test(url)){ url='https:'+url.slice(5); upg=true; }   // l'http da qui non passerebbe: provo l'https
+  const type=$('svcType').value==='auto'? svcGuess(url) : $('svcType').value;
+  svcFound=null; $('svcList').innerHTML=''; $('svcAdd').hidden=true; $('svcTools').hidden=true; $('svcRead').disabled=true;
+  toolMsg('svcMsg','Leggo il servizio '+SVC_LBL[type]+'…');
+  try{ const M=await svcMods();
+    const f= type==='wms'? await svcReadWms(M,url) : type==='wfs'? await svcReadWfs(M,url) : await svcReadRest(M,url);
+    if(!f.items.length) throw new Error('il servizio non contiene layer da aggiungere');
+    svcFound=f; svcRenderList();
+    toolMsg('svcMsg', SVC_LBL[type]+' «'+f.title+'»: '+f.items.length+' layer'+(upg? ' (letto in https)' : '')+'. Spunta quelli da aggiungere.','ok');
+  }catch(e){ console.warn('[servizio]',e); toolMsg('svcMsg', SVC_LBL[type]+': '+svcErr(e,type,upg), 'err'); }
+  finally{ $('svcRead').disabled=false; } }
+function svcRenderList(){
+  const f=svcFound, box=$('svcList'); box.innerHTML=''; if(!f) return;
+  const pre=f.items.length<=5;   // pochi layer: già spuntati
+  f.items.forEach((it,i)=>{ const lab=document.createElement('label'); lab.className='svrow';
+    const c=document.createElement('input'); c.type='checkbox'; c.dataset.i=i; c.checked=pre;
+    const s=document.createElement('span'); s.textContent=(it.pre||'')+it.title;
+    if(it.id!=null&&String(it.id)!==it.title){ const sm=document.createElement('small'); sm.textContent=' '+it.id; s.appendChild(sm); }
+    lab.appendChild(c); lab.appendChild(s); box.appendChild(lab); });
+  $('svcTools').hidden=f.items.length<8; $('svcFilter').value=''; $('svcAdd').hidden=false; }
+function svcFilterList(){ const t=($('svcFilter').value||'').trim().toLowerCase();
+  $('svcList').querySelectorAll('.svrow').forEach(r=>{ r.style.display=!t||r.textContent.toLowerCase().indexOf(t)>=0? '' : 'none'; }); }
+// crea il layer dalla ricetta, lo mette in mappa e lo registra; errore → eccezione (niente layer a metà)
+async function svcCreate(rec){
+  const M=await svcMods(); let l=null;
+  const tryLoad=async x=>{ try{ await x.load(); return x; }catch(e){ try{ x.destroy(); }catch(z){} if(x._blobUrl) URL.revokeObjectURL(x._blobUrl); throw e; } };
+  if(rec.type==='wms') l=await tryLoad(new M.WMSLayer({url:rec.url, title:rec.title||undefined,
+    sublayers:(rec.names||[]).length? rec.names.map(n=>({name:n})) : undefined, spatialReferences:rec.srs? [rec.srs] : undefined}));
+  else if(rec.type==='wfs'){
+    if(rec.mode!=='geojson'){ try{ l=await tryLoad(new M.WFSLayer({url:rec.url, name:rec.name, title:rec.title||undefined})); }
+      catch(e){ console.warn('[servizio] WFSLayer non parte, provo il GeoJSON diretto:', svcMsgs(e)); } }
+    if(!l){ l=await tryLoad(await svcWfsGeojson(M, rec)); rec.mode='geojson'; } }   // la scelta resta nella ricetta
+  else if(rec.ids) l=await tryLoad(new M.MapImageLayer({url:rec.url, title:rec.title||undefined}));
+  else l=await tryLoad(await M.Layer.fromArcGISServerUrl({url:rec.url}));
+  if(rec.type==='rest'&&!rec.ids&&rec.title) l.title=rec.title;
+  if(rec.ids){ const sel=new Set(rec.ids), on=s=>sel.has(s.id)||!!(s.sublayers&&s.sublayers.some(on));   // un gruppo resta acceso se contiene layer scelti
+    l.allSublayers.forEach(s=>{ s.visible=on(s); }); }
+  l._projSvc=rec; view.map.add(l);
+  if(addedServices.indexOf(rec)<0) addedServices.push(rec);
+  impCounts(); return l; }
+// estensione di un layer nel SR della mappa. Per i WMS conta quella dei soli layer scelti: quella del
+// servizio è spesso tutta Italia (o il mondo) e lo zoom non portava da nessuna parte.
+async function svcExtent(l){
+  await esriMods.projection.load();
+  const put=(u,e)=>{ if(!e) return u; if(e.spatialReference&&!e.spatialReference.equals(view.spatialReference)) e=esriMods.projection.project(e, view.spatialReference);
+    return e? (u? u.union(e) : e.clone()) : u; };
+  let u=null;
+  if(l.type==='wms'&&l.sublayers) l.sublayers.forEach(s=>{ try{ u=put(u, s.fullExtent); }catch(e){} });
+  if(!u){ if(!l.fullExtent&&l.load) try{ await l.load(); }catch(e){} try{ u=put(null, l.fullExtent); }catch(e){} }
+  return u; }
+async function svcZoomIfAway(ls){   // zoom solo se i layer aggiunti sono fuori dalla vista
+  try{ let u=null; for(const l of ls){ const e=await svcExtent(l); if(e) u=u? u.union(e) : e; }
+    if(u&&!u.intersects(view.extent)) view.goTo(u.expand(1.1)).catch(()=>{}); }catch(e){} }
+async function svcAdd(){
+  const f=svcFound; if(!f) return;
+  const sel=[...$('svcList').querySelectorAll('input:checked')].map(c=>f.items[+c.dataset.i]);
+  if(!sel.length){ toolMsg('svcMsg','Spunta almeno un layer.','err'); return; }
+  const recs=[];
+  // titolo nella lista Layer: il layer, se è uno solo; sennò il servizio col suo host (il titolo di default
+  // di GeoServer, «GeoServer Web Map Service», da solo non dice quale sia)
+  if(f.type==='wms') recs.push({type:'wms', url:f.url, title:sel.length===1? sel[0].title : f.title+' · '+svcHost(f.url), names:sel.map(x=>x.id), srs:f.srs});
+  else if(f.type==='wfs') sel.forEach(x=>recs.push({type:'wfs', url:f.url, name:x.id, title:x.title, bbox:x.bbox||null}));
+  else if(f.kind==='map-image') recs.push({type:'rest', url:f.url, title:f.title, ids:sel.map(x=>x.id)});
+  else if(f.kind==='group') sel.forEach(x=>recs.push({type:'rest', url:f.url+'/'+x.id, title:x.title}));
+  else recs.push({type:'rest', url:f.url, title:f.title});
+  $('svcAdd').disabled=true; toolMsg('svcMsg','Aggiungo '+recs.length+' layer…');
+  const bad=[], added=[];
+  for(const rec of recs){ try{ added.push(await svcCreate(rec)); }
+    catch(e){ console.warn('[servizio]',e); bad.push('«'+(rec.title||rec.name||'layer')+'»: '+svcErr(e,rec.type,false)); } }
+  $('svcAdd').disabled=false;
+  if(added.length){ svcZoomIfAway(added); try{ window.openPanel&&window.openPanel('layers'); }catch(e){} saveStateDebounced(); }
+  const snap=added.filter(l=>l._blobUrl), trunc=added.some(l=>l._wfsTrunc);
+  toolMsg('svcMsg', (added.length? (added.length>1? added.length+' layer aggiunti alla mappa: li trovi' : 'Layer aggiunto alla mappa: lo trovi')+' nel pannello Layer.' : '')
+    +(snap.length? ' WFS letto per intero in GeoJSON (il server non accetta la lettura standard)'+(trunc? ', fermato ai primi '+SVC_WFS_MAX.toLocaleString('it-IT')+' elementi' : '')+'.' : '')
+    +(bad.length? (added.length?' ':'')+'Non aggiunti: '+bad.join(' · ') : ''), bad.length? 'err' : 'ok'); }
+// dal salvataggio automatico o da un progetto: in ordine, uno alla volta (l'ordine in mappa conta).
+// svcGen: se nel frattempo il lavoro viene svuotato (o si apre un altro progetto), quello che arriva dopo
+// si scarta — prima un «Svuota il lavoro» durante il ripristino all'avvio si ritrovava i servizi in mappa.
+let svcGen=0;
+async function svcRestoreAll(list, onEach){
+  const bad=[], gen=svcGen;
+  for(let i=0;i<(list||[]).length;i++){ const rec=list[i];
+    if(gen!==svcGen) break;
+    try{ const l=await svcCreate(rec);
+      if(gen!==svcGen){ try{ view.map.remove(l); l.destroy(); if(l._blobUrl) URL.revokeObjectURL(l._blobUrl); }catch(e){}
+        addedServices=addedServices.filter(r=>r!==rec); impCounts(); break; }
+      if(onEach) onEach(i,l); }
+    catch(e){ console.warn('[servizio] non ripristinato', rec&&rec.url, e); bad.push('«'+((rec&&(rec.title||rec.name))||'servizio')+'» ('+svcErr(e,rec&&rec.type,false)+')'); } }
+  return bad; }
 
 // ── FASE 4b: immagini georeferenziate (MediaLayer + angoli trascinabili) ──
 var MAX_IMG_DIM=4096, MAX_IMG_MB=30, MAX_TIF_MB=100;
@@ -2946,7 +3803,7 @@ async function loadGeoTIFF(file){
   }catch(e){ corners=null; }
   return {image:cv, w:outW, h:outH, corners:corners};
 }
-async function createGeorefImage(image, pxW, pxH, name, corners){
+async function createGeorefImage(image, pxW, pxH, name, corners, noEdit){   // noEdit: riapertura da progetto, senza maniglie
   var M=await imgMods();
   var cs = corners || makeCorners(pxW,pxH);
   function cp(){ return [ {sourcePoint:{x:0,y:0},mapPoint:cs[0]}, {sourcePoint:{x:pxW,y:0},mapPoint:cs[1]},
@@ -2955,7 +3812,7 @@ async function createGeorefImage(image, pxW, pxH, name, corners){
   var ml=new M.MediaLayer({source:[el], title:name, opacity:0.85});
   view.map.add(ml,0);
   var im={name:name, layer:ml, el:el, pxW:pxW, pxH:pxH};
-  importedImages.push(im); renderGeoms(); editImage(im, cs); return im;
+  importedImages.push(im); renderGeoms(); if(!noEdit) editImage(im, cs); return im;
 }
 async function editImage(im, cornersOverride){
   var M=await imgMods();
@@ -3027,7 +3884,8 @@ async function startOneImage(file){
   toolMsg('impMsg','Carico '+name+'\u2026');
   try{
     var r = isTif ? await loadGeoTIFF(file) : await loadPlainImage(file);
-    await createGeorefImage(r.image, r.w, r.h, name, r.corners);
+    const im=await createGeorefImage(r.image, r.w, r.h, name, r.corners);
+    im.file=file;   // l'originale entra nel file di progetto
     toolMsg('impMsg', name+(r.corners?' \u2014 posizionata dai metadati; ':' \u2014 ')+'trascina gli angoli, poi Fatto.', 'ok');
   }catch(e){ toolMsg('impMsg', name+': '+((e&&e.message)||e), 'err'); }
 }
@@ -3045,7 +3903,8 @@ async function startOneImage(file){
 //  - ARC, CIRCLE, LWPOLYLINE, POLYLINE2D, TEXT, SOLID, HATCH, INSERT sono in coordinate OCS:
 //    con estrusione Z<0 la X va specchiata. LINE, SPLINE, ELLIPSE, MTEXT sono in WCS.
 // Un DWG non dichiara quasi mai il suo SR: lo stimo dalle coordinate (cadEstimate) e lo fa
-// confermare all'utente. I disegni valgono per la sessione (non entrano in saveState).
+// confermare all'utente. I disegni non entrano in saveState (pesano troppo per il browser): li conserva
+// il file di progetto, con l'originale e il posizionamento (projBuild / projCadRestore).
 const CAD_LIB='https://cdn.jsdelivr.net/npm/@mlightcad/libredwg-web@0.7.14';
 // ── sistemi di riferimento usati in Italia ─────────────────────────────────────────────────
 // Tabella condivisa: stima del SR dei DWG, menù della finestra di conferma e «Trova SR» delle
@@ -3535,7 +4394,7 @@ async function cadImportOne(file){
   try{
     if(!view||!esriMods) throw new Error('la mappa non è ancora pronta');
     if(file.size>CAD_MAX_MB*1048576) throw new Error('file troppo grande ('+cadN(file.size/1048576)+' MB, massimo '+CAD_MAX_MB+')');
-    try{ if(window.showTab) window.showTab('import'); }catch(e){}
+    try{ if(window.showTab) window.showTab('import'); window.impOpen&&window.impOpen('impSecCad'); }catch(e){}   // anche se il DWG arriva da «Scegli file»
     const buf=await file.arrayBuffer();
     const ver=String.fromCharCode.apply(null, new Uint8Array(buf,0,Math.min(6,buf.byteLength)));   // "AC1032" = AutoCAD 2018+
     if(!/^AC\d{4}$/.test(ver)) throw new Error('non è un file DWG (intestazione non riconosciuta)');
@@ -3555,6 +4414,7 @@ async function cadImportOne(file){
     const ch=await cadAsk(st,est);
     if(!ch){ toolMsg('impCadMsg',file.name+': importazione annullata.'); return; }
     const f=await cadCommit(st,ch);
+    f.file=file;   // l'originale entra nel file di progetto
     toolMsg('impCadMsg', file.name+': '+cadN(f.n)+' elementi in '+f.layers.length+' layer · '+f.srLabel+'.', 'ok');
   }catch(e){ console.warn('[DWG]',e); toolMsg('impCadMsg', file.name+': '+((e&&e.message)||e), 'err'); } }
 // ── resa sulla mappa ──────────────────────────────────────────────────────────
@@ -3643,7 +4503,7 @@ async function cadPlace(f){
   f.zoom=isFinite(x0)? esriMods.webMercatorUtils.geographicToWebMercator(new M.Extent({xmin:x0, ymin:y0, xmax:x1, ymax:y1, spatialReference:M.WGS})).expand(1.3) : null;
   _cadFg=cadFgHex(); cadTextRefresh();
 }
-async function cadCommit(st,ch){
+async function cadCommit(st,ch,opt){   // opt.noZoom: riapertura da progetto (la vista è quella salvata)
   const M=CadM; delete st._BL; delete st._LT;   // i blocchi grezzi non servono più (e pesano)
   cadOutliers(st,ch.sc);
   if(ch.align&&!ch.M){   // posizionamento a mano: appoggio il disegno al centro della mappa, nel fuso UTM della zona
@@ -3653,12 +4513,13 @@ async function cadCommit(st,ch){
   const f={name:st.name, fkey:st.fkey, st:st, ch:ch, layers:[], open:true, n:0, zoom:null,
     srLabel:(ch.align||ch.saved? 'Posizionato a mano · ' : '')+s.label,
     group:new M.GroupLayer({title:'DWG · '+st.name.replace(/\.dwg$/i,''), visibilityMode:'independent'})};
+  f.group._cad=true;   // la lista Layer lo crea prima che il file entri in cadFiles: serve per «Rimuovi»
   watchProp(f.group,'visible', ()=>{ cadListSoon(); cadTextRefreshSoon(); });
   if(cadTxtGL&&view.map.layers.indexOf(cadTxtGL)<0){ const i=view.map.layers.indexOf(gl); if(i>=0) view.map.add(cadTxtGL,i); else view.map.add(cadTxtGL); }
   const i=view.map.layers.indexOf(cadTxtGL); if(i>=0) view.map.add(f.group,i); else view.map.add(f.group);   // sotto testi, particelle e disegni
   await cadPlace(f);
   f.layers.sort((a,b)=>a.name.localeCompare(b.name,'it',{numeric:true})); f.group.addMany(f.layers.map(L=>L.grp));
-  cadFiles.push(f); cadRenderList(); cadZoom(f);
+  cadFiles.push(f); cadRenderList(); if(!(opt&&opt.noZoom)) cadZoom(f);
   if(ch.align) cadAlignStart(f);
   return f; }
 function cadZoom(f){ if(!f.zoom||!view) return; const z=f.zoom;
@@ -3691,8 +4552,13 @@ let _cadListT=null;
 function cadListSoon(){ clearTimeout(_cadListT); _cadListT=setTimeout(cadRenderList,60); }
 function cadBtn(txt,title,fn){ const b=document.createElement('button'); b.className='gact'; b.type='button'; b.textContent=txt; b.title=title;
   b.onclick=e=>{ e.stopPropagation(); fn(); }; return b; }
+// L'elenco si ricostruisce a ogni accensione/spegnimento: il riquadro dei layer, che scorre per conto suo,
+// nasceva ogni volta in cima e con tanti layer il clic riportava al primo. Ora la posizione si conserva
+// (per file, e quella della barra laterale), e si rimette solo a elenco completo.
 function cadRenderList(){
-  const box=$('cadList'); if(!box) return; box.innerHTML='';
+  const box=$('cadList'); if(!box) return;
+  const sc=$('sideContent'), sTop=sc? sc.scrollTop : 0, keep=[];
+  box.innerHTML='';
   cadFiles.forEach(f=>{ const wrap=document.createElement('div'); wrap.className='cadfile';
     const head=document.createElement('div'); head.className='grow'+(f.group.visible?'':' hidden');
     head.appendChild(makeVisToggle(()=>f.group.visible, v=>{ f.group.visible=v; }));
@@ -3704,6 +4570,7 @@ function cadRenderList(){
     const sub=document.createElement('span'); sub.className='gsub'; sub.textContent=f.srLabel+' · '+f.layers.length+' layer · '+cadN(f.n)+' elementi'; head.appendChild(sub);
     wrap.appendChild(head);
     if(f.open){ const ll=document.createElement('div'); ll.className='cadlayers';
+      ll.onscroll=()=>{ f._scroll=ll.scrollTop; }; keep.push([ll,f]);
       f.layers.forEach(L=>{ const r=document.createElement('div'); r.className='grow'+(L.grp.visible?'':' hidden');
         r.appendChild(makeVisToggle(()=>L.grp.visible, v=>{ L.grp.visible=v; }));
         r.appendChild(makeColorSwatch(()=>cadColNow(L.col), hex=>{ clearTimeout(L._t); L._t=setTimeout(()=>cadLayerColor(L,hex),120); }));
@@ -3711,7 +4578,9 @@ function cadRenderList(){
         const c=document.createElement('span'); c.className='cadn'; c.textContent=cadN(L.n); r.appendChild(c);
         ll.appendChild(r); });
       wrap.appendChild(ll); }
-    box.appendChild(wrap); }); }
+    box.appendChild(wrap); });
+  keep.forEach(([ll,f])=>{ ll.scrollTop=f._scroll||0; });
+  if(sc) sc.scrollTop=sTop; impCounts(); }
 function cadLayerColor(L,hex){ L.col=hex; L.userCol=true; L.grp._cadHex=hex;
   Object.values(L.subs).forEach(s=>{ s.lyr.renderer=cadRenderer(L,s); }); cadTextRefreshSoon(); }
 function cadRemove(f){
@@ -4059,7 +4928,7 @@ async function srSearch(x, y){
   if(!L){ msg('Quelle due coordinate non cadono in Italia con nessuno dei sistemi noti: prova «Coordinate · trova il sistema» nella scheda Import.','err'); return []; }
   const c=srPick(L);
   msg('Interpretate come '+c.s.label+(L.swap?' con X e Y invertiti':'')
-    +(all.length>1? ' — altri '+(all.length-1)+' sistemi possibili in «Coordinate · trova il sistema» (scheda Import).' : '.'), 'ok');
+    +(all.length>1? ' — altri '+(all.length-1)+' sistemi possibili in «Coordinate senza sistema» (scheda Importa dati).' : '.'), 'ok');
   return [coordResult(L.lat, L.lon, x+', '+y+' · '+c.s.label)]; }
 // risultato della ricerca per un punto: il widget naviga sull'ESTENSIONE, che deve essere un Extent vero
 // (prima c'era un oggetto semplice più un {target, zoom} che il widget ignorava: il segnaposto
@@ -4073,7 +4942,7 @@ function srFromImport(fc, name){
   srPend={fc:fc, name:name};
   const pts=[]; (fc.features||[]).forEach(f=>{ if(pts.length<40) gjEachCoord(f.geometry, p=>{ if(pts.length<40) pts.push(p); }); });
   if($('srIn')) $('srIn').value=pts.map(p=>p[0]+'  '+p[1]).join('\n');
-  try{ window.showTab&&window.showTab('import'); }catch(e){}
+  try{ window.showTab&&window.showTab('import'); window.impOpen&&window.impOpen('impSecSr'); }catch(e){}   // i candidati si vedono solo a sezione aperta
   srFind(); }
 
 function openExport(){
@@ -4261,7 +5130,7 @@ function baseGroundSet(){
 
   /* schede sidebar sinistra */
   var _tabs=Array.prototype.slice.call(document.querySelectorAll('#sideRail button'));
-  var _tabTitle={ricerca:'Ricerca particelle',disegno:'Disegno',geoproc:'Geoprocessi',contesto:'Contesto sito',\u0069mport:'Import file esterni'};
+  var _tabTitle={ricerca:'Ricerca particelle',disegno:'Disegno',geoproc:'Geoprocessi',contesto:'Contesto sito',\u0069mport:'Importa dati'};
   function showTab(name){
     _tabs.forEach(function(b){ b.classList.toggle('active', b.dataset.tab===name); });
     Array.prototype.forEach.call(document.querySelectorAll('#side .tabpane'),function(p){ p.classList.toggle('active', p.dataset.tab===name); });
@@ -4284,8 +5153,151 @@ function baseGroundSet(){
   if($g('helpBtn'))   $g('helpBtn').onclick=function(){ $g('helpModal').style.display='flex'; };
   if($g('helpClose')) $g('helpClose').onclick=function(){ $g('helpModal').style.display='none'; };
 
+  /* 7 ── Scheda Import: sezioni collassabili (aperte/chiuse ricordate in questo browser) e finestra «i» */
+  var IMP_INFO={
+    cad:{t:'Disegni CAD (DWG)', s:'Layout, rilievi e planimetrie da AutoCAD, sulla mappa.', h:
+      '<h3>Come si usa</h3><ol>'
+      +'<li>Premi <b>Scegli un disegno DWG</b>. La prima volta scarico il lettore (circa 9 MB), poi resta in memoria.</li>'
+      +'<li>Guardo le coordinate del disegno e ti propongo il <b>sistema di coordinate</b> più probabile (Gauss-Boaga, UTM…). Nella finestra vedi dove cadrebbe: premi <b>Conferma e aggiungi</b>, oppure scegline un altro.</li>'
+      +'<li>Se il disegno <b>non è georeferenziato</b> (coordinate «di cantiere»), premi <b>📍 Posiziona a mano</b>: lo metto al centro della mappa e lo sistemi con 2 punti. Clicchi un punto del disegno e poi dove sta davvero, due volte; i clic si agganciano ai vertici di particelle, disegni e altri DWG.</li>'
+      +'<li>Nell\'elenco sotto il pulsante accendi e spegni i layer del CAD e ne cambi il colore. <b>⌖</b> porta al disegno, <b>📍</b> lo riallinea, <b>×</b> lo toglie.</li></ol>'
+      +'<h3>Da sapere</h3><ul>'
+      +'<li>Il file viene letto sul tuo PC: non viene caricato da nessuna parte.</li>'
+      +'<li>Il posizionamento a mano viene ricordato: riaprendo lo stesso file te lo ripropongo.</li>'
+      +'<li>Chiuso il browser il disegno non resta: per ritrovarlo usa <b>💾 Salva progetto</b>, in alto.</li>'
+      +'<li>Solo file .dwg (non .dxf), fino a 150 MB.</li></ul>'},
+    img:{t:'Immagini sulla mappa', s:'Ortofoto, planimetrie e mappe scansionate sopra la cartografia.', h:
+      '<h3>Come si usa</h3><ol>'
+      +'<li>Premi <b>Scegli un\'immagine</b>: PNG, JPG oppure GeoTIFF.</li>'
+      +'<li>Un <b>GeoTIFF</b> contiene le sue coordinate: si posiziona da solo.</li>'
+      +'<li>Una <b>foto o planimetria</b> (PNG, JPG) compare al centro della mappa con 4 maniglie agli angoli: trascina ogni angolo sul punto giusto, poi premi <b>Fatto</b>.</li>'
+      +'<li>La ritrovi nell\'<b>Elenco</b>, sezione <b>Importati</b>: da lì cambi la trasparenza, la riposizioni (<b>⤢</b>) o la togli.</li></ol>'
+      +'<h3>Da sapere</h3><ul>'
+      +'<li>Le immagini vengono ridotte a 4096 pixel sul lato lungo, per non bloccare il browser.</li>'
+      +'<li>Limiti: 30 MB per un\'immagine, 100 MB per un GeoTIFF.</li>'
+      +'<li>Chiuso il browser l\'immagine non resta: per ritrovarla usa <b>💾 Salva progetto</b>, in alto.</li></ul>'},
+    svc:{t:'Servizi web', s:'Layer da WMS, WFS e servizi ArcGIS, senza caricarli prima sul portale.', h:
+      '<h3>Come si usa</h3><ol>'
+      +'<li>Incolla l\'<b>indirizzo</b> del servizio, per esempio quello di un GeoServer regionale o di un servizio ArcGIS. Il tipo lo riconosco da solo; se sbaglio, sceglilo tu nel menu.</li>'
+      +'<li>Premi <b>Leggi il servizio</b>: compare l\'elenco dei layer disponibili. Spunta quelli che ti servono (con tanti layer usa <b>Filtra l\'elenco</b>).</li>'
+      +'<li>Premi <b>Aggiungi alla mappa</b>. I layer li trovi nel pannello <b>Layer</b>, a destra: lì li filtri, e dal menu <b>…</b> li togli.</li></ol>'
+      +'<h3>Da sapere</h3><ul>'
+      +'<li>È una regola del browser, non del portale: si leggono solo servizi <b>https</b> che permettono la lettura da altri siti. Se un servizio è solo http, o non lo permette, da qui non si legge: serve un proxy sul server. Il WMS del Geoportale Nazionale, per esempio, non si legge.</li>'
+      +'<li>Se un indirizzo inizia con http, provo da solo la versione https.</li>'
+      +'<li>WFS: se la lettura normale non riesce, scarico tutti gli elementi in una volta (fino a 20.000). È una fotografia: non si aggiorna spostando la mappa.</li>'
+      +'<li>I servizi aggiunti restano in questo browser e si salvano nel progetto.</li></ul>'},
+    sr:{t:'Coordinate senza sistema', s:'Quando ti arrivano coordinate e non sai in che sistema sono.', h:
+      '<h3>Quando serve</h3><p>Un decreto, un rilievo, una mail con delle coordinate, uno shapefile senza il file .prj: numeri senza il loro sistema di riferimento.</p>'
+      +'<h3>Come si usa</h3><ol>'
+      +'<li>Incolla le coordinate: <b>una coppia X Y per riga</b>, anche con un nome davanti. Virgola decimale, separatori delle migliaia e gradi-minuti-secondi vanno bene.</li>'
+      +'<li>Premi <b>Trova il sistema</b>: le provo nei sistemi usati in Italia (Gauss-Boaga, UTM, RDN2008, ETRS89, ED50, WGS84…) e tengo quelli che le fanno cadere in Italia, anche con X e Y invertiti. Ogni ipotesi ha un numero sulla mappa.</li>'
+      +'<li>Se sai più o meno dove dovrebbero stare, premi <b>📍 Dove dovrebbe stare</b> e clicca quel punto: metto in cima le ipotesi più vicine, con la distanza in metri.</li>'
+      +'<li>Scegli l\'ipotesi giusta e premi <b>Aggiungi agli Importati</b>: come punti, oppure come un\'unica area.</li></ol>'
+      +'<h3>Da sapere</h3><ul>'
+      +'<li>Con il punto di riferimento distinguo anche sistemi vicini, come ED50 e WGS84 nello stesso fuso (circa 200 m di differenza).</li>'
+      +'<li>Uno shapefile senza .prj passa da qui in automatico: scegli il sistema e il file intero viene convertito.</li>'
+      +'<li>Le coordinate restano sul tuo PC.</li></ul>'}
+  };
+  // Geoprocessi: ogni «i» mostra un esempio disegnato, prima → dopo, con i colori della mappa
+  // (A arancione, B viola, risultato azzurro), più un caso concreto di scouting
+  var cA='#FF8C1A', fA='rgba(255,140,26,.22)', cB='#8250DC', fB='rgba(130,80,220,.2)', cR='#2FB6E6', fR='rgba(47,182,230,.35)';
+  function gpDia(left, right, lt, rt, cap){
+    var lab=function(t){ return '<text x="55" y="97" text-anchor="middle" font-size="10" fill="currentColor" opacity=".75">'+t+'</text>'; };
+    return '<figure class="gpdia"><svg viewBox="0 0 270 100" role="img" aria-label="'+cap+'">'+left+lab(lt)
+      +'<path d="M122 50h24m-6-5 6 5-6 5" fill="none" stroke="currentColor" stroke-width="1.6" opacity=".55"/>'
+      +'<g transform="translate(160,0)">'+right+lab(rt)+'</g></svg><figcaption>'+cap+'</figcaption></figure>'; }
+  var sA=' fill="'+fA+'" stroke="'+cA+'" stroke-width="2"', sR=' fill="'+fR+'" stroke="'+cR+'" stroke-width="2"';
+  var P1='30,30 70,24 82,58 40,66', L1='12,72 42,40 72,56 102,26';
+  var halo=function(el,w){ return '<g opacity=".4">'+el.replace('/>',' fill="'+cR+'" stroke="'+cR+'" stroke-width="'+w+'" stroke-linejoin="round" stroke-linecap="round"/>')+'</g>'; };
+  var DIA={
+    bufArea: gpDia('<polygon points="'+P1+'"'+sA+'/>', halo('<polygon points="'+P1+'"/>',24)+'<polygon points="'+P1+'"'+sA+'/>',
+      'A: un\'area', 'buffer', 'Intorno a un\'area: la stessa forma, allargata'),
+    bufLine: gpDia('<polyline points="'+L1+'" fill="none" stroke="'+cA+'" stroke-width="2.5"/>',
+      halo('<polyline points="'+L1+'" fill="none"/>',22)+'<polyline points="'+L1+'" fill="none" stroke="'+cA+'" stroke-width="2.5"/>',
+      'A: una linea', 'buffer', 'Intorno a una linea: un corridoio'),
+    union: gpDia('<rect x="22" y="22" width="45" height="38"'+sA+'/><rect x="50" y="38" width="45" height="38"'+sA+'/>',
+      '<path d="M22 22H67V38H95V76H50V60H22Z"'+sR+'/>', 'A: due aree', 'Unisci', 'Due aree che si toccano diventano una sola'),
+    hull: gpDia('<rect x="20" y="30" width="15" height="15"'+sA+'/><rect x="70" y="20" width="15" height="15"'+sA+'/><rect x="55" y="60" width="15" height="15"'+sA+'/><circle cx="30" cy="66" r="8"'+sA+'/>',
+      '<polygon points="20,30 70,20 85,20 85,35 70,75 55,75 30,74 24.3,71.7 22,66 20,45"'+sR+'/><rect x="20" y="30" width="15" height="15"'+sA+'/><rect x="70" y="20" width="15" height="15"'+sA+'/><rect x="55" y="60" width="15" height="15"'+sA+'/><circle cx="30" cy="66" r="8"'+sA+'/>',
+      'A: aree sparse', 'Contorno', 'Un elastico teso intorno a tutte le aree'),
+    simp: (function(){ var J='20,42 26,33 31,37 37,25 43,31 49,22 56,29 63,21 71,28 79,22 88,36 84,45 91,53 83,59 87,69 75,67 67,75 59,69 49,77 41,69 31,73 27,63 18,57 23,49',
+        S='20,42 49,22 79,22 90,48 86,69 58,72 31,73 18,57';
+        var dots=function(pts,c){ return pts.split(' ').map(function(p){ var q=p.split(','); return '<circle cx="'+q[0]+'" cy="'+q[1]+'" r="1.8" fill="'+c+'"/>'; }).join(''); };
+        return gpDia('<polygon points="'+J+'"'+sA+'/>'+dots(J,cA), '<polygon points="'+S+'"'+sR+'/>'+dots(S,cR),
+          'A: 24 vertici', 'Semplifica: 8', 'Stessa forma, molti meno vertici'); })(),
+    clip: gpDia('<polygon points="15,50 30,20 80,18 100,45 85,78 35,80"'+sA+'/><rect x="55" y="10" width="50" height="74" fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="4 3"/>',
+      '<polygon points="15,50 30,20 80,18 100,45 85,78 35,80" fill="none" stroke="'+cA+'" stroke-width="1.2" stroke-dasharray="3 3" opacity=".6"/><polygon points="55,19 80,18 100,45 85,78 55,79.2"'+sR+'/><rect x="55" y="10" width="50" height="74" fill="none" stroke="currentColor" stroke-width="1" stroke-dasharray="4 3" opacity=".45"/>',
+      'A e l\'area disegnata', 'Ritaglia', 'Resta solo la parte di A dentro l\'area tratteggiata'),
+    inter: gpDia('<circle cx="45" cy="48" r="28"'+sA+'/><circle cx="70" cy="48" r="28" fill="'+fB+'" stroke="'+cB+'" stroke-width="2"/><text x="31" y="52" font-size="11" font-weight="700" fill="'+cA+'">A</text><text x="79" y="52" font-size="11" font-weight="700" fill="'+cB+'">B</text>',
+      '<circle cx="45" cy="48" r="28" fill="none" stroke="'+cA+'" stroke-width="1.2" stroke-dasharray="3 3" opacity=".7"/><circle cx="70" cy="48" r="28" fill="none" stroke="'+cB+'" stroke-width="1.2" stroke-dasharray="3 3" opacity=".7"/><path d="M57.5 22.95A28 28 0 0 1 57.5 73.05A28 28 0 0 1 57.5 22.95Z"'+sR+'/>',
+      'A e B', 'Parte comune', 'Solo dove A e B si sovrappongono'),
+    diff: gpDia('<circle cx="45" cy="48" r="28"'+sA+'/><circle cx="70" cy="48" r="28" fill="'+fB+'" stroke="'+cB+'" stroke-width="2"/><text x="31" y="52" font-size="11" font-weight="700" fill="'+cA+'">A</text><text x="79" y="52" font-size="11" font-weight="700" fill="'+cB+'">B</text>',
+      '<circle cx="70" cy="48" r="28" fill="none" stroke="'+cB+'" stroke-width="1.2" stroke-dasharray="3 3" opacity=".7"/><path d="M57.5 22.95A28 28 0 1 0 57.5 73.05A28 28 0 0 1 57.5 22.95Z"'+sR+'/>',
+      'A e B', 'Sottrai B da A', 'A senza la parte coperta da B')
+  };
+  var GP_INFO={
+    gpA:{t:'Scegli gli oggetti', s:'Gli oggetti in A sono quelli su cui lavorano le operazioni.', h:
+      '<h3>Tre modi per riempire A</h3><ul>'
+      +'<li><b>👆 Dalla mappa</b>: clicchi gli oggetti sulla mappa. Valgono particelle, disegni, risultati, e anche gli elementi dei layer della mappa (vincoli, aree AREAS, servizi aggiunti), che copio negli Importati. Un secondo clic sullo stesso oggetto lo toglie; se più oggetti sono uno sopra l\'altro, cliccando ancora nello stesso punto passi a quello sotto. Esc per finire.</li>'
+      +'<li><b>☑ Spuntati</b>: prende le righe che hai spuntato nell\'<b>Elenco</b> (la casella a sinistra di ogni riga).</li>'
+      +'<li><b>＋ Categoria</b>: aggiunge in un colpo tutte le particelle, tutti i disegni, tutti i risultati o tutti gli importati.</li></ul>'
+      +'<h3>Esempio</h3><p>Vuoi una fascia di 150 m intorno a tre particelle: premi <b>👆 Dalla mappa</b> e clicca le tre particelle. Poi, nella sezione <b>Buffer</b>, scrivi 150 e premi <b>Crea buffer</b>.</p>'
+      +'<h3>Da sapere</h3><ul>'
+      +'<li>Sulla mappa gli oggetti in A hanno un contorno <b style="color:#FF8C1A">arancione</b> tratteggiato, quelli in B <b style="color:#8250DC">viola</b>.</li>'
+      +'<li>La <b>×</b> su un oggetto lo toglie da A, quella in alto svuota A. Gli oggetti restano comunque nell\'Elenco.</li>'
+      +'<li>I layer WMS sono solo immagini: i loro elementi non si possono scegliere.</li></ul>'},
+    gpBuf:{t:'Buffer', s:'Una fascia di una certa larghezza intorno agli oggetti di A.', h:
+      '<h3>Esempio</h3>'+DIA.bufArea+DIA.bufLine
+      +'<p>Hai disegnato un <b>elettrodotto</b>: un buffer di 150 m ti dà la fascia di rispetto. Poi, in <b>Ricerca particelle › Da un disegno esistente</b>, scegli il buffer e trovi tutte le particelle che la toccano.</p>'
+      +'<h3>Come si usa</h3><ol><li>Metti in A gli oggetti: punti, linee o aree.</li><li>Scrivi la larghezza in metri e premi <b>Crea buffer</b>.</li></ol>'
+      +'<h3>Da sapere</h3><ul>'
+      +'<li>Con la spunta <b>Uno per ogni oggetto</b> ottieni un buffer per ciascuno; senza, un\'unica fascia che li comprende tutti.</li>'
+      +'<li>La distanza è misurata sul terreno, non sulla carta.</li>'
+      +'<li>Il risultato va nell\'<b>Elenco</b>, sezione <b>Geoprocessi</b>, con la sua superficie.</li>'
+      +'<li>Un oggetto molto dettagliato (oltre 5.000 vertici) viene prima semplificato, per non bloccare il browser; te lo dico nel messaggio.</li></ul>'},
+    gpShape:{t:'Unisci, contorna, semplifica', s:'Tre modi di ottenere una nuova area dalle aree di A.', h:
+      '<h3>Unisci</h3>'+DIA.union+'<p>Fonde tutte le aree di A in una sola. Esempio: tre <b>particelle confinanti</b> diventano un unico lotto, con la superficie totale.</p>'
+      +'<h3>Contorno</h3>'+DIA.hull+'<p>Il perimetro più stretto e senza rientranze che racchiude tutte le aree di A (in GIS: inviluppo convesso). Esempio: l\'<b>ingombro</b> di un gruppo di particelle sparse.</p>'
+      +'<h3>Semplifica</h3>'+DIA.simp+'<p>Unisce le aree di A e toglie i dettagli sotto i 20 m circa. Esempio: un\'area importata con <b>migliaia di vertici</b> diventa più leggera da esportare o promuovere.</p>'
+      +'<h3>Da sapere</h3><ul><li>Lavorano sulle <b>aree</b>: linee e punti vengono ignorati. Per usarli, fai prima un buffer.</li>'
+      +'<li>Il risultato va nell\'<b>Elenco</b>, sezione <b>Geoprocessi</b>.</li></ul>'},
+    gpClip:{t:'Ritaglia', s:'Tieni solo la parte di A che sta dentro un\'area disegnata al momento.', h:
+      '<h3>Esempio</h3>'+DIA.clip
+      +'<p>Un <b>vincolo</b> copre un territorio molto più grande del tuo sito: ritaglialo sull\'area del progetto e sai quanta parte ti riguarda, con la superficie.</p>'
+      +'<h3>Come si usa</h3><ol><li>Metti in A le aree da ritagliare.</li><li>Premi <b>Disegna l\'area e ritaglia</b> e disegna sulla mappa: un clic per ogni vertice, doppio clic per finire.</li></ol>'
+      +'<h3>Da sapere</h3><ul><li>Le aree di A vengono prima unite: il risultato è un\'unica area.</li>'
+      +'<li>Per ritagliare con un\'area che hai già (una particella, un buffer…), mettila in B e usa <b>Parte comune</b>.</li></ul>'},
+    gpAB:{t:'Confronta A con B', s:'Due gruppi di oggetti: dove si sovrappongono, o cosa resta di A togliendo B.', h:
+      '<h3>Parte comune</h3>'+DIA.inter
+      +'<p>L\'area dove A e B si sovrappongono (in GIS: intersect). Esempio: A = le <b>particelle</b> del progetto, B = un\'<b>area vincolata</b>: ottieni la parte delle particelle che ricade nel vincolo, con la sua superficie.</p>'
+      +'<h3>Sottrai B da A</h3>'+DIA.diff
+      +'<p>A senza le parti coperte da B (in GIS: difference). Esempio: A = il <b>lotto</b>, B = il buffer di un <b>elettrodotto</b>: ottieni la superficie davvero utilizzabile.</p>'
+      +'<h3>Come si usa</h3><ol><li>Riempi A (prima sezione) e B (in questa sezione) negli stessi tre modi: 👆 Dalla mappa, ☑ Spuntati, ＋ Categoria.</li>'
+      +'<li>Premi <b>Parte comune</b> oppure <b>Sottrai B da A</b>.</li></ol>'
+      +'<h3>Da sapere</h3><ul><li>Le aree di A vengono unite tra loro, e così quelle di B: il risultato è un\'unica area.</li>'
+      +'<li>Lavorano sulle <b>aree</b>: una linea o un punto va prima trasformato con un buffer.</li>'
+      +'<li>Il risultato va nell\'<b>Elenco</b>, sezione <b>Geoprocessi</b>, e si può rimettere in A o in B per continuare.</li></ul>'}
+  };
+  function impInfo(k){ var d=IMP_INFO[k]||GP_INFO[k], m=$g('infoModal'); if(!d||!m) return;
+    $g('infoTitle').textContent=d.t; $g('infoSub').textContent=d.s; $g('infoBody').innerHTML=d.h;
+    m.style.display='flex'; var c=$g('infoClose'); if(c) c.focus(); }
+  function impInfoClose(){ var m=$g('infoModal'); if(m) m.style.display='none'; }
+  if($g('infoClose')) $g('infoClose').onclick=impInfoClose;
+  // sezioni aperte/chiuse di Importa dati e Geoprocessi (la chiave vecchia era solo di Importa dati)
+  var IMP_KEY='axpo_sezioni_aperte', impSecs=Array.prototype.slice.call(document.querySelectorAll('details.imod'));
+  try{ var sv=JSON.parse(localStorage.getItem(IMP_KEY)||localStorage.getItem('axpo_import_aperte')||'null');
+    if(sv&&typeof sv==='object') impSecs.forEach(function(d){ if(d.id in sv) d.open=!!sv[d.id]; }); }catch(e){}
+  function impSave(){ try{ var o={}; impSecs.forEach(function(d){ o[d.id]=d.open; }); localStorage.setItem(IMP_KEY, JSON.stringify(o)); }catch(e){} }
+  impSecs.forEach(function(d){ d.addEventListener('toggle', impSave); });
+  // la «i» sta nel titolo della sezione: il clic apre la spiegazione e non apre/chiude la sezione
+  Array.prototype.forEach.call(document.querySelectorAll('.imod .im-info'), function(b){
+    b.addEventListener('click', function(e){ e.preventDefault(); e.stopPropagation(); impInfo(b.dataset.info); }); });
+  // apre la sezione di un modulo quando è il codice a portarci lì (un DWG scelto con «Scegli file», uno shapefile senza .prj…)
+  window.impOpen=function(id){ var d=$g(id); if(d&&!d.open){ d.open=true; impSave(); } };
+  window.impInfo=impInfo;
+
   /* 6a ── click sul backdrop chiude (riusa i pulsanti esistenti) */
-  [['exportModal','exCancel'],['promoteModal','pmCancel'],['snModal','snCancel'],['helpModal','helpClose'],['cadModal','cadCancel']].forEach(function(p){
+  [['exportModal','exCancel'],['promoteModal','pmCancel'],['snModal','snCancel'],['helpModal','helpClose'],['cadModal','cadCancel'],['infoModal','infoClose']].forEach(function(p){
     var el=$g(p[0]); if(!el) return;
     el.addEventListener('click',function(e){ if(e.target===el){ var b=$g(p[1]); if(b) b.click(); else el.style.display='none'; } });
   });
@@ -4344,7 +5356,8 @@ function baseGroundSet(){
   /* 6b ── Esc: modali → drawer → modalità */
   document.addEventListener('keydown',function(e){
     if(e.key!=='Escape') return;
-    var hm=$g('helpModal'), em=$g('exportModal'), pm=$g('promoteModal');
+    var hm=$g('helpModal'), em=$g('exportModal'), pm=$g('promoteModal'), im=$g('infoModal');
+    if(im&&im.style.display==='flex'){ im.style.display='none'; return; }
     if(hm&&hm.style.display==='flex'){ hm.style.display='none'; return; }
     if(em&&getComputedStyle(em).display==='flex'){ $g('exCancel').click(); return; }
     if(pm&&getComputedStyle(pm).display==='flex'){ $g('pmCancel').click(); return; }
@@ -4416,20 +5429,22 @@ function baseGroundSet(){
     {sel:'#step2', title:'3 · Ricerca particelle', body:"Cerca per Foglio/Particella, oppure attiva la selezione su mappa (punto, rettangolo, poligono, linea). Puoi anche partire da un disegno esistente.", open:function(){openTab('ricerca');}, placement:'right'},
     {sel:'#drawerElenco', title:'4 · Elenco & azioni', body:"Tutto ciò che raccogli finisce qui, diviso in <b>Particelle · Disegni · Geoprocessi · Importati</b>. Ogni riga si rinomina, si colora, si nasconde, si zooma — e la <b>casella a sinistra</b> la seleziona per usarla nei geoprocessi.", open:function(){openDrawer('elenco');}, placement:'left'},
     {sel:'.colbtns', title:'5 · Esporta e promuovi', body:"Esporta in GeoJSON/KML/KMZ/SHP/XLSX, oppure promuovi in <b>AREAS COLLECTION</b> o <b>Sites Notes</b>.", open:function(){openDrawer('elenco');}, placement:'left'},
+    {sel:'#projSaveBtn', title:'6 · Salva il progetto', body:"<b>Salva progetto</b> mette tutto il lavoro in un file .axpo, come un progetto QGIS: mappa e layer, particelle, disegni, import, anche <b>DWG e immagini</b> già posizionati. Con <b>Apri progetto</b> lo ritrovi com'era, o lo passi a un collega. <kbd>Ctrl</kbd>+<kbd>S</kbd> risalva.", placement:'below'},
     {title:'Pronto!', body:"Questo è il flusso base. Riapri i tour quando vuoi dal <b>?</b> in alto a destra. Per gli strumenti avanzati, prova il tour <i>Tutti gli strumenti</i>."}
   ];
   var TOUR_ALL=[
     {sel:'#sideRail', title:'Le schede a sinistra', body:"Il rail di icone: Ricerca, Disegno, Geoprocessi, Contesto sito, Import. Cliccando l'icona già attiva, la sidebar si comprime a colonna.", placement:'right'},
     {sel:'.tabpane[data-tab=disegno]', title:'Disegno', body:"Punti, linee e aree con categoria e nota. Avanzati: <b>snapping</b>, <b>rettangolo/cerchio</b>, <b>quote distanza/angolo</b> con input digitato (90° = perpendicolare).", open:function(){openTab('disegno');}, placement:'right'},
-    {sel:'.tabpane[data-tab=geoproc]', title:'Geoprocessi', body:"Due slot, <b>A</b> e <b>B</b>, contengono gli <b>oggetti</b> su cui lavorare: li scegli cliccandoli sulla mappa (👆), prendendo le righe spuntate nell'elenco (☑) o aggiungendo una categoria intera. Su A: <b>Buffer</b> (anche uno per oggetto), Union, Convex hull, Simplify, Clip; tra A e B: Intersect e Difference. Ogni risultato finisce in <b>Geoprocessi</b> con la sua area, e si può rimettere in A o in B.", open:function(){openTab('geoproc');}, placement:'right'},
+    {sel:'.tabpane[data-tab=geoproc]', title:'Geoprocessi', body:"Si lavora in due passi. Prima scegli gli <b>oggetti</b> e mettili in <b>A</b>: cliccandoli sulla mappa (👆), dalle righe spuntate nell'elenco (☑) o per categoria. Poi scegli l'operazione: <b>Buffer</b>; <b>Unisci</b>, <b>Contorno</b>, <b>Semplifica</b>; <b>Ritaglia</b> con un'area disegnata; oppure confronta A con <b>B</b> (<b>Parte comune</b>, <b>Sottrai B da A</b>). La <b>i</b> di ogni sezione mostra un esempio disegnato. I risultati vanno nell'Elenco, sezione Geoprocessi.", open:function(){openTab('geoproc');}, placement:'right'},
     {sel:'.tabpane[data-tab=contesto]', title:'Contesto sito', body:"Attiva e clicca un punto sulla mappa: trovi sottostazioni, linea AT e progetti FV vicini.", open:function(){openTab('contesto');}, placement:'right'},
-    {sel:'.tabpane[data-tab=import]', title:'Import file esterni', body:"Carica GeoJSON, KML, KMZ, Shapefile e immagini/GeoTIFF georeferenziate, con gli angoli trascinabili per posizionarle. Un file senza sistema di riferimento non viene piazzato a caso: ti propongo i sistemi possibili e scegli tu.", open:function(){openTab('import');}, placement:'right'},
-    {sel:'#impCadBtn', title:'Disegni CAD (DWG)', body:"Carica un <b>DWG</b>: viene letto nel browser, senza uscire dal PC. Il <b>sistema di riferimento</b> è stimato dalle coordinate e lo confermi tu; layer e colori restano quelli del CAD, accendibili e ricolorabili dall'elenco sotto il pulsante. Se il disegno è in coordinate locali usa <b>📍 Posiziona a mano</b>: clicchi due punti del disegno e dove stanno davvero (si aggancia ai vertici di particelle, disegni e altri DWG). Il posizionamento viene ricordato per quel file.", open:function(){openTab('import');}, placement:'right'},
-    {sel:'#srFind', title:'Coordinate senza sistema', body:"Ti arrivano delle coordinate e non sai in che sistema sono — un decreto, un rilievo, una mail? Incollale qui: le provo nei sistemi usati in Italia (Gauss-Boaga, UTM, ED50…) e ti mostro <b>dove cadono</b>, anche con X e Y invertiti. Se sai già dove dovrebbero stare usa <b>📍 Dove dovrebbe stare</b>: clicchi il punto sulla mappa e i candidati vengono ordinati per <b>errore in metri</b>. Poi i punti (o l'area) finiscono negli Importati. Stessa strada per uno <b>shapefile senza .prj</b>: l'import lo passa qui.", open:function(){openTab('import');}, placement:'right'},
-    {sel:'#actionIcons', title:'Strumenti mappa e portale', body:"A destra: Elenco & azioni, Layer (anche dal portale), Basemap, Segnalibri, Modifica AREAS COLLECTION, Stampa.", placement:'left'},
+    {sel:'.tabpane[data-tab=import]', title:'Importa dati', body:"Cinque moduli, ognuno nella sua sezione: <b>file di geometrie</b> (GeoJSON, KML, KMZ, Shapefile), <b>disegni CAD</b>, <b>immagini</b>, <b>servizi web</b> (WMS, WFS, ArcGIS REST) e <b>coordinate senza sistema</b>. Clicca un titolo per aprirlo; la <b>i</b> spiega come funziona il modulo.", open:function(){openTab('import');}, placement:'right'},
+    {sel:'#impCadBtn', title:'Disegni CAD (DWG)', body:"Carica un <b>DWG</b>: viene letto nel browser, senza uscire dal PC. Il <b>sistema di riferimento</b> è stimato dalle coordinate e lo confermi tu; layer e colori restano quelli del CAD, accendibili e ricolorabili dall'elenco sotto il pulsante. Se il disegno è in coordinate locali usa <b>📍 Posiziona a mano</b>: clicchi due punti del disegno e dove stanno davvero (si aggancia ai vertici di particelle, disegni e altri DWG). Il posizionamento viene ricordato per quel file.", open:function(){openTab('import'); window.impOpen&&window.impOpen('impSecCad');}, placement:'right'},
+    {sel:'#srFind', title:'Coordinate senza sistema', body:"Ti arrivano delle coordinate e non sai in che sistema sono — un decreto, un rilievo, una mail? Incollale qui: le provo nei sistemi usati in Italia (Gauss-Boaga, UTM, ED50…) e ti mostro <b>dove cadono</b>, anche con X e Y invertiti. Se sai già dove dovrebbero stare usa <b>📍 Dove dovrebbe stare</b>: clicchi il punto sulla mappa e i candidati vengono ordinati per <b>errore in metri</b>. Poi i punti (o l'area) finiscono negli Importati. Stessa strada per uno <b>shapefile senza .prj</b>: l'import lo passa qui.", open:function(){openTab('import'); window.impOpen&&window.impOpen('impSecSr');}, placement:'right'},
+    {sel:'#actionIcons', title:'Strumenti mappa e portale', body:"A destra: Elenco & azioni, Layer (anche dal portale, con ricerca per nome e <b>filtro per attributo</b>; i layer aggiunti da te si tolgono dal menu …), Basemap, Segnalibri, Modifica AREAS COLLECTION, Stampa.", placement:'left'},
     {sel:'#trStack', title:'Ricerca e misura', body:"In alto a destra sulla mappa: la <b>ricerca</b> di indirizzi e coordinate — lat, lon, ma anche X Y in Gauss-Boaga o UTM, di cui indovina il sistema — e la <b>Misura</b> (distanza/area).", placement:'left'},
     {sel:'#brStack', title:'Scala e coordinate del puntatore', body:"In basso a destra: scalimetro e coordinate del puntatore; il <b>pin</b> fissa le coordinate del prossimo click.", placement:'left'},
     {sel:'#elevDock', title:'Profilo di elevazione', body:"In basso a sinistra: apri il profilo altimetrico del terreno lungo una linea.", placement:'right'},
+    {sel:'#projOpenBtn', title:'Progetti', body:"<b>Apri</b> e <b>Salva progetto</b>: un file .axpo con tutto il lavoro — vista, mappa e layer del portale con accensione, trasparenza e ordine, particelle, disegni, geoprocessi, import, DWG e immagini con il loro posizionamento. <kbd>Ctrl</kbd>+<kbd>S</kbd> risalva sullo stesso file, <kbd>Ctrl</kbd>+<kbd>Maiusc</kbd>+<kbd>S</kbd> salva con nome.", placement:'below'},
     {title:'Fine', body:"Hai visto tutti gli strumenti. Buon lavoro! Riapri i tour dal <b>?</b>."}
   ];
 
@@ -4487,7 +5502,7 @@ function baseGroundSet(){
     if($('helpMenu').style.display==='flex'){ $('helpMenu').style.display='none'; } });
 
   /* --- tooltip ricchi sulle icone delle due sidebar --- */
-  var RAIL_TIPS={ricerca:'Ricerca particelle — ambito e ricerca per foglio/particella',disegno:'Disegno — punti, linee, aree, forme, snapping, quote',geoproc:'Geoprocessi — buffer e operazioni (union, clip, intersect…)',contesto:'Contesto sito — sottostazioni, linea AT, progetti FV vicini',import:'Import — GeoJSON/KML/KMZ/SHP, immagini/GeoTIFF, disegni DWG e coordinate da incollare'};
+  var RAIL_TIPS={ricerca:'Ricerca particelle — ambito e ricerca per foglio/particella',disegno:'Disegno — punti, linee, aree, forme, snapping, quote',geoproc:'Geoprocessi — buffer e operazioni (union, clip, intersect…)',contesto:'Contesto sito — sottostazioni, linea AT, progetti FV vicini',import:'Importa dati — file di geometrie, disegni DWG, immagini, servizi web, coordinate da incollare'};
   var PANEL_TIPS={elenco:'Elenco & azioni — geometrie raccolte, export, promote',layers:'Layer in mappa e aggiunta dal portale',basemaps:'Mappa di base',bookmarks:'Segnalibri',edit:'Modifica AREAS COLLECTION',print:'Stampa'};
   Array.prototype.forEach.call(document.querySelectorAll('#sideRail button'), function(b){ var t=RAIL_TIPS[b.dataset.tab]; if(t){ b.setAttribute('data-tip',t); b.removeAttribute('title'); } });
   Array.prototype.forEach.call(document.querySelectorAll('#actionIcons button'), function(b){ var t=PANEL_TIPS[b.dataset.panel]; if(t){ b.setAttribute('data-tip',t); b.removeAttribute('title'); } });
