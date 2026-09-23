@@ -85,7 +85,6 @@
   [data-theme="dark"] .card{border-color:var(--line-strong)}
   [data-theme="dark"] .toast{border-color:var(--line-strong)}
   [data-theme="dark"] #list,[data-theme="dark"] #itemResults:not(:empty){border-color:var(--line-strong)}
-  [data-theme="dark"] .step>header h2{color:var(--txt)}
   [data-theme="dark"] code{background:#121D27;color:var(--txt)}
   [data-theme="dark"] .cswatch{border-color:var(--line-strong)}
 
@@ -126,11 +125,6 @@
   #sideHead{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--panel-head);border-bottom:1px solid var(--line-strong)}
   #sideHead b{font-size:11px;text-transform:uppercase;letter-spacing:.6px;color:var(--txt);font-weight:700}
   #sideToggle{background:var(--panel);border:1px solid var(--line);border-radius:6px;color:var(--txt);cursor:pointer;padding:4px 9px;font-size:13px}
-  .step{border-bottom:1px solid var(--line-strong)}
-  .step>header{display:flex;align-items:center;gap:9px;padding:11px 14px 6px}
-  .step>header .n{width:20px;height:20px;border-radius:50%;background:var(--axpo-gradient);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex:none}
-  .step>header h2{font-size:13px;margin:0}
-  .step-body{padding:2px 14px 13px}
   label,.lbl-block{display:block;font-size:11px;color:var(--mut);text-transform:uppercase;letter-spacing:.5px;margin:9px 0 4px;font-weight:600}
   select,input{width:100%;padding:8px 10px;background:var(--bg);border:1px solid var(--line);border-radius:6px;color:var(--txt);font-size:13px}
   select:disabled,input:disabled{opacity:.45}
@@ -191,7 +185,6 @@
   .drawer{display:none;padding:14px}
   .drawer.open{display:block}
   .tlab{font-size:11px;color:var(--txt);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;font-weight:700;opacity:.9}
-  .tlab2{display:block;font-size:10px;color:var(--mut);text-transform:uppercase;letter-spacing:.4px;margin-bottom:3px}
   .drawer .btns{display:flex;gap:6px;flex-wrap:wrap;margin-top:0}
   .drawer .btns button{flex:1;min-width:64px}
   .thint{color:var(--mut);font-size:11px;margin-top:6px;line-height:1.35}
@@ -410,6 +403,22 @@
   .gpslot.gpB+.gpop{margin-top:10px}
   .imod .chk{font-weight:400;font-size:12px;margin-top:8px;align-items:flex-start;line-height:1.35}   /* non il grassetto delle etichette */
   .imod .chk input{margin-top:1px}
+  /* schede Ricerca e Disegno: stesse sezioni */
+  .imod .im-body>label:first-child{margin-top:2px}
+  .imod .im-n.im-txt{max-width:96px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600}
+  .drwgrid{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}   /* 3 pulsanti sopra, 2 sotto */
+  .drwgrid button{grid-column:span 2;margin:0;padding:7px 4px;white-space:nowrap}
+  .drwgrid button:nth-child(n+4){grid-column:span 3}
+  .lbl-opt{text-transform:none;letter-spacing:0;font-weight:400}
+  .drwundo{display:flex;gap:6px;margin-top:6px}
+  .drwundo button{flex:1;margin:0;padding:5px 4px;font-size:12px}
+  .shprot{display:flex;gap:6px;align-items:stretch}
+  .shprot input{flex:1;min-width:0}
+  .shprot button{flex:0 0 auto;margin:0;padding:5px 9px;white-space:nowrap}
+  #shpKind{margin-bottom:2px}
+  #shpPlace{margin-top:10px}
+  .gpbuf span{line-height:1.25}
+  #drwClear{margin-top:2px}
   /* esempi «prima → dopo» nella finestra «i» dei geoprocessi */
   .gpdia{margin:4px 0 8px;padding:8px 6px 4px;border:1px solid var(--line);border-radius:8px;background:var(--hover)}
   .gpdia svg{display:block;width:100%;height:auto;max-height:110px}
@@ -526,72 +535,143 @@
     <div id="sideHead"><b id="sideTitle">Ricerca particelle</b><button id="sideToggle" aria-label="Comprimi pannello" title="Comprimi">«</button></div>
     <div id="authTodo" class="warn" style="display:none"></div>
 
-    <div class="tabpane active" data-tab="ricerca">
-    <section class="step" id="step1">
-      <header><span class="n">1</span><h2>Area di lavoro</h2></header>
-      <div class="step-body">
-        <label for="reg">Regione</label>
-        <select id="reg"><option value="">— seleziona —</option></select>
-        <label for="prov">Provincia</label>
-        <select id="prov" disabled><option value="">—</option></select>
-        <label for="com">Comune</label>
-        <select id="com" disabled><option value="">—</option></select>
-        <div id="cvNote" class="hint"></div>
-      </div>
-    </section>
-
-    <section class="step" id="step2">
-      <header><span class="n">2</span><h2>Ricerca particelle</h2></header>
-      <div class="step-body">
-        <div class="row">
-          <div><label for="fog">Foglio</label><input id="fog" placeholder="es. 1"></div>
-          <div><label for="par">Particelle</label><input id="par" placeholder="es. 1, 2, 3"></div>
-        </div>
-        <div class="hint">Una o più particelle, separate da virgola o spazio.</div>
-        <button id="go" class="primary" disabled>Aggiungi all'elenco</button>
-        <label class="lbl-block">Selezione su mappa</label>
-        <div class="segbtns" id="selModeBox">
-          <button data-m="point">👆 Puntuale</button>
-          <button data-m="rectangle">▭ Rettangolo</button>
-          <button data-m="polygon">⬠ Poligono</button>
-          <button data-m="polyline">╱ Linea</button>
-        </div>
-        <div class="hint" id="selHint">Nessuna modalità attiva: i click aprono i popup. Clicca un pulsante per attivare (di nuovo per disattivare).</div>
-        <label class="lbl-block">Da un disegno esistente</label>
-        <div class="row" style="align-items:flex-end">
-          <div style="flex:2"><select id="selFromDraw"><option value="">— nessun disegno —</option></select></div>
-          <div style="flex:0 0 auto"><button class="sec" id="selDrawGo" disabled style="margin-top:0">Cerca</button></div>
-        </div>
-        <div class="hint">Usa la geometria di un disegno/buffer per trovare le particelle che interseca.</div>
+    <div class="tabpane active" data-tab="ricerca"><div class="paneBody">
+        <!-- Come Importa dati e Geoprocessi: prima dove, poi uno dei tre modi di cercare. Titolo + una riga per
+             sezione; gli esempi (con disegni prima → dopo) stanno nella finestra «i» (RC_INFO nello script). -->
+        <details class="imod" id="rcSecArea" open>
+          <summary><span class="im-ico" aria-hidden="true">📍</span><span class="im-t"><b>Dove cerchi</b><small>Regione, provincia e comune</small></span>
+            <span class="im-n im-txt" id="rcSumArea"></span><button type="button" class="im-info" data-info="rcArea" title="Come funziona" aria-label="Come funziona la scelta del comune">i</button></summary>
+          <div class="im-body">
+            <label for="reg">Regione</label>
+            <select id="reg"><option value="">— seleziona —</option></select>
+            <label for="prov">Provincia</label>
+            <select id="prov" disabled><option value="">—</option></select>
+            <label for="com">Comune</label>
+            <select id="com" disabled><option value="">—</option></select>
+            <div id="cvNote" class="hint"></div>
+          </div>
+        </details>
+        <details class="imod" id="rcSecFP" open>
+          <summary><span class="im-ico" aria-hidden="true">🔢</span><span class="im-t"><b>Foglio e particella</b><small>Se conosci i numeri catastali</small></span></summary>
+          <div class="im-body">
+            <div class="row">
+              <div><label for="fog">Foglio</label><input id="fog" placeholder="es. 1"></div>
+              <div><label for="par">Particelle</label><input id="par" placeholder="es. 1, 2, 3"></div>
+            </div>
+            <div class="hint">Una o più, separate da virgola o spazio. Serve il comune, qui sopra.</div>
+            <button id="go" class="primary" disabled>Aggiungi all'elenco</button>
+          </div>
+        </details>
+        <details class="imod" id="rcSecMap">
+          <summary><span class="im-ico" aria-hidden="true">👆</span><span class="im-t"><b>Sulla mappa</b><small>Clicca o disegna sopra le particelle che vuoi</small></span>
+            <button type="button" class="im-info" data-info="rcMap" title="Come funziona, con un esempio" aria-label="Come funziona la selezione sulla mappa">i</button></summary>
+          <div class="im-body">
+            <div class="segbtns" id="selModeBox">
+              <button data-m="point">👆 Puntuale</button>
+              <button data-m="rectangle">▭ Rettangolo</button>
+              <button data-m="polygon">⬠ Poligono</button>
+              <button data-m="polyline">╱ Linea</button>
+            </div>
+            <div class="hint" id="selHint">Scegli un modo, poi lavora sulla mappa. Di nuovo sul pulsante, o Esc, per smettere.</div>
+          </div>
+        </details>
+        <details class="imod" id="rcSecDraw">
+          <summary><span class="im-ico" aria-hidden="true">✏️</span><span class="im-t"><b>Da un disegno</b><small>Le particelle toccate da un disegno, un buffer o un file</small></span>
+            <span class="im-n" id="rcNDraw"></span><button type="button" class="im-info" data-info="rcDraw" title="Come funziona, con un esempio" aria-label="Come funziona la ricerca da un disegno">i</button></summary>
+          <div class="im-body">
+            <div class="row" style="align-items:flex-end">
+              <div style="flex:2"><select id="selFromDraw" aria-label="Disegno da usare"><option value="">— nessun disegno —</option></select></div>
+              <div style="flex:0 0 auto"><button class="sec" id="selDrawGo" disabled style="margin-top:0">Cerca</button></div>
+            </div>
+          </div>
+        </details>
         <div id="out" hidden></div>
-      </div>
-    </section>
-
-    </div>
+    </div></div>
 
     <div class="tabpane" data-tab="disegno"><div class="paneBody">
-        <div class="tlab">Strumenti di disegno</div>
-        <div class="btns">
-          <button class="sec" id="drwPoint">• Punto</button>
-          <button class="sec" id="drwLine">╱ Linea</button>
-          <button class="sec" id="drwArea">▱ Area</button>
-        </div>
-        <label class="tlab2" style="margin-top:9px">Categoria</label>
-        <select id="drwCat"><option value="">— scegli prima il tipo —</option></select>
-        <label class="tlab2" style="margin-top:7px">Nota (facoltativa)</label>
-        <input id="drwNote" placeholder="testo libero…">
-        <div class="btns" style="margin-top:8px"><button class="sec" id="drwClear">Pulisci disegni</button></div>
-        <div id="drwMsg" class="thint">I disegni sono locali (come i buffer) ed esportabili.</div>
-        <div id="advDrawBox">
-          <div class="tlab2" style="margin-top:12px">Forme</div>
-          <div class="btns">
-            <button class="sec" id="drwRect">▭ Rettangolo</button>
-            <button class="sec" id="drwCircle">◯ Cerchio</button>
+        <!-- Come le altre schede: titolo + una riga per sezione, gli esempi nella finestra «i» (DRW_INFO nello script) -->
+        <details class="imod" id="drwSecDraw" open>
+          <summary><span class="im-ico" aria-hidden="true">✏️</span><span class="im-t"><b>Disegna sulla mappa</b><small>Punti, linee e aree, con categoria e nota</small></span>
+            <span class="im-n" id="drwNSum"></span><button type="button" class="im-info" data-info="drwDraw" title="Come funziona, con un esempio" aria-label="Come si disegna">i</button></summary>
+          <div class="im-body">
+            <div class="drwgrid">
+              <button class="sec" id="drwPoint">• Punto</button>
+              <button class="sec" id="drwLine">╱ Linea</button>
+              <button class="sec" id="drwArea">▱ Area</button>
+              <button class="sec" id="drwRect">▭ Rettangolo</button>
+              <button class="sec" id="drwCircle">◯ Cerchio</button>
+            </div>
+            <div class="drwundo">
+              <button class="sec" id="drwUndo" disabled title="Annulla l'ultima modifica a disegni, buffer, risultati e importati (Ctrl+Z)">↶ Annulla</button>
+              <button class="sec" id="drwRedo" disabled title="Rifai ciò che hai annullato (Ctrl+Y)">↷ Ripeti</button>
+            </div>
+            <label for="drwCat">Categoria</label>
+            <select id="drwCat"><option value="">— scegli prima cosa disegnare —</option></select>
+            <label for="drwNote">Nota <span class="lbl-opt">(facoltativa)</span></label>
+            <input id="drwNote" placeholder="testo libero…">
+            <div id="drwMsg" class="thint">Scegli cosa disegnare, poi clicca sulla mappa. I disegni vanno nell'<b>Elenco</b>, sezione <b>Disegni</b>.</div>
           </div>
-          <label class="chk" style="margin-top:9px"><input type="checkbox" id="drwSnap" checked> Snapping (vertici + geometrie)</label>
-          <label class="chk"><input type="checkbox" id="drwTip" checked> Quote distanza/angolo + input digitato</label>
-          <div class="thint">Mentre disegni, digita un valore per fissare distanza/angolo (90° = perpendicolare); Tab per cambiare campo.</div>
-        </div>
+        </details>
+        <details class="imod" id="drwSecShape">
+          <summary><span class="im-ico" aria-hidden="true">📐</span><span class="im-t"><b>Forme con misure</b><small>Rettangoli e cerchi di misura esatta, messi con un clic</small></span>
+            <button type="button" class="im-info" data-info="drwShape" title="Come funziona, con un esempio" aria-label="Come funzionano le forme con misure">i</button></summary>
+          <div class="im-body">
+            <div class="segbtns" id="shpKind">
+              <button type="button" data-k="rect" class="active">▭ Rettangolo</button>
+              <button type="button" data-k="circle">◯ Cerchio</button>
+            </div>
+            <div id="shpRectBox">
+              <div class="row">
+                <div><label for="shpW">Larghezza (m)</label><input id="shpW" type="number" min="0" step="any" value="100"></div>
+                <div><label for="shpH">Altezza (m)</label><input id="shpH" type="number" min="0" step="any" value="50"></div>
+              </div>
+              <label for="shpRot">Orientamento della larghezza (azimut, °)</label>
+              <div class="shprot"><input id="shpRot" type="number" step="any" value="90">
+                <button type="button" class="sec" id="shpRotPick" title="Clicca un lato sulla mappa (disegno, particella, DWG, layer): la larghezza gli diventa parallela">∥ Da un lato</button></div>
+            </div>
+            <div id="shpCircleBox" hidden>
+              <label for="shpR">Raggio (m)</label><input id="shpR" type="number" min="0" step="any" value="50">
+            </div>
+            <button type="button" class="sec im-main" id="shpPlace">📍 Posiziona sulla mappa</button>
+            <div id="shpMsg" class="thint">Poi clicca dove va il centro. Prende la categoria e la nota qui sopra.</div>
+          </div>
+        </details>
+        <details class="imod" id="drwSecOff">
+          <summary><span class="im-ico" aria-hidden="true"><svg viewBox="0 0 20 20" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M3 13 9 7h8"/><path d="M3 17.5 10 10.5h7" stroke-dasharray="2.2 2"/></svg></span>
+            <span class="im-t"><b>Copia parallela</b><small>Una linea o un'area a distanza fissa da un'altra</small></span>
+            <button type="button" class="im-info" data-info="drwOffset" title="Come funziona, con un esempio" aria-label="Come funziona la copia parallela">i</button></summary>
+          <div class="im-body">
+            <div class="gpbuf"><input id="offDist" type="number" value="10" min="0" step="any" aria-label="Distanza della copia in metri"><span>metri</span>
+              <button type="button" class="sec" id="offPick">∥ Scegli e copia</button></div>
+            <label class="chk"><input type="checkbox" id="offEdge"> Solo il lato cliccato (senza spunta: tutto l'oggetto)</label>
+            <div id="offMsg" class="thint">Clicca un oggetto, poi dalla parte dove vuoi la copia.</div>
+          </div>
+        </details>
+        <details class="imod" id="drwSecAid">
+          <summary><span class="im-ico" aria-hidden="true">📏</span><span class="im-t"><b>Misure esatte e aggancio</b><small>Lunghezze e angoli scritti a mano, aggancio ai vertici</small></span>
+            <button type="button" class="im-info" data-info="drwAid" title="Come funziona, con un esempio" aria-label="Come funzionano misure e aggancio">i</button></summary>
+          <div class="im-body">
+            <label class="chk"><input type="checkbox" id="drwSnap" checked> Aggancia ai vertici e ai bordi di disegni e particelle</label>
+            <label class="chk"><input type="checkbox" id="drwSnapLayers" checked> …e anche dei DWG e dei layer vettoriali accesi</label>
+            <label class="chk"><input type="checkbox" id="drwTip" checked> Mostra lunghezze e angoli mentre disegni, e fammeli scrivere</label>
+            <label for="drwDir">Angoli</label>
+            <select id="drwDir"><option value="relative">Rispetto al lato precedente (deflezione)</option><option value="absolute">Da nord, in senso orario (azimut)</option></select>
+          </div>
+        </details>
+        <details class="imod" id="drwSecGrid">
+          <summary><span class="im-ico" aria-hidden="true"><svg viewBox="0 0 20 20" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M2 6.5h16M2 13.5h16M6.5 2v16M13.5 2v16"/></svg></span>
+            <span class="im-t"><b>Griglia</b><small>Una griglia in metri su cui agganciare, anche ruotata</small></span>
+            <button type="button" class="im-info" data-info="drwGrid" title="Come funziona, con un esempio" aria-label="Come funziona la griglia">i</button></summary>
+          <div class="im-body">
+            <label class="chk" style="margin-top:0"><input type="checkbox" id="grdOn"> Mostra la griglia</label>
+            <div class="gpbuf" style="margin-top:8px"><input id="grdStep" type="number" value="10" min="0" step="any" aria-label="Passo della griglia in metri"><span>metri tra una linea e l'altra</span></div>
+            <label class="chk"><input type="checkbox" id="grdSnap" checked> Aggancia alla griglia</label>
+            <div class="btns"><button type="button" class="sec" id="grdAlign" title="Clicca due punti lungo un lato: la griglia parte dal primo e segue quella direzione">∥ Allinea a un lato</button>
+              <button type="button" class="sec" id="grdStraight" title="Riporta la griglia dritta, nord-sud">Raddrizza</button></div>
+            <div id="grdMsg" class="thint"></div>
+          </div>
+        </details>
+        <button class="ghost-danger" id="drwClear" title="Toglie tutti i disegni dall'Elenco; i risultati dei geoprocessi e gli importati restano">Cancella tutti i disegni</button>
     </div></div>
 
     <div class="tabpane" data-tab="geoproc"><div class="paneBody">
@@ -987,8 +1067,9 @@
     <h2>Guida rapida</h2>
     <div class="sub">Geoportale AxpoSolar Italia — dati catastali AdE via Zornade · portale ArcGIS Online interno.</div>
     <ol style="margin:0;padding-left:18px;font-size:13px;line-height:1.7">
-      <li><b>Sidebar sinistra (rail di icone)</b> — Ricerca (ambito + foglio/particella + selezione mappa), Disegno, Geoprocessi, Contesto sito, Importa dati (file, disegni DWG, immagini, servizi web, coordinate: una sezione per modulo, con la <b>i</b> che spiega come funziona).</li>
-      <li><b>Ricerca particelle</b> — per Foglio/Particella, con la selezione su mappa (punto/rettangolo/poligono/linea) o da un disegno esistente.</li>
+      <li><b>Sidebar sinistra (rail di icone)</b> — Ricerca particelle, Disegno, Geoprocessi, Contesto sito, Importa dati. In ogni scheda ogni strumento ha la sua sezione: clicca il titolo per aprirla; la <b>i</b> spiega come funziona, spesso con un esempio disegnato.</li>
+      <li><b>Ricerca particelle</b> — scegli dove cerchi, poi uno dei tre modi: per foglio e particella, sulla mappa (clic, rettangolo, poligono, linea) o da un disegno.</li>
+      <li><b>Disegno</b> — punti, linee, aree, rettangoli e cerchi con categoria e nota. Mentre disegni, <kbd>Tab</kbd> fa scrivere lunghezza e angolo del lato (anche come azimut). Forme di misura esatta, copia parallela (rientri dai confini), griglia in metri allineabile a un lato, aggancio anche a DWG e layer. <kbd>Ctrl</kbd>+<kbd>Z</kbd> / <kbd>Ctrl</kbd>+<kbd>Y</kbd> annullano e ripetono. Un disegno cliccato sulla mappa si sposta e si rimodella.</li>
       <li><b>Action bar destra</b> — <b>Elenco &amp; azioni</b> (Particelle · Disegni · Geoprocessi · Importati): ogni riga si rinomina, si colora, si nasconde e si <b>spunta</b> per usarla nei geoprocessi. Poi Layer, Basemap, Segnalibri, Modifica AREAS, Stampa.</li>
       <li><b>Layer</b> — cerca un layer per nome; dal pannello di ogni layer (icona a cursori) trasparenza, popup e <b>filtro per attributo</b> (l'icona diventa un imbuto quando è attivo). I layer aggiunti da te (dal portale, servizi web, DWG, immagini) hanno il menu <b>…</b> con Zoom e <b>Rimuovi dalla mappa</b>.</li>
       <li><b>Servizi web</b> (scheda Importa dati) — WMS, WFS e ArcGIS REST per indirizzo, senza creare item sul portale. Il browser accetta solo servizi <b>https</b> che permettono la lettura da altri siti (CORS).</li>
@@ -1345,6 +1426,18 @@ require([
       toolsGL.remove(e.graphic);
     }
   });
+  // un disegno (o un buffer, un risultato, un importato) cliccato sulla mappa si sposta e si rimodella: a modifica
+  // finita ricalcolo l'area memorizzata e aggiorno Elenco e salvataggio (prima la modifica restava solo sulla mappa
+  // e al ricaricamento tornava la forma vecchia); Canc durante la modifica toglie l'oggetto, anche dall'Elenco
+  sketchVM.on("update", e=>{
+    if(e.state==="start"){ histFreeze(e.graphics); drwSnapSync(); return; }   // storico: la forma di prima resta ferma
+    if(e.state!=="complete") return;
+    (e.graphics||[]).forEach(g=>{ const at=g.attributes;
+      if(at&&at.area_ha!=null&&g.geometry&&/polygon/i.test(g.geometry.type)){
+        try{ at.area_ha=+Math.abs(esriMods.geometryEngine.geodesicArea(g.geometry,'hectares')||0).toFixed(4); }catch(x){} } });
+    refreshDl(); });
+  sketchVM.on("delete", ()=>refreshDl());
+  sketchVM.on(["create","update","undo","redo"], ()=>histUi());   // Annulla/Ripeti seguono anche i vertici del disegno in corso
 
   view.on("click", async e=>{
     if(subActive){ if(e.mapPoint) querySubstations(e.mapPoint); return; }   // modalità sottostazioni
@@ -1662,7 +1755,9 @@ function wireUI(){
   $('pmSources').innerHTML='<option value="">— nessuna —</option>'+opt(DOM.Sources);
   $('pmEstr').innerHTML=opt(DOM.Estrazione_Massiva);
 }
-function checkReady(){$('go').disabled=!(key()&&$('com')&&$('com').value&&$('fog').value.trim()&&$('par').value.trim());}
+function checkReady(){$('go').disabled=!(key()&&$('com')&&$('com').value&&$('fog').value.trim()&&$('par').value.trim());
+  // il titolo di «Dove cerchi», anche chiuso, dice dove: il comune, o la provincia, o la regione
+  const s=$('rcSumArea'); if(s){ s.textContent=($('com')&&$('com').value)||($('prov')&&$('prov').value)||($('reg')&&$('reg').value)||''; s.title=s.textContent; } }
 
 // ── Strumenti: misura / buffer / vai-a-coordinate ─────────────────────────
 function toolMsg(id,t,cls){ const el=$(id); if(el){ el.className='thint'+(cls?' '+cls:''); el.textContent=t||''; } }
@@ -1687,8 +1782,10 @@ function wireTools(){
     Object.entries(m).forEach(([t,id])=>$(id).classList.toggle('active', drawType===t)); };
   const startDraw=t=>{
     if(drawType===t){ drawType=null; try{sketchVM.cancel();}catch(e){} setDrawBtns(); toolMsg('drwMsg','Disegno disattivato.'); return; }
+    try{ drwModeEnd(); grdPlaceEnd(); }catch(e){}
     drawType=t; setDrawBtns();
-    $('drwCat').innerHTML=(DRAW_CATS[t]||DRAW_CATS.polygon||[]).map(c=>`<option>${c}</option>`).join('');
+    drwCatFor(t==='rectangle'||t==='circle'? 'polygon' : t);   // stesso tipo di prima: la categoria scelta resta
+    drwSnapSync();                                              // aggancio anche ai layer accesi adesso
     sketchPurpose='drawing'; try{sketchVM.cancel();}catch(e){} sketchVM.create(t);
     toolMsg('drwMsg','Disegna sulla mappa'+(t==='point'?'':(t==='rectangle'||t==='circle'?' (clicca e trascina)':' (doppio click per finire)'))+'.');
   };
@@ -1699,6 +1796,35 @@ function wireTools(){
   $('drwCircle').onclick=()=>startDraw('circle');
   if($('drwSnap')) $('drwSnap').onchange=e=>{ try{ sketchVM.snappingOptions.enabled=e.target.checked; }catch(x){} };
   if($('drwTip')) $('drwTip').onchange=e=>{ try{ sketchVM.tooltipOptions.enabled=e.target.checked; sketchVM.labelOptions.enabled=e.target.checked; }catch(x){} };
+  // disegno stile CAD: annulla/ripeti, forme con misure, copia parallela, aggancio ai layer, angoli, griglia
+  if($('drwUndo')){
+    $('drwUndo').onclick=drwUndo; $('drwRedo').onclick=drwRedo;
+    $('shpKind').querySelectorAll('button').forEach(b=>b.onclick=()=>{
+      $('shpKind').querySelectorAll('button').forEach(x=>x.classList.toggle('active', x===b));
+      const c=b.dataset.k==='circle'; $('shpRectBox').hidden=c; $('shpCircleBox').hidden=!c; });
+    $('shpPlace').onclick=()=>drwModeStart('shape');
+    $('shpRotPick').onclick=()=>drwModeStart('angle');
+    $('offPick').onclick=()=>drwModeStart('off1');
+    $('offEdge').onchange=()=>{ const m=drwMode; if(m&&m.kind==='off2'&&m.src) drwTmpShow($('offEdge').checked? m.src.seg : m.src.geom); };
+    try{ if(localStorage.getItem('axpo_drw_snaplayers')==='0') $('drwSnapLayers').checked=false;
+      if(localStorage.getItem('axpo_drw_dir')==='absolute') $('drwDir').value='absolute';
+      const gs=parseFloat(localStorage.getItem('axpo_grid_step')); if(gs>0) $('grdStep').value=gs; }catch(e){}
+    $('drwSnapLayers').onchange=()=>{ try{ localStorage.setItem('axpo_drw_snaplayers', $('drwSnapLayers').checked?'1':'0'); }catch(e){} drwSnapSync(); };
+    $('drwDir').onchange=drwDirApply; drwDirApply();
+    $('grdOn').onchange=()=>grdSet($('grdOn').checked);
+    $('grdStep').onchange=()=>{ try{ localStorage.setItem('axpo_grid_step', String(grdStep())); }catch(e){}
+      if(grdVM&&grdVM.displayEnabled){ grdVM.spacing=grdStep(); grdUi(); } };
+    $('grdSnap').onchange=()=>{ if(grdVM&&grdVM.displayEnabled) grdVM.snappingEnabled=$('grdSnap').checked; };
+    $('grdAlign').onclick=()=>grdAlign();
+    $('grdStraight').onclick=()=>{ if(grdVM){ grdPlaceEnd(); grdVM.rotation=0; grdUi(); } };
+    grdUi(); histUi();
+    // Ctrl+Z / Ctrl+Y (anche Ctrl+Maiusc+Z): mentre si disegna sulla mappa li gestisce l'SDK (ultimo vertice)
+    document.addEventListener('keydown',e=>{ if(!(e.ctrlKey||e.metaKey)||e.altKey) return; const k=String(e.key||'').toLowerCase();
+      if(k!=='z'&&k!=='y') return; const t=e.target;
+      if(t&&(t.isContentEditable||/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)||(t.closest&&t.closest('calcite-input,.esri-tooltip')))) return;   // nei campi resta l'annulla del testo
+      if(sketchVM&&sketchVM.state==='active'&&t&&t.closest&&t.closest('#viewDiv')) return;
+      e.preventDefault(); if(k==='y'||e.shiftKey) drwRedo(); else drwUndo(); });
+  }
   if($('impBtn')) $('impBtn').onclick=()=>$('impFile').click();
   if($('impImgBtn')) $('impImgBtn').onclick=()=>$('impImg').click();
   if($('impImg')) $('impImg').onchange=e=>{ startImageFiles(e.target.files); e.target.value=''; };
@@ -1728,9 +1854,14 @@ function wireTools(){
     $('svcNone').onclick=()=>$('svcList').querySelectorAll('input').forEach(c=>{ c.checked=false; }); }
   if($('selDrawGo')) $('selDrawGo').onclick=()=>{ const v=$('selFromDraw').value; if(v==='') return;
     const g=(window.__selDrawList||[])[+v]; if(g&&g.geometry){ try{ view.goTo(g.geometry.extent?g.geometry.extent.expand(1.4):g.geometry).catch(()=>{}); }catch(e){} selectByGeometry(g.geometry); } };
-  $('drwClear').onclick=()=>{ try{sketchVM.cancel();}catch(e){} drawType=null; setDrawBtns();
-    toolsGL.graphics.toArray().filter(g=>g.attributes&&g.attributes._kind==='drawing').forEach(g=>toolsGL.remove(g));
-    toolMsg('drwMsg','Disegni rimossi.'); refreshDl(); };
+  // chiede conferma e lascia stare i risultati dei geoprocessi (anche loro sono _kind 'drawing', con _sub 'geoproc':
+  // prima sparivano insieme ai disegni)
+  $('drwClear').onclick=()=>{ const n=countDrawingsPure();
+    if(!n){ toolMsg('drwMsg','Non ci sono disegni da cancellare.'); return; }
+    if(!confirm((n===1?'Cancellare il disegno?':'Cancellare tutti i '+n+' disegni?')+' I risultati dei geoprocessi e gli importati restano. Non si può annullare.')) return;
+    try{sketchVM.cancel();}catch(e){} drawType=null; setDrawBtns();
+    toolsGL.graphics.toArray().filter(g=>g.attributes&&g.attributes._kind==='drawing'&&g.attributes._sub!=='geoproc').forEach(g=>toolsGL.remove(g));
+    toolMsg('drwMsg', n===1?'Disegno cancellato.':n+' disegni cancellati.'); refreshDl(); };
   // geoprocessi
   if($('gpUnion')){
     $('gpUnion').onclick=()=>gpRun('union'); $('gpHull').onclick=()=>gpRun('hull'); $('gpSimplify').onclick=()=>gpRun('simplify');
@@ -1748,11 +1879,11 @@ function wireTools(){
   };
 }
 
-const SEL_NEUTRAL='Nessuna modalità attiva: i click consultano i popup, non aggiungono particelle. Clicca un pulsante per attivare (e di nuovo per disattivare).';
-const SEL_HINT={point:'Click su mappa → aggiunge la particella nel punto.',
-  rectangle:'Trascina un rettangolo → aggiunge tutte le particelle nell\'area.',
-  polygon:'Disegna un poligono (doppio click per finire) → particelle nell\'area.',
-  polyline:'Disegna una linea (doppio click per finire) → particelle attraversate.'};
+const SEL_NEUTRAL='Scegli un modo, poi lavora sulla mappa. Di nuovo sul pulsante, o Esc, per smettere.';
+const SEL_HINT={point:'Clicca una particella sulla mappa: la aggiungo all\'elenco.',
+  rectangle:'Trascina un rettangolo: aggiungo le particelle al suo interno.',
+  polygon:'Clicca i vertici, doppio clic per chiudere: aggiungo le particelle all\'interno.',
+  polyline:'Clicca i punti della linea, doppio clic per finire: aggiungo le particelle attraversate.'};
 function setSelMode(mode){
   if(selMode===mode) mode=null;                 // click sul pulsante attivo → disattiva
   selMode=mode;
@@ -1772,7 +1903,10 @@ async function selectByGeometry(geom){
   const ge=esriMods.geometryEngine, w=esriMods.webMercatorUtils;
   let pts=[];   // [lng,lat]
   try{
-    if(geom.type==='polyline'){
+    if(geom.type==='point'||geom.type==='multipoint'){   // un punto (da «Da un disegno»): la particella sotto il punto
+      const xy=geom.type==='point'?[[geom.x,geom.y]]:geom.points, geo=geom.spatialReference&&geom.spatialReference.isWGS84;
+      xy.forEach(([x,y])=>{ const ll=geo?[x,y]:w.xyToLngLat(x,y); if(ll) pts.push(ll); });
+    }else if(geom.type==='polyline'){
       const len=ge.geodesicLength(geom,'meters')||0;
       const step=Math.max(SEL_LINE_STEP, len/SEL_MAX_PTS);
       const dens=ge.geodesicDensify(geom, step, 'meters');
@@ -1809,7 +1943,7 @@ async function selectByGeometry(geom){
     rs.forEach(r=>{ if(r==='ok')added++; else if(r==='dup')dup++; });
   }
   render(true);
-  msg((run.stop?'Selezione interrotta: ':'Selezione: ')+`${added} particelle aggiunte`+(dup?`, ${dup} già in elenco`:'')
+  msg((run.stop?'Selezione interrotta: ':'Selezione: ')+`${added} particell${added===1?'a aggiunta':'e aggiunte'}`+(dup?`, ${dup} già in elenco`:'')
     +(run.stop? ' (area analizzata solo in parte).' : ` (${fids.size} nell'area).`), 'ok');
   } finally { if(_selRun===run) _selRun=null; }
 }
@@ -1931,6 +2065,7 @@ function restoreState(){
       svcRestoreAll(st.services).then(bad=>{ svcBooting=null; saveStateDebounced();
         if(bad.length) msg('Servizi web non più raggiungibili, tolti dal lavoro: '+bad.join(' · '),'err'); }); }
   }catch(e){}
+  try{ histReset(); }catch(e){}   // Annulla non deve tornare a prima del ripristino
 }
 let svcBooting=null;
 // particelle e geometrie (disegni, buffer, geoprocessi, import): da salvataggio automatico o da progetto
@@ -1983,6 +2118,7 @@ function clearWork(){
   try{ gpSlots.A=[]; gpSlots.B=[]; }catch(e){}
   render(); renderGeoms(); refreshDl();
   try{ localStorage.removeItem('cat_state'); }catch(e){}
+  try{ drwModeEnd(); grdPlaceEnd(); histReset(); }catch(e){}   // dopo «Svuota» Annulla non riporta disegni senza DWG e immagini
   saveState._warned=false; storeInfo(); impCounts(); }
 function resetAll(){
   if(!confirm('Ripristinare tutto? Cancello ogni dato del geoportale in questo browser — lavoro, tema, segnalibri, posizionamenti DWG, preferenze — e ricarico la pagina.')) return;
@@ -2213,7 +2349,7 @@ async function projOpenFile(file, handle){
     const vp=vpFromJSON(st.viewpoint); if(vp) view.viewpoint=vp;   // per ultima: DWG e immagini non spostano la vista
     toolMsg('impMsg',''); toolMsg('impCadMsg', cadFiles.length? 'Riaperti dal progetto «'+name+'».' : '');
     await adm;
-    projSetName(name, handle||null);
+    projSetName(name, handle||null); try{ histReset(); }catch(e){}   // lo storico riparte dal progetto aperto
     const ng=toolsGL.graphics.filter(g=>g.attributes&&g.attributes._kind).length, parts=[];
     if(parcels.length) parts.push(parcels.length+(parcels.length>1? ' particelle' : ' particella'));
     if(ng) parts.push(ng+(ng>1? ' geometrie' : ' geometria'));
@@ -2598,7 +2734,7 @@ async function search(){
     }catch(e){notfound.push(part+'(err)');}
   }
   render(true);
-  let m=`${added} aggiunte`; if(dup)m+=`, ${dup} già in elenco`;
+  let m=`${added} particell${added===1?'a aggiunta':'e aggiunte'}`; if(dup)m+=`, ${dup} già in elenco`;
   if(notfound.length)m+=`, non trovate: ${notfound.join(', ')} (oltre le 100/foglio o altra sezione → verifica su FoMaps)`;
   msg(m, notfound.length?'err':'ok');
 }
@@ -3256,7 +3392,7 @@ function countGeoproc(){ return toolsGL? toolsGL.graphics.toArray().filter(g=>g.
 var GEOM_ZOOM_SVG='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="6"/><line x1="20" y1="20" x2="15.5" y2="15.5"/></svg>';
 function refreshDl(){ const el=$('dl'); if(el) el.disabled=!(parcels.length||countKind('buffer')||countKind('drawing')||countKind('import'));
   const _sn=$('promoteSN'); if(_sn) _sn.disabled=!((countKind('buffer')||countKind('drawing')||countKind('import')) && (typeof signedIn!=='undefined'&&signedIn));
-  try{renderGeoms();}catch(e){} try{refreshSelDraw();}catch(e){} try{saveStateDebounced();}catch(e){} }
+  try{renderGeoms();}catch(e){} try{refreshSelDraw();}catch(e){} try{saveStateDebounced();}catch(e){} try{histRecord();}catch(e){} }
 // ── FASE 2: elenco geometrie (disegni/buffer/geoprocessi) + rinomina inline ──
 // ══ Visibilità + colore (righe elenco e header sezione) ═══════════════════
 // hex "#rrggbb" → [r,g,b]
@@ -3461,7 +3597,239 @@ function refreshSelDraw(){
   window.__selDrawList=geoms;
   sel.innerHTML='<option value="">— nessun disegno —</option>'+geoms.map((g,i)=>`<option value="${i}">${esc(g.attributes.nome||geomDefName(g))}</option>`).join('');
   const btn=$('selDrawGo'); if(btn) btn.disabled=!geoms.length;
+  const n1=$('rcNDraw'); if(n1) n1.textContent=geoms.length||'';          // contatori nei titoli delle sezioni
+  const n2=$('drwNSum'); if(n2) n2.textContent=countDrawingsPure()||'';
 }
+// ══ Disegno stile CAD: aggancio ai layer, direzione, annulla/ripeti, forme con misure, copia parallela, griglia ══
+// Metri a terra → unità Web Mercator. Web Mercator proietta con la sfera ma le coordinate sono sull'ellissoide WGS84,
+// quindi NON è conforme: a 45° un metro vale ~0,17% in più in est-ovest e ~0,16% in meno in nord-sud del semplice
+// 1/cos(lat) (misurato: un rettangolo 100×50 veniva 100,17×49,92). Due scale separate, kx e ky, rendono lati e angoli
+// esatti; su un sito di qualche centinaio di metri variano di pochi millimetri. (La griglia dell'SDK è già in metri veri.)
+function mercK2(y){ const lat=esriMods.webMercatorUtils.xyToLngLat(0,y)[1]*Math.PI/180, e2=0.00669437999014,
+    s=1-e2*Math.sin(lat)**2, c=Math.cos(lat);
+  return {x:Math.sqrt(s)/c, y:Math.pow(s,1.5)/((1-e2)*c)}; }
+function mercK(y){ const k=mercK2(y); return Math.sqrt(k.x*k.y); }   // una scala sola (copia parallela di tutto l'oggetto): errore ≤ 0,1%
+function toWM(geom){ try{ if(geom&&geom.spatialReference&&geom.spatialReference.isWGS84) return esriMods.webMercatorUtils.geographicToWebMercator(geom); }catch(e){} return geom; }
+function numIn(id){ const v=parseFloat(String(($(id)||{}).value||'').replace(',','.')); return isFinite(v)? v : NaN; }
+function mkLine(paths){ return new esriMods.Graphic({geometry:{type:'polyline', paths:paths, spatialReference:view.spatialReference}}).geometry; }
+// categorie del menu per un tipo di geometria; se il menu è già di quel tipo resta la voce scelta
+function drwCatFor(t){ const s=$('drwCat'); if(!s||s.dataset.t===t) return;
+  s.innerHTML=(DRAW_CATS[t]||DRAW_CATS.polygon||[]).map(c=>`<option>${c}</option>`).join(''); s.dataset.t=t; }
+
+// aggancio: disegni e particelle sempre; con la spunta anche DWG, layer del portale e servizi vettoriali accesi.
+// Si ricalcola quando parte un disegno o una modifica (così vale per ciò che è acceso in quel momento).
+const SNAP_TYPES=['feature','geojson','wfs','csv'];
+function drwLayerOn(l){ for(let p=l; p&&p!==view.map; p=p.parent) if(p.visible===false) return false; return true; }
+function drwSnapSync(){
+  if(!sketchVM||!toolsGL) return 0;
+  const src=[toolsGL]; if(gl) src.push(gl);
+  if(!$('drwSnapLayers')||$('drwSnapLayers').checked)
+    try{ view.map.allLayers.forEach(l=>{ if(SNAP_TYPES.indexOf(l.type)>=0&&drwLayerOn(l)) src.push(l); }); }catch(e){}
+  try{ sketchVM.snappingOptions.featureSources=src.map(l=>({layer:l, enabled:true})); }catch(e){}
+  return src.length; }
+function drwDirApply(){ const v=$('drwDir')&&$('drwDir').value==='absolute'? 'absolute' : 'relative';
+  try{ sketchVM.valueOptions.directionMode=v; }catch(e){} try{ localStorage.setItem('axpo_drw_dir', v); }catch(e){} }
+
+// ── annulla / ripeti ──
+// L'annulla dell'SDK vale solo dentro il disegno o la modifica in corso (toglie l'ultimo vertice, Ctrl+Z compreso).
+// Per ciò che è già finito (un disegno, uno spostamento, una cancellazione, un buffer, un import) tengo uno storico
+// di «fotografie» dello strato degli strumenti: riferimenti ai grafici e alle loro geometrie, niente copie pesanti.
+const HIST_KINDS={drawing:1, buffer:1, import:1}, HIST_MAX=40;
+let drwHist={stack:[], i:-1, busy:false};
+function histSnap(){ const out=[]; if(!toolsGL) return out;
+  toolsGL.graphics.forEach((g,idx)=>{ const a=g.attributes; if(!a||!HIST_KINDS[a._kind]) return;
+    out.push({g:g, geom:g.geometry, attrs:Object.assign({},a), vis:g.visible, sym:g.symbol, idx:idx}); });
+  return out; }
+function histSame(a,b){ if(!a||!b||a.length!==b.length) return false;
+  for(let i=0;i<a.length;i++){ const x=a[i], y=b[i]; if(x.g!==y.g||x.geom!==y.geom||x.vis!==y.vis||x.sym!==y.sym) return false; }
+  return true; }
+function histRecord(){ const H=drwHist; if(H.busy||!toolsGL) return; const s=histSnap();
+  if(H.i>=0&&histSame(H.stack[H.i], s)){ H.stack[H.i]=s; histUi(); return; }   // stesso stato: aggiorno gli attributi
+  H.stack=H.stack.slice(0,H.i+1); H.stack.push(s); if(H.stack.length>HIST_MAX) H.stack.shift(); H.i=H.stack.length-1; histUi(); }
+function histReset(){ drwHist={stack:[], i:-1, busy:false}; histRecord(); }   // dopo avvio, apertura progetto, svuota
+// l'SDK può modificare la geometria sul posto: all'inizio di una modifica le fotografie che la usano ne ricevono una copia
+function histFreeze(gs){ (gs||[]).forEach(g=>{ const cur=g&&g.geometry; if(!cur) return; let cl=null;
+  drwHist.stack.forEach(s=>s.forEach(e=>{ if(e.g===g&&e.geom===cur){ cl=cl||cur.clone(); e.geom=cl; } })); }); }
+function histApply(s){ const H=drwHist; H.busy=true;
+  try{ const keep=new Set(s.map(e=>e.g));
+    toolsGL.graphics.toArray().forEach(g=>{ const a=g.attributes; if(a&&HIST_KINDS[a._kind]&&!keep.has(g)) toolsGL.remove(g); });
+    s.forEach(e=>{ const g=e.g; if(g.geometry!==e.geom) g.geometry=e.geom; g.attributes=Object.assign({},e.attrs); g.visible=e.vis;
+      if(g.symbol!==e.sym) g.symbol=e.sym; if(toolsGL.graphics.indexOf(g)<0) toolsGL.graphics.add(g, Math.min(e.idx, toolsGL.graphics.length)); });
+    try{ refreshDl(); }catch(e){}
+  } finally{ H.busy=false; } histUi(); }
+function drwIdle(){   // chiude una sessione dell'SDK senza modifiche (un disegno armato resta armato)
+  if(!sketchVM||sketchVM.state!=='active') return; const t=drawType, pur=sketchPurpose;
+  try{ sketchVM.cancel(); }catch(e){} if(t&&pur==='drawing'){ sketchPurpose='drawing'; try{ sketchVM.create(t); }catch(e){} } }
+function drwUndo(){ const act=sketchVM&&sketchVM.state==='active';
+  if(act&&sketchVM.canUndo()){ sketchVM.undo(); histUi(); return; }
+  const H=drwHist; if(H.i<=0) return; drwIdle(); H.i--; histApply(H.stack[H.i]); toolMsg('drwMsg','Annullato.'); }
+function drwRedo(){ const act=sketchVM&&sketchVM.state==='active';
+  if(act&&sketchVM.canRedo()){ sketchVM.redo(); histUi(); return; }
+  const H=drwHist; if(H.i>=H.stack.length-1) return; drwIdle(); H.i++; histApply(H.stack[H.i]); toolMsg('drwMsg','Rifatto.'); }
+function histUi(){ const act=sketchVM&&sketchVM.state==='active', H=drwHist, u=$('drwUndo'), r=$('drwRedo');
+  if(u) u.disabled=!((act&&sketchVM.canUndo())||H.i>0);
+  if(r) r.disabled=!((act&&sketchVM.canRedo())||H.i<H.stack.length-1); }
+
+// ── modalità sulla mappa della scheda Disegno: forma con misure, lato per l'orientamento, copia parallela ──
+let drwMode=null;
+function drwModeOn(){ return !!drwMode; }
+function drwModeInfo(){ const m=drwMode;
+  if(!m){ return grdPlaceOn()? 'Griglia: clicca <b>due punti</b> lungo il lato a cui allinearla. <kbd>Esc</kbd> per annullare.' : null; }
+  if(m.kind==='shape') return 'Clicca dove va il <b>centro</b> del '+(shpParams().kind==='circle'?'cerchio':'rettangolo')+'. <kbd>Esc</kbd> per finire.';
+  if(m.kind==='angle') return 'Clicca vicino a un <b>lato</b> (disegno, particella, DWG, layer): la larghezza gli diventa parallela. <kbd>Esc</kbd> per annullare.';
+  if(m.kind==='off1') return 'Copia parallela: clicca la <b>linea o l\'area</b> da copiare, vicino al bordo. <kbd>Esc</kbd> per finire.';
+  if(m.kind==='off2') return 'Ora clicca <b>da che parte</b> mettere la copia'+(m.src&&m.src.geom.type==='polygon'&&!$('offEdge').checked?' (dentro o fuori dall\'area)':'')+'. <kbd>Esc</kbd> per annullare.';
+  return null; }
+function drwModeUi(){ const k=drwMode&&drwMode.kind;
+  [['shpPlace',k==='shape'],['shpRotPick',k==='angle'],['offPick',k==='off1'||k==='off2'],['grdAlign',grdPlaceOn()]]
+    .forEach(p=>{ const b=$(p[0]); if(b) b.classList.toggle('active', !!p[1]); }); }
+function drwTmpClear(){ try{ view.graphics.removeMany(view.graphics.toArray().filter(g=>g.__drwTmp)); }catch(e){} }
+function drwTmpShow(geom){ drwTmpClear(); if(!geom) return;
+  const sym=geom.type==='polygon'? {type:'simple-fill', color:[255,140,26,0.12], outline:{color:[255,140,26], width:2, style:'dash'}}
+    : {type:'simple-line', color:[255,140,26], width:3, style:'dash'};
+  const g=new esriMods.Graphic({geometry:geom, symbol:sym}); g.__drwTmp=true; view.graphics.add(g); }
+function drwModeEnd(){ const m=drwMode; if(!m) return; drwMode=null;
+  try{ m.h&&m.h.remove(); }catch(e){} try{ m.hm&&m.hm.remove(); }catch(e){}
+  sketchClickResume(m.sk); view.popupEnabled=m.popup; view.container.style.cursor=m.cursor||''; drwTmpClear(); drwModeUi(); }
+function drwModeStart(kind){
+  const same=drwMode&&(drwMode.kind===kind||(kind==='off1'&&drwMode.kind==='off2')); drwModeEnd(); if(same) return;   // di nuovo sul pulsante: esce
+  try{ gpPickEnd(); }catch(e){} try{ if(srRefOn()) srRefEnd(); }catch(e){} try{ if(cadAlignOn()) cadAlignEnd(true); }catch(e){}
+  grdPlaceEnd(); cadModesOff();   // una sola modalità mappa alla volta
+  drwMode={kind:kind, popup:view.popupEnabled, cursor:view.container.style.cursor, sk:sketchClickPause()};
+  drwMode.h=view.on('click', drwModeClick);
+  if(kind==='shape'){ drwCatFor('polygon'); let raf=0;
+    drwMode.hm=view.on('pointer-move', e=>{ if(raf) return; raf=requestAnimationFrame(()=>{ raf=0; if(!drwMode||drwMode.kind!=='shape') return;
+      const mp=view.toMap({x:e.x, y:e.y}); drwTmpShow(mp? shpGeom(mp, shpParams()) : null); }); }); }
+  view.popupEnabled=false; view.container.style.cursor='crosshair'; drwModeUi(); }
+async function drwModeClick(e){ const m=drwMode; if(!m) return; e.stopPropagation();
+  if(selMode||drawType||subActive||(sketchVM&&sketchVM.state==='active')){ drwModeEnd(); return; }   // è partita un'altra modalità
+  const mp=e.mapPoint; if(!mp) return;
+  if(m.kind==='shape'){ const p=shpParams(), geom=shpGeom(mp, p);
+    if(!geom){ toolMsg('shpMsg', p.kind==='circle'? 'Scrivi il raggio in metri.' : 'Scrivi larghezza e altezza in metri.', 'err'); return; }
+    const fmt=v=>String(+v.toFixed(2)).replace('.',','), nome=p.kind==='circle'? 'Cerchio r '+fmt(p.r)+' m' : 'Rettangolo '+fmt(p.w)+' × '+fmt(p.h)+' m';
+    drwAddGraphic(geom, {nome:nome});
+    const ha=Math.abs(esriMods.geometryEngine.geodesicArea(geom,'hectares')||0);
+    toolMsg('shpMsg', nome+' messo ('+ha.toFixed(ha<1?4:2).replace('.',',')+' ha). Clicca per metterne un altro, Esc per finire.', 'ok'); return; }
+  const hit=await drwEdgeAt(e); if(drwMode!==m) return;   // modalità cambiata mentre cercavo il lato
+  if(m.kind==='angle'){
+    if(!hit){ toolMsg('shpMsg','Lì non trovo un lato: clicca vicino al bordo di un disegno, una particella, un DWG o un layer.','err'); return; }
+    $('shpRot').value=+hit.az.toFixed(2); drwModeEnd(); drwTmpShow(hit.seg); setTimeout(()=>{ if(!drwMode) drwTmpClear(); }, 1600);
+    toolMsg('shpMsg','Orientamento preso dal lato di «'+hit.name+'»: '+String(+hit.az.toFixed(2)).replace('.',',')+'°. Ora «Posiziona sulla mappa».','ok'); return; }
+  if(m.kind==='off1'){
+    if(!hit){ toolMsg('offMsg','Lì non trovo una linea o un\'area: clicca vicino al bordo di un disegno, una particella, un DWG o un layer.','err'); return; }
+    m.src=hit; m.kind='off2'; drwTmpShow($('offEdge').checked? hit.seg : hit.geom); drwModeUi();
+    toolMsg('offMsg','Scelto «'+hit.name+'». Ora clicca da che parte mettere la copia.'); return; }
+  if(m.kind==='off2'){ const src=m.src; m.src=null; m.kind='off1'; drwTmpClear(); drwModeUi(); drwDoOffset(src, mp); } }
+function segDist(P,a,b){ const dx=b[0]-a[0], dy=b[1]-a[1], L=dx*dx+dy*dy;
+  let t=L? ((P[0]-a[0])*dx+(P[1]-a[1])*dy)/L : 0; t=Math.max(0,Math.min(1,t));
+  return Math.hypot(P[0]-(a[0]+t*dx), P[1]-(a[1]+t*dy)); }
+function nearSeg(geom, P){ let best=null;
+  (geom.paths||geom.rings||[]).forEach(pa=>{ for(let i=0;i<pa.length-1;i++){ const d=segDist(P,pa[i],pa[i+1]); if(!best||d<best.d) best={d:d, a:pa[i], b:pa[i+1]}; } });
+  return best; }
+// il lato più vicino al clic: prima disegni, risultati, importati e particelle; poi DWG e layer vettoriali (geometria
+// completa riletta dal layer: quella del hitTest è semplificata per lo schermo); poi i layer di mappa (identify)
+async function drwEdgeAt(e){
+  let geom=null, name='';
+  const lin=g=>g&&/^(polyline|polygon)$/.test(g.type);
+  try{ const r=await view.hitTest(e,{include:[toolsGL,gl]});
+    const x=(r.results||[]).find(x=>x.graphic&&x.graphic.visible!==false&&lin(x.graphic.geometry));
+    if(x){ const g=x.graphic; geom=g.geometry;
+      if(g.layer===gl){ const p=gpParcelOf.get(g); name=p? 'Fg '+p.foglio+' · Part. '+p.particella : 'particella'; }
+      else name=(g.attributes&&g.attributes.nome)||geomDefName(g); } }catch(err){}
+  if(!geom){ try{ const skip=new Set([gl,toolsGL,labelsGL,cadTxtGL,window.__searchGL,imgHandlesGL].filter(Boolean)), r=await view.hitTest(e);
+    for(const x of (r.results||[])){ const l=x.layer||(x.graphic&&x.graphic.layer);
+      if(!x.graphic||!l||skip.has(l)||typeof l.queryFeatures!=='function'||!l.objectIdField) continue;
+      const oid=x.graphic.attributes&&x.graphic.attributes[l.objectIdField]; if(oid==null) continue;
+      const q=await l.queryFeatures({objectIds:[oid], returnGeometry:true, outSpatialReference:view.spatialReference});
+      const f=q&&q.features&&q.features[0]; if(f&&lin(f.geometry)){ geom=f.geometry; name=l.title||'layer'; break; } } }catch(err){} }
+  if(!geom){ try{ const got=await gpIdentifyAt(e.mapPoint); if(got&&lin(got.geometry)){ geom=got.geometry; name=got.name||got.layerTitle; } }catch(err){} }
+  if(!geom) return null;
+  geom=toWM(geom); const P=[e.mapPoint.x, e.mapPoint.y], s=nearSeg(geom, P); if(!s) return null;
+  const k=mercK2((s.a[1]+s.b[1])/2);   // azimut a terra (un lato non ha verso: 0–180°)
+  const az=(Math.atan2((s.b[0]-s.a[0])/k.x, (s.b[1]-s.a[1])/k.y)*180/Math.PI+360)%180;
+  return {geom:geom, seg:mkLine([[s.a,s.b]]), a:s.a, b:s.b, az:az, name:String(name||'oggetto')}; }
+// un disegno nuovo, come quelli fatti a mano: categoria (se il menu è di quel tipo) e nota della scheda
+function drwAddGraphic(geom, extra){
+  const t=geom.type, s=$('drwCat'), cat=(s&&s.dataset.t===t)? (s.value||'') : '';
+  const base=t==='polygon'? sketchVM.polygonSymbol : t==='polyline'? sketchVM.polylineSymbol : sketchVM.pointSymbol;
+  const g=new esriMods.Graphic({geometry:geom, symbol:base&&base.clone? base.clone() : base,
+    attributes:Object.assign({_kind:'drawing', geomType:t, categoria:cat, note:($('drwNote')&&$('drwNote').value)||''}, extra||{})});
+  toolsGL.add(g); refreshDl(); return g; }
+
+// ── forme con misure: rettangolo (larghezza × altezza, orientamento) e cerchio (raggio), centrati sul clic ──
+function shpParams(){ const b=document.querySelector('#shpKind .active');
+  return {kind:b? b.dataset.k : 'rect', w:numIn('shpW'), h:numIn('shpH'), rot:numIn('shpRot'), r:numIn('shpR')}; }
+function shpGeom(center, p){
+  const k=mercK2(center.y), cx=center.x, cy=center.y, sr=view.spatialReference;   // metri a terra: x·k.x, y·k.y
+  if(p.kind==='circle'){ if(!(p.r>0)) return null; const pts=[];
+    for(let i=0;i<=72;i++){ const t=(i%72)/72*2*Math.PI; pts.push([cx+p.r*k.x*Math.sin(t), cy+p.r*k.y*Math.cos(t)]); }   // da nord in senso orario
+    return new esriMods.Polygon({rings:[pts], spatialReference:sr}); }
+  if(!(p.w>0&&p.h>0)) return null;
+  const a=(isFinite(p.rot)? p.rot : 90)*Math.PI/180, ux=Math.sin(a), uy=Math.cos(a), vx=Math.cos(a), vy=-Math.sin(a);   // u: larghezza (azimut), v: altezza
+  const hw=p.w/2, hh=p.h/2, c=(s,t)=>[cx+(s*hw*ux+t*hh*vx)*k.x, cy+(s*hw*uy+t*hh*vy)*k.y];
+  const ring=[c(-1,-1),c(1,-1),c(1,1),c(-1,1)];
+  let s2=0; for(let i=0;i<4;i++){ const q=ring[i], w=ring[(i+1)%4]; s2+=q[0]*w[1]-w[0]*q[1]; }
+  if(s2>0) ring.reverse();   // anello esterno in senso orario, come vuole ArcGIS
+  ring.push(ring[0].slice());
+  return new esriMods.Polygon({rings:[ring], spatialReference:sr}); }
+
+// ── copia parallela: tutto l'oggetto (linea → linea parallela, area → rientro o allargamento) o solo il lato cliccato ──
+function drwDoOffset(src, mp){
+  const d=numIn('offDist'); if(!(d>0)){ toolMsg('offMsg','Scrivi la distanza in metri.','err'); return; }
+  const ge=esriMods.geometryEngine, P=[mp.x, mp.y], D=d*mercK(mp.y), fmt=String(+d.toFixed(2)).replace('.',',');
+  let out=null, what='';
+  if($('offEdge').checked){   // il lato, spostato perpendicolarmente (a terra) dalla parte del clic
+    const a=src.a, b=src.b, k=mercK2((a[1]+b[1])/2), gx=(b[0]-a[0])/k.x, gy=(b[1]-a[1])/k.y, L=Math.hypot(gx,gy); if(!L) return;
+    const left=(b[0]-a[0])*(P[1]-a[1])-(b[1]-a[1])*(P[0]-a[0])>0, nx=(left? -gy : gy)/L*d*k.x, ny=(left? gx : -gx)/L*d*k.y;
+    out=mkLine([[[a[0]+nx,a[1]+ny],[b[0]+nx,b[1]+ny]]]); what='Lato parallelo a '+fmt+' m';
+  }else{
+    const g=src.geom, r1=ge.offset(g, D, 'meters', 'miter'), r2=ge.offset(g, -D, 'meters', 'miter');
+    const ok=r=>r&&((r.paths&&r.paths.length)||(r.rings&&r.rings.length));
+    if(g.type==='polygon'){   // dentro → rientro (area più piccola dell'originale), fuori → allargamento (più grande)
+      const inside=ge.contains(g, mp), A=r=>Math.abs(ge.planarArea(r)), A0=A(g), c=[r1,r2].filter(ok);
+      out=inside? c.filter(r=>A(r)<A0)[0] : c.filter(r=>A(r)>A0)[0];
+      if(!out){ toolMsg('offMsg', inside? '«'+src.name+'» è troppo stretta per un rientro di '+fmt+' m.' : 'Non riesco ad allargare «'+src.name+'».','err'); return; }
+      what=(inside? 'Rientro di ' : 'Allargamento di ')+fmt+' m';
+    }else{   // linea: la copia dalla parte del clic
+      const dist=r=>ok(r)? ge.distance(r, mp) : Infinity; out=dist(r1)<=dist(r2)? r1 : r2;
+      if(!ok(out)){ toolMsg('offMsg','Non riesco a copiare «'+src.name+'».','err'); return; }
+      what='Parallela a '+fmt+' m';
+    }
+  }
+  const nome=(what+' · '+src.name).slice(0,120); drwAddGraphic(out, {nome:nome});
+  toolMsg('offMsg','Nuovo disegno: «'+nome+'». Clicca un altro oggetto, o Esc per finire.','ok'); }
+
+// ── griglia in metri (quella dell'SDK: «misurata», quindi metri veri anche in Web Mercator) ──
+let grdVM=null, grdPop=null;
+async function grdEnsure(){ if(grdVM) return grdVM;
+  const VM=await new Promise((res,rej)=>require(['esri/widgets/support/GridControls/GridControlsViewModel'],res,rej));
+  if(grdVM) return grdVM;
+  grdVM=new VM({view:view, snappingOptions:sketchVM.snappingOptions});
+  esriMods.reactiveUtils.watch(()=>grdVM.interactivePlacementState, s=>{ if(!s&&grdPop!=null){ view.popupEnabled=grdPop; grdPop=null; } drwModeUi(); grdUi(); });
+  esriMods.reactiveUtils.watch(()=>grdVM.gridOutOfScale, ()=>grdUi());
+  return grdVM; }
+function grdPlaceOn(){ return !!(grdVM&&grdVM.interactivePlacementState); }
+function grdPlaceEnd(){ if(grdPlaceOn()) grdVM.interactivePlacementState=null; }
+function grdStep(){ const v=numIn('grdStep'); return v>0? v : 10; }
+async function grdSet(on){
+  try{ const vm=await grdEnsure(); vm.trySetDisplayEnabled(!!on);
+    if(on){ await new Promise(r=>setTimeout(r,60));   // impostati prima dell'accensione, passo e unità tornavano ai valori di default
+      vm.dynamicScaling=false; vm.unit='meters'; vm.spacing=grdStep(); vm.snappingEnabled=$('grdSnap').checked; }
+    else{ grdPlaceEnd(); vm.snappingEnabled=false; try{ sketchVM.snappingOptions.gridEnabled=false; }catch(e){} }
+  }catch(e){ console.warn('[griglia]',e); toolMsg('grdMsg','Griglia non disponibile ('+((e&&e.message)||e)+').','err'); }
+  grdUi(); }
+function grdUi(){ const on=!!(grdVM&&grdVM.displayEnabled), m=$('grdMsg'); if($('grdOn')) $('grdOn').checked=on;
+  ['grdAlign','grdStraight'].forEach(id=>{ const b=$(id); if(b) b.disabled=!on; });
+  if(!m) return;
+  if(!on) m.textContent='';
+  else if(grdVM.gridOutOfScale) m.innerHTML='A questa scala le celle da '+String(grdStep()).replace('.',',')+' m sono troppo piccole: <b>avvicinati</b> per vederle e agganciarle.';
+  else if(grdPlaceOn()) m.textContent='Clicca due punti lungo il lato: la griglia parte dal primo e segue quella direzione.';
+  else{ const az=((90-(grdVM.rotation||0))%180+180)%180;   // la rotazione dell'SDK è in gradi, antioraria da est
+    m.textContent=(Math.abs(az-90)<0.05||az<0.05? 'Dritta, nord-sud' : 'Allineata a '+String(+az.toFixed(1)).replace('.',',')+'° (azimut)')+'. Si aggancia a linee e incroci.'; } }
+async function grdAlign(){ if(!(grdVM&&grdVM.displayEnabled)) await grdSet(true);
+  if(grdPlaceOn()){ grdPlaceEnd(); return; }
+  drwModeEnd(); try{ gpPickEnd(); }catch(e){} cadModesOff();
+  grdPop=view.popupEnabled; view.popupEnabled=false; grdVM.interactivePlacementState='interactive'; drwModeUi(); grdUi(); }
 // ── FASE 4a: import file vettoriali ───────────────────────────────────────
 const IMP_COLORS=[[47,182,230],[245,166,35],[130,80,220],[40,180,110],[220,70,120],[0,150,180],[200,120,0]];
 let impColorIdx=0;
@@ -4606,6 +4974,7 @@ function cadReattach(wm){
 let _cadAl=null, cadAlGL=null, _cadAlRaf=0;
 function cadAlignOn(){ return !!_cadAl; }
 function cadModesOff(){   // una sola modalità mappa alla volta
+  try{ drwModeEnd(); grdPlaceEnd(); }catch(e){}
   try{ if(selMode) setSelMode(selMode); }catch(e){}
   try{ if(subActive&&$('subToggle')) $('subToggle').click(); }catch(e){}
   try{ const B={point:'drwPoint',polyline:'drwLine',polygon:'drwArea',rectangle:'drwRect',circle:'drwCircle'}; if(drawType&&B[drawType]) $(B[drawType]).click(); }catch(e){}
@@ -5153,7 +5522,8 @@ function baseGroundSet(){
   if($g('helpBtn'))   $g('helpBtn').onclick=function(){ $g('helpModal').style.display='flex'; };
   if($g('helpClose')) $g('helpClose').onclick=function(){ $g('helpModal').style.display='none'; };
 
-  /* 7 ── Scheda Import: sezioni collassabili (aperte/chiuse ricordate in questo browser) e finestra «i» */
+  /* 7 ── Schede a sezioni collassabili (Ricerca, Disegno, Geoprocessi, Importa dati; aperte/chiuse ricordate in questo
+         browser) e finestra «i» */
   var IMP_INFO={
     cad:{t:'Disegni CAD (DWG)', s:'Layout, rilievi e planimetrie da AutoCAD, sulla mappa.', h:
       '<h3>Come si usa</h3><ol>'
@@ -5248,7 +5618,7 @@ function baseGroundSet(){
       +'<li>I layer WMS sono solo immagini: i loro elementi non si possono scegliere.</li></ul>'},
     gpBuf:{t:'Buffer', s:'Una fascia di una certa larghezza intorno agli oggetti di A.', h:
       '<h3>Esempio</h3>'+DIA.bufArea+DIA.bufLine
-      +'<p>Hai disegnato un <b>elettrodotto</b>: un buffer di 150 m ti dà la fascia di rispetto. Poi, in <b>Ricerca particelle › Da un disegno esistente</b>, scegli il buffer e trovi tutte le particelle che la toccano.</p>'
+      +'<p>Hai disegnato un <b>elettrodotto</b>: un buffer di 150 m ti dà la fascia di rispetto. Poi, in <b>Ricerca particelle › Da un disegno</b>, scegli il buffer e trovi tutte le particelle che la toccano.</p>'
       +'<h3>Come si usa</h3><ol><li>Metti in A gli oggetti: punti, linee o aree.</li><li>Scrivi la larghezza in metri e premi <b>Crea buffer</b>.</li></ol>'
       +'<h3>Da sapere</h3><ul>'
       +'<li>Con la spunta <b>Uno per ogni oggetto</b> ottieni un buffer per ciascuno; senza, un\'unica fascia che li comprende tutti.</li>'
@@ -5278,12 +5648,162 @@ function baseGroundSet(){
       +'<li>Lavorano sulle <b>aree</b>: una linea o un punto va prima trasformato con un buffer.</li>'
       +'<li>Il risultato va nell\'<b>Elenco</b>, sezione <b>Geoprocessi</b>, e si può rimettere in A o in B per continuare.</li></ul>'}
   };
-  function impInfo(k){ var d=IMP_INFO[k]||GP_INFO[k], m=$g('infoModal'); if(!d||!m) return;
+  // Ricerca: stessi esempi disegnati, su una griglia di particelle (grigio); quelle trovate in ambra, come sulla mappa
+  var cP='#F5A623', fP='rgba(245,166,35,.38)', cD='#79C0FF', fD='rgba(121,192,255,.28)';
+  var PN=[[[8,8],[36,8],[72,8],[102,8]],[[8,32],[40,30],[68,36],[102,32]],[[8,58],[34,60],[74,56],[102,60]],[[8,84],[38,84],[70,84],[102,84]]];
+  function pgrid(sel){ var off='', on=''; sel=sel||[];
+    for(var r=0;r<3;r++) for(var c=0;c<3;c++){ var pts=[PN[r][c],PN[r][c+1],PN[r+1][c+1],PN[r+1][c]].join(' ');
+      if(sel.some(function(s){ return s[0]===r&&s[1]===c; })) on+='<polygon points="'+pts+'" fill="'+fP+'" stroke="'+cP+'" stroke-width="1.8" stroke-linejoin="round"/>';
+      else off+='<polygon points="'+pts+'" fill="none" stroke="currentColor" stroke-opacity=".35" stroke-width="1"/>'; }
+    return off+on; }
+  var RDIA={
+    point: gpDia(pgrid()+'<circle cx="55" cy="45" r="7" fill="none" stroke="currentColor" stroke-width="1.3" opacity=".6"/><circle cx="55" cy="45" r="2.6" fill="currentColor"/>',
+      pgrid([[1,1]]), 'un clic', '1 particella', 'Puntuale: la particella sotto il clic'),
+    rect: gpDia(pgrid()+'<rect x="44" y="38" width="52" height="40" fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="4 3"/>',
+      pgrid([[1,1],[1,2],[2,1],[2,2]])+'<rect x="44" y="38" width="52" height="40" fill="none" stroke="currentColor" stroke-width="1" stroke-dasharray="4 3" opacity=".5"/>',
+      'un rettangolo', '4 particelle', 'Rettangolo o poligono: le particelle dentro la forma'),
+    line: gpDia(pgrid()+'<polyline points="4,64 54,48 106,40" fill="none" stroke="currentColor" stroke-width="2"/>',
+      pgrid([[2,0],[1,0],[1,1],[1,2]])+'<polyline points="4,64 54,48 106,40" fill="none" stroke="currentColor" stroke-width="1.2" stroke-dasharray="3 3" opacity=".6"/>',
+      'una linea', '4 particelle', 'Linea: le particelle attraversate'),
+    buf: gpDia(pgrid()+'<rect x="20" y="38" width="70" height="16" rx="8"'+sR+'/><line x1="28" y1="46" x2="82" y2="46" stroke="'+cD+'" stroke-width="2.2"/>',
+      pgrid([[1,0],[1,1],[1,2]])+'<rect x="20" y="38" width="70" height="16" rx="8" fill="none" stroke="'+cR+'" stroke-width="1.2" stroke-dasharray="3 3"/>',
+      'un buffer', '3 particelle', 'Le particelle toccate dal buffer')
+  };
+  var RC_INFO={
+    rcArea:{t:'Dove cerchi', s:'Regione, provincia e comune della zona in cui lavori.', h:
+      '<h3>Come si usa</h3><ol><li>Scegli la <b>regione</b>, poi la <b>provincia</b> e il <b>comune</b>. Con l\'accesso ad AGOL la mappa si sposta lì.</li>'
+      +'<li>Con il comune scelto puoi cercare per <b>foglio e particella</b>, nella sezione qui sotto.</li></ol>'
+      +'<h3>Da sapere</h3><ul><li>La regione carica anche la sua mappa <b>Check Vincoli</b>, se esiste (serve l\'accesso). I vincoli arrivano spenti: li accendi dal pannello <b>Layer</b>, a destra.</li>'
+      +'<li>Il comune serve solo per foglio e particella: <b>Sulla mappa</b> e <b>Da un disegno</b> funzionano ovunque.</li>'
+      +'<li>A sezione chiusa, il titolo ricorda il comune scelto.</li></ul>'},
+    rcMap:{t:'Sulla mappa', s:'Le particelle che clicchi, o che stanno dentro una forma che disegni.', h:
+      '<h3>Esempio</h3>'+RDIA.point+RDIA.rect+RDIA.line
+      +'<p>Sull\'ortofoto vedi un terreno che ti interessa: con <b>Poligono</b> ne ricalchi il contorno e trovi tutte le sue particelle, senza conoscerne i numeri. Con <b>Linea</b>, lungo una strada o un canale, trovi le particelle che attraversa.</p>'
+      +'<h3>Come si usa</h3><ol><li>Premi un modo: <b>Puntuale</b>, <b>Rettangolo</b>, <b>Poligono</b> o <b>Linea</b>.</li>'
+      +'<li>Sulla mappa: un clic sulla particella; oppure trascina il rettangolo; oppure clicca i vertici del poligono, o i punti della linea, e finisci con un doppio clic.</li>'
+      +'<li>Le particelle trovate vanno nell\'<b>Elenco</b>, sezione <b>Particelle</b>. Il modo resta attivo: di nuovo sul pulsante, o Esc, per smettere.</li></ol>'
+      +'<h3>Da sapere</h3><ul><li>Funziona ovunque, anche senza aver scelto il comune.</li>'
+      +'<li>Il catasto non permette di cercare per area: provo un punto ogni tanti metri dentro la forma, o lungo la linea. Su aree grandi ci vuole tempo, e una particella molto piccola può sfuggire: aggiungila con un clic.</li>'
+      +'<li>Mi fermo a circa 120 particelle per volta. <b>Esc</b> ferma la ricerca: il primo tiene le particelle già trovate, il secondo ferma tutto.</li>'
+      +'<li>Senza un modo attivo, un clic sulla mappa apre le informazioni dei layer.</li></ul>'},
+    rcDraw:{t:'Da un disegno', s:'Le particelle toccate da qualcosa che hai già: un disegno, un buffer, un file.', h:
+      '<h3>Esempio</h3>'+RDIA.buf
+      +'<p>Hai disegnato un <b>elettrodotto</b> e in <b>Geoprocessi</b> ne hai fatto un buffer di 150 m. Qui scegli il buffer e premi <b>Cerca</b>: trovi tutte le particelle nella fascia di rispetto.</p>'
+      +'<h3>Come si usa</h3><ol><li>Scegli dal menu un disegno, un buffer, un risultato dei geoprocessi o un oggetto importato.</li>'
+      +'<li>Premi <b>Cerca</b>: la mappa va sull\'oggetto e le particelle che tocca vanno nell\'<b>Elenco</b>. Con un punto trovi la particella sotto il punto.</li></ol>'
+      +'<h3>Da sapere</h3><ul><li>Vale quanto detto in <b>Sulla mappa</b>: un punto ogni tanti metri, circa 120 particelle per volta, Esc per fermare.</li>'
+      +'<li>Il numero nel titolo dice quanti oggetti puoi usare.</li></ul>'}
+  };
+  // Disegno: i gesti di ogni strumento, e un lato scritto a mano (deflezione + distanza)
+  var dS=' fill="'+fD+'" stroke="'+cD+'" stroke-width="2" stroke-linejoin="round"';
+  var vdot=function(pts){ return pts.split(' ').map(function(p){ var q=p.split(','); return '<circle cx="'+q[0]+'" cy="'+q[1]+'" r="2.2" fill="'+cD+'"/>'; }).join(''); };
+  var dlab=function(x,t,s){ return '<text x="'+x+'" y="80" text-anchor="middle" font-size="10" font-weight="600" fill="currentColor">'+t+'</text>'
+    +'<text x="'+x+'" y="92" text-anchor="middle" font-size="9" fill="currentColor" opacity=".7">'+s+'</text>'; };
+  var dfig=function(svg,cap){ return '<figure class="gpdia"><svg viewBox="0 0 270 100" role="img" aria-label="'+cap+'">'+svg+'</svg><figcaption>'+cap+'</figcaption></figure>'; };
+  var DDIA={
+    tools: dfig('<circle cx="27" cy="40" r="5" fill="'+cD+'" stroke="#fff" stroke-width="1.2"/>'+dlab(27,'Punto','1 clic')
+      +'<polyline points="60,56 72,30 86,48 100,24" fill="none" stroke="'+cD+'" stroke-width="2"/>'+vdot('60,56 72,30 86,48 100,24')
+      +'<circle cx="100" cy="24" r="5" fill="none" stroke="'+cD+'" stroke-width="1.2"/>'+dlab(81,'Linea','doppio clic')
+      +'<polygon points="116,54 122,26 148,22 156,46 138,58"'+dS+'/>'+vdot('116,54 122,26 148,22 156,46 138,58')+dlab(136,'Area','doppio clic')
+      +'<rect x="170" y="24" width="38" height="32"'+dS+'/><path d="M172 26 202 50.5" stroke="currentColor" stroke-width="1.2" stroke-dasharray="3 2"/><path d="M206 54 199.4 52.5 203.2 47.9Z" fill="currentColor"/>'+dlab(189,'Rettangolo','trascina')
+      +'<circle cx="243" cy="40" r="17"'+dS+'/><circle cx="243" cy="40" r="1.8" fill="currentColor"/><path d="M243 40h12" stroke="currentColor" stroke-width="1.2" stroke-dasharray="3 2"/><path d="M259 40 254 37v6z" fill="currentColor"/>'+dlab(243,'Cerchio','dal centro'),
+      'Punto: un clic. Linea e area: un clic per vertice, doppio clic per finire. Rettangolo e cerchio: trascina'),
+    typed: dfig('<line x1="30" y1="26" x2="130" y2="26" stroke="'+cD+'" stroke-width="2"/>'+vdot('30,26 130,26')
+      +'<text x="80" y="18" text-anchor="middle" font-size="9" fill="currentColor" opacity=".7">lato già disegnato</text>'
+      +'<line x1="130" y1="26" x2="130" y2="80" stroke="'+cD+'" stroke-width="2" stroke-dasharray="5 3"/><circle cx="130" cy="80" r="3.2" fill="#FF8C1A"/>'
+      +'<path d="M122 26V34H130" fill="none" stroke="currentColor" stroke-width="1" opacity=".7"/>'
+      +'<rect x="146" y="34" width="112" height="44" rx="5" fill="currentColor" fill-opacity=".08" stroke="currentColor" stroke-opacity=".35"/>'
+      +'<text x="154" y="52" font-size="10" fill="currentColor">Deflezione</text><text x="250" y="52" text-anchor="end" font-size="10" font-weight="700" fill="currentColor">90°</text>'
+      +'<text x="154" y="68" font-size="10" fill="currentColor">Distanza</text><text x="250" y="68" text-anchor="end" font-size="10" font-weight="700" fill="currentColor">120 m</text>',
+      'Deflezione 90 e distanza 120: il nuovo lato gira ad angolo retto a destra ed è lungo 120 m')
+  };
+  // forme con misure, copia parallela, griglia
+  var DDIA2={
+    shape: dfig('<polygon points="20,82 40,18 120,10 134,74" fill="'+fP+'" stroke="'+cP+'" stroke-width="1.5"/>'
+      +'<line x1="40" y1="18" x2="120" y2="10" stroke="#FF8C1A" stroke-width="3" stroke-dasharray="5 3"/>'
+      +'<polygon points="50.8,37.1 110.5,31.1 113.2,58.9 53.5,64.9"'+dS+'/>'
+      +'<text x="82" y="51" text-anchor="middle" font-size="9" fill="currentColor">100 × 50 m</text>'
+      +'<circle cx="205" cy="48" r="28"'+dS+'/><circle cx="205" cy="48" r="1.8" fill="currentColor"/>'
+      +'<path d="M205 48h28" stroke="currentColor" stroke-width="1.2" stroke-dasharray="3 2"/><text x="219" y="43" text-anchor="middle" font-size="9" fill="currentColor">r 50 m</text>',
+      'Un rettangolo 100 × 50 m parallelo al lato scelto (tratteggio arancione) e un cerchio di raggio 50 m'),
+    offLine: gpDia('<polyline points="10,60 50,40 100,48" fill="none" stroke="'+cD+'" stroke-width="2.2"/><circle cx="62" cy="72" r="6" fill="none" stroke="currentColor" stroke-width="1.2" opacity=".6"/><circle cx="62" cy="72" r="2.2" fill="currentColor"/>',
+      '<polyline points="10,60 50,40 100,48" fill="none" stroke="'+cD+'" stroke-width="2.2"/><polyline points="15.4,70.7 52,52.4 98.1,59.8"'+' fill="none" stroke="'+cR+'" stroke-width="2.2"/>'
+      +'<path d="M30 50 35.4 60.7" stroke="currentColor" stroke-width="1"/><text x="44" y="72" font-size="9" fill="currentColor">10 m</text>',
+      'una linea e il clic', 'la copia', 'Linea: la copia va dalla parte del clic, alla distanza scritta'),
+    offArea: gpDia('<polygon points="20,20 95,15 100,75 25,80" fill="'+fP+'" stroke="'+cP+'" stroke-width="1.8"/><circle cx="60" cy="48" r="6" fill="none" stroke="currentColor" stroke-width="1.2" opacity=".6"/><circle cx="60" cy="48" r="2.2" fill="currentColor"/>',
+      '<polygon points="20,20 95,15 100,75 25,80" fill="none" stroke="'+cP+'" stroke-width="1.5"/><polygon points="29.5,28.9 86,24.8 90.2,66.3 33.8,70.1"'+sR+'/>',
+      'un\'area, clic dentro', 'il rientro', 'Area: clic dentro, un rientro dal confine; clic fuori, un allargamento'),
+    grid: (function(){ var L='';
+      for(var x=50-14*8;x<=330;x+=14) L+='<line x1="'+x+'" y1="-90" x2="'+x+'" y2="190"/>';   // origine della griglia sul primo clic
+      for(var y=64-14*12;y<=190;y+=14) L+='<line x1="-90" y1="'+y+'" x2="360" y2="'+y+'"/>';
+      return dfig('<defs><clipPath id="drwGridClip"><rect x="0" y="0" width="270" height="100"/></clipPath></defs><g clip-path="url(#drwGridClip)"><g transform="rotate(-12 135 50)">'
+        +'<g stroke="currentColor" stroke-opacity=".22" stroke-width=".8">'+L+'</g>'
+        +'<line x1="50" y1="64" x2="230" y2="64" stroke="#FF8C1A" stroke-width="2.5" stroke-dasharray="5 3"/><circle cx="50" cy="64" r="3.5" fill="#FF8C1A"/><circle cx="230" cy="64" r="3.5" fill="#FF8C1A"/>'
+        +'<rect x="106" y="22" width="70" height="28"'+dS+'/></g></g>',
+        'La griglia allineata con due clic lungo un lato (arancione): un rettangolo agganciato ai suoi incroci gli resta parallelo'); })()
+  };
+  var DRW_INFO={
+    drwDraw:{t:'Disegna sulla mappa', s:'Punti, linee e aree tuoi, ognuno con una categoria e una nota.', h:
+      '<h3>Come si disegna</h3>'+DDIA.tools
+      +'<ol><li>Premi <b>Punto</b>, <b>Linea</b>, <b>Area</b>, <b>Rettangolo</b> o <b>Cerchio</b>.</li>'
+      +'<li>Scegli la <b>categoria</b> (le voci cambiano con il tipo) e, se vuoi, scrivi una <b>nota</b>: valgono per i disegni che fai da quel momento.</li>'
+      +'<li>Disegna. Lo strumento resta attivo per il disegno successivo: di nuovo sul pulsante, o Esc, per smettere.</li></ol>'
+      +'<h3>Esempio</h3><p>Al sopralluogo hai visto una <b>linea elettrica</b> che non è sulle carte: premi <b>Linea</b>, scegli la categoria <b>Elettrodotto</b>, scrivi nella nota «MT su pali, da verificare» e ricalcala sull\'ortofoto. Poi, in <b>Geoprocessi</b>, un buffer ti dà la fascia di rispetto.</p>'
+      +'<h3>Correggere un disegno</h3><ul><li>Con nessuno strumento attivo, clicca il disegno: lo sposti trascinandolo, e con le maniglie lo ruoti o lo ridimensioni. Cliccalo di nuovo per spostarne i singoli vertici. Clic fuori per finire.</li>'
+      +'<li>Al primo clic, con le maniglie attorno, <b>Canc</b> lo cancella.</li>'
+      +'<li><b>↶ Annulla</b> e <b>↷ Ripeti</b> (anche <kbd>Ctrl</kbd>+<kbd>Z</kbd> e <kbd>Ctrl</kbd>+<kbd>Y</kbd>): mentre disegni tolgono o rimettono l\'ultimo vertice; dopo, annullano l\'ultima modifica a disegni, buffer, risultati e importati, anche uno spostamento o una cancellazione. Lo storico riparte quando apri un progetto o svuoti il lavoro.</li></ul>'
+      +'<h3>Da sapere</h3><ul><li>I disegni vanno nell\'<b>Elenco</b>, sezione <b>Disegni</b>: da lì li rinomini, li colori, li togli, li esporti o li promuovi in <b>Sites Notes</b> (serve l\'accesso), con la loro categoria.</li>'
+      +'<li>Restano in questo browser e si salvano nel progetto.</li>'
+      +'<li>Il numero nel titolo dice quanti disegni hai. <b>Cancella tutti i disegni</b>, in fondo, chiede conferma e non tocca i risultati dei geoprocessi.</li></ul>'},
+    drwAid:{t:'Misure esatte e aggancio', s:'Lati con la lunghezza e l\'angolo che scrivi tu, e vertici agganciati a quelli che ci sono già.', h:
+      '<h3>Esempio</h3>'+DDIA.typed
+      +'<p>Stai disegnando il confine di un lotto e il secondo lato deve essere lungo <b>120 m</b>, ad angolo retto con il primo. Dopo il primo vertice premi Tab, scrivi <b>90</b> e <b>120</b>, Invio, poi un clic.</p>'
+      +'<h3>Come si scrivono le misure</h3><ol><li>Mentre disegni, con il puntatore sulla mappa, premi <b>Tab</b>: si aprono i campi <b>Deflezione</b> e <b>Distanza</b>.</li>'
+      +'<li>Scrivi i valori (Tab passa da un campo all\'altro) e premi <b>Invio</b>: il lato si blocca su quelle misure.</li>'
+      +'<li><b>Clicca</b> sulla mappa, in un punto qualsiasi: il vertice va dove dicono le misure. Poi continui come sempre.</li></ol>'
+      +'<h3>La deflezione</h3><p>È di quanto giri rispetto al lato precedente: <b>0</b> vai dritto, <b>90</b> giri ad angolo retto a destra, <b>−90</b> a sinistra.</p>'
+      +'<h3>Angoli da nord</h3><p>Nel menu <b>Angoli</b> scegli <b>Da nord</b>: il campo diventa <b>Direzione</b>, l\'azimut del lato (0 nord, 90 est, 180 sud), come nei rilievi. La scelta resta per le volte dopo.</p>'
+      +'<h3>L\'aggancio</h3><p>Attira il puntatore sui vertici e sui bordi di disegni e particelle e, con la seconda spunta, anche dei <b>DWG</b> e dei <b>layer vettoriali accesi</b> (vincoli del portale, servizi web): quelli accesi quando inizi a disegnare. In più mostra gli angoli retti e i paralleli tra i lati del disegno in corso.</p>'
+      +'<h3>Da sapere</h3><ul><li>Se scrivi un solo valore, l\'altro lo decide il mouse: per esempio fissi la distanza e scegli la direzione muovendo il puntatore.</li>'
+      +'<li>Un secondo Invio chiude il disegno senza aggiungere il vertice: prima clicca.</li>'
+      +'<li>Tieni premuto <b>Ctrl</b> per staccarti al volo dall\'aggancio; togli le spunte se ti ostacola.</li>'
+      +'<li>Parallelo e perpendicolare valgono tra i lati dello stesso disegno. Per stare paralleli al lato di una particella usa la <b>Griglia</b> allineata a quel lato, o <b>∥ Da un lato</b> nelle forme con misure.</li>'
+      +'<li>Con l\'opzione delle lunghezze accesa vedi sempre, mentre disegni, la lunghezza del lato e quella totale.</li></ul>'},
+    drwShape:{t:'Forme con misure', s:'Rettangoli e cerchi di misura esatta, messi sulla mappa con un clic.', h:
+      '<h3>Esempio</h3>'+DDIA2.shape
+      +'<p>Vuoi vedere se un campo da <b>100 × 50 m</b> sta nella particella, allineato al suo confine: scrivi le misure, premi <b>∥ Da un lato</b> e clicca il confine, poi <b>Posiziona sulla mappa</b> e clicca dove vuoi il centro.</p>'
+      +'<h3>Come si usa</h3><ol><li>Scegli <b>Rettangolo</b> (larghezza, altezza e orientamento) o <b>Cerchio</b> (raggio).</li>'
+      +'<li>Premi <b>Posiziona sulla mappa</b>: la forma segue il puntatore, tratteggiata.</li>'
+      +'<li>Clicca dove va il centro. Puoi metterne altre; Esc per finire.</li></ol>'
+      +'<h3>L\'orientamento</h3><p>È la direzione della larghezza, come azimut: <b>90</b> est-ovest, <b>0</b> nord-sud, <b>45</b> nord-est. Con <b>∥ Da un lato</b> lo prendi da un lato di un disegno, di una particella, di un DWG o di un layer della mappa.</p>'
+      +'<h3>Da sapere</h3><ul><li>Le misure sono a terra, esatte al centimetro.</li>'
+      +'<li>La forma è un disegno come gli altri: prende categoria e nota della sezione <b>Disegna sulla mappa</b>, e poi la sposti, la ruoti o la cancelli come ogni disegno.</li></ul>'},
+    drwOffset:{t:'Copia parallela', s:'Una linea o un\'area alla distanza che scrivi da una che c\'è già.', h:
+      '<h3>Esempio</h3>'+DDIA2.offLine+DDIA2.offArea
+      +'<p>Devi stare a <b>10 m</b> dai confini della particella: scrivi 10, premi <b>∥ Scegli e copia</b>, clicca il confine e poi dentro la particella. Ottieni l\'area che resta, con la sua superficie nell\'Elenco.</p>'
+      +'<h3>Come si usa</h3><ol><li>Scrivi la distanza in metri e premi <b>∥ Scegli e copia</b>.</li>'
+      +'<li>Clicca vicino al bordo dell\'oggetto da copiare: disegno, risultato, importato, particella, DWG o layer della mappa. Si evidenzia in arancione.</li>'
+      +'<li>Clicca dalla parte dove vuoi la copia. Per un\'area: dentro fa un <b>rientro</b>, fuori un <b>allargamento</b>.</li></ol>'
+      +'<h3>Solo il lato cliccato</h3><p>Con la spunta copi solo quel lato, come una linea: per esempio la parallela a 30 m dal confine lungo la strada.</p>'
+      +'<h3>Da sapere</h3><ul><li>Gli angoli restano vivi, non arrotondati come nel buffer.</li>'
+      +'<li>La copia è un nuovo disegno; puoi farne altre di seguito, Esc per finire.</li>'
+      +'<li>Copiando l\'oggetto intero la distanza ha un errore dello 0,15% (1,5 cm su 10 m); copiando un solo lato è esatta.</li></ul>'},
+    drwGrid:{t:'Griglia', s:'Una griglia in metri veri su cui agganciare i disegni, anche ruotata lungo un lato.', h:
+      '<h3>Esempio</h3>'+DDIA2.grid
+      +'<p>Per un layout allineato al confine della particella: accendi la griglia col passo che ti serve, premi <b>∥ Allinea a un lato</b> e clicca due punti lungo il confine. Poi disegna: i vertici si agganciano agli incroci e i lati restano paralleli o perpendicolari al confine.</p>'
+      +'<h3>Come si usa</h3><ol><li>Spunta <b>Mostra la griglia</b> e scrivi il passo in metri.</li>'
+      +'<li><b>∥ Allinea a un lato</b>: la griglia parte dal primo clic e segue la direzione del secondo. <b>Raddrizza</b> la riporta nord-sud.</li>'
+      +'<li>Con <b>Aggancia alla griglia</b> i vertici vanno su linee e incroci vicini.</li></ol>'
+      +'<h3>Da sapere</h3><ul><li>Il passo è in metri veri, sul terreno.</li>'
+      +'<li>Se sei troppo lontano le celle diventano troppo piccole e la griglia sparisce: te lo dico qui sotto, avvicinati.</li>'
+      +'<li>La griglia non si salva nel progetto: riaccendila quando serve.</li></ul>'}
+  };
+  function impInfo(k){ var d=IMP_INFO[k]||GP_INFO[k]||RC_INFO[k]||DRW_INFO[k], m=$g('infoModal'); if(!d||!m) return;
     $g('infoTitle').textContent=d.t; $g('infoSub').textContent=d.s; $g('infoBody').innerHTML=d.h;
     m.style.display='flex'; var c=$g('infoClose'); if(c) c.focus(); }
   function impInfoClose(){ var m=$g('infoModal'); if(m) m.style.display='none'; }
   if($g('infoClose')) $g('infoClose').onclick=impInfoClose;
-  // sezioni aperte/chiuse di Importa dati e Geoprocessi (la chiave vecchia era solo di Importa dati)
+  // sezioni aperte/chiuse di tutte le schede (la chiave vecchia era solo di Importa dati)
   var IMP_KEY='axpo_sezioni_aperte', impSecs=Array.prototype.slice.call(document.querySelectorAll('details.imod'));
   try{ var sv=JSON.parse(localStorage.getItem(IMP_KEY)||localStorage.getItem('axpo_import_aperte')||'null');
     if(sv&&typeof sv==='object') impSecs.forEach(function(d){ if(d.id in sv) d.open=!!sv[d.id]; }); }catch(e){}
@@ -5318,6 +5838,7 @@ function baseGroundSet(){
     if(switching) return;
     var b=e.target&&e.target.closest? e.target.closest('button') : null; if(!b) return;
     var fam=familyOf(b); if(!fam) return;
+    try{ if(typeof drwModeEnd==='function') drwModeEnd(); if(typeof grdPlaceEnd==='function') grdPlaceEnd(); }catch(x){}
     switching=true;
     if(fam!=='sel') offSel();
     if(fam!=='draw') offDraw();
@@ -5332,6 +5853,7 @@ function baseGroundSet(){
       if(typeof selRunning==='function'&&selRunning()) return 'Cerco le particelle nell\'area… <kbd>Esc</kbd> per interrompere.';
       if(typeof gpPick!=='undefined'&&gpPick) return 'Scegli gli oggetti per <b>'+gpPick+'</b> cliccandoli sulla mappa. <kbd>Esc</kbd> per finire.';
       if(typeof srRefOn==='function'&&srRefOn()) return 'Clicca <b>dove dovrebbero cadere</b> le coordinate incollate. <kbd>Esc</kbd> per annullare.';
+      if(typeof drwModeInfo==='function'){ var dm=drwModeInfo(); if(dm) return dm; }   // forme con misure, copia parallela, griglia
       if(typeof subActive!=='undefined'&&subActive) return 'Modalità <b>Contesto sito</b> attiva — clicca un punto sulla mappa. <kbd>Esc</kbd> per uscire.';
       if(typeof drawType!=='undefined'&&drawType){
         var dn={point:'Disegno punto',polyline:'Disegno linea',polygon:'Disegno area',rectangle:'Disegno rettangolo',circle:'Disegno cerchio'}[drawType];
@@ -5366,6 +5888,8 @@ function baseGroundSet(){
     if(typeof selRunning==='function'&&selRunning()){ selAbort(); return; }             // selezione su area in corso: interrompi
     if(typeof cadAlignOn==='function'&&cadAlignOn()){ cadAlignEnd(true); return; }   // allineamento DWG: Esc = Annulla
     if(typeof gpPickOn==='function'&&gpPickOn()){ gpPickEnd(); return; }               // scelta oggetti per A/B
+    if(typeof drwModeOn==='function'&&drwModeOn()){ drwModeEnd(); return; }            // forma con misure, lato, copia parallela
+    if(typeof grdPlaceOn==='function'&&grdPlaceOn()){ grdPlaceEnd(); return; }         // allineamento della griglia
     if(typeof srRefOn==='function'&&srRefOn()){ srRefEnd(); toolMsg('srMsg','Scelta del riferimento annullata.'); return; }
     if(document.querySelector('#toolsBody .drawer.open')){ openPanel(null); return; }
     switching=true; offSel(); offDraw(); offSub(); switching=false;
@@ -5425,8 +5949,8 @@ function baseGroundSet(){
   /* --- definizione dei due tour --- */
   var TOUR_START=[
     {sel:'#signin', title:'1 · Accedi ad AGOL', body:"Accedi col tuo account: serve per le mappe dei vincoli e i layer del portale, il contesto sito e per promuovere aree. La ricerca delle particelle funziona anche senza.", placement:'below'},
-    {sel:'#step1', title:'2 · Ambito', body:"Scegli Regione, Provincia e Comune. La regione carica anche la mappa Check Vincoli della zona.", open:function(){openTab('ricerca');}, placement:'right'},
-    {sel:'#step2', title:'3 · Ricerca particelle', body:"Cerca per Foglio/Particella, oppure attiva la selezione su mappa (punto, rettangolo, poligono, linea). Puoi anche partire da un disegno esistente.", open:function(){openTab('ricerca');}, placement:'right'},
+    {sel:'#rcSecArea', title:'2 · Dove cerchi', body:"Scegli regione, provincia e comune. La regione carica anche la mappa Check Vincoli della zona (serve l'accesso).", open:function(){openTab('ricerca'); window.impOpen&&window.impOpen('rcSecArea');}, placement:'right'},
+    {sel:'.tabpane[data-tab=ricerca]', title:'3 · Ricerca particelle', body:"Tre modi, ognuno nella sua sezione: <b>Foglio e particella</b>, se conosci i numeri; <b>Sulla mappa</b>, con un clic o disegnando un rettangolo, un poligono o una linea; <b>Da un disegno</b>, per le particelle toccate da un disegno o da un buffer. Clicca un titolo per aprirlo; la <b>i</b> spiega ognuno con un esempio.", open:function(){openTab('ricerca');}, placement:'right'},
     {sel:'#drawerElenco', title:'4 · Elenco & azioni', body:"Tutto ciò che raccogli finisce qui, diviso in <b>Particelle · Disegni · Geoprocessi · Importati</b>. Ogni riga si rinomina, si colora, si nasconde, si zooma — e la <b>casella a sinistra</b> la seleziona per usarla nei geoprocessi.", open:function(){openDrawer('elenco');}, placement:'left'},
     {sel:'.colbtns', title:'5 · Esporta e promuovi', body:"Esporta in GeoJSON/KML/KMZ/SHP/XLSX, oppure promuovi in <b>AREAS COLLECTION</b> o <b>Sites Notes</b>.", open:function(){openDrawer('elenco');}, placement:'left'},
     {sel:'#projSaveBtn', title:'6 · Salva il progetto', body:"<b>Salva progetto</b> mette tutto il lavoro in un file .axpo, come un progetto QGIS: mappa e layer, particelle, disegni, import, anche <b>DWG e immagini</b> già posizionati. Con <b>Apri progetto</b> lo ritrovi com'era, o lo passi a un collega. <kbd>Ctrl</kbd>+<kbd>S</kbd> risalva.", placement:'below'},
@@ -5434,7 +5958,7 @@ function baseGroundSet(){
   ];
   var TOUR_ALL=[
     {sel:'#sideRail', title:'Le schede a sinistra', body:"Il rail di icone: Ricerca, Disegno, Geoprocessi, Contesto sito, Import. Cliccando l'icona già attiva, la sidebar si comprime a colonna.", placement:'right'},
-    {sel:'.tabpane[data-tab=disegno]', title:'Disegno', body:"Punti, linee e aree con categoria e nota. Avanzati: <b>snapping</b>, <b>rettangolo/cerchio</b>, <b>quote distanza/angolo</b> con input digitato (90° = perpendicolare).", open:function(){openTab('disegno');}, placement:'right'},
+    {sel:'.tabpane[data-tab=disegno]', title:'Disegno', body:"<b>Disegna sulla mappa</b>: punti, linee, aree, rettangoli e cerchi, con categoria e nota, e <b>↶ Annulla</b> / <b>↷ Ripeti</b>. <b>Forme con misure</b>: rettangoli e cerchi esatti, anche paralleli a un lato. <b>Copia parallela</b>: una linea o un'area a distanza fissa, come il rientro dai confini. <b>Misure esatte e aggancio</b>: <b>Tab</b> mentre disegni per scrivere angolo e distanza, aggancio anche a DWG e layer. <b>Griglia</b> in metri, allineabile a un lato.", open:function(){openTab('disegno');}, placement:'right'},
     {sel:'.tabpane[data-tab=geoproc]', title:'Geoprocessi', body:"Si lavora in due passi. Prima scegli gli <b>oggetti</b> e mettili in <b>A</b>: cliccandoli sulla mappa (👆), dalle righe spuntate nell'elenco (☑) o per categoria. Poi scegli l'operazione: <b>Buffer</b>; <b>Unisci</b>, <b>Contorno</b>, <b>Semplifica</b>; <b>Ritaglia</b> con un'area disegnata; oppure confronta A con <b>B</b> (<b>Parte comune</b>, <b>Sottrai B da A</b>). La <b>i</b> di ogni sezione mostra un esempio disegnato. I risultati vanno nell'Elenco, sezione Geoprocessi.", open:function(){openTab('geoproc');}, placement:'right'},
     {sel:'.tabpane[data-tab=contesto]', title:'Contesto sito', body:"Attiva e clicca un punto sulla mappa: trovi sottostazioni, linea AT e progetti FV vicini.", open:function(){openTab('contesto');}, placement:'right'},
     {sel:'.tabpane[data-tab=import]', title:'Importa dati', body:"Cinque moduli, ognuno nella sua sezione: <b>file di geometrie</b> (GeoJSON, KML, KMZ, Shapefile), <b>disegni CAD</b>, <b>immagini</b>, <b>servizi web</b> (WMS, WFS, ArcGIS REST) e <b>coordinate senza sistema</b>. Clicca un titolo per aprirlo; la <b>i</b> spiega come funziona il modulo.", open:function(){openTab('import');}, placement:'right'},

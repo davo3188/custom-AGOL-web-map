@@ -73,7 +73,12 @@ changes.
 **Parcel search**
 - By *Comune / Foglio / Particella*, with an administrative cascade (region → province → municipality).
 - By clicking the map, or by drawing a point, rectangle, polygon or line over an area.
-- From a geometry you already drew.
+- From a geometry you already drew — a drawing, a buffer, a geoprocessing result or an import; a point
+  finds the parcel under it (since 2026-09-23; before, a point gave a sampling error).
+- The tab has the same layout as *Importa dati* and *Geoprocessi* (since 2026-09-23): *Dove cerchi*
+  (the cascade; the closed title shows the chosen comune), then one section per way of searching —
+  *Foglio e particella*, *Sulla mappa*, *Da un disegno* (its title counts the usable objects). The **i**
+  windows draw each mode on a small parcel grid, found parcels in the map's amber (`RC_INFO`/`RDIA`).
 
 Because Zornade exposes **no spatial query**, area selection works by sampling a grid of points inside
 the geometry and calling `/parcels/locate` on each. It is bounded by explicit caps and is slow on large
@@ -82,8 +87,47 @@ scan and still adds the parcels already found, a second one stops that too. Ever
 after 20 s with a message, instead of leaving the UI waiting forever.
 
 **Drawing & geoprocessing**
-- Native `SketchViewModel`: snapping, rectangle, circle, live distance/angle readouts and typed input
-  (90° = perpendicular).
+- Native `SketchViewModel`: snapping, rectangle, circle, live distance/angle readouts and typed input.
+  Verified on 4.34: with the pointer over the map, **Tab** opens the *Deflezione* and *Distanza* fields
+  (deflection is relative to the previous side: 90 = right angle to the right, −90 to the left); **Enter**
+  locks the values and a **click** anywhere places the vertex there. A second Enter completes the drawing
+  *without* that vertex. The circle is drawn from its centre.
+- The *Disegno* tab has two sections (since 2026-09-23): *Disegna sulla mappa* (the five tools, category,
+  note; the title counts the drawings) and *Misure esatte e aggancio*. The **i** windows draw the gesture
+  of each tool and a typed side (`DRW_INFO`/`DDIA`). *Cancella tutti i disegni* sits below, asks first and
+  leaves geoprocessing results alone.
+- A drawing, buffer, result or import clicked on the map (no tool active) can be moved, rotated and
+  scaled; a second click edits its vertices; Delete, on the first click, removes it. Since 2026-09-23 the
+  end of an edit updates the stored area, the list and the auto-save (see §7).
+- **CAD-style tools** (since 2026-09-23), all in the *Disegno* tab:
+  - **Undo / redo** (buttons, Ctrl+Z / Ctrl+Y). The SDK's own undo only works inside the active sketch
+    session (it removes the last vertex, and handles Ctrl+Z itself while the map has focus). For finished
+    work the app keeps its own history (`drwHist`, 40 steps): "snapshots" of the tool layer holding references
+    to graphics and geometries, recorded in `refreshDl()`. The SDK replaces geometry objects on edit, but at
+    the start of an edit every snapshot still pointing at the live geometry gets a clone (`histFreeze`), in case
+    it is ever mutated in place. History restarts after start-up restore, *Svuota il lavoro* and project open.
+  - **Snapping to DWGs and map layers**: feature sources are rebuilt (`drwSnapSync`) when a drawing or an edit
+    starts — the tool layer, parcels and, with the option on, every visible `feature`/`geojson`/`wfs`/`csv`
+    layer (DWG sublayers included). Map-image and WMS layers cannot be snapped to.
+  - **Angles as azimuth**: `valueOptions.directionMode` `relative` (deflection, default) or `absolute`
+    (azimuth from north, clockwise — verified: east = 90°). Remembered in `axpo_drw_dir`.
+  - **Shapes with measurements**: a rectangle (width × height, orientation of the width as azimuth) or a
+    circle (radius), previewed under the pointer and placed with a click on the centre. *Da un lato* takes the
+    orientation from the nearest side of a drawing, parcel, DWG or layer feature (full geometry re-queried).
+  - **Parallel copy**: pick an object, then click the side. A line gives a parallel line, an area an inset
+    (click inside) or an outset (outside), with mitered corners (`geometryEngine.offset`); *Solo il lato
+    cliccato* copies just that side.
+  - **Metric grid**: the SDK's `GridControlsViewModel` (a "measured" grid, `view.grid`, spacing in real
+    metres even in Web Mercator — verified by snapping: vertices at whole 10 m cells from the grid centre).
+    Spacing must be set *after* `trySetDisplayEnabled(true)` or it reverts to 1. *Allinea a un lato* uses
+    `interactivePlacementState='interactive'` (two clicks: origin, then direction). `rotation` is in degrees,
+    counter-clockwise from east. Not saved in the project.
+- **Web Mercator is not conformal on the ellipsoid.** It projects with the sphere, but the coordinates are
+  WGS84: at 45° one ground metre is ~0.17% more in x and ~0.16% less in y than the plain 1/cos(lat) — a
+  100×50 m rectangle built with 1/cos(lat) measured 100.17×49.92 m. Shapes, single-side offsets and edge
+  azimuths therefore use two scales (`mercK2`: kx=√(1−e²sin²φ)/cosφ, ky=(1−e²sin²φ)^1.5/((1−e²)cosφ)) and come
+  out exact to the millimetre; whole-object offsets go through `geometryEngine.offset` with one scale, within
+  0.15% (1.5 cm on 10 m).
 - Client-side geoprocessing via turf on **individual objects**, not whole categories. Two slots, **A** and
   **B**, are filled by clicking objects on the map (parcels, drawings, imports, earlier results — click
   again on the same spot to step down through overlapping objects), from the rows ticked in the list,
@@ -582,6 +626,40 @@ loose in `backups/`.)
   open/closed memory of both tabs now uses the key `axpo_sezioni_aperte` (the old `axpo_import_aperte`
   is still read). All operations were re-run after the change: Parte comune 24.24 ha + Differenza
   127.27 ha = Unione 151.52 ha. Backup: `geoportale_axpo_pre-geoprocessi-sezioni_2026-09-23.html`.
+- 2026-09-23: **Ricerca and Disegno tabs reorganised** the same way (§4), so all four working tabs now
+  share the layout. The old `.step` CSS went with the old markup. Four defects found and fixed on the
+  way, each reproduced first:
+  - *Pulisci disegni* also deleted every **geoprocessing result** (they are `_kind:'drawing'` with
+    `_sub:'geoproc'`), with no confirmation. Now *Cancella tutti i disegni* asks, and removes drawings only.
+  - A drawing (or buffer, result, import) **moved or reshaped on the map was never saved**: nothing
+    listened to the sketch `update` event, so a reload brought the old shape back, and the stored area of
+    buffers and results stayed stale. Delete during an edit removed the object from the map but not from
+    the list or the save. Handlers on `update` (complete) and `delete` now recompute `area_ha` and call
+    `refreshDl()`.
+  - *Da un disegno* with a **point** failed ("Errore nel campionamento": a point has no extent).
+  - "1 particelle aggiunte": plurals of both search messages.
+
+  Tested signed out: the three search modes, a foglio/particella search, the comune in the
+  closed title, a search from a point drawing, a move, a reshape and a delete with the save checked,
+  a buffer's area after a reshape (4.27 → 6.39 ha), the clear with a union and a buffer left intact, typed
+  deflection/distance (90° / 120 m placed exactly), both tours, light and dark theme. Backup:
+  `geoportale_axpo_pre-disegno-ricerca-sezioni_2026-09-23.html`.
+- 2026-09-23: **CAD-style drawing** (§4): grid, snapping to DWGs and map layers, azimuth, undo/redo, shapes
+  with measurements, parallel copy; three new *Disegno* sections with drawn examples in their **i**. Tested
+  signed out:
+  - rectangles 100×50 and 120×40 at 37°, circle r 50: sides, radii and areas exact to the millimetre;
+  - *Da un lato* on a parcel side (15.67°), rectangle parallel within 0.004°;
+  - 5 m inset of the parcel: 5 m ± 7 mm from the boundary, 7.1 m at the re-entrant corner as expected;
+  - parallel line at 10 m (9.985 m), single side at 10.000 m on the clicked side, outset containing the source;
+  - snapping to a real DWG: a click 0.52 m from a vertex lands on it with the option on, stays 0.52 m away
+    with it off;
+  - grid on at 10 m, aligned with two clicks (45°, as the clicked segment), straightened;
+  - undo/redo with the buttons and Ctrl+Z/Ctrl+Y: drawing a line (last vertex), a finished drawing, a move
+    with the mouse, a delete, *Cancella tutti i disegni*; *Svuota il lavoro* resets the history;
+  - Esc, the mode banner, one map mode at a time, light and dark theme.
+
+  **Not tested**: snapping to portal feature layers (needs sign-in; same mechanism as the DWG layers),
+  `edgeOperation: "offset"` (not used). Backup: `geoportale_axpo_pre-disegno-cad_2026-09-23.html`.
 
 **Checked and not a problem** (do not reopen): `projection.project` applies the default datum
 transformation by itself, so Monte Mario GeoTIFFs are placed right; the AREAS `edits` handler gets the
