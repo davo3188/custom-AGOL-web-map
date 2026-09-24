@@ -29,9 +29,8 @@
   :root{
     /* Brand Axpo — gradient ufficiali */
     --axpo-water-a:#3945CF; --axpo-water-b:#0CE6CD;
-    --axpo-sky-a:#ED6056;   --axpo-sky-b:#4B42D9;
-    --axpo-sun-a:#FF6661;   --axpo-sun-b:#FFC845;
-    --axpo-earth-a:#2DDBD2; --axpo-earth-b:#D5CE35;
+    /* altri gradienti del brand, oggi non usati (tolti come variabili il 24/9, qui per memoria):
+       sky #ED6056→#4B42D9 · sun #FF6661→#FFC845 · earth #2DDBD2→#D5CE35 */
     --axpo-gradient: linear-gradient(90deg, var(--axpo-water-a), var(--axpo-water-b));
     /* Accento operativo */
     --accent:#1F99CC; --accent-strong:#3945CF; --on-accent:#ffffff;
@@ -63,7 +62,7 @@
   *{box-sizing:border-box}
   html,body{margin:0;height:100%}
   body{display:flex;flex-direction:column;font-family:var(--font-ui);background:var(--bg);color:var(--txt);font-size:13px}
-  h1,h2,h3{font-family:var(--font-head);font-weight:600}
+  h1,h2,h3{font-family:var(--font-head);font-weight:700}
   button{font-family:var(--font-ui)}
   *:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
   @media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
@@ -268,6 +267,9 @@
 
   /* ══ TOAST (brief §8) ══ */
   #toasts{position:fixed;right:16px;bottom:16px;z-index:1200;display:flex;flex-direction:column;gap:8px;max-width:340px}
+  .toast .tact{display:inline;margin:0 0 0 6px;padding:0;border:0;background:none;color:var(--accent);font:inherit;font-weight:700;cursor:pointer;text-decoration:underline}
+  .toast .tclose{float:right;margin:-4px -6px 0 8px;padding:0 4px;border:0;background:none;color:var(--mut);font-size:16px;line-height:1;cursor:pointer}
+  .toast .tclose:hover{color:var(--txt)}
   .toast{background:var(--panel);color:var(--txt);border:1px solid var(--line);border-left:4px solid var(--mut);border-radius:8px;padding:10px 13px;font-size:12px;box-shadow:0 6px 18px rgba(0,0,0,.22);line-height:1.4}
   .toast.ok{border-left-color:var(--ok)}
   .toast.err{border-left-color:var(--err)}
@@ -280,7 +282,6 @@
   .esri-ui-corner .esri-expand .esri-widget--button,.esri-ui-corner .esri-widget--button{border-radius:8px}
 
   /* ══ RIORG 2026-07-24: controlli mappa + drawer widget ══ */
-  h1,h2,h3{font-weight:700}
   .mapchip{background:color-mix(in srgb, var(--panel) 82%, transparent);backdrop-filter:blur(6px);border:1px solid var(--line);border-radius:22px;color:var(--txt);cursor:pointer}
   #trStack{position:absolute;top:14px;right:14px;z-index:24;display:flex;flex-direction:column;align-items:flex-end;gap:8px}
   #measureBtn{width:40px;height:40px;font-size:17px;padding:0}
@@ -328,12 +329,22 @@
   .vtoggle:hover{opacity:1;background:var(--hover)}
   .vtoggle.off{opacity:.35}
   .grow.hidden .gname,.grow.hidden .gsub{opacity:.45;text-decoration:line-through}
-  .cswatch{position:relative;width:20px;height:20px;flex:none;border:1px solid var(--line);border-radius:5px;cursor:pointer;padding:0;overflow:hidden}
+  /* colore = secchiello + barretta del colore (un quadratino pieno si confondeva con la casella di spunta) */
+  .cswatch{position:relative;width:20px;height:20px;flex:none;border:0;border-radius:5px;cursor:pointer;padding:0;overflow:hidden;
+    display:grid;place-items:center;color:var(--txt);opacity:.75;background:transparent}
+  .cswatch:hover{opacity:1;background:var(--hover)}
+  .cswatch svg{width:14px;height:14px;margin-top:-3px;pointer-events:none}
+  .cswatch .cbar{position:absolute;left:4px;right:4px;bottom:2px;height:3px;border-radius:2px;background:var(--sw,#888);pointer-events:none;
+    box-shadow:0 0 0 .5px color-mix(in srgb, var(--txt) 35%, transparent)}
   .cswatch input[type=color]{position:absolute;inset:-4px;width:calc(100% + 8px);height:calc(100% + 8px);border:none;padding:0;margin:0;cursor:pointer;background:transparent;opacity:0}
-  .cswatch:hover{border-color:var(--accent)}
   .gsecH .gtools{display:flex;align-items:center;gap:4px;flex:none}
   .gsecH .gtools .vtoggle,.gsecH .gtools .cswatch{width:22px;height:22px}
   .gsecH .gtools>*{cursor:pointer}
+  .gsecH .gselall{flex:none;width:14px;height:14px;margin:0 1px 0 0;accent-color:var(--accent);cursor:pointer}
+  .gsecH .gselall:disabled{opacity:.35;cursor:default}
+  .gdel{border:none;background:transparent;cursor:pointer;padding:0;width:22px;height:22px;flex:none;display:grid;place-items:center;color:var(--txt);opacity:.6;border-radius:5px}
+  .gdel:hover{opacity:1;color:var(--err);background:color-mix(in srgb, var(--err) 12%, transparent)}
+  .gdel:disabled{opacity:.25;cursor:default;color:var(--txt);background:transparent}
   #imgToolbar{position:absolute;top:60px;left:50%;transform:translateX(-50%);z-index:26;display:none;align-items:center;gap:12px;background:color-mix(in srgb,var(--panel) 92%,transparent);backdrop-filter:blur(6px);border:1px solid var(--line);border-radius:12px;padding:8px 14px;font-size:12px;color:var(--txt)}
   #imgToolbar label{display:flex;align-items:center;gap:6px}
   /* selettore numerico opacità (toolbar immagine + righe elenco Importati) */
@@ -414,6 +425,7 @@
   .imod .im-t small{font-size:11px;color:var(--mut)}
   .imod .im-n{flex:none;font-size:10.5px;font-weight:700;padding:1px 7px;border-radius:9px;color:var(--accent);background:color-mix(in srgb, var(--accent) 15%, transparent)}
   .imod .im-n:empty{display:none}
+  .imod .im-n.off{color:var(--mut);background:var(--hover);font-weight:600}
   .imod .im-info{flex:none;width:22px;height:22px;margin:0;padding:0;border-radius:50%;border:1px solid var(--line-strong);background:transparent;
     color:var(--mut);font:italic 700 12px Georgia,'Times New Roman',serif;line-height:1;cursor:pointer;display:grid;place-items:center}
   .imod .im-info:hover,.imod .im-info:focus-visible{color:var(--accent);border-color:var(--accent);outline:none}
@@ -471,8 +483,23 @@
   .shprot{display:flex;gap:6px;align-items:stretch}
   .shprot input{flex:1;min-width:0}
   .shprot button{flex:0 0 auto;margin:0;padding:5px 9px;white-space:nowrap}
-  #shpKind{margin-bottom:2px}
-  #shpPlace{margin-top:10px}
+  .shpbox{margin-top:8px;padding:8px 10px 9px;border:1px dashed var(--line-strong);border-radius:8px}
+  .shpbox .row{margin-top:2px}
+  /* supporto al disegno (misure e aggancio, griglia): fermo in fondo alla scheda Disegno mentre il resto scorre */
+  .drwDock{position:sticky;bottom:-10px;z-index:2;   /* -10px: il margine in fondo a #sideContent, così aderisce al bordo */background:var(--panel);border-top:1px solid var(--line-strong);
+    padding:7px 14px 8px;max-height:60vh;overflow-y:auto;box-shadow:0 -8px 14px -10px rgba(0,0,0,.35)}
+  .drwDockT{font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--mut);margin:0 0 6px}
+  .drwDock .imod{margin-bottom:6px}
+  .drwDock .imod:last-child{margin-bottom:0}
+  .drwDock .imod>summary{padding:6px 10px}
+  .drwDock .imod .im-t small{display:none}   /* chiusi: una riga sola a modulo, il resto nella «i» */
+  .drwDock .imod[open] .im-t small{display:block}
+  .drwDock .imod .im-n.im-txt{max-width:140px}
+  @container (min-width:640px){
+    .drwDock{display:grid;grid-template-columns:1fr 1fr;column-gap:12px;align-items:start}
+    .drwDockT{grid-column:1/-1}
+    .drwDock .imod{margin-bottom:0}
+  }
   .gpbuf span{line-height:1.25}
   #drwClear{margin-top:2px}
   /* esempi «prima → dopo» nella finestra «i» dei geoprocessi */
@@ -624,6 +651,7 @@
               <button data-m="polyline">╱ Linea</button>
             </div>
             <div class="hint" id="selHint">Scegli un modo, poi lavora sulla mappa. Di nuovo sul pulsante, o Esc, per smettere.</div>
+            <div class="hint selnote">Rettangolo, poligono e linea danno una ricerca <b>indicativa</b>: il catasto non si interroga per area, provo un punto ogni tanti metri e una particella molto piccola può sfuggire.</div>
           </div>
         </details>
         <details class="imod" id="rcSecDraw">
@@ -634,18 +662,18 @@
               <div style="flex:2"><select id="selFromDraw" aria-label="Disegno da usare"><option value="">— nessun disegno —</option></select></div>
               <div style="flex:0 0 auto"><button class="sec" id="selDrawGo" disabled style="margin-top:0">Cerca</button></div>
             </div>
+            <div class="hint selnote">Ricerca <b>indicativa</b>, come quella su area: una particella molto piccola può sfuggire (un punto la trova sempre).</div>
           </div>
         </details>
-        <div id="out" hidden></div>
     </div></div>
 
     <div class="tabpane" data-tab="disegno"><div class="paneBody">
         <!-- Come le altre schede: titolo + una riga per sezione, gli esempi nella finestra «i» (DRW_INFO nello script) -->
-        <details class="imod" id="drwSecSite" open>
-          <summary><span class="im-ico" aria-hidden="true">🏷️</span><span class="im-t"><b>Sito di lavoro</b><small>L'area di AREAS COLLECTION a cui legare i disegni</small></span>
+        <details class="imod" id="drwSecSite">
+          <summary><span class="im-ico" aria-hidden="true">🏷️</span><span class="im-t"><b>Sito di lavoro</b><small>Facoltativo: il legame all'area è automatico, qui lo forzi</small></span>
             <button type="button" class="im-info" data-info="drwSite" title="Come funziona, con un esempio" aria-label="Come funziona il sito di lavoro">i</button></summary>
           <div class="im-body">
-            <div id="sfSiteBox" class="sfsite empty">Nessun sito: i disegni restano senza legame.</div>
+            <div id="sfSiteBox" class="sfsite empty">Nessun sito scelto: salvando, ogni oggetto prende da solo l'area che tocca.</div>
             <div class="sfsiterow">
               <button type="button" class="sec" id="sfSitePick" disabled title="Clicca dentro un'area di AREAS COLLECTION sulla mappa">📍 Dalla mappa</button>
               <input id="sfSiteCode" placeholder="Codice, es. C0000" aria-label="Codice progetto" title="Codice progetto dell'area, es. C0000" disabled>
@@ -682,6 +710,30 @@
               <button class="sec" id="drwRect">▭ Rettangolo</button>
               <button class="sec" id="drwCircle">◯ Cerchio</button>
             </div>
+            <!-- percorso di connessione: oltre alla Linea, il calcolo su strada col servizio percorsi Esri (serve l'accesso, 0,005 crediti) -->
+            <div id="rteBox" class="shpbox" hidden>
+              <button type="button" class="sec im-main" id="rteGo" title="Clicca la partenza e l'arrivo: il percorso segue le strade">↝ Su strada: partenza e arrivo</button>
+              <label for="rteMode">Rete</label>
+              <select id="rteMode"><option value="walk">Strade e sentieri: niente autostrade, sensi unici ignorati</option><option value="drive">Solo strade carrabili, come in auto</option></select>
+              <div id="rteMsg" class="thint">Clicca la partenza, poi l'arrivo; <kbd>Maiusc</kbd>+clic in mezzo aggiunge un punto di passaggio. Serve l'accesso ad AGOL (0,005 crediti a percorso).</div>
+            </div>
+            <!-- rettangolo e cerchio: con la spunta, misure esatte (lo Sketch dell'SDK non ha campi scrivibili per queste due forme) -->
+            <div id="shpBox" class="shpbox" hidden>
+              <label class="chk" style="margin-top:0"><input type="checkbox" id="shpOn"> Con misure esatte</label>
+              <div id="shpRectBox" hidden>
+                <div class="row">
+                  <div><label for="shpW">Larghezza (m)</label><input id="shpW" type="number" min="0" step="any" value="100"></div>
+                  <div><label for="shpH">Altezza (m)</label><input id="shpH" type="number" min="0" step="any" value="50"></div>
+                </div>
+                <label for="shpRot">Orientamento della larghezza (azimut, °)</label>
+                <div class="shprot"><input id="shpRot" type="number" step="any" value="90">
+                  <button type="button" class="sec" id="shpRotPick" title="Clicca un lato sulla mappa (disegno, particella, DWG, layer): la larghezza gli diventa parallela">∥ Da un lato</button></div>
+              </div>
+              <div id="shpCircleBox" hidden>
+                <label for="shpR">Raggio (m)</label><input id="shpR" type="number" min="0" step="any" value="50">
+              </div>
+              <div id="shpMsg" class="thint">Senza spunta si disegna a mano libera (clicca e trascina).</div>
+            </div>
             <div class="drwundo">
               <button class="sec" id="drwUndo" disabled title="Annulla l'ultima modifica a disegni, buffer, risultati e importati (Ctrl+Z)">↶ Annulla</button>
               <button class="sec" id="drwRedo" disabled title="Rifai ciò che hai annullato (Ctrl+Y)">↷ Ripeti</button>
@@ -689,44 +741,28 @@
             <div id="drwMsg" class="thint">Scegli la categoria e lo strumento, poi clicca sulla mappa. I disegni vanno nell'Elenco, sezione Disegni.</div>
           </div>
         </details>
-        <details class="imod" id="drwSecShape">
-          <summary><span class="im-ico" aria-hidden="true">📐</span><span class="im-t"><b>Forme con misure</b><small>Rettangoli e cerchi di misura esatta, messi con un clic</small></span>
-            <button type="button" class="im-info" data-info="drwShape" title="Come funziona, con un esempio" aria-label="Come funzionano le forme con misure">i</button></summary>
+        <details class="imod" id="drwSecCopy">
+          <summary><span class="im-ico" aria-hidden="true"><svg viewBox="0 0 20 20" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><rect x="7" y="7" width="10" height="10" rx="1.5"/><path d="M13 7V4.5A1.5 1.5 0 0 0 11.5 3h-7A1.5 1.5 0 0 0 3 4.5v7A1.5 1.5 0 0 0 4.5 13H7"/></svg></span>
+            <span class="im-t"><b>Copia</b><small>Un oggetto copiato dove clicchi, o parallelo a distanza fissa</small></span>
+            <button type="button" class="im-info" data-info="drwCopy" title="Come funziona, con un esempio" aria-label="Come funziona la copia">i</button></summary>
           <div class="im-body">
-            <div class="segbtns" id="shpKind">
-              <button type="button" data-k="rect" class="active">▭ Rettangolo</button>
-              <button type="button" data-k="circle">◯ Cerchio</button>
+            <label class="chk" style="margin-top:0"><input type="checkbox" id="offOn"> Parallela, a distanza fissa</label>
+            <div id="offBox" hidden>
+              <div class="gpbuf" style="margin-top:6px"><input id="offDist" type="number" value="10" min="0" step="any" aria-label="Distanza della copia in metri"><span>metri</span></div>
+              <label class="chk"><input type="checkbox" id="offEdge"> Solo il lato cliccato (senza spunta: tutto l'oggetto)</label>
             </div>
-            <div id="shpRectBox">
-              <div class="row">
-                <div><label for="shpW">Larghezza (m)</label><input id="shpW" type="number" min="0" step="any" value="100"></div>
-                <div><label for="shpH">Altezza (m)</label><input id="shpH" type="number" min="0" step="any" value="50"></div>
-              </div>
-              <label for="shpRot">Orientamento della larghezza (azimut, °)</label>
-              <div class="shprot"><input id="shpRot" type="number" step="any" value="90">
-                <button type="button" class="sec" id="shpRotPick" title="Clicca un lato sulla mappa (disegno, particella, DWG, layer): la larghezza gli diventa parallela">∥ Da un lato</button></div>
-            </div>
-            <div id="shpCircleBox" hidden>
-              <label for="shpR">Raggio (m)</label><input id="shpR" type="number" min="0" step="any" value="50">
-            </div>
-            <button type="button" class="sec im-main" id="shpPlace">📍 Posiziona sulla mappa</button>
-            <div id="shpMsg" class="thint">Poi clicca dove va il centro. Prende la categoria e la nota qui sopra.</div>
+            <button type="button" class="sec im-main" id="offPick" style="margin-top:8px">⧉ Scegli e copia</button>
+            <div id="offMsg" class="thint">Clicca l'oggetto da copiare, poi dove metterlo.</div>
           </div>
         </details>
-        <details class="imod" id="drwSecOff">
-          <summary><span class="im-ico" aria-hidden="true"><svg viewBox="0 0 20 20" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M3 13 9 7h8"/><path d="M3 17.5 10 10.5h7" stroke-dasharray="2.2 2"/></svg></span>
-            <span class="im-t"><b>Copia parallela</b><small>Una linea o un'area a distanza fissa da un'altra</small></span>
-            <button type="button" class="im-info" data-info="drwOffset" title="Come funziona, con un esempio" aria-label="Come funziona la copia parallela">i</button></summary>
-          <div class="im-body">
-            <div class="gpbuf"><input id="offDist" type="number" value="10" min="0" step="any" aria-label="Distanza della copia in metri"><span>metri</span>
-              <button type="button" class="sec" id="offPick">∥ Scegli e copia</button></div>
-            <label class="chk"><input type="checkbox" id="offEdge"> Solo il lato cliccato (senza spunta: tutto l'oggetto)</label>
-            <div id="offMsg" class="thint">Clicca un oggetto, poi dalla parte dove vuoi la copia.</div>
-          </div>
-        </details>
+        <button class="ghost-danger" id="drwClear" title="Toglie tutti i disegni dall'Elenco, come il cestino della sezione Disegni: per quelli salvati sul portale chiede se toglierli anche da lì">Cancella tutti i disegni</button>
+    </div>
+    <!-- supporto al disegno: sempre in vista in fondo alla scheda (anche quando scorre); i moduli si aprono verso l'alto -->
+    <div class="drwDock" id="drwDock">
+        <div class="drwDockT">Supporto al disegno</div>
         <details class="imod" id="drwSecAid">
           <summary><span class="im-ico" aria-hidden="true">📏</span><span class="im-t"><b>Misure esatte e aggancio</b><small>Lunghezze e angoli scritti a mano, aggancio ai vertici</small></span>
-            <button type="button" class="im-info" data-info="drwAid" title="Come funziona, con un esempio" aria-label="Come funzionano misure e aggancio">i</button></summary>
+            <span class="im-n im-txt" id="drwAidSum"></span><button type="button" class="im-info" data-info="drwAid" title="Come funziona, con un esempio" aria-label="Come funzionano misure e aggancio">i</button></summary>
           <div class="im-body">
             <label class="chk"><input type="checkbox" id="drwSnap" checked> Aggancia ai vertici e ai bordi di disegni e particelle</label>
             <label class="chk"><input type="checkbox" id="drwSnapLayers" checked> …e anche dei DWG e dei layer vettoriali accesi</label>
@@ -738,7 +774,7 @@
         <details class="imod" id="drwSecGrid">
           <summary><span class="im-ico" aria-hidden="true"><svg viewBox="0 0 20 20" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M2 6.5h16M2 13.5h16M6.5 2v16M13.5 2v16"/></svg></span>
             <span class="im-t"><b>Griglia</b><small>Una griglia in metri su cui agganciare, anche ruotata</small></span>
-            <button type="button" class="im-info" data-info="drwGrid" title="Come funziona, con un esempio" aria-label="Come funziona la griglia">i</button></summary>
+            <span class="im-n im-txt" id="grdSum"></span><button type="button" class="im-info" data-info="drwGrid" title="Come funziona, con un esempio" aria-label="Come funziona la griglia">i</button></summary>
           <div class="im-body">
             <label class="chk" style="margin-top:0"><input type="checkbox" id="grdOn"> Mostra la griglia</label>
             <div class="gpbuf" style="margin-top:8px"><input id="grdStep" type="number" value="10" min="0" step="any" aria-label="Passo della griglia in metri"><span>metri tra una linea e l'altra</span></div>
@@ -748,7 +784,6 @@
             <div id="grdMsg" class="thint"></div>
           </div>
         </details>
-        <button class="ghost-danger" id="drwClear" title="Toglie tutti i disegni dall'Elenco; i risultati dei geoprocessi e gli importati restano">Cancella tutti i disegni</button>
     </div></div>
 
     <div class="tabpane" data-tab="geoproc"><div class="paneBody">
@@ -977,22 +1012,23 @@
     <div id="toolsBody">
       <div class="drawer" data-panel="elenco" id="drawerElenco">
         <div class="tlab">Elenco &amp; azioni</div>
+        <!-- intestazione di sezione: spunta tutti · mostra/nascondi · colore (non nei Disegni: lì il colore è la categoria) · elimina tutti -->
         <div class="gsec" data-sec="parcels">
-          <div class="gsecH"><b>Particelle</b><span class="gtools" data-sec="parcels"><button class="vtoggle" data-role="visall" title="Mostra/nascondi tutte" aria-label="Mostra/nascondi tutte le particelle"></button><span class="cswatch" data-role="colall" title="Colore di tutte le particelle"><input type="color" value="#F5A623"></span></span><span id="cnt" class="gcount">0</span></div>
+          <div class="gsecH"><input type="checkbox" class="gselall" data-sec="parcels" title="Spunta tutte" aria-label="Spunta tutte le particelle"><b>Particelle</b><span class="gtools" data-sec="parcels"><button class="vtoggle" data-role="visall" title="Mostra/nascondi tutte" aria-label="Mostra/nascondi tutte le particelle"></button><span class="cswatch" data-role="colall" title="Colore di tutte le particelle"><input type="color" value="#F5A623" aria-label="Colore di tutte le particelle"></span><button type="button" class="gdel" data-role="delall" title="Elimina tutte le particelle" aria-label="Elimina tutte le particelle"></button></span><span id="cnt" class="gcount">0</span></div>
           <div class="glist"><div id="listTot" class="hint"></div>
             <label class="chk" style="margin:2px 0 7px"><input type="checkbox" id="lblParcels" checked> Etichette sulla mappa</label>
             <div id="list"><div class="empty">Nessuna particella. Cercala o cliccala sulla mappa.</div></div></div>
         </div>
         <div class="gsec" data-sec="draw">
-          <div class="gsecH"><b>Disegni</b><span class="gtools" data-sec="draw"><button class="vtoggle" data-role="visall" title="Mostra/nascondi tutti" aria-label="Mostra/nascondi tutti i disegni"></button><span class="cswatch" data-role="colall" title="Colore di tutti i disegni"><input type="color" value="#2FB6E6"></span></span><span id="cntDraw" class="gcount">0</span></div>
+          <div class="gsecH"><input type="checkbox" class="gselall" data-sec="draw" title="Spunta tutti" aria-label="Spunta tutti i disegni"><b>Disegni</b><span class="gtools" data-sec="draw"><button class="vtoggle" data-role="visall" title="Mostra/nascondi tutti" aria-label="Mostra/nascondi tutti i disegni"></button><button type="button" class="gdel" data-role="delall" title="Elimina tutti i disegni" aria-label="Elimina tutti i disegni"></button></span><span id="cntDraw" class="gcount">0</span></div>
           <div class="glist"><div id="listDraw"><div class="empty">Nessun disegno.</div></div></div>
         </div>
         <div class="gsec" data-sec="geo">
-          <div class="gsecH"><b>Geoprocessi</b><span class="gtools" data-sec="geo"><button class="vtoggle" data-role="visall" title="Mostra/nascondi tutti" aria-label="Mostra/nascondi tutti i geoprocessi"></button><span class="cswatch" data-role="colall" title="Colore di tutti i geoprocessi"><input type="color" value="#2FB6E6"></span></span><span id="cntGeo" class="gcount">0</span></div>
+          <div class="gsecH"><input type="checkbox" class="gselall" data-sec="geo" title="Spunta tutti" aria-label="Spunta tutti i risultati dei geoprocessi"><b>Geoprocessi</b><span class="gtools" data-sec="geo"><button class="vtoggle" data-role="visall" title="Mostra/nascondi tutti" aria-label="Mostra/nascondi tutti i geoprocessi"></button><span class="cswatch" data-role="colall" title="Colore di tutti i geoprocessi"><input type="color" value="#2FB6E6" aria-label="Colore di tutti i geoprocessi"></span><button type="button" class="gdel" data-role="delall" title="Elimina tutti i risultati dei geoprocessi" aria-label="Elimina tutti i risultati dei geoprocessi"></button></span><span id="cntGeo" class="gcount">0</span></div>
           <div class="glist"><div id="listGeo"><div class="empty">Nessun output.</div></div></div>
         </div>
         <div class="gsec" data-sec="import">
-          <div class="gsecH"><b>Importati</b><span id="cntImport" class="gcount">0</span></div>
+          <div class="gsecH"><input type="checkbox" class="gselall" data-sec="import" title="Spunta tutti" aria-label="Spunta tutti gli importati"><b>Importati</b><span class="gtools" data-sec="import"><button class="vtoggle" data-role="visall" title="Mostra/nascondi tutti" aria-label="Mostra/nascondi tutti gli importati"></button><span class="cswatch" data-role="colall" title="Colore di tutti gli importati (le immagini restano come sono)"><input type="color" value="#2FB6E6" aria-label="Colore di tutti gli importati"></span><button type="button" class="gdel" data-role="delall" title="Elimina tutti gli importati" aria-label="Elimina tutti gli importati"></button></span><span id="cntImport" class="gcount">0</span></div>
           <div class="glist"><div id="listImport"><div class="empty">Nessun import.</div></div></div>
         </div>
         <label class="lbl-block" for="fmt">Formato export</label>
@@ -1008,7 +1044,6 @@
           <button class="sec" id="dl" disabled>⬇ Esporta</button>
           <button class="primary" id="promote" disabled>★ Promuovi → AREAS</button>
           <button class="sec" id="sfSave" disabled title="Salva disegni, geoprocessi e importati nel layer «IT - Site Features», con categoria, tipo e sito">⤴ Salva sul portale</button>
-          <button class="ghost-danger" id="reset" disabled style="margin-top:6px" title="Toglie tutte le particelle; disegni, geoprocessi e import restano">Svuota particelle</button>
         </div>
       </div>
       <div class="drawer" data-panel="layers">
@@ -1078,15 +1113,15 @@
     <button id="pmClose" class="mclose" title="Chiudi" aria-label="Chiudi">×</button>
     <h2>Promuovi in AREAS COLLECTION</h2>
     <div class="sub" id="pmSub">—</div>
-    <label>Area class</label>
+    <label>Classe dell'area <span class="lbl-opt">· Area class</span></label>
     <select id="pmClass"></select>
-    <label>Area type</label>
+    <label>Tipo di area <span class="lbl-opt">· Area type</span></label>
     <select id="pmType"></select>
-    <label>Sources</label>
+    <label>Fonte del dato <span class="lbl-opt">· Sources</span></label>
     <select id="pmSources"></select>
     <label>Estrazione massiva</label>
     <select id="pmEstr"></select>
-    <label>Project type (facoltativo)</label>
+    <label>Tipo di progetto <span class="lbl-opt">(facoltativo) · Project type</span></label>
     <input id="pmProjType" placeholder="es. GROUND / AGRIVOLTAICO…">
     <div class="warn" style="margin:12px 0 0"><b>Scrittura sul portale.</b> Verranno aggiunte feature al layer 426 come utente loggato. COMUNE/REGIONE/PROVINCIA/area/ID_univoco sono compilati in automatico.</div>
     <div id="pmMsg"></div>
@@ -1147,7 +1182,7 @@
     <ol style="margin:0;padding-left:18px;font-size:13px;line-height:1.7">
       <li><b>Pannello sinistro</b> — il <b>rail</b> di icone sceglie la <b>scheda</b>: Ricerca particelle, Disegno, Geoprocessi, Contesto sito, Importa dati. Ogni scheda è fatta di <b>moduli</b>: clicca il titolo per aprirne uno; la <b>i</b> spiega come funziona, spesso con un esempio disegnato. <b>⧉</b> in alto sgancia il pannello in una finestra da mettere sul secondo schermo (con più spazio i moduli vanno su più colonne); <b>⇤</b> o chiudere la finestra lo riaggancia.</li>
       <li><b>Ricerca particelle</b> — tre moduli: <b>Ricerca particelle</b> (comune, foglio e particella), <b>Sulla mappa con selezione manuale particelle</b> (clic, rettangolo, poligono, linea) e <b>Seleziona da un disegno esistente</b>.</li>
-      <li><b>Disegno</b> — prima il <b>sito di lavoro</b> (un'area di AREAS COLLECTION), poi la <b>categoria</b> (area lorda, area netta, esclusione, infrastruttura lineare, ostacolo, accesso, mitigazione, zona agricola, nota) con tipo e attributi, poi punti, linee, aree, rettangoli e cerchi. Mentre disegni, <kbd>Tab</kbd> fa scrivere lunghezza e angolo del lato (anche come azimut). Forme di misura esatta, copia parallela (rientri dai confini), griglia in metri allineabile a un lato, aggancio anche a DWG e layer. <kbd>Ctrl</kbd>+<kbd>Z</kbd> / <kbd>Ctrl</kbd>+<kbd>Y</kbd> annullano e ripetono. Un disegno cliccato sulla mappa si sposta e si rimodella.</li>
+      <li><b>Disegno</b> — la <b>categoria</b> (area lorda, area netta, percorso di connessione, esclusione, infrastruttura lineare, ostacolo, accesso e punto di connessione, mitigazione, zona agricola, nota) con tipo e attributi, poi punti, linee, aree, rettangoli e cerchi (anche di misura esatta). Il percorso di connessione si calcola anche <b>su strada</b>. Salvando sul portale ogni oggetto si lega da solo all'area di AREAS COLLECTION che tocca; il <b>sito di lavoro</b> serve solo a forzarla. Mentre disegni, <kbd>Tab</kbd> fa scrivere lunghezza e angolo del lato (anche come azimut). <b>Copia</b> (anche parallela, per i rientri dai confini); in fondo, sempre in vista, misure e aggancio e la griglia in metri. <kbd>Ctrl</kbd>+<kbd>Z</kbd> / <kbd>Ctrl</kbd>+<kbd>Y</kbd> annullano e ripetono. Un disegno cliccato sulla mappa si sposta e si rimodella.</li>
       <li><b>Action bar destra</b> — <b>Elenco &amp; azioni</b> (Particelle · Disegni · Geoprocessi · Importati): ogni riga si rinomina, si colora, si nasconde e si <b>spunta</b> per usarla nei geoprocessi. Poi Layer, Basemap, Segnalibri, Modifica AREAS, Stampa.</li>
       <li><b>Layer</b> — cerca un layer per nome; dal pannello di ogni layer (icona a cursori) trasparenza, popup e <b>filtro per attributo</b> (l'icona diventa un imbuto quando è attivo). I layer aggiunti da te (dal portale, servizi web, DWG, immagini) hanno il menu <b>…</b> con Zoom e <b>Rimuovi dalla mappa</b>.</li>
       <li><b>Servizi web</b> (scheda Importa dati) — WMS, WFS e ArcGIS REST per indirizzo, senza creare item sul portale. Il browser accetta solo servizi <b>https</b> che permettono la lettura da altri siti (CORS).</li>
@@ -1305,7 +1340,7 @@ let gpPendingClip=null;   // geometria A in attesa del poligono di clip disegnat
 let addedPortalItems=[], BM_BY_ID={};   // auto-resume: layer aggiunti + basemap per id
 let sketchPurpose=null;   // 'selection' | 'drawing' | 'geoproc' (clip) — a cosa serve il disegno corrente
 let selMode=null;         // modalità selezione: null(nessuna)|point|rectangle|polygon|polyline
-let drawType=null;        // tipo disegno attivo: null|point|polyline|polygon
+let drawType=null;        // tipo disegno attivo: null|point|polyline|polygon|rectangle|circle
 // ── Site Features: un solo modello per disegno, archivio sul portale e PV Predesign ──
 // Categoria = ruolo nel progetto, tipo = cosa è. Codici uguali al layer «IT - Site Features» e a PV Predesign
 // (schemas/site_features_model.json, versione 1.0.0); qui ci sono le etichette italiane e i colori.
@@ -1314,6 +1349,8 @@ const SF_LID={point:0, polyline:1, polygon:2};
 const SF_CATS=[
   {c:'gross', l:'Area lorda', col:'#FF8C1A', g:['polygon'], a:[], h:'Perimetro del sito, area in opzione o in locazione', t:[]},
   {c:'net', l:'Area netta', col:'#2DBE7E', g:['polygon'], a:[], h:'Area disponibile, se già calcolata', t:[]},
+  {c:'connection', l:'Percorso di connessione', col:'#8B5CF6', g:['polyline'], a:[], h:'Tracciato del cavo fino al punto di connessione: disegnalo, o «↝ Su strada» lo calcola sulle strade',
+    t:[['estimated','Stimato'],['confirmed','Confermato']]},
   {c:'exclusion', l:'Esclusione', col:'#E5484D', g:['polygon','polyline','point'], a:['buffer'], h:'Vincoli, aree protette, pendenze, fasce di rispetto; buffer facoltativo',
     t:[['landscape','Vincolo paesaggistico'],['archaeological','Vincolo archeologico'],['cultural-heritage','Bene culturale'],['protected-area','Area protetta / Natura 2000'],
        ['planning','Vincolo da piano'],['sector-plan','Vincolo da piano di settore'],['flood','Area a rischio idraulico'],['steep-slope','Pendenza elevata'],
@@ -1323,7 +1360,7 @@ const SF_CATS=[
        ['ditch',"Fosso, canale, corso d'acqua"],['road','Strada'],['railway','Ferrovia'],['other','Altro']]},
   {c:'obstacle', l:'Ostacolo', col:'#965A28', g:['point','polygon','polyline'], a:['height','buffer'], h:"Alberi, pali, edifici: l'altezza serve per l'ombra",
     t:[['tree','Albero'],['pole','Palo o traliccio'],['building','Edificio o manufatto'],['other','Altro']]},
-  {c:'access', l:'Accesso e connessione', col:'#1F99CC', g:['point','polyline'], a:[], h:'Ingressi al sito e punto di connessione',
+  {c:'access', l:'Accesso e punto di connessione', col:'#1F99CC', g:['point','polyline'], a:[], h:'Ingressi al sito e punto di connessione alla rete (cabina primaria, SE)',
     t:[['site-access','Accesso al sito'],['grid-connection','Punto di connessione']]},
   {c:'mitigation', l:'Mitigazione', col:'#6EAA3C', g:['polygon','polyline'], a:['width'], h:'Siepi e fasce verdi; per le linee serve la larghezza',
     t:[['hedge','Siepe o filare'],['green-screen','Fascia verde'],['other','Altro']]},
@@ -1389,7 +1426,7 @@ require([
   const bmStreets=bm("Stradale","https://services.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer","streets");
   const map=new Map({basemap:bmTopo, ground:{layers:[new ElevationLayer({url:WORLD_ELEV})]}, layers:[catasto, gl, labelsGL, toolsGL]});
   view=new MapView({container:"viewDiv", map, center:[12.5,42.0], zoom:6});
-  window.view=view;
+  window.view=view; window.dispatchEvent(new Event('axpo-view'));   // per chi aspetta la vista (pin delle coordinate)
   wireContextMenu();   // tasto destro sulla mappa
   // popup ancorato a SINISTRA (di default si ancorava in alto a destra)
   view.popup.dockEnabled=true;
@@ -1598,20 +1635,29 @@ require([
   $('signin').onclick=()=>{
     if(!CLIENT_ID){ msg('Manca CLIENT_ID: registra un\'app OAuth e incollane il client_id nello script.','err'); return; }
     if(signedIn){ IdentityManager.destroyCredentials(); location.reload(); return; }
-    IdentityManager.getCredential(PORTAL+"/sharing").then(()=>onSignedIn()).catch(e=>msg('Login annullato: '+e.message,'err'));
+    IdentityManager.getCredential(PORTAL+"/sharing").then(()=>onSignedIn(true)).catch(e=>msg('Login annullato: '+((e&&e.message)||e),'err'));
   };
 
   loadRegions(); checkReady(); wireUI(); wireTools();
 });
 
-async function onSignedIn(){
-  // IdentityManager emette 'credential-create' UNA VOLTA PER SERVIZIO autenticato (nella General Map
-  // erano ~20): senza guardia rifacevamo 20 volte portal.load() + render(). Riprovo solo se il
-  // portale non è davvero caricato (login parziale); il logout azzera signedIn/portal.
+// IdentityManager emette 'credential-create' UNA VOLTA PER SERVIZIO autenticato (nella General Map
+// erano ~20): la guardia evita di rifare portal.load() + render() a ogni evento. «Connesso» solo DOPO che il
+// portale si è caricato (prima diceva «Connesso» anche se il caricamento falliva, e riprovava a ogni evento):
+// se fallisce lo dico una volta e non riprovo da solo; riprova il pulsante «Accedi» (force).
+let signInBusy=false, signInFailed=false;
+async function onSignedIn(force){
   if(signedIn && portal && portal.loaded) return;
+  if(signInBusy || (signInFailed && !force)) return;
+  signInBusy=true;
+  try{ const p=new esriMods.Portal({authMode:"immediate"}); await p.load();
+    portal=p; username=p.user&&p.user.username; signInFailed=false; }
+  catch(e){ signInFailed=true; console.warn('[OAuth] portale non caricato:', e);
+    msg('Accesso non completato: il portale non ha risposto ('+((e&&e.message)||e)+'). Riprova con «Accedi con AGOL».','err');
+    return; }
+  finally{ signInBusy=false; }
   console.log('[OAuth] sessione inizializzata');
   signedIn=true;
-  try{ portal=new esriMods.Portal({authMode:"immediate"}); await portal.load(); username=portal.user&&portal.user.username; }catch(e){}
   $('authDot').classList.add('on');
   $('authTxt').textContent = username ? ('Connesso: '+username) : 'Connesso ad AGOL';
   $('signin').textContent='Esci';
@@ -1863,7 +1909,6 @@ function wireUI(){
   docOn('keydown',e=>{ if(!(e.ctrlKey||e.metaKey)||e.altKey) return; const k=String(e.key||'').toLowerCase();
     if(k==='s'){ e.preventDefault(); projSave(e.shiftKey); } else if(k==='o'){ e.preventDefault(); projOpenPick(); } });
   $('dl').onclick=openExport;
-  $('reset').onclick=()=>{if(parcels.length&&confirm('Togliere tutte le particelle dall\'elenco? Disegni, geoprocessi e import restano.')){parcels=[];render();msg('','');}};
   $('searchItem').onclick=searchPortalItems;
   $('itemQ').addEventListener('keydown',e=>{if(e.key==='Enter'&&!$('searchItem').disabled)searchPortalItems();});
   $('promote').onclick=openPromote;
@@ -1904,14 +1949,17 @@ function wireTools(){
   $('selModeBox').querySelectorAll('button').forEach(b=>b.onclick=()=>setSelMode(b.dataset.m));
   // strumenti di disegno (locali, con la categoria e il tipo scelti sopra: modello Site Features)
   const startDraw=t=>{
-    if(drawType===t){ drawType=null; try{sketchVM.cancel();}catch(e){} sfDrawBtns(); toolMsg('drwMsg','Disegno disattivato.'); return; }
+    if(drawType===t){ if(drwMode&&drwMode.kind==='shape') drwModeEnd(true);
+      drawType=null; try{sketchVM.cancel();}catch(e){} sfDrawBtns(); toolMsg('drwMsg','Disegno disattivato.'); return; }
     const gt=t==='rectangle'||t==='circle'? 'polygon' : t;
     if(!sfAccepts(sfDrawCat, gt)){ toolMsg('drwMsg', sfCat(sfDrawCat).l+' non si disegna come '+SF_GEOM_IT[gt]+': scegli un\'altra categoria.','err'); return; }
     try{ drwModeEnd(); grdPlaceEnd(); sfPickEnd(); }catch(e){}
     drawType=t; sfDrawBtns();
     drwSnapSync();                                              // aggancio anche ai layer accesi adesso
-    sketchPurpose='drawing'; try{sketchVM.cancel();}catch(e){} sketchVM.create(t);
-    toolMsg('drwMsg','Disegna sulla mappa'+(t==='point'?'':(t==='rectangle'||t==='circle'?' (clicca e trascina)':' (doppio click per finire)'))+'.');
+    sketchPurpose='drawing'; try{sketchVM.cancel();}catch(e){}
+    if((t==='rectangle'||t==='circle')&&shpExact()){ shpSync(); toolMsg('drwMsg','Clicca dove va il centro: misure nel riquadro qui sotto.'); return; }
+    sketchVM.create(t);
+    toolMsg('drwMsg','Disegna sulla mappa'+(t==='point'?'':(t==='rectangle'||t==='circle'?' (clicca e trascina, o spunta «Con misure esatte»)':' (doppio click per finire)'))+'.');
   };
   $('drwPoint').onclick=()=>startDraw('point');
   $('drwLine').onclick=()=>startDraw('polyline');
@@ -1928,19 +1976,23 @@ function wireTools(){
   $('sfSiteCode').onkeydown=e=>{ if(e.key==='Enter'){ e.preventDefault(); sfFindByCode(); } };
   $('sfLoad').onclick=sfLoadSite;
   $('sfSiteClear').onclick=()=>{ sfSite=null; sfShowSite(false); sfRenderSite(); saveStateDebounced();
-    toolMsg('sfSiteMsg','Sito tolto: i disegni nuovi restano senza legame.'); };
+    toolMsg('sfSiteMsg','Sito tolto: salvando, ogni oggetto prenderà l\'area che tocca.'); };
   sfRenderDrawUi(); sfRenderSite();
-  if($('drwSnap')) $('drwSnap').onchange=e=>{ try{ sketchVM.snappingOptions.enabled=e.target.checked; }catch(x){} };
-  if($('drwTip')) $('drwTip').onchange=e=>{ try{ sketchVM.tooltipOptions.enabled=e.target.checked; sketchVM.labelOptions.enabled=e.target.checked; }catch(x){} };
-  // disegno stile CAD: annulla/ripeti, forme con misure, copia parallela, aggancio ai layer, angoli, griglia
+  if($('drwSnap')) $('drwSnap').onchange=e=>{ try{ sketchVM.snappingOptions.enabled=e.target.checked; }catch(x){} drwDockSum(); };
+  if($('drwTip')) $('drwTip').onchange=e=>{ try{ sketchVM.tooltipOptions.enabled=e.target.checked; sketchVM.labelOptions.enabled=e.target.checked; }catch(x){} drwDockSum(); };
+  // disegno stile CAD: annulla/ripeti, misure esatte di rettangolo e cerchio, copia (anche parallela), su strada, aggancio, angoli, griglia
   if($('drwUndo')){
     $('drwUndo').onclick=drwUndo; $('drwRedo').onclick=drwRedo;
-    $('shpKind').querySelectorAll('button').forEach(b=>b.onclick=()=>{
-      $('shpKind').querySelectorAll('button').forEach(x=>x.classList.toggle('active', x===b));
-      const c=b.dataset.k==='circle'; $('shpRectBox').hidden=c; $('shpCircleBox').hidden=!c; });
-    $('shpPlace').onclick=()=>drwModeStart('shape');
+    $('rteGo').onclick=rteStart;
+    try{ if(localStorage.getItem('axpo_rte_mode')==='drive') $('rteMode').value='drive'; }catch(e){}
+    $('rteMode').onchange=()=>{ try{ localStorage.setItem('axpo_rte_mode', $('rteMode').value); }catch(e){} };
+    $('shpOn').onchange=shpSync;
+    ['shpW','shpH','shpRot','shpR'].forEach(id=>$(id).addEventListener('input', shpSync));
     $('shpRotPick').onclick=()=>drwModeStart('angle');
-    $('offPick').onclick=()=>drwModeStart('off1');
+    $('offOn').onchange=()=>{ const par=$('offOn').checked; $('offBox').hidden=!par;
+      if(drwMode&&/^(off|cp)/.test(drwMode.kind)) drwModeEnd();
+      toolMsg('offMsg', par? 'Clicca una linea o un\'area, poi da che parte mettere la copia.' : 'Clicca l\'oggetto da copiare, poi dove metterlo.'); };
+    $('offPick').onclick=()=>drwModeStart($('offOn').checked? 'off1' : 'cp1');
     $('offEdge').onchange=()=>{ const m=drwMode; if(m&&m.kind==='off2'&&m.src) drwTmpShow($('offEdge').checked? m.src.seg : m.src.geom); };
     try{ if(localStorage.getItem('axpo_drw_snaplayers')==='0') $('drwSnapLayers').checked=false;
       if(localStorage.getItem('axpo_drw_dir')==='absolute') $('drwDir').value='absolute';
@@ -1949,7 +2001,8 @@ function wireTools(){
     $('drwDir').onchange=drwDirApply; drwDirApply();
     $('grdOn').onchange=()=>grdSet($('grdOn').checked);
     $('grdStep').onchange=()=>{ try{ localStorage.setItem('axpo_grid_step', String(grdStep())); }catch(e){}
-      if(grdVM&&grdVM.displayEnabled){ grdVM.spacing=grdStep(); grdUi(); } };
+      if(grdVM&&grdVM.displayEnabled){ grdVM.spacing=grdStep(); } grdUi(); };
+    drwDockSum();
     $('grdSnap').onchange=()=>{ if(grdVM&&grdVM.displayEnabled) grdVM.snappingEnabled=$('grdSnap').checked; };
     $('grdAlign').onclick=()=>grdAlign();
     $('grdStraight').onclick=()=>{ if(grdVM){ grdPlaceEnd(); grdVM.rotation=0; grdUi(); } };
@@ -1992,12 +2045,10 @@ function wireTools(){
     const g=(window.__selDrawList||[])[+v]; if(g&&g.geometry){ try{ view.goTo(g.geometry.extent?g.geometry.extent.expand(1.4):g.geometry).catch(()=>{}); }catch(e){} selectByGeometry(g.geometry); } };
   // chiede conferma e lascia stare i risultati dei geoprocessi (anche loro sono _kind 'drawing', con _sub 'geoproc':
   // prima sparivano insieme ai disegni)
-  $('drwClear').onclick=()=>{ const n=countDrawingsPure();
+  // lo stesso cestino dell'intestazione «Disegni» nell'Elenco (per quelli salvati chiede se toglierli anche dal portale)
+  $('drwClear').onclick=async()=>{ const n=countDrawingsPure();
     if(!n){ toolMsg('drwMsg','Non ci sono disegni da cancellare.'); return; }
-    if(!confirm((n===1?'Cancellare il disegno?':'Cancellare tutti i '+n+' disegni?')+' I risultati dei geoprocessi e gli importati restano, e quelli salvati sul portale restano sul portale. Non si può annullare.')) return;
-    try{sketchVM.cancel();}catch(e){} drawType=null; sfDrawBtns();
-    toolsGL.graphics.toArray().filter(g=>g.attributes&&g.attributes._kind==='drawing'&&g.attributes._sub!=='geoproc').forEach(g=>toolsGL.remove(g));
-    toolMsg('drwMsg', n===1?'Disegno cancellato.':n+' disegni cancellati.'); refreshDl(); };
+    if(await sectionDelete('draw')) toolMsg('drwMsg', n===1?'Disegno cancellato.':n+' disegni cancellati.'); };
   // geoprocessi
   if($('gpUnion')){
     $('gpUnion').onclick=()=>gpRun('union'); $('gpHull').onclick=()=>gpRun('hull'); $('gpSimplify').onclick=()=>gpRun('simplify');
@@ -2062,10 +2113,13 @@ async function selectByGeometry(geom){
   const run=_selRun={stop:0};
   try{
   // 1) locate su ogni punto → fid unici
-  const fids=new Map();
+  // le chiamate fallite (Zornade giù, quota, rete) si contano: prima diventavano «nessuna particella» e una scansione
+  // senza risposte finiva con «0 particelle aggiunte» come fosse un risultato
+  const fids=new Map(); let failLoc=0, doneLoc=0, failDet=0;
   for(let i=0;i<pts.length&&run.stop<1;i+=SEL_CONC){
     const b=pts.slice(i,i+SEL_CONC);
-    const rs=await Promise.all(b.map(([lng,lat])=>z('/parcels/locate',{lat,lng,limit:1}).catch(()=>null)));
+    const rs=await Promise.all(b.map(([lng,lat])=>z('/parcels/locate',{lat,lng,limit:1}).catch(e=>{ failLoc++; if(failLoc===1) console.warn('[selezione] locate non riuscito:', e); return null; })));
+    doneLoc+=b.length;
     rs.forEach(r=>{ const h=r&&r.data&&r.data[0]; if(h&&!fids.has(h.fid)) fids.set(h.fid,h); });
     msg(`Analizzo… ${Math.min(i+SEL_CONC,pts.length)}/${pts.length} punti · ${fids.size} particelle · Esc per interrompere`,'');
     if(fids.size>=SEL_MAX_PARCELS) break;
@@ -2076,11 +2130,15 @@ async function selectByGeometry(geom){
   for(let i=0;i<hits.length&&run.stop<2;i+=SEL_CONC){
     const b=hits.slice(i,i+SEL_CONC);
     const rs=await Promise.all(b.map(h=>addByFid(h.fid,(h.municipality&&h.municipality.name)||'',null,h.label,h.centroid)));
-    rs.forEach(r=>{ if(r==='ok')added++; else if(r==='dup')dup++; });
+    rs.forEach(r=>{ if(r==='ok')added++; else if(r==='dup')dup++; else failDet++; });
   }
   render(true);
+  if(doneLoc&&failLoc===doneLoc){ msg('Zornade non ha risposto a nessuno dei '+doneLoc+' punti: non so se nell\'area ci sono particelle. Riprova tra poco.','err'); return; }
+  const fails=[]; if(failLoc) fails.push(failLoc+' punt'+(failLoc===1?'o':'i')+' su '+doneLoc+' senza risposta'); if(failDet) fails.push(failDet+' particell'+(failDet===1?'a':'e')+' trovat'+(failDet===1?'a':'e')+' ma non lett'+(failDet===1?'a':'e'));
   msg((run.stop?'Selezione interrotta: ':'Selezione: ')+`${added} particell${added===1?'a aggiunta':'e aggiunte'}`+(dup?`, ${dup} già in elenco`:'')
-    +(run.stop? ' (area analizzata solo in parte).' : ` (${fids.size} nell'area).`), 'ok');
+    +(run.stop? ' (area analizzata solo in parte).' : ` (${fids.size} individuat${fids.size===1?'a':'e'} campionando l'area: una particella molto piccola può sfuggire).`)
+    +(fails.length? ' Attenzione: '+fails.join(', ')+' (Zornade): l\'area potrebbe non essere completa, ripeti la selezione.' : ''), fails.length? 'err' : 'ok',
+    added? vediElenco('parcels') : null);
   } finally { if(_selRun===run) _selRun=null; }
 }
 let _selRun=null;
@@ -2204,7 +2262,7 @@ function restoreState(){
     if(Array.isArray(st.services)&&st.services.length){ svcBooting=st.services;
       svcRestoreAll(st.services).then(bad=>{ svcBooting=null; saveStateDebounced();
         if(bad.length) msg('Servizi web non più raggiungibili, tolti dal lavoro: '+bad.join(' · '),'err'); }); }
-  }catch(e){}
+  }catch(e){ console.warn('[ripristino] lavoro salvato non ripristinato del tutto:', e); }
   try{ histReset(); }catch(e){}   // Annulla non deve tornare a prima del ripristino
 }
 let svcBooting=null;
@@ -2226,7 +2284,7 @@ function applyWork(st){
         const _gr=new esriMods.Graphic({geometry:geom, attributes:_at, symbol:_sym});
         if(rec.v===false || (rec.a&&rec.a.hidden)) _gr.visible=false;
         toolsGL.add(_gr);
-      }catch(e){} });
+      }catch(e){ console.warn('[ripristino] un oggetto salvato è stato saltato:', e, rec); } });
       try{ refreshDl(); }catch(e){}
     }
 }
@@ -2699,10 +2757,15 @@ async function llFilterUi(wrap, layer){
 // ── caricamento di una web map del portale (General Map o CV) ──────────────
 // hideLayers=true → spegne i layer operativi (per le CV, che caricano lazy quando
 // l'utente li accende). NO loadAll: caricherebbe avidamente i WMS regionali (CORS).
+// cambio rapido di regione: se la mappa chiesta prima arriva dopo, non deve sostituire quella chiesta per ultima (e
+// portarsi via particelle, strumenti, DWG e immagini). Ogni richiesta ha un numero; dopo l'attesa conta solo l'ultima.
+let wmReq=0;
 async function loadWebMap(id, hideLayers, label){
+  const my=++wmReq;
   try{
     const wm=new esriMods.WebMap({portalItem:{id}});
     await wm.load();
+    if(my!==wmReq) return false;   // nel frattempo è stata chiesta un'altra mappa
     if(hideLayers) wm.layers.forEach(l=>{ l.visible=false; });
     try{ wm.ground={layers:[new esriMods.ElevationLayer({url:WORLD_ELEV})]}; }catch(e){}   // profilo elevazione dopo lo swap
     const wmCat=findWebmapCatasto(wm);
@@ -2727,7 +2790,8 @@ async function loadWebMap(id, hideLayers, label){
     else if(parcels.length) view.goTo(gl.graphics.toArray()).catch(()=>{});
     setTimeout(setupAreasEditor, 800);                  // abilita l'edit se AREAS COLLECTION è nella mappa
     return true;
-  }catch(e){ if(label) $('cvNote').innerHTML=`<span style="color:var(--err)">Impossibile caricare ${label}: ${esc(e&&e.message)}</span>`; return false; }
+  }catch(e){ if(my!==wmReq) return false;   // richiesta superata da una più recente: niente messaggi vecchi
+    if(label) $('cvNote').innerHTML=`<span style="color:var(--err)">Impossibile caricare ${esc(label)}: ${esc(e&&e.message)}</span>`; return false; }
 }
 
 // ── Edit tool SOLO per AREAS COLLECTION (geometria modificabile, area ricalcolata) ──
@@ -2739,14 +2803,17 @@ function findAreasLayer(){
 }
 function setupAreasEditor(){
   const l=findAreasLayer();
-  if(!l){ return; }                       // AREAS non presente (es. su una CV) → niente editor
-  if(areasLayer===l && areasEditorExpand){ return; }   // già configurato
+  if(l && areasLayer===l && areasEditorExpand){ return; }   // già configurato
   // a ogni cambio di web map il layer è un oggetto nuovo: prima si creava un altro Editor e un altro
-  // gestore "edits" senza togliere i vecchi (che restavano agganciati al layer della mappa precedente)
+  // gestore "edits" senza togliere i vecchi (che restavano agganciati al layer della mappa precedente).
+  // Si smonta anche quando la mappa nuova non ha AREAS (una CV): prima l'Editor vecchio restava nel cassetto.
   try{ if(areasEditorExpand&&areasEditorExpand.destroy) areasEditorExpand.destroy(); }catch(e){}
   try{ if(setupAreasEditor._h) setupAreasEditor._h.remove(); }catch(e){}
+  setupAreasEditor._h=null; areasEditorExpand=null; areasLayer=null;
+  const eb=document.getElementById('editorBox');
+  if(!l){ if(eb) eb.innerHTML='<div class="thint">AREAS COLLECTION non è in questa mappa: torna alla General Map (togli la regione) per modificarla.</div>'; return; }
   areasLayer=l;
-  const eb=document.getElementById('editorBox'); if(eb) eb.innerHTML='';
+  if(eb) eb.innerHTML='';
   const editor=new esriMods.Editor({ view, container:"editorBox",
     layerInfos:[{ layer:l, enabled:true, addEnabled:true, deleteEnabled:true, updateEnabled:true }] });
   areasEditorExpand=editor;   // shim per il guard: l'editor vive nel drawer "edit"
@@ -2857,7 +2924,8 @@ async function addByFid(fid, hintComune, hintFoglio, hintPart, centroid){
       regione:muni.region||'', provincia:fixProvName(muni.region||'', muni.province||''),
       belfiore:(prof.municipality&&prof.municipality.code)||cad.comune_code||'',
       ncr:prof.cadastral_reference||prof.gml_id||'',
-      area_m2:(areaVera!=null?areaVera:prof.area_m2), land_use:(prof.land_use&&prof.land_use.class)||'',
+      // senza geometria valida niente area: il valore di Zornade è in Web Mercator, ~2 volte quello vero a 45°
+      area_m2:areaVera, area_nd:areaVera==null? true : undefined, land_use:(prof.land_use&&prof.land_use.class)||'',
       omi:(prof.valuation&&(prof.valuation.omi_avg||prof.valuation.value))||'',
       lat:c.lat, lng:c.lng, geometry:prof.geometry});
     return 'ok';
@@ -2883,7 +2951,7 @@ async function search(){
   render(true);
   let m=`${added} particell${added===1?'a aggiunta':'e aggiunte'}`; if(dup)m+=`, ${dup} già in elenco`;
   if(notfound.length)m+=`, non trovate: ${notfound.join(', ')} (oltre le 100/foglio o altra sezione → verifica su FoMaps)`;
-  msg(m, notfound.length?'err':'ok');
+  msg(m, notfound.length?'err':'ok', added? vediElenco('parcels') : null);
 }
 async function addByClick(lat,lng){
   if(!key()){msg('Chiave API Zornade mancante.','err');return;}
@@ -2895,7 +2963,7 @@ async function addByClick(lat,lng){
     const r=await addByFid(hit.fid,(hit.municipality&&hit.municipality.name)||'',null,hit.label,hit.centroid);
     render(true);
     const last=parcels[parcels.length-1];
-    if(r==='ok') msg(`Aggiunta: ${last.comune} · Fg ${last.foglio} · ${last.particella}.`,'ok');
+    if(r==='ok') msg(`Aggiunta: ${last.comune} · Fg ${last.foglio} · ${last.particella}.`,'ok', vediElenco('parcels'));
     else if(r==='dup') msg('Particella già in elenco.','ok');
     else msg('Particella individuata ma profilo non leggibile.','err');
   }catch(err){msg('Errore: '+err.message,'err');}
@@ -2924,8 +2992,9 @@ function render(zoom){
   $('cnt').textContent=parcels.length;
   const has=parcels.length>0;
   const totHa=parcels.reduce((s,p)=>s+(p.area_m2||0),0)/10000;
-  $('listTot').textContent = has ? `${parcels.length} particell${parcels.length>1?'e':'a'} · ${totHa.toFixed(2)} ha totali` : '';
-  $('reset').disabled=!has; refreshDl();
+  const nNd=parcels.filter(p=>!p.area_m2).length;
+  $('listTot').textContent = has ? `${parcels.length} particell${parcels.length>1?'e':'a'} · ${totHa.toFixed(2)} ha totali`+(nNd? ` (${nNd} senza area)` : '') : '';
+  refreshDl();
   $('promote').disabled=!(has&&signedIn);
   saveStateDebounced();   // auto-resume
   if(gl){
@@ -2953,16 +3022,16 @@ function render(zoom){
     psc.title='Seleziona per i geoprocessi'; psc.checked=!!p.sel;
     row.classList.toggle('sel', !!p.sel);
     psc.onchange=function(e){ e.stopPropagation(); p.sel=psc.checked;
-      row.classList.toggle('sel', psc.checked); gpSelInfo(); };
+      row.classList.toggle('sel', psc.checked); gpSelInfo(); try{ wireSectionTools(); }catch(x){} };
     row.appendChild(psc);
-    row.appendChild(makeVisToggle(()=>!p.hidden, on=>{ p.hidden=!on; row.classList.toggle('hidden',!on); const gg=gl.graphics.getItemAt(i); if(gg) gg.visible=on; renderLabels(); saveStateDebounced&&saveStateDebounced(); }));
+    row.appendChild(makeVisToggle(()=>!p.hidden, on=>{ p.hidden=!on; row.classList.toggle('hidden',!on); const gg=gl.graphics.getItemAt(i); if(gg) gg.visible=on; renderLabels(); saveStateDebounced&&saveStateDebounced(); try{ wireSectionTools(); }catch(x){} }));
     row.appendChild(makeColorSwatch(()=>p.color||PARCEL_HEX, hex=>{ p.color=hex; const gg=gl.graphics.getItemAt(i); if(gg&&gg.geometry) gg.symbol=symbolForColor(gg.geometry.type,hex); saveStateDebounced&&saveStateDebounced(); }));
     const nm=document.createElement('input'); nm.className='gname'; nm.spellcheck=false;
     nm.value=p.nome||(p.comune+' · Fg '+p.foglio+' · '+p.particella); nm.title=nm.value;
     nm.onchange=function(){ p.nome=nm.value.trim()||undefined; nm.title=nm.value; renderLabels(); saveStateDebounced&&saveStateDebounced(); };
     nm.onkeydown=function(e){ if(e.key==='Enter'){ e.preventDefault(); nm.blur(); } };
     row.appendChild(nm);
-    const st=(p.area_m2?(p.area_m2/10000).toFixed(2)+' ha':'')+(p.land_use?' · '+p.land_use:'');
+    const st=(p.area_m2?(p.area_m2/10000).toFixed(2)+' ha':(p.area_nd?'area non disponibile (manca il contorno)':''))+(p.land_use?' · '+p.land_use:'');
     if(st){ const sub=document.createElement('span'); sub.className='gsub'; sub.textContent=st; row.appendChild(sub); }
     const zb=document.createElement('button'); zb.className='gact'; zb.title='Zoom'; zb.innerHTML=GEOM_ZOOM_SVG;
     zb.onclick=function(){ if(view) view.goTo({center:[p.lng,p.lat],zoom:18}).catch(function(){}); };
@@ -2991,7 +3060,11 @@ async function confirmPromote(){
   const btn=$('pmConfirm'); if(btn.disabled) return;         // già in corso → niente doppio invio
   btn.disabled=true; btn.textContent='Inserimento…';
   const diss=$('diss').checked;
-  const fc=buildFC(diss);
+  const stop=t=>{ pmMsg(esc(t),'err'); btn.disabled=false; btn.textContent='Conferma inserimento'; };
+  // AREAS COLLECTION è un layer di aree: una particella senza contorno (solo il punto) non ci può andare
+  const noGeom=parcels.filter(p=>!(p.geometry&&/Polygon/.test(p.geometry.type||'')));
+  if(noGeom.length){ stop('Senza contorno, non promuovibili: '+noGeom.slice(0,4).map(parcelLabel).join('; ')+(noGeom.length>4? '…' : '')+'. Toglile dall\'Elenco e riprova.'); return; }
+  let fc; try{ fc=buildFC(diss); }catch(e){ stop((e&&e.message)||String(e)); return; }
   const cls=$('pmClass').value, atype=$('pmType').value, src=$('pmSources').value;
   const estr=parseInt($('pmEstr').value,10)||0, ptype=$('pmProjType').value.trim();
   const region=$('reg').value, prov=$('prov').value;
@@ -3019,7 +3092,7 @@ async function confirmPromote(){
           outFields:["PRO_COM_T","COMUNE"], returnGeometry:false, num:1});
         const a=qr.features[0] && qr.features[0].attributes;
         if(a){ proComT=a.PRO_COM_T; comuneIstat=a.COMUNE; }
-      }catch(e){}
+      }catch(e){ console.warn('[promuovi] comune ISTAT non letto, uso quello della particella:', e); }
       const comune = comuneIstat || (diss ? (pr.comuni||'') : (pr.comune||''));
       // regione e provincia sono quelle della PARTICELLA (da Zornade, stessa grafia dei dati già nel layer):
       // prima vincevano i menù a tendina, sbagliati per le particelle cliccate in un'altra zona e vuoti
@@ -3046,7 +3119,7 @@ async function confirmPromote(){
             promoteOverlapAck=true; btn.disabled=false; btn.textContent='Inserisci comunque'; return;
           }
         }
-      }catch(e){}
+      }catch(e){ console.warn('[promuovi] controllo delle sovrapposizioni non riuscito:', e); }
     }
     pmMsg(`Inserisco ${adds.length} feature…`,'');
     const res=await layer.applyEdits({addFeatures:adds});
@@ -3220,10 +3293,12 @@ function sfDrawBtns(){ const c=sfCat(sfDrawCat);
     const b=$(p[0]); if(!b) return; const ok=!c||c.g.indexOf(p[2])>=0;
     b.disabled=!ok; b.title=ok? '' : c.l+' non si disegna come '+SF_GEOM_IT[p[2]]; b.classList.toggle('active', drawType===p[1]); });
   if(drawType&&c){ const gt=drawType==='rectangle'||drawType==='circle'? 'polygon' : drawType;
-    if(c.g.indexOf(gt)<0){ drawType=null; try{ sketchVM.cancel(); }catch(e){} sfDrawBtns();
+    if(c.g.indexOf(gt)<0){ if(drwMode&&drwMode.kind==='shape') drwModeEnd(true); drawType=null; try{ sketchVM.cancel(); }catch(e){} sfDrawBtns();
       toolMsg('drwMsg','Strumento spento: '+c.l+' non si disegna come '+SF_GEOM_IT[gt]+'.'); return; } }
   try{ const col=sfColor(sfDrawCat); sketchVM.polygonSymbol=symbolForColor('polygon',col); sketchVM.polylineSymbol=symbolForColor('polyline',col);
-    sketchVM.pointSymbol=symbolForColor('point',col); }catch(e){} }
+    sketchVM.pointSymbol=symbolForColor('point',col); }catch(e){}
+  try{ shpUi(); }catch(e){}
+  if($('rteBox')) $('rteBox').hidden=sfDrawCat!=='connection'; }
 // attributi di un disegno nuovo: categoria e tipo se valgono per la sua geometria, attributi, nota, fonte e sito
 function sfNewAttrs(gtype){ const s=sfDrawState(), gt=sfGk(gtype)||gtype;
   const a={_kind:'drawing', geomType:gt, note:($('drwNote')&&$('drwNote').value)||'', sf_src:s.src};
@@ -3254,7 +3329,7 @@ function sfEditor(g){ const at=g.attributes, gt=sfGk(g.geometry.type), s=sfOf(g)
   h+='<div class="sfattrs"><div><label>Fonte</label><select data-f="src">'+SF_SRC.map(x=>opt(x[0],x[1],(at.sf_src||sfDefaultSrc(at))===x[0])).join('')+'</select></div>'
     +'<div><label>Stato</label><select data-f="status">'+SF_STATUS.map(x=>opt(x[0],x[1],(at.sf_status||'')===x[0])).join('')+'</select></div></div>';
   const site=at.sf_site;
-  h+='<div class="thint">'+(site? 'Sito: '+esc(site.code||'area senza codice') : 'Senza sito'+(sfSite? ': salvando prende il sito di lavoro' : ''))
+  h+='<div class="thint">'+(site? 'Sito: '+esc(site.code||'area senza codice') : 'Senza sito: salvando prende l\'area di AREAS COLLECTION che tocca'+(sfSite? ' (fuori da ogni area, il sito di lavoro)' : ''))
     +' · '+(at.sf_saved? (sfNeedsSave(g)? 'sul portale, con modifiche da salvare' : 'salvato sul portale') : 'non ancora sul portale')+'</div>';
   const ed=document.createElement('div'); ed.className='gedit'; ed.innerHTML=h;
   ed.addEventListener('change', e=>{ const f=e.target.dataset.f; if(!f) return; const v=e.target.value;
@@ -3286,7 +3361,7 @@ function sfSubtitle(g, base){ const at=g.attributes||{}, s=sfOf(g), c=sfCat(s.ca
 
 // ── sito di lavoro: un'area di AREAS COLLECTION ──
 function sfRenderSite(){ const box=$('sfSiteBox'); if(!box) return; const on=typeof signedIn!=='undefined'&&signedIn;
-  if(!sfSite){ box.className='sfsite empty'; box.textContent='Nessun sito: i disegni restano senza legame.'; }
+  if(!sfSite){ box.className='sfsite empty'; box.textContent='Nessun sito scelto: salvando, ogni oggetto prende da solo l\'area che tocca.'; }
   else { box.className='sfsite'; const ha=sfSite.ha!=null? String(sfSite.ha.toFixed(2)).replace('.',',')+' ha' : '';
     box.innerHTML='<b>'+esc(sfSite.code||'Senza codice progetto')+'</b>'+(sfSite.comune? ' · '+esc(sfSite.comune) : '')
       +(sfSite.regione? ' ('+esc(sfSite.regione)+')' : '')+'<br><small>'+[ha,'AREAS COLLECTION'].filter(Boolean).join(' · ')+'</small>'; }
@@ -3376,8 +3451,11 @@ function sfRenderSave(){ const c=sfCandidates(), todo=c.use.filter(sfNeedsSave),
   if(c.use.length-todo.length) parts.push((c.use.length-todo.length)+' già salvati senza modifiche');
   $('sfSub').textContent=(parts.join(' · ')||'Niente da salvare')+' → «IT - Site Features».';
   const ss=$('sfSaveSite');
-  if(sfSite){ ss.className='sfsite'; ss.innerHTML='Sito di lavoro: <b>'+esc(sfSite.code||'area senza codice')+'</b>'+(sfSite.comune? ' · '+esc(sfSite.comune) : '')+'<br><small>Gli oggetti senza sito gli vengono legati.</small>'; }
-  else { ss.className='sfsite empty'; ss.textContent='Nessun sito di lavoro: gli oggetti senza sito si salvano senza legame. Per legarli, scegli il sito nella scheda Disegno.'; }
+  const nFree=todo.filter(g=>!g.attributes.sf_site).length;
+  if(sfSite){ ss.className='sfsite'; ss.innerHTML='Sito di lavoro: <b>'+esc(sfSite.code||'area senza codice')+'</b>'+(sfSite.comune? ' · '+esc(sfSite.comune) : '')
+    +'<br><small>'+(nFree? nFree+' senza sito: prendono l\'area di AREAS COLLECTION che toccano, o questo sito se sono fuori da ogni area.' : 'Tutti hanno già un sito.')+'</small>'; }
+  else { ss.className='sfsite'+(nFree? '' : ' empty'); ss.innerHTML=nFree? 'Legame al sito <b>automatico</b><br><small>'+nFree+' senza sito: ognuno prende l\'area di AREAS COLLECTION che tocca (con più aree, quella che copre di più). Quelli fuori da ogni area restano senza sito.</small>'
+    : 'Tutti gli oggetti da salvare hanno già un sito.'; }
   const noCat={point:0, polyline:0, polygon:0}; todo.forEach(g=>{ if(!sfOf(g).cat) noCat[sfGk(g.geometry.type)]++; });
   $('sfNoCat').innerHTML=Object.keys(noCat).filter(k=>noCat[k]).map(k=>`<label for="sfDef_${k}">Categoria per ${noCat[k]} ${noCat[k]===1? SF_GEOM_IT[k] : SF_GEOM_PL[k]} senza categoria</label>`
     +`<select id="sfDef_${k}">${SF_CATS.filter(x=>x.g.indexOf(k)>=0).map(x=>`<option value="${x.c}"${x.c==='reference'?' selected':''}>${esc(x.l)}</option>`).join('')}</select>`).join('');
@@ -3396,8 +3474,10 @@ function sfAttrsOut(g){ const at=g.attributes, gt=sfGk(g.geometry.type), cat=sfC
   return o; }
 async function sfConfirmSave(){
   const btn=$('sfConfirm'); if(btn.disabled) return; btn.disabled=true; btn.textContent='Salvo…';
-  const todo=sfCandidates().use.filter(sfNeedsSave), errs=[]; let added=0, updated=0;
+  const todo=sfCandidates().use.filter(sfNeedsSave), errs=[]; let added=0, updated=0, auto=null;
   try{ await esriMods.projection.load();
+    sfMsg('Cerco le aree di AREAS COLLECTION toccate dagli oggetti…','');
+    auto=await sfAutoSite(todo); await sfRefreshCodes(todo);
     for(const gt of ['point','polyline','polygon']){
       const arr=todo.filter(g=>sfGk(g.geometry.type)===gt); if(!arr.length) continue;
       sfMsg('Salvo '+arr.length+' '+(arr.length===1? SF_GEOM_IT[gt] : SF_GEOM_PL[gt])+'…','');
@@ -3409,25 +3489,97 @@ async function sfConfirmSave(){
         if(!at.sf_gid) at.sf_gid=sfNewGuid();
         (at.sf_saved? upds : adds).push({g:g, f:new esriMods.Graphic({geometry:sfGeomOut(g.geometry, gt), attributes:sfAttrsOut(g)})}); });
       const L=new esriMods.FeatureLayer({url:SF_URL+'/'+SF_LID[gt]});
-      let res=await L.applyEdits({addFeatures:adds.map(x=>x.f), updateFeatures:upds.map(x=>x.f)}, {globalIdUsed:true, rollbackOnFailureEnabled:false});
-      (res.addFeatureResults||[]).forEach((r,i)=>{ const x=adds[i]; if(r.error) errs.push((x.g.attributes.nome||'oggetto')+': '+(r.error.message||'errore'));
+      // ogni oggetto ha bisogno della SUA conferma: una risposta mancante è un errore (prima passava per salvato
+      // e il messaggio era positivo); chi non è confermato resta «da salvare»
+      const nm=x=>(x.g.attributes.nome||'oggetto'), noAns=' nessuna conferma dal servizio';
+      const res=await L.applyEdits({addFeatures:adds.map(x=>x.f), updateFeatures:upds.map(x=>x.f)}, {globalIdUsed:true, rollbackOnFailureEnabled:false});
+      const aR=(res&&res.addFeatureResults)||[], uR=(res&&res.updateFeatureResults)||[], lost=[];
+      adds.forEach((x,i)=>{ const r=aR[i];
+        if(!r) errs.push(nm(x)+':'+noAns); else if(r.error) errs.push(nm(x)+': '+(r.error.message||'errore'));
         else { x.g.attributes.sf_saved=true; x.g.attributes.sf_dirty=false; added++; } });
-      const lost=[];
-      (res.updateFeatureResults||[]).forEach((r,i)=>{ const x=upds[i]; if(r.error) lost.push(x); else { x.g.attributes.sf_dirty=false; updated++; } });
-      // aggiornamento non riuscito (l'oggetto non c'è più sul portale, magari cancellato altrove): lo riaggiungo
-      if(lost.length){ res=await L.applyEdits({addFeatures:lost.map(x=>x.f)}, {globalIdUsed:true, rollbackOnFailureEnabled:false});
-        (res.addFeatureResults||[]).forEach((r,i)=>{ const x=lost[i]; if(r.error) errs.push((x.g.attributes.nome||'oggetto')+': '+(r.error.message||'errore'));
-          else { x.g.attributes.sf_dirty=false; added++; } }); }
+      upds.forEach((x,i)=>{ const r=uR[i];
+        if(!r) errs.push(nm(x)+':'+noAns); else if(r.error) lost.push({x:x, err:r.error});
+        else { x.g.attributes.sf_dirty=false; updated++; } });
+      // aggiornamento non riuscito: lo riaggiungo SOLO se sul portale non c'è più (cancellato altrove). Gli altri
+      // errori (permessi, valori non ammessi) restano errori e l'oggetto resta da salvare.
+      if(lost.length){ const exist=new Set();
+        try{ const q=await L.queryFeatures({where:"GlobalID IN ('"+lost.map(o=>String(o.x.g.attributes.sf_gid).replace(/'/g,'')).join("','")+"')",
+            outFields:['GlobalID'], returnGeometry:false});
+          ((q&&q.features)||[]).forEach(f=>exist.add(sfGuid(f.attributes.GlobalID))); }
+        catch(e){ console.warn('[salva sul portale] verifica degli oggetti non riuscita:', e); lost.forEach(o=>exist.add(o.x.g.attributes.sf_gid)); }   // nel dubbio non riaggiungo
+        const gone=[]; lost.forEach(o=>{ if(exist.has(o.x.g.attributes.sf_gid)) errs.push(nm(o.x)+': '+(o.err.message||'errore')); else gone.push(o.x); });
+        if(gone.length){ const r2=await L.applyEdits({addFeatures:gone.map(x=>x.f)}, {globalIdUsed:true, rollbackOnFailureEnabled:false}), a2=(r2&&r2.addFeatureResults)||[];
+          gone.forEach((x,i)=>{ const r=a2[i];
+            if(!r) errs.push(nm(x)+':'+noAns); else if(r.error) errs.push(nm(x)+': '+(r.error.message||'errore'));
+            else { x.g.attributes.sf_dirty=false; added++; } }); } }
     }
     refreshDl();
     const txt=[added? added+(added===1?' aggiunto':' aggiunti') : '', updated? updated+(updated===1?' aggiornato':' aggiornati') : ''].filter(Boolean).join(', ');
     if(errs.length){ sfMsg((txt? txt+'. ' : '')+'Non salvati: '+esc(errs.slice(0,3).join(' · '))+(errs.length>3? ' …' : ''),'err'); btn.disabled=false; btn.textContent='Riprova'; }
-    else { sfCloseSave(); msg('✔ Salvati sul portale: '+(txt||'niente da cambiare')+'.','ok'); }
+    else { sfCloseSave(); msg('✔ Salvati sul portale: '+(txt||'niente da cambiare')+'.'+sfAutoTxt(auto),'ok'); }
   }catch(e){ console.warn('[salva sul portale]',e); sfMsg('Errore: '+esc((e&&e.message)||e),'err'); btn.disabled=false; btn.textContent='Riprova'; } }
+// legame automatico al sito, al salvataggio: un oggetto senza sito prende l'area di AREAS COLLECTION che tocca (più aree:
+// quella con più sovrapposizione, in superficie per le aree e in lunghezza per le linee); fuori da ogni area il sito di
+// lavoro, se c'è, altrimenti resta senza. Una sola interrogazione, sull'ingombro di tutti.
+async function sfAutoSite(arr){ const out={linked:0, work:0, none:0, gs:[]};
+  const need=(arr||[]).filter(g=>!g.attributes.sf_site); if(!need.length) return out;
+  const setSite=(g,s)=>{ g.attributes.sf_site=s; if(g.attributes.sf_saved) g.attributes.sf_dirty=true; };
+  try{ const ge=esriMods.geometryEngine, geoms=need.map(g=>sfGeomOut(g.geometry, sfGk(g.geometry.type)));
+    let ext=null;
+    geoms.forEach(x=>{ const e=x.type==='point'? new esriMods.Graphic({geometry:{type:'extent', xmin:x.x-1, ymin:x.y-1, xmax:x.x+1, ymax:x.y+1, spatialReference:x.spatialReference}}).geometry : x.extent;
+      if(e) ext=ext? ext.union(e) : e.clone(); });
+    let areas=[], perObj=null;
+    if(ext){ const L=new esriMods.FeatureLayer({url:AREAS_LAYER_URL}), qa={spatialRelationship:'intersects', outFields:['GlobalID','Project_Code'],
+        returnGeometry:true, outSpatialReference:{wkid:102100}};
+      const r=await L.queryFeatures(Object.assign({geometry:ext, num:1000}, qa));
+      areas=(r&&r.features)||[];
+      // oggetti sparsi su un ingombro grande: la risposta è stata tagliata (exceededTransferLimit) e la scelta
+      // avverrebbe fra un sottoinsieme a caso. Allora un'interrogazione per oggetto, sulla sua geometria.
+      if(r&&r.exceededTransferLimit){ perObj=[];
+        for(const x of geoms){ const q=await L.queryFeatures(Object.assign({geometry:x}, qa)); perObj.push((q&&q.features)||[]);
+          if(q&&q.exceededTransferLimit) out.partial=true; } } }
+    need.forEach((g,i)=>{ const x=geoms[i], gt=sfGk(x.type); let best=null, bestV=-1;
+      (perObj? perObj[i] : areas).forEach(f=>{ const A=f.geometry; if(!A) return;
+        try{ if(!ge.intersects(A, x)) return; let v=0;
+          if(gt==='polygon'){ const I=ge.intersect(A, x); v=I? Math.abs(ge.planarArea(I)) : 0; }
+          else if(gt==='polyline'){ const I=ge.intersect(A, x); v=I? ge.planarLength(I) : 0; }
+          if(v>bestV){ best=f; bestV=v; } }catch(e){} });
+      if(best){ const a=best.attributes||{}, code=String(a.Project_Code||'').trim()||null;
+        setSite(g, {guid:sfGuid(a.GlobalID), code:code}); out.linked++; out.gs.push(g); }
+      else if(sfSite){ setSite(g, {guid:sfSite.guid, code:sfSite.code||null}); out.work++; }
+      else out.none++; });
+  }catch(e){ console.warn('[sito automatico]',e);   // interrogazione fallita: resta il sito di lavoro, come prima
+    need.forEach(g=>{ if(!g.attributes.sf_site&&sfSite){ setSite(g, {guid:sfSite.guid, code:sfSite.code||null}); out.work++; } }); }
+  return out; }
+// un'area appena promossa non ha il codice progetto finché non lo assegna il CRM: il legame vero è il GUID, e al
+// salvataggio il codice si rilegge dall'area
+async function sfRefreshCodes(arr){
+  const miss=[]; (arr||[]).forEach(g=>{ const s=g.attributes.sf_site; if(s&&s.guid&&!s.code&&miss.indexOf(s.guid)<0) miss.push(s.guid); });
+  if(!miss.length) return;
+  try{ const L=new esriMods.FeatureLayer({url:AREAS_LAYER_URL});
+    const r=await L.queryFeatures({where:"GlobalID IN ('"+miss.map(x=>x.replace(/'/g,'')).join("','")+"')", outFields:['GlobalID','Project_Code'], returnGeometry:false});
+    const m={}; ((r&&r.features)||[]).forEach(f=>{ const a=f.attributes||{}; if(a.Project_Code) m[sfGuid(a.GlobalID)]=String(a.Project_Code).trim(); });
+    arr.forEach(g=>{ const s=g.attributes.sf_site; if(s&&!s.code&&m[s.guid]) g.attributes.sf_site={guid:s.guid, code:m[s.guid]}; });
+    if(sfSite&&!sfSite.code&&m[sfSite.guid]){ sfSite.code=m[sfSite.guid]; sfRenderSite(); }
+  }catch(e){ console.warn('[sito] codici progetto non riletti:', e); } }
+function sfAutoTxt(a){ if(!a) return ''; const p=[], codes=[];   // i codici dopo sfRefreshCodes: anche quelli appena riletti
+  (a.gs||[]).forEach(g=>{ const c=g.attributes.sf_site&&g.attributes.sf_site.code; if(c&&codes.indexOf(c)<0) codes.push(c); });
+  if(a.linked) p.push(a.linked+(a.linked===1? ' legato da solo all\'area ' : ' legati da soli alle aree ')+(codes.length? codes.slice(0,3).join(', ')+(codes.length>3? '…' : '') : 'toccate'));
+  if(a.work) p.push(a.work+' al sito di lavoro');
+  if(a.none) p.push(a.none+' fuori da ogni area, senza sito');
+  if(a.partial) p.push('attenzione: per qualche oggetto le aree toccate erano troppe per leggerle tutte, controlla il sito nell\'Elenco');
+  return p.length? ' '+p.join(' · ')+'.' : ''; }
 // togliere un oggetto salvato: su richiesta anche dal portale
 async function sfDeleteRemote(g){ const at=g.attributes, L=new esriMods.FeatureLayer({url:SF_URL+'/'+SF_LID[sfGk(g.geometry.type)]});
   const r=await L.applyEdits({deleteFeatures:[{globalId:at.sf_gid}]}, {globalIdUsed:true});
   const x=(r.deleteFeatureResults||[])[0]; if(x&&x.error) throw new Error(x.error.message||'errore'); }
+// più oggetti insieme (cestino di sezione): una chiamata per layer; {ok, err, msg}
+async function sfDeleteRemoteMany(gs){ const out={ok:0, err:0, msg:''};
+  for(const gt of ['point','polyline','polygon']){ const arr=gs.filter(g=>sfGk(g.geometry.type)===gt); if(!arr.length) continue;
+    const L=new esriMods.FeatureLayer({url:SF_URL+'/'+SF_LID[gt]});
+    const r=await L.applyEdits({deleteFeatures:arr.map(g=>({globalId:g.attributes.sf_gid}))}, {globalIdUsed:true, rollbackOnFailureEnabled:false});
+    (r.deleteFeatureResults||[]).forEach(x=>{ if(x.error){ out.err++; out.msg=out.msg||x.error.message||'errore'; } else out.ok++; }); }
+  return out; }
 
 // ── export multi-formato (invariato) ──────────────────────────────────────
 function dlBlob(name,blob){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();URL.revokeObjectURL(a.href);}
@@ -3767,6 +3919,7 @@ function gpDoClip(sketchGeom){
   gpPendingClip=null;
 }
 
+function parcelLabel(p){ return (p.comune? p.comune+' ' : '')+'Fg '+(p.foglio!=null? p.foglio : '?')+' · '+(p.particella!=null? p.particella : '?'); }
 function buildFC(dissolve, incl){
   incl = incl || {parcels:true};
   let feats=[];
@@ -3776,10 +3929,21 @@ function buildFC(dissolve, incl){
       properties:{nome:p.nome||null,comune:p.comune,regione:p.regione,provincia:p.provincia,belfiore:p.belfiore,foglio:p.foglio,particella:p.particella,
         area_m2:p.area_m2?Math.round(p.area_m2):null,area_ha:p.area_m2?+(p.area_m2/10000).toFixed(4):null,
         land_use:p.land_use,omi:p.omi,ncr:p.ncr,fid:p.fid}}));
-    if(dissolve){
-      const polys=feats.filter(f=>f.geometry.type==='Polygon'||f.geometry.type==='MultiPolygon');
-      if(polys.length){
-        let u=polys[0]; for(let i=1;i<polys.length;i++){try{u=turf.union(u,polys[i]);}catch(e){}}
+    // Dissolve: un'unione fallita (o una particella senza contorno) dava un'area PARZIALE che dichiarava comunque
+    // tutte le particelle, e finiva nell'export o in AREAS COLLECTION. Ora mi fermo e dico quali (audit 24/9).
+    if(dissolve&&feats.length){
+      const isPoly=f=>f.geometry&&(f.geometry.type==='Polygon'||f.geometry.type==='MultiPolygon');
+      const lab=i=>parcelLabel(parcels[i]), many=a=>a.slice(0,4).join('; ')+(a.length>4? '…' : '');
+      const noGeom=feats.map((f,i)=>isPoly(f)? null : lab(i)).filter(Boolean);
+      if(noGeom.length) throw new Error('Non posso dissolvere: '+noGeom.length+(noGeom.length===1? ' particella non ha' : ' particelle non hanno')
+        +' il contorno ('+many(noGeom)+'). Toglile dall\'Elenco, oppure togli la spunta «Dissolvi».');
+      const failed=[];
+      {
+        let u=feats[0]; for(let i=1;i<feats.length;i++){ let r=null;
+          try{ r=turf.union(u,feats[i]); }catch(e){ console.warn('[dissolvi] unione non riuscita:', lab(i), e); }
+          if(r&&r.geometry) u=r; else failed.push(lab(i)); }
+        if(failed.length) throw new Error('Unione non riuscita per '+failed.length+(failed.length===1? ' particella' : ' particelle')+' ('+many(failed)
+          +'): l\'area dissolta sarebbe incompleta, quindi mi fermo. Probabile geometria non valida: togli quelle particelle o togli la spunta «Dissolvi».');
         const most=k=>{ const c={}; parcels.forEach(p=>{ const v=p[k]; if(v&&v!=='-') c[v]=(c[v]||0)+1; });
           return Object.keys(c).sort((a,b)=>c[b]-c[a])[0]||''; };   // regione/provincia prevalenti
         u.properties={n_particelle:parcels.length,
@@ -3873,11 +4037,17 @@ function makeVisToggle(getVisible, onToggle){
   b.onclick=function(e){ e.stopPropagation(); onToggle(!getVisible()); paint(); };
   return b;
 }
+// colore: un secchiello con sotto una barretta del colore attuale (il quadratino pieno sembrava la casella di spunta)
+const BUCKET_SVG='<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" aria-hidden="true"><path d="M8.3 2.6 14.8 9l-5.9 6-5.6-5.6a1.4 1.4 0 0 1 0-2z"/><path d="M3.3 9.1h11.3"/><path d="M17 11.6c.9 1.3 1.4 2.2 1.4 2.9a1.4 1.4 0 0 1-2.8 0c0-.7.5-1.6 1.4-2.9z" fill="currentColor"/></svg>';
+const TRASH_SVG='<svg viewBox="0 0 20 20" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 5.5h13M8 5.5v-2h4v2M5.5 5.5l.8 11h7.4l.8-11M8.6 8.6v5.2M11.4 8.6v5.2"/></svg>';
+function swatchPaint(wrap, hex){ if(!wrap) return;
+  if(!wrap.querySelector('svg')) wrap.insertAdjacentHTML('afterbegin', BUCKET_SVG+'<i class="cbar"></i>');
+  wrap.style.setProperty('--sw', hex||'#888888'); }
 function makeColorSwatch(getHex, onPick){
-  const wrap=document.createElement('span'); wrap.className='cswatch';
-  const inp=document.createElement('input'); inp.type='color';
-  const cur=getHex()||'#888888'; inp.value=cur; wrap.style.background=cur;
-  inp.oninput=function(e){ e.stopPropagation(); wrap.style.background=inp.value; onPick(inp.value); };
+  const wrap=document.createElement('span'); wrap.className='cswatch'; wrap.title='Colore';
+  const inp=document.createElement('input'); inp.type='color'; inp.setAttribute('aria-label','Colore');
+  const cur=getHex()||'#888888'; inp.value=cur; swatchPaint(wrap, cur);
+  inp.oninput=function(e){ e.stopPropagation(); swatchPaint(wrap, inp.value); onPick(inp.value); };
   inp.onclick=function(e){ e.stopPropagation(); };
   wrap.onclick=function(e){ e.stopPropagation(); };
   wrap.appendChild(inp); return wrap;
@@ -3915,9 +4085,9 @@ function geomRow(g, subtitle){
   sc.title='Seleziona per i geoprocessi'; sc.checked=!!(g.attributes&&g.attributes._sel);
   row.classList.toggle('sel', sc.checked);
   sc.onchange=function(e){ e.stopPropagation(); g.attributes._sel=sc.checked;
-    row.classList.toggle('sel', sc.checked); gpSelInfo(); };
+    row.classList.toggle('sel', sc.checked); gpSelInfo(); try{ wireSectionTools(); }catch(x){} };
   row.appendChild(sc);
-  row.appendChild(makeVisToggle(()=>g.visible!==false, on=>{ setGraphicVisible(g,on); row.classList.toggle('hidden',!on); }));
+  row.appendChild(makeVisToggle(()=>g.visible!==false, on=>{ setGraphicVisible(g,on); row.classList.toggle('hidden',!on); try{ wireSectionTools(); }catch(x){} }));
   row.appendChild(makeColorSwatch(()=>graphicColorHex(g), hex=>applyGraphicColor(g,hex)));
   const nm=document.createElement('input'); nm.className='gname'; nm.spellcheck=false;
   nm.value=g.attributes.nome||''; nm.title=nm.value;
@@ -3939,7 +4109,7 @@ function geomRow(g, subtitle){
     if(at.sf_saved&&at.sf_gid&&typeof signedIn!=='undefined'&&signedIn
       &&confirm('«'+(at.nome||'Oggetto')+'» è salvato sul portale (IT - Site Features).\n\nOK = eliminalo anche dal portale\nAnnulla = toglilo solo da qui')){
       try{ await sfDeleteRemote(g); msg('Eliminato anche dal portale.','ok'); }
-      catch(e){ msg('Non eliminato dal portale ('+esc((e&&e.message)||e)+'): tolto solo da qui.','err'); } }
+      catch(e){ msg('Non eliminato dal portale ('+((e&&e.message)||e)+'): tolto solo da qui.','err'); } }
     if(sfEditOpen===g) sfEditOpen=null;
     toolsGL.remove(g); renderGeoms(); refreshDl(); };
   row.appendChild(db);
@@ -3964,6 +4134,7 @@ function renderGeoms(){
   fill('listDraw','cntDraw',draws,'Nessun disegno.', function(g){ const at=g.attributes;
     const t={point:'punto',polyline:'linea',polygon:'area'}[at.geomType]||at.geomType||'';
     const a=geomAreaHa(g), pezzi=[]; if(t) pezzi.push(t); if(a!=null) pezzi.push(a.toFixed(2)+' ha');
+    if(g.geometry&&g.geometry.type==='polyline'){ try{ pezzi.push(fmtLen(Math.abs(esriMods.geometryEngine.geodesicLength(g.geometry,'meters')||0))); }catch(e){} }
     const s=sfSubtitle(g,''); if(s) pezzi.push(s);
     if(at.note) pezzi.push(at.note); return pezzi.join(' · '); });
   fill('listGeo','cntGeo',geos,'Nessun output.', function(g){ const at=g.attributes, pezzi=[];
@@ -3978,30 +4149,62 @@ function renderGeoms(){
   impCounts();
 }
 
-// ══ Controlli di GRUPPO negli header di sezione (visibilità + colore) ══════
+// ══ Controlli di GRUPPO negli header di sezione (spunta, visibilità, colore, elimina) ══════
 // Restituisce le graphics di una sezione: 'parcels' → gl (via parcels[]),
-// 'draw'/'buf'/'geo' → toolsGL filtrato.
+// 'draw'/'geo'/'import' → toolsGL filtrato. Le immagini degli Importati sono a parte (importedImages).
 function sectionGraphics(sec){
   if(sec==='parcels') return gl?gl.graphics.toArray():[];
   if(!toolsGL) return [];
   return toolsGL.graphics.toArray().filter(function(g){ var at=g.attributes||{};
     if(sec==='geo') return at._kind==='buffer'||(at._kind==='drawing'&&at._sub==='geoproc');
     if(sec==='draw') return at._kind==='drawing'&&at._sub!=='geoproc';
+    if(sec==='import') return at._kind==='import';
     return false; });
 }
+function sectionImages(sec){ return sec==='import'&&typeof importedImages!=='undefined'? importedImages : []; }
 // La sezione è "visibile" se almeno una graphic è visibile
 function sectionAllVisible(sec){
   if(sec==='parcels') return parcels.some(function(p){return !p.hidden;}) || parcels.length===0;
-  var gs=sectionGraphics(sec); if(!gs.length) return true;
-  return gs.some(function(g){return g.visible!==false;});
+  var gs=sectionGraphics(sec), ims=sectionImages(sec); if(!gs.length&&!ims.length) return true;
+  return gs.some(function(g){return g.visible!==false;})||ims.some(function(im){ return im.layer&&im.layer.visible!==false; });
 }
 function setSectionVisible(sec,on){
   if(sec==='parcels'){
     parcels.forEach(function(p,i){ p.hidden=!on; var gg=gl&&gl.graphics.getItemAt(i); if(gg) gg.visible=on; });
   } else {
     sectionGraphics(sec).forEach(function(g){ g.visible=!!on; if(g.attributes) g.attributes.hidden=on?undefined:true; });
+    sectionImages(sec).forEach(function(im){ if(im.layer) im.layer.visible=!!on; });
   }
   try{ saveStateDebounced(); }catch(e){}
+}
+// spunta di sezione: [quanti, quanti spuntati] e spunta/togli a tutti
+function sectionSelCount(sec){
+  if(sec==='parcels') return [parcels.length, parcels.filter(function(p){ return p.sel; }).length];
+  var gs=sectionGraphics(sec); return [gs.length, gs.filter(function(g){ return g.attributes&&g.attributes._sel; }).length];
+}
+function setSectionSel(sec,on){
+  if(sec==='parcels') parcels.forEach(function(p){ p.sel=!!on; });
+  else sectionGraphics(sec).forEach(function(g){ if(g.attributes) g.attributes._sel=!!on; });
+}
+// elimina tutta la sezione, con conferma; quelli salvati sul portale: chiede se toglierli anche da lì (come la riga)
+const SEC_WHAT={parcels:['la particella','tutte le %n particelle'], draw:['il disegno','tutti i %n disegni'],
+  geo:['il risultato del geoprocesso','tutti i %n risultati dei geoprocessi'], import:['l\'importato','tutti i %n importati']};
+async function sectionDelete(sec){
+  const gs=sec==='parcels'? [] : sectionGraphics(sec), ims=sectionImages(sec).slice(), n=sec==='parcels'? parcels.length : gs.length+ims.length;
+  if(!n){ msg('La sezione è già vuota.',''); return false; }
+  const w=SEC_WHAT[sec]||['l\'oggetto','tutti i %n oggetti'];
+  if(!confirm('Togliere '+(n===1? w[0] : w[1].replace('%n',n))+' dall\'Elenco?'+(sec==='parcels'? '' : ' Si può annullare con ↶ Annulla nella scheda Disegno.'))) return false;
+  if(sec==='parcels'){ parcels=[]; render(); msg('',''); return true; }
+  const saved=gs.filter(function(g){ var a=g.attributes||{}; return a.sf_saved&&a.sf_gid; });
+  if(saved.length&&typeof signedIn!=='undefined'&&signedIn
+    &&confirm(saved.length+(saved.length===1? ' di questi è salvato' : ' di questi sono salvati')+' sul portale (IT - Site Features).\n\nOK = eliminali anche dal portale\nAnnulla = toglili solo da qui')){
+    try{ const r=await sfDeleteRemoteMany(saved);
+      msg(r.err? r.ok+' eliminati dal portale, '+r.err+' no ('+r.msg+'): tolti comunque da qui.' : 'Eliminati anche dal portale ('+r.ok+').', r.err? 'err' : 'ok'); }
+    catch(e){ msg('Non eliminati dal portale ('+((e&&e.message)||e)+'): tolti solo da qui.','err'); } }
+  if(sec==='draw'&&drawType){ try{ sketchVM.cancel(); }catch(e){} drawType=null; sfDrawBtns(); }
+  gs.forEach(function(g){ if(sfEditOpen===g) sfEditOpen=null; toolsGL.remove(g); });
+  ims.forEach(function(im){ removeImage(im); });
+  renderGeoms(); refreshDl(); return true;
 }
 // Colore di gruppo → sovrascrive il colore di ogni elemento della sezione
 function setSectionColor(sec,hex){
@@ -4020,20 +4223,33 @@ function wireSectionTools(){
     var sec=box.dataset.sec;
     var vb=box.querySelector('.vtoggle[data-role=visall]');
     var ci=box.querySelector('.cswatch[data-role=colall] input[type=color]');
+    var db=box.querySelector('.gdel[data-role=delall]');
+    var sa=box.parentNode.querySelector('.gselall');
+    var redraw=function(){ if(sec==='parcels') render(); else renderGeoms(); };
     if(vb && !vb.dataset.wired){ vb.dataset.wired='1';
       vb.innerHTML=EYE_ON;
       vb.onclick=function(e){ e.stopPropagation(); var on=!sectionAllVisible(sec); setSectionVisible(sec,on);
-        vb.innerHTML=on?EYE_ON:EYE_OFF; vb.classList.toggle('off',!on);
-        if(sec==='parcels') render(); else renderGeoms(); };
+        vb.innerHTML=on?EYE_ON:EYE_OFF; vb.classList.toggle('off',!on); redraw(); };
     }
     if(ci && !ci.dataset.wired){ ci.dataset.wired='1';
       var stop=function(e){ e.stopPropagation(); };
       ci.onclick=stop; if(ci.parentNode) ci.parentNode.onclick=stop;
-      ci.oninput=function(e){ e.stopPropagation(); if(ci.parentNode) ci.parentNode.style.background=ci.value;
-        setSectionColor(sec,ci.value); if(sec==='parcels') render(); else renderGeoms(); };
+      swatchPaint(ci.parentNode, ci.value);
+      ci.oninput=function(e){ e.stopPropagation(); swatchPaint(ci.parentNode, ci.value);
+        setSectionColor(sec,ci.value); redraw(); };
     }
-    // sincronizza lo stato dell'occhio col contenuto attuale
+    if(db && !db.dataset.wired){ db.dataset.wired='1'; db.innerHTML=TRASH_SVG;
+      db.onclick=function(e){ e.stopPropagation(); sectionDelete(sec); };
+    }
+    if(sa && !sa.dataset.wired){ sa.dataset.wired='1';
+      sa.onclick=function(e){ e.stopPropagation(); };
+      sa.onchange=function(e){ e.stopPropagation(); setSectionSel(sec, sa.checked); redraw(); try{ gpSelInfo(); }catch(x){} };
+    }
+    // sincronizza occhio, spunta e cestino col contenuto attuale
     if(vb){ var on=sectionAllVisible(sec); vb.innerHTML=on?EYE_ON:EYE_OFF; vb.classList.toggle('off',!on); }
+    var sc=sectionSelCount(sec), nImg=sectionImages(sec).length;
+    if(sa){ sa.disabled=!sc[0]; sa.checked=!!sc[0]&&sc[1]===sc[0]; sa.indeterminate=sc[1]>0&&sc[1]<sc[0]; }
+    if(db) db.disabled=!(sc[0]+nImg);
   });
 }
 window.wireSectionTools=wireSectionTools;
@@ -4048,7 +4264,7 @@ function refreshSelDraw(){
   const n1=$('rcNDraw'); if(n1) n1.textContent=geoms.length||'';          // contatori nei titoli delle sezioni
   const n2=$('drwNSum'); if(n2) n2.textContent=countDrawingsPure()||'';
 }
-// ══ Disegno stile CAD: aggancio ai layer, direzione, annulla/ripeti, forme con misure, copia parallela, griglia ══
+// ══ Disegno stile CAD: aggancio ai layer, direzione, annulla/ripeti, misure esatte, copia (anche parallela), griglia ══
 // Metri a terra → unità Web Mercator. Web Mercator proietta con la sfera ma le coordinate sono sull'ellissoide WGS84,
 // quindi NON è conforme: a 45° un metro vale ~0,17% in più in est-ovest e ~0,16% in meno in nord-sud del semplice
 // 1/cos(lat) (misurato: un rettangolo 100×50 veniva 100,17×49,92). Due scale separate, kx e ky, rendono lati e angoli
@@ -4115,40 +4331,50 @@ function histUi(){ const act=sketchVM&&sketchVM.state==='active', H=drwHist, u=$
   if(u) u.disabled=!((act&&sketchVM.canUndo())||H.i>0);
   if(r) r.disabled=!((act&&sketchVM.canRedo())||H.i<H.stack.length-1); }
 
-// ── modalità sulla mappa della scheda Disegno: forma con misure, lato per l'orientamento, copia parallela ──
+// ── modalità sulla mappa della scheda Disegno: forma con misure, lato per l'orientamento, copia, copia parallela, su strada ──
 let drwMode=null;
 function drwModeOn(){ return !!drwMode; }
 function drwModeInfo(){ const m=drwMode;
   if(!m){ return grdPlaceOn()? 'Griglia: clicca <b>due punti</b> lungo il lato a cui allinearla. <kbd>Esc</kbd> per annullare.' : null; }
   if(m.kind==='shape') return 'Clicca dove va il <b>centro</b> del '+(shpParams().kind==='circle'?'cerchio':'rettangolo')+'. <kbd>Esc</kbd> per finire.';
+  if(m.kind==='rte') return (m.stops&&m.stops.length? 'Clicca l\'<b>arrivo</b> (<kbd>Maiusc</kbd>+clic: un punto di passaggio).' : 'Percorso su strada: clicca la <b>partenza</b>.')+' <kbd>Esc</kbd> per annullare.';
+  if(m.kind==='cp1') return 'Copia: clicca l\'<b>oggetto</b> da copiare. <kbd>Esc</kbd> per finire.';
+  if(m.kind==='cp2') return 'Clicca <b>dove metterlo</b>: il punto cliccato prima va lì. Ogni clic una copia, <kbd>Esc</kbd> per finire.';
   if(m.kind==='angle') return 'Clicca vicino a un <b>lato</b> (disegno, particella, DWG, layer): la larghezza gli diventa parallela. <kbd>Esc</kbd> per annullare.';
   if(m.kind==='off1') return 'Copia parallela: clicca la <b>linea o l\'area</b> da copiare, vicino al bordo. <kbd>Esc</kbd> per finire.';
   if(m.kind==='off2') return 'Ora clicca <b>da che parte</b> mettere la copia'+(m.src&&m.src.geom.type==='polygon'&&!$('offEdge').checked?' (dentro o fuori dall\'area)':'')+'. <kbd>Esc</kbd> per annullare.';
   return null; }
 function drwModeUi(){ const k=drwMode&&drwMode.kind;
-  [['shpPlace',k==='shape'],['shpRotPick',k==='angle'],['offPick',k==='off1'||k==='off2'],['grdAlign',grdPlaceOn()]]
+  [['shpRotPick',k==='angle'],['offPick',k==='off1'||k==='off2'||k==='cp1'||k==='cp2'],['rteGo',k==='rte'],['grdAlign',grdPlaceOn()]]
     .forEach(p=>{ const b=$(p[0]); if(b) b.classList.toggle('active', !!p[1]); }); }
 function drwTmpClear(){ try{ view.graphics.removeMany(view.graphics.toArray().filter(g=>g.__drwTmp)); }catch(e){} }
 function drwTmpShow(geom){ drwTmpClear(); if(!geom) return;
   const sym=geom.type==='polygon'? {type:'simple-fill', color:[255,140,26,0.12], outline:{color:[255,140,26], width:2, style:'dash'}}
     : {type:'simple-line', color:[255,140,26], width:3, style:'dash'};
-  const g=new esriMods.Graphic({geometry:geom, symbol:sym}); g.__drwTmp=true; view.graphics.add(g); }
-function drwModeEnd(){ const m=drwMode; if(!m) return; drwMode=null;
+  const g=new esriMods.Graphic({geometry:geom, symbol:/point/.test(geom.type)? {type:'simple-marker', color:[255,140,26,0.35], size:11, outline:{color:[255,140,26], width:2}} : sym});
+  g.__drwTmp=true; view.graphics.add(g); }
+// keepDraw: il rettangolo/cerchio armato resta armato (si passa da misure esatte a mano libera o al lato); senza,
+// finire la modalità «forma» spegne anche lo strumento (Esc, un'altra modalità)
+function drwModeEnd(keepDraw){ const m=drwMode; if(!m) return; drwMode=null;
   try{ m.h&&m.h.remove(); }catch(e){} try{ m.hm&&m.hm.remove(); }catch(e){}
-  sketchClickResume(m.sk); view.popupEnabled=m.popup; view.container.style.cursor=m.cursor||''; drwTmpClear(); drwModeUi(); }
+  sketchClickResume(m.sk); view.popupEnabled=m.popup; view.container.style.cursor=m.cursor||''; drwTmpClear(); drwModeUi();
+  if(m.kind==='shape'&&!keepDraw&&(drawType==='rectangle'||drawType==='circle')){ drawType=null; try{ sketchVM.cancel(); }catch(e){} sfDrawBtns(); } }
 function drwModeStart(kind){
-  const same=drwMode&&(drwMode.kind===kind||(kind==='off1'&&drwMode.kind==='off2')); drwModeEnd(); if(same) return;   // di nuovo sul pulsante: esce
+  const keep=kind==='shape'||kind==='angle';   // lavorano con lo strumento Rettangolo/Cerchio armato
+  const same=drwMode&&(drwMode.kind===kind||(kind==='off1'&&drwMode.kind==='off2')||(kind==='cp1'&&drwMode.kind==='cp2')); drwModeEnd(keep); if(same) return;   // di nuovo sul pulsante: esce
   try{ gpPickEnd(); }catch(e){} try{ if(srRefOn()) srRefEnd(); }catch(e){} try{ if(cadAlignOn()) cadAlignEnd(true); }catch(e){}
-  grdPlaceEnd(); cadModesOff();   // una sola modalità mappa alla volta
+  grdPlaceEnd(); cadModesOff(keep);   // una sola modalità mappa alla volta
   drwMode={kind:kind, popup:view.popupEnabled, cursor:view.container.style.cursor, sk:sketchClickPause()};
   drwMode.h=view.on('click', drwModeClick);
+  if(kind==='rte') drwMode.stops=[];
   if(kind==='shape'){ let raf=0;
     if(!sfAccepts(sfDrawCat,'polygon')) toolMsg('shpMsg', sfCat(sfDrawCat).l+' non è un\'area: la forma resta senza categoria (la scegli poi nell\'Elenco).');
     drwMode.hm=view.on('pointer-move', e=>{ if(raf) return; raf=requestAnimationFrame(()=>{ raf=0; if(!drwMode||drwMode.kind!=='shape') return;
       const mp=view.toMap({x:e.x, y:e.y}); drwTmpShow(mp? shpGeom(mp, shpParams()) : null); }); }); }
   view.popupEnabled=false; view.container.style.cursor='crosshair'; drwModeUi(); }
 async function drwModeClick(e){ const m=drwMode; if(!m) return; e.stopPropagation();
-  if(selMode||drawType||subActive||(sketchVM&&sketchVM.state==='active')){ drwModeEnd(); return; }   // è partita un'altra modalità
+  const armedOk=m.kind==='shape'||m.kind==='angle';
+  if(selMode||(drawType&&!armedOk)||subActive||(sketchVM&&sketchVM.state==='active')){ drwModeEnd(); return; }   // è partita un'altra modalità
   const mp=e.mapPoint; if(!mp) return;
   if(m.kind==='shape'){ const p=shpParams(), geom=shpGeom(mp, p);
     if(!geom){ toolMsg('shpMsg', p.kind==='circle'? 'Scrivi il raggio in metri.' : 'Scrivi larghezza e altezza in metri.', 'err'); return; }
@@ -4156,11 +4382,26 @@ async function drwModeClick(e){ const m=drwMode; if(!m) return; e.stopPropagatio
     drwAddGraphic(geom, {nome:nome});
     const ha=Math.abs(esriMods.geometryEngine.geodesicArea(geom,'hectares')||0);
     toolMsg('shpMsg', nome+' messo ('+ha.toFixed(ha<1?4:2).replace('.',',')+' ha). Clicca per metterne un altro, Esc per finire.', 'ok'); return; }
+  if(m.kind==='rte'){ const via=!!(e.native&&e.native.shiftKey);
+    m.stops.push(mp.clone()); rteShowStops(m.stops);
+    if(m.stops.length===1){ toolMsg('rteMsg','Partenza messa. Ora clicca l\'arrivo (Maiusc+clic per un punto di passaggio).'); return; }
+    if(via){ toolMsg('rteMsg',(m.stops.length-1)+(m.stops.length===2? ' punto' : ' punti')+' di passaggio. Ora clicca l\'arrivo.'); return; }
+    const stops=m.stops.slice(); drwModeEnd(); rteShowStops(stops); await rteSolve(stops); return; }
+  if(m.kind==='cp1'){ const src=await drwObjAt(e); if(drwMode!==m) return;
+    if(!src){ toolMsg('offMsg','Lì non trovo un oggetto: clicca un disegno, un risultato, un importato, una particella o un oggetto di un layer.','err'); return; }
+    m.src=src; m.P0=[mp.x, mp.y]; m.kind='cp2'; drwModeUi(); drwTmpShow(src.geom);
+    let raf=0; m.hm=view.on('pointer-move', ev=>{ if(raf) return; raf=requestAnimationFrame(()=>{ raf=0; if(drwMode!==m||m.kind!=='cp2') return;
+      const q=view.toMap({x:ev.x, y:ev.y}); if(q) drwTmpShow(geomShift(m.src.geom, q.x-m.P0[0], q.y-m.P0[1])); }); });
+    toolMsg('offMsg','Scelto «'+src.name+'». Ora clicca dove metterlo: il punto che hai cliccato va lì.'); return; }
+  if(m.kind==='cp2'){ const geom=geomShift(m.src.geom, mp.x-m.P0[0], mp.y-m.P0[1]); if(!geom) return;
+    const g=drwCopyAdd(m.src, geom);
+    toolMsg('offMsg','Copiato: «'+g.attributes.nome+'». Clicca ancora per un\'altra copia, Esc per finire.','ok'); return; }
   const hit=await drwEdgeAt(e); if(drwMode!==m) return;   // modalità cambiata mentre cercavo il lato
   if(m.kind==='angle'){
     if(!hit){ toolMsg('shpMsg','Lì non trovo un lato: clicca vicino al bordo di un disegno, una particella, un DWG o un layer.','err'); return; }
-    $('shpRot').value=+hit.az.toFixed(2); drwModeEnd(); drwTmpShow(hit.seg); setTimeout(()=>{ if(!drwMode) drwTmpClear(); }, 1600);
-    toolMsg('shpMsg','Orientamento preso dal lato di «'+hit.name+'»: '+String(+hit.az.toFixed(2)).replace('.',',')+'°. Ora «Posiziona sulla mappa».','ok'); return; }
+    $('shpRot').value=+hit.az.toFixed(2); drwModeEnd(true); drwTmpShow(hit.seg); setTimeout(()=>{ if(!drwMode) drwTmpClear(); }, 1600);
+    shpSync();   // lo strumento Rettangolo è armato: torna a seguire il puntatore, già orientato
+    toolMsg('shpMsg','Orientamento preso dal lato di «'+hit.name+'»: '+String(+hit.az.toFixed(2)).replace('.',',')+'°. Ora clicca dove va il centro.','ok'); return; }
   if(m.kind==='off1'){
     if(!hit){ toolMsg('offMsg','Lì non trovo una linea o un\'area: clicca vicino al bordo di un disegno, una particella, un DWG o un layer.','err'); return; }
     m.src=hit; m.kind='off2'; drwTmpShow($('offEdge').checked? hit.seg : hit.geom); drwModeUi();
@@ -4201,8 +4442,21 @@ function drwAddGraphic(geom, extra){
   toolsGL.add(g); refreshDl(); return g; }
 
 // ── forme con misure: rettangolo (larghezza × altezza, orientamento) e cerchio (raggio), centrati sul clic ──
-function shpParams(){ const b=$('shpKind')&&$('shpKind').querySelector('.active');
-  return {kind:b? b.dataset.k : 'rect', w:numIn('shpW'), h:numIn('shpH'), rot:numIn('shpRot'), r:numIn('shpR')}; }
+function shpParams(){ return {kind:drawType==='circle'? 'circle' : 'rect', w:numIn('shpW'), h:numIn('shpH'), rot:numIn('shpRot'), r:numIn('shpR')}; }
+function shpExact(){ const p=shpParams(); return !!($('shpOn')&&$('shpOn').checked)&&(p.kind==='circle'? p.r>0 : p.w>0&&p.h>0); }
+// riquadro delle misure: si vede con Rettangolo o Cerchio armati; i campi con la spunta
+function shpUi(){ const t=drawType, on=t==='rectangle'||t==='circle', box=$('shpBox'); if(!box) return;
+  box.hidden=!on; const ex=!!($('shpOn')&&$('shpOn').checked);
+  $('shpRectBox').hidden=!(on&&ex&&t==='rectangle'); $('shpCircleBox').hidden=!(on&&ex&&t==='circle');
+  if(on&&!ex) toolMsg('shpMsg','Senza spunta si disegna a mano libera (clicca e trascina).'); }
+// misure complete → la forma segue il puntatore e un clic la posa; senza misure → di nuovo a mano libera
+function shpSync(){ shpUi(); const t=drawType; if(t!=='rectangle'&&t!=='circle') return;
+  const inShape=!!(drwMode&&drwMode.kind==='shape'); if(drwMode&&drwMode.kind==='angle') return;   // sta scegliendo il lato
+  if(shpExact()){ if(!inShape){ try{ sketchVM.cancel(); }catch(e){} drwModeStart('shape'); }
+    toolMsg('shpMsg','Clicca dove va il centro del '+(t==='circle'? 'cerchio' : 'rettangolo')+'. Esc per finire.'); }
+  else{ if(inShape) drwModeEnd(true);
+    if(!(sketchVM&&sketchVM.state==='active')){ sketchPurpose='drawing'; try{ sketchVM.create(t); }catch(e){} }
+    if($('shpOn').checked) toolMsg('shpMsg', t==='circle'? 'Scrivi il raggio in metri.' : 'Scrivi larghezza e altezza in metri.', 'err'); } }
 function shpGeom(center, p){
   const k=mercK2(center.y), cx=center.x, cy=center.y, sr=view.spatialReference;   // metri a terra: x·k.x, y·k.y
   if(p.kind==='circle'){ if(!(p.r>0)) return null; const pts=[];
@@ -4216,6 +4470,88 @@ function shpGeom(center, p){
   if(s2>0) ring.reverse();   // anello esterno in senso orario, come vuole ArcGIS
   ring.push(ring[0].slice());
   return new esriMods.Polygon({rings:[ring], spatialReference:sr}); }
+
+// ── percorso di connessione su strada: servizio percorsi di ArcGIS Online (quello dell'organizzazione, helperServices.route) ──
+// Un percorso semplice costa 0,005 crediti, con qualsiasi numero di punti di passaggio. «Strade e sentieri» usa la modalità
+// a piedi (percorso più corto in km, niente autostrade, sensi unici ignorati: un cavo non è un'auto), «Solo strade
+// carrabili» quella in auto per le zone rurali. Il servizio parte e arriva sulla strada più vicina: i tratti dritti dai
+// punti cliccati li aggiungo io, così la linea parte dal sito e arriva alla cabina.
+const RTE_URL='https://route.arcgis.com/arcgis/rest/services/World/Route/NAServer/Route_World';
+let rteMods=null, rteModes=null;
+function rteStart(){
+  if(typeof signedIn==='undefined'||!signedIn){ toolMsg('rteMsg','Serve l\'accesso ad AGOL: il calcolo usa il servizio percorsi Esri, con i crediti dell\'organizzazione (0,005 a percorso).','err'); return; }
+  if(sfDrawCat!=='connection'){ toolMsg('rteMsg','Scegli prima la categoria Percorso di connessione.','err'); return; }
+  drwModeStart('rte');
+  if(drwMode&&drwMode.kind==='rte') toolMsg('rteMsg','Clicca la partenza sulla mappa (Esc per annullare).'); }
+function rteShowStops(stops){ try{ view.graphics.removeMany(view.graphics.toArray().filter(g=>g.__rteStop)); }catch(e){}
+  stops.forEach((p,i)=>{ const last=i===stops.length-1&&i>0, col=i===0? [45,190,126] : last? [229,72,77] : [139,92,246];
+    const g=new esriMods.Graphic({geometry:p, symbol:{type:'simple-marker', style:'circle', size:12, color:col, outline:{color:[255,255,255], width:2}}});
+    g.__rteStop=true; g.__drwTmp=true; view.graphics.add(g); }); }
+async function rteLoad(){ if(rteMods) return rteMods;
+  rteMods=await new Promise((res,rej)=>require(['esri/rest/route','esri/rest/support/RouteParameters','esri/rest/support/FeatureSet','esri/rest/networkService'],
+    (route,RP,FS,ns)=>res({route:route, RP:RP, FS:FS, ns:ns}), rej));
+  return rteMods; }
+function rteUrl(){ try{ const u=portal&&portal.helperServices&&portal.helperServices.route&&portal.helperServices.route.url; if(u) return u; }catch(e){} return RTE_URL; }
+async function rteTravelMode(M, url, kind){
+  if(!rteModes){ const d=await M.ns.fetchServiceDescription(url); rteModes=(d&&d.supportedTravelModes)||[]; }
+  const want=kind==='drive'? ['Rural Driving Distance','Driving Distance'] : ['Walking Distance'];
+  for(const n of want){ const tm=rteModes.find(x=>x.name===n); if(tm) return tm; }
+  // nomi diversi (servizio in un'altra lingua o rinominato): per tipo, con la distanza come costo
+  const dist=x=>/kilomet|miles|meter|length/i.test(x.impedanceAttributeName||'');
+  return rteModes.find(x=>x.type===(kind==='drive'? 'AUTOMOBILE' : 'WALK')&&dist(x))||null; }
+function fmtLen(m){ return m<1000? Math.round(m)+' m' : String(+(m/1000).toFixed(2)).replace('.',',')+' km'; }
+async function rteSolve(stops){
+  const kind=($('rteMode')&&$('rteMode').value)||'walk';
+  toolMsg('rteMsg','Calcolo il percorso su strada…');
+  try{ const M=await rteLoad(), url=rteUrl(), tm=await rteTravelMode(M, url, kind);
+    const fs=new M.FS({features:stops.map((p,i)=>new esriMods.Graphic({geometry:p, attributes:{Name:i===0? 'Partenza' : i===stops.length-1? 'Arrivo' : 'Passaggio '+i}}))});
+    const par=new M.RP({stops:fs, returnRoutes:true, returnDirections:false, returnStops:false, outSpatialReference:view.spatialReference,
+      findBestSequence:false, preserveFirstStop:true, preserveLastStop:true});
+    if(tm) par.travelMode=tm;
+    const r=await M.route.solve(url, par);
+    const rr=r&&r.routeResults&&r.routeResults[0]&&r.routeResults[0].route;
+    if(!rr||!rr.geometry||!(rr.geometry.paths||[]).length) throw new Error('nessun percorso trovato tra questi punti');
+    // una sola linea, senza z e m, con i tratti dritti dal punto di partenza e fino all'arrivo cliccati
+    const pts=[]; rr.geometry.paths.forEach(pa=>pa.forEach(q=>{ const l=pts[pts.length-1]; if(!l||l[0]!==q[0]||l[1]!==q[1]) pts.push([q[0],q[1]]); }));
+    const a=toWM(stops[0]), b=toWM(stops[stops.length-1]);
+    if(Math.hypot(pts[0][0]-a.x, pts[0][1]-a.y)>0.5) pts.unshift([a.x,a.y]);
+    const e=pts[pts.length-1]; if(Math.hypot(e[0]-b.x, e[1]-b.y)>0.5) pts.push([b.x,b.y]);
+    const geom=mkLine([pts]), len=Math.abs(esriMods.geometryEngine.geodesicLength(geom,'meters')||0);
+    const note=($('drwNote')&&$('drwNote').value)||(kind==='drive'? 'Calcolato su strade carrabili' : 'Calcolato su strade e sentieri');
+    const g=drwAddGraphic(geom, {nome:'Su strada '+fmtLen(len), note:note});
+    try{ view.graphics.removeMany(view.graphics.toArray().filter(x=>x.__rteStop)); }catch(e){}
+    toolMsg('rteMsg','Percorso di '+fmtLen(len)+' nell\'Elenco («'+g.attributes.nome+'»). Correggilo cliccandolo: sposti i vertici come in ogni disegno.','ok');
+  }catch(e){ console.warn('[percorso su strada]',e);
+    try{ view.graphics.removeMany(view.graphics.toArray().filter(x=>x.__rteStop)); }catch(x){}
+    const t=String((e&&(e.details&&e.details.messages&&e.details.messages.join(' ')))||(e&&e.message)||e);
+    toolMsg('rteMsg','Percorso non calcolato: '+t+(/token|permission|403|498|499/i.test(t)? ' (serve il privilegio di analisi di rete nel tuo ruolo).' : ''),'err'); } }
+
+// ── copia: l'oggetto sotto il clic (anche un punto), spostato col punto cliccato dove si clicca dopo ──
+async function drwObjAt(e){
+  try{ const r=await view.hitTest(e,{include:[toolsGL,gl]});
+    const x=(r.results||[]).find(x=>{ const g=x.graphic; return g&&g.geometry&&g.visible!==false&&(g.layer===gl||(g.attributes&&HIST_KINDS[g.attributes._kind])); });
+    if(x){ const g=x.graphic; let name;
+      if(g.layer===gl){ const p=gpParcelOf.get(g); name=p? 'Fg '+p.foglio+' · Part. '+p.particella : 'particella'; }
+      else name=(g.attributes&&g.attributes.nome)||geomDefName(g);
+      return {geom:toWM(g.geometry), g:g, name:String(name||'oggetto')}; } }catch(err){}
+  const h=await drwEdgeAt(e); return h? {geom:h.geom, g:null, name:h.name} : null; }
+function geomShift(geom, dx, dy){ if(!geom) return null; const g=toWM(geom).clone(), mv=p=>[p[0]+dx, p[1]+dy].concat(p.slice(2));
+  if(g.type==='point'){ g.x+=dx; g.y+=dy; return g; }
+  if(g.type==='multipoint'){ g.points=g.points.map(mv); return g; }
+  if(g.type==='polyline'){ g.paths=g.paths.map(pa=>pa.map(mv)); return g; }
+  if(g.type==='polygon'){ g.rings=g.rings.map(r=>r.map(mv)); return g; }
+  if(g.type==='extent'){ g.xmin+=dx; g.xmax+=dx; g.ymin+=dy; g.ymax+=dy; return g; }
+  return null; }
+// la copia di un nostro oggetto ne tiene categoria, tipo, attributi, sito e stile (non l'identità sul portale);
+// quella di una particella o di un layer è un disegno nuovo con la categoria della scheda
+function drwCopyAdd(src, geom){ const nome=('Copia · '+src.name).slice(0,120), s=src.g&&src.g.layer===toolsGL&&src.g.attributes;
+  if(!s) return drwAddGraphic(geom, {nome:nome});
+  const a=Object.assign({}, s); ['sf_gid','sf_saved','sf_dirty','_sel','hidden'].forEach(k=>delete a[k]);
+  a._kind='drawing'; delete a._sub; a.geomType=sfGk(geom.type)||geom.type; a.nome=nome;
+  if(a.area_ha!=null){ try{ a.area_ha=+Math.abs(esriMods.geometryEngine.geodesicArea(geom,'hectares')||0).toFixed(4); }catch(e){ delete a.area_ha; } }
+  let sym=null; try{ sym=src.g.symbol&&src.g.symbol.clone(); }catch(e){}
+  const g=new esriMods.Graphic({geometry:geom, attributes:a, symbol:sym||symbolForColor(geom.type, a.color||sfColor(a.sf_cat))});
+  toolsGL.add(g); refreshDl(); return g; }
 
 // ── copia parallela: tutto l'oggetto (linea → linea parallela, area → rientro o allargamento) o solo il lato cliccato ──
 function drwDoOffset(src, mp){
@@ -4262,7 +4598,13 @@ async function grdSet(on){
     else{ grdPlaceEnd(); vm.snappingEnabled=false; try{ sketchVM.snappingOptions.gridEnabled=false; }catch(e){} }
   }catch(e){ console.warn('[griglia]',e); toolMsg('grdMsg','Griglia non disponibile ('+((e&&e.message)||e)+').','err'); }
   grdUi(); }
-function grdUi(){ const on=!!(grdVM&&grdVM.displayEnabled), m=$('grdMsg'); if($('grdOn')) $('grdOn').checked=on;
+// supporto al disegno: lo stato nel titolo dei due moduli, visibile anche da chiusi
+function drwDockSum(){ const a=$('drwAidSum'), g=$('grdSum');
+  if(a){ const s=[]; if($('drwSnap')&&$('drwSnap').checked) s.push('aggancio'); if($('drwTip')&&$('drwTip').checked) s.push('misure');
+    a.textContent=s.length? s.join(' · ') : 'spenti'; a.classList.toggle('off', !s.length); }
+  if(g){ let on=false; try{ on=!!(grdVM&&grdVM.displayEnabled); }catch(e){}
+    g.textContent=on? String(grdStep()).replace('.',',')+' m' : 'spenta'; g.classList.toggle('off', !on); } }
+function grdUi(){ const on=!!(grdVM&&grdVM.displayEnabled), m=$('grdMsg'); if($('grdOn')) $('grdOn').checked=on; drwDockSum();
   ['grdAlign','grdStraight'].forEach(id=>{ const b=$(id); if(b) b.disabled=!on; });
   if(!m) return;
   if(!on) m.textContent='';
@@ -4368,7 +4710,7 @@ async function onImportFiles(files){
   let m=ok.map(r=>`${r.name}: ${r.n} geometrie${r.note?' ('+r.note+')':''}`).join(' · ');
   if(bad.length) m+=(m?' · ':'')+bad.map(r=>`${r.name}: errore (${r.err})`).join(' · ');
   toolMsg('impMsg', m||'Nessuna geometria importata.', (bad.length&&!ok.length)?'err':'ok');
-  try{ if(window.openPanel) window.openPanel('elenco'); }catch(e){}
+  if(ok.length) impShowDone();
 }
 
 // ══ Servizi web: WMS, WFS e ArcGIS REST aggiunti per indirizzo, senza item sul portale ═══════════════
@@ -4657,7 +4999,8 @@ function removeImage(im){ try{ view.map.remove(im.layer); }catch(e){}
   var i=importedImages.indexOf(im); if(i>=0) importedImages.splice(i,1);
   if(imgEditing===im) imgDone(); renderGeoms(); }
 function imgRow(im){
-  var row=document.createElement('div'); row.className='grow';
+  var row=document.createElement('div'); row.className='grow'; if(im.layer&&im.layer.visible===false) row.classList.add('hidden');
+  row.appendChild(makeVisToggle(function(){ return !(im.layer&&im.layer.visible===false); }, function(on){ if(im.layer) im.layer.visible=on; row.classList.toggle('hidden',!on); try{ wireSectionTools(); }catch(x){} }));
   var nm=document.createElement('input'); nm.className='gname'; nm.spellcheck=false; nm.value=im.name; nm.title=im.name;
   nm.onchange=function(){ im.name=nm.value.trim()||im.name; im.layer.title=im.name; }; row.appendChild(nm);
   var tag=document.createElement('span'); tag.className='gsub'; tag.textContent='immagine'; row.appendChild(tag);
@@ -5417,11 +5760,18 @@ function cadReattach(wm){
 // per quel file (nome + dimensione) e alla prossima apertura viene riproposto.
 let _cadAl=null, cadAlGL=null, _cadAlRaf=0;
 function cadAlignOn(){ return !!_cadAl; }
-function cadModesOff(){   // una sola modalità mappa alla volta
-  try{ drwModeEnd(); grdPlaceEnd(); }catch(e){}
-  try{ if(selMode) setSelMode(selMode); }catch(e){}
-  try{ if(subActive&&$('subToggle')) $('subToggle').click(); }catch(e){}
-  try{ const B={point:'drwPoint',polyline:'drwLine',polygon:'drwArea',rectangle:'drwRect',circle:'drwCircle'}; if(drawType&&B[drawType]) $(B[drawType]).click(); }catch(e){}
+// ── una sola modalità mappa alla volta: l'unico posto che sa spegnerle. Fino al 24/9 la stessa logica era scritta tre
+// volte (qui, nella UI e nel pin delle coordinate) e una modalità nuova andava aggiunta in tutte e tre. Le tre
+// famiglie a pulsante (selezione particelle, strumenti di disegno, contesto sito) si spengono ripremendo il loro
+// pulsante, così ognuna rimette a posto il suo stato; le altre modalità (forma, copia, lato, su strada, griglia)
+// con drwModeEnd/grdPlaceEnd.
+const DRW_BTN={point:'drwPoint',polyline:'drwLine',polygon:'drwArea',rectangle:'drwRect',circle:'drwCircle'};
+function modeOffSel(){ try{ if(selMode) setSelMode(selMode); }catch(e){} }
+function modeOffDraw(){ try{ if(drawType&&DRW_BTN[drawType]){ const b=$(DRW_BTN[drawType]); if(b) b.click(); } }catch(e){} }
+function modeOffSub(){ try{ if(subActive&&$('subToggle')) $('subToggle').click(); }catch(e){} }
+function cadModesOff(keepDraw){   // tutto spento (keepDraw: lo strumento di disegno armato resta)
+  try{ drwModeEnd(keepDraw); grdPlaceEnd(); }catch(e){}
+  modeOffSel(); modeOffSub(); if(!keepDraw) modeOffDraw();
   try{ if(sketchVM&&sketchVM.state==='active') sketchVM.cancel(); }catch(e){} }
 function cadAlignTargets(f){   // vertici "a": particelle, disegni/import e altri DWG accesi (lon/lat)
   const out=[], wm=esriMods.webMercatorUtils;
@@ -5716,7 +6066,7 @@ async function srAddResult(){
     properties:{name:srPts[i].name||('Punto '+(i+1))}, geometry:{type:'Point', coordinates:c}}))};
   const n=impAdd(fc, 'coordinate ('+s.label+')');
   toolMsg('srMsg', n+(poly?' area':(n===1?' punto':' punti'))+' in Importati, da '+s.label+'.', 'ok');
-  try{ if(window.openPanel) window.openPanel('elenco'); }catch(e){} }
+  if(n) impShowDone(); }
 // shapefile/GeoJSON arrivato in coordinate proiettate senza .prj: lo riproietto tutto e lo importo
 function srImportPending(wkid, s){
   const fc=srPend.fc, name=srPend.name; let bad=0, tot=0;
@@ -5730,7 +6080,7 @@ function srImportPending(wkid, s){
   srPend=null; srClearOut();
   toolMsg('srMsg', name+': '+n+' geometrie importate come '+s.label+(bad?' ('+bad+' vertici non convertiti)':'')+'.', 'ok');
   toolMsg('impMsg', name+': importato come '+s.label+'.', 'ok');
-  try{ if(window.openPanel) window.openPanel('elenco'); }catch(e){} }
+  if(n) impShowDone(); }
 // ricerca in alto: due numeri troppo grandi per essere gradi → stimo il sistema e ci vado
 async function srSearch(x, y){
   try{ await cadMods(); await esriMods.projection.load(); }catch(e){ return []; }
@@ -5769,20 +6119,27 @@ function openExport(){
   $('exImports').checked=nI>0; $('exImports').disabled=!nI;
   $('exDiss').checked=$('diss')&&$('diss').checked;
   $('exMsg').innerHTML='';
+  // XLSX è una tabella delle particelle: le altre categorie non ci entrano, lo dico invece di ignorarle in silenzio
+  if(($('fmt').value||'')==='xlsx'){ ['exBuffers','exDrawings','exGeoproc','exImports'].forEach(id=>{ $(id).checked=false; $(id).disabled=true; });
+    $('exMsg').innerHTML='<div class="msg">L\'XLSX è una tabella: contiene solo le particelle'+(parcels.length? '' : ' (nessuna nell\'Elenco)')+'.</div>'; }
   $('exportModal').style.display='flex';
 }
 function closeExport(){ $('exportModal').style.display='none'; }
 async function doExport(){
   const fmt=$('fmt').value;
   const incl={parcels:$('exParcels').checked, buffers:$('exBuffers').checked, drawings:$('exDrawings').checked, geoproc:$('exGeoproc').checked, imports:$('exImports').checked};
-  if(!incl.parcels && !incl.buffers && !incl.drawings && !incl.geoproc && !incl.imports){ $('exMsg').innerHTML='<div class="msg err">Seleziona almeno una categoria.</div>'; return; }
+  // l'XLSX ha il suo controllo qui sotto (contiene solo le particelle)
+  if(fmt!=='xlsx' && !incl.parcels && !incl.buffers && !incl.drawings && !incl.geoproc && !incl.imports){ $('exMsg').innerHTML='<div class="msg err">Seleziona almeno una categoria.</div>'; return; }
   const diss=$('exDiss').checked, base='export';
-  if(fmt==='xlsx'){   // tabellare → solo particelle
-    const data=diss?buildFC(true,{parcels:true}).features.map(f=>({...f.properties})):parcels.map(p=>({Comune:p.comune,Regione:p.regione,Provincia:p.provincia,Cod_Belfiore:p.belfiore,Foglio:p.foglio,Particella:p.particella,
+  const exErr=t=>{ $('exMsg').innerHTML='<div class="msg err">'+esc(t)+'</div>'; };
+  if(fmt==='xlsx'){   // tabellare → solo particelle (la finestra lo dice e spegne le altre caselle)
+    if(!parcels.length||!incl.parcels){ exErr('L\'XLSX contiene solo le particelle: aggiungine almeno una, oppure scegli un altro formato.'); return; }
+    let fcx=null; if(diss){ try{ fcx=buildFC(true,{parcels:true}); }catch(e){ exErr((e&&e.message)||String(e)); return; } }
+    const data=diss?fcx.features.map(f=>({...f.properties})):parcels.map(p=>({Comune:p.comune,Regione:p.regione,Provincia:p.provincia,Cod_Belfiore:p.belfiore,Foglio:p.foglio,Particella:p.particella,
       Area_m2:p.area_m2?Math.round(p.area_m2):'',Area_ha:p.area_m2?+(p.area_m2/10000).toFixed(4):'',Destinazione_uso:p.land_use,OMI:p.omi,NCR:p.ncr,FID_Zornade:p.fid,Lat:p.lat,Lng:p.lng}));
     const ws=XLSX.utils.json_to_sheet(data),wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Particelle');XLSX.writeFile(wb,base+'.xlsx'); closeExport(); return;
   }
-  const fc=buildFC(diss, incl);
+  let fc; try{ fc=buildFC(diss, incl); }catch(e){ exErr((e&&e.message)||String(e)); return; }
   if(!fc.features.length){ $('exMsg').innerHTML='<div class="msg err">Niente da esportare con questa selezione.</div>'; return; }
   if(fmt==='geojson'){dlBlob(base+'.geojson',new Blob([JSON.stringify(fc,null,1)],{type:'application/geo+json'}));}
   else if(fmt==='kml'){dlBlob(base+'.kml',new Blob([toKML(fc)],{type:'application/vnd.google-earth.kml+xml'}));}
@@ -5811,7 +6168,36 @@ function shpPrep(fc){
     else if(g.type==='MultiPoint') g.coordinates.forEach(c=>feats.push(Object.assign({},f,{geometry:{type:'Point', coordinates:c}})));
     else feats.push(f); });
   return {type:'FeatureCollection', features:feats}; }
-function msg(t,cls){$('out').innerHTML=t?`<div class="msg ${cls}">${t}</div>`:'';}
+// messaggi: un toast in basso a destra, testo semplice, sparisce dopo 6 s. Con il pannello sganciato compare nella
+// finestra dove stai lavorando. (Fino al 24/9 c'erano due definizioni: questa scriveva in un #out nascosto e la UI la
+// sostituiva; i messaggi mandati prima della sostituzione non si vedevano.)
+// Revisione UX (24/9): un errore o un esito parziale non sparisce dopo 6 s (lo perdevi se guardavi altrove): resta fino
+// alla × o al messaggio successivo. opt.action = {label, fn}: un pulsante nel messaggio (es. «Vedi nell'Elenco ›»).
+let msgToast=null, msgTimer=null;
+function msg(t,cls,opt){
+  const d=typeof sideActiveDoc==='function'? sideActiveDoc() : document;
+  const box=(d!==document&&d.getElementById('toasts'))||document.getElementById('toasts');
+  if(!box) return;
+  if(!t){ if(msgToast){ msgToast.remove(); msgToast=null; } return; }
+  if(!msgToast||!box.contains(msgToast)){ if(msgToast) msgToast.remove(); msgToast=document.createElement('div'); box.appendChild(msgToast); }
+  const err=cls==='err', act=opt&&opt.action;
+  msgToast.className='toast '+(cls||'info'); msgToast.setAttribute('role', err? 'alert' : 'status'); msgToast.textContent='';
+  const s=document.createElement('span'); s.textContent=t; msgToast.appendChild(s);
+  if(act){ const b=document.createElement('button'); b.type='button'; b.className='tact'; b.textContent=act.label;
+    b.onclick=()=>{ msg(''); try{ act.fn(); }catch(e){ console.warn('[messaggio] azione non riuscita:', e); } }; msgToast.appendChild(b); }
+  if(err){ const x=document.createElement('button'); x.type='button'; x.className='tclose'; x.textContent='×'; x.title='Chiudi';
+    x.setAttribute('aria-label','Chiudi il messaggio'); x.onclick=()=>msg(''); msgToast.appendChild(x); }
+  while(box.children.length>3) box.firstChild.remove();
+  clearTimeout(msgTimer);
+  if(!err) msgTimer=setTimeout(()=>{ if(msgToast){ msgToast.remove(); msgToast=null; } }, act? 10000 : 6000); }
+// una regola sola per «dove sono finiti i risultati»: niente cassetto aperto d'autorità (restringe la mappa mentre
+// lavori), ma il messaggio porta «Vedi nell'Elenco ›», che apre l'Elenco sulla sezione giusta
+function elencoOpen(){ return !!document.querySelector('#toolsBody .drawer.open[data-panel="elenco"]'); }
+function showInElenco(sec){ try{ window.openPanel&&window.openPanel('elenco'); window.ensureMapRoom&&window.ensureMapRoom('right'); }catch(e){}
+  const s=document.querySelector('#drawerElenco .gsec[data-sec="'+sec+'"]'); if(!s) return; s.classList.remove('collapsed');
+  setTimeout(()=>{ try{ s.scrollIntoView({block:'nearest', behavior:'smooth'}); }catch(e){} }, 260); }
+function vediElenco(sec){ return elencoOpen()? null : {action:{label:'Vedi nell\'Elenco ›', fn:()=>showInElenco(sec)}}; }
+function impShowDone(){ const v=vediElenco('import'); if(v) msg('Importato: lo trovi nella sezione Importati dell\'Elenco.','ok',v); }
 
 // ══ LOGO AXPO ufficiale (SVG inline) ══════════════════════════════════════
 // Inline nel sorgente: nessuna dipendenza da assets/ e nessun problema di CORS
@@ -5875,18 +6261,7 @@ function baseGroundSet(){
   applyTheme(th);
   if($g('themeToggle')) $g('themeToggle').onclick=function(){ applyTheme(document.documentElement.dataset.theme==='dark'?'light':'dark'); };
 
-  /* 2 ── TOAST: override di msg(t,cls) mantenendo la firma */
-  var toastBox=$g('toasts'), lastToast=null, lastTimer=null;
-  window.msg=function(t,cls){
-    // con il pannello sganciato, il messaggio compare nella finestra dove stai lavorando
-    var box=(typeof sideActiveDoc==='function'&&sideActiveDoc()!==document&&sideActiveDoc().getElementById('toasts'))||toastBox;
-    if(!box) return;
-    if(!t){ if(lastToast){lastToast.remove();lastToast=null;} return; }
-    if(!lastToast||!box.contains(lastToast)){ if(lastToast) lastToast.remove(); lastToast=document.createElement('div'); box.appendChild(lastToast); }
-    lastToast.className='toast '+(cls||'info'); lastToast.textContent=t;
-    while(box.children.length>3) box.firstChild.remove();
-    clearTimeout(lastTimer); lastTimer=setTimeout(function(){ if(lastToast){lastToast.remove();lastToast=null;} },6000);
-  };
+  /* 2 ── TOAST: msg(t,cls) è definita una volta sola nello script principale */
 
   /* 3 ── ACTION BAR: un drawer alla volta */
   var icons=Array.prototype.slice.call(document.querySelectorAll('#actionIcons button'));
@@ -5895,7 +6270,48 @@ function baseGroundSet(){
     Array.prototype.forEach.call(document.querySelectorAll('#toolsBody .drawer'),function(d){ d.classList.toggle('open', d.dataset.panel===name); });
     var tp=$g('toolsPanel'); if(tp) tp.classList.toggle('open', !!name);
   }
-  icons.forEach(function(b){ b.onclick=function(){ openPanel(b.classList.contains('active')?null:b.dataset.panel); }; });
+  icons.forEach(function(b){ b.onclick=function(){ var n=b.classList.contains('active')?null:b.dataset.panel; openPanel(n); if(n) ensureMapRoom('right'); }; });
+
+  /* 3b ── la mappa resta usabile (revisione UX 24/9): sotto MAP_MIN px faccio spazio da solo, rispettando l'ultima
+     cosa aperta. Aperto un cassetto → stringo, poi chiudo, il pannello sinistro; aperto o allargato il pannello
+     sinistro, o finestra ristretta → prima chiudo il cassetto. Un passo alla volta, misurando dopo la transizione. */
+  var MAP_MIN=360, roomT=null, roomSteps=0;
+  function mapWidth(){ var v=$g('viewDiv'); return v? v.getBoundingClientRect().width : 9999; }
+  function ensureMapRoom(prefer){ clearTimeout(roomT); roomSteps=0; roomT=setTimeout(function(){ roomStep(prefer, []); }, 260); }
+  function roomStep(prefer, did){
+    var done=function(){ if(did.length) msg('Poco spazio per la mappa: '+did.join(', ')+'. Con il pannello sganciato (⧉) su un secondo schermo la mappa ha tutto lo spazio.',''); };
+    if(MAP_MIN-mapWidth()<=0||roomSteps++>4){ done(); return; }
+    var short=MAP_MIN-mapWidth(), drawer=!!document.querySelector('#toolsBody .drawer.open'), side=$g('side'),
+      sideOpen=!document.body.classList.contains('side-collapsed')&&!(typeof sideUndocked==='function'&&sideUndocked()),
+      sideW=side? side.getBoundingClientRect().width : 0;
+    if(prefer!=='right'&&drawer){ openPanel(null); did.push('ho chiuso il cassetto a destra'); }
+    else if(sideOpen&&sideW>301){ document.documentElement.style.setProperty('--side-w', Math.max(300, Math.floor(sideW-short))+'px'); did.push('ho stretto il pannello sinistro'); }
+    else if(sideOpen){ document.body.classList.add('side-collapsed'); did.push('ho chiuso il pannello sinistro (si riapre dal rail)'); }
+    else if(drawer){ openPanel(null); did.push('ho chiuso il cassetto a destra'); }
+    else { done(); return; }
+    roomT=setTimeout(function(){ roomStep(prefer, did); }, 260); }
+  window.ensureMapRoom=ensureMapRoom;
+  window.addEventListener('resize', function(){ ensureMapRoom(); });
+  ensureMapRoom();   // all'apertura, su uno schermo stretto
+
+  /* 3c ── finestre (dialoghi): semantica, fuoco dentro la finestra e ritorno al comando che l'ha aperta */
+  var DLG=['exportModal','promoteModal','sfModal','cadModal','helpModal','infoModal','helpMenu'];
+  function dlgFocusables(m){ return Array.prototype.filter.call(m.querySelectorAll('button,[href],input,select,textarea,[tabindex]:not([tabindex="-1"])'),
+    function(el){ return !el.disabled && el.offsetParent!==null; }); }
+  DLG.forEach(function(id){ var m=$g(id); if(!m) return; var h=m.querySelector('h2');
+    if(!m.getAttribute('role')) m.setAttribute('role','dialog'); m.setAttribute('aria-modal','true');
+    if(h&&!m.getAttribute('aria-labelledby')){ if(!h.id) h.id=id+'Title'; m.setAttribute('aria-labelledby', h.id); }
+    var opener=null;
+    new MutationObserver(function(){ var open=m.style.display==='flex';
+      if(open&&!m.__open){ m.__open=true; opener=m.ownerDocument.activeElement;
+        setTimeout(function(){ var f=dlgFocusables(m), first=f.filter(function(el){ return !el.classList.contains('mclose'); })[0]||f[0]; try{ first&&first.focus(); }catch(e){} }, 40); }
+      else if(!open&&m.__open){ m.__open=false; var o=opener; opener=null; try{ if(o&&o.isConnected&&o.focus) o.focus(); }catch(e){} }
+    }).observe(m, {attributes:true, attributeFilter:['style']}); });
+  docOn('keydown', function(e){ if(e.key!=='Tab') return;
+    var d=(e.target&&e.target.ownerDocument)||document, m=DLG.map(function(id){ return $g(id); }).filter(function(x){ return x&&x.__open&&x.ownerDocument===d; }).pop();
+    if(!m) return; var f=dlgFocusables(m); if(!f.length) return; var first=f[0], last=f[f.length-1], a=d.activeElement;
+    if(!m.contains(a)){ e.preventDefault(); first.focus(); return; }
+    if(e.shiftKey&&a===first){ e.preventDefault(); last.focus(); } else if(!e.shiftKey&&a===last){ e.preventDefault(); first.focus(); } });
   window.openPanel=openPanel;
 
   /* ── Sidebar destra ridimensionabile (maniglia + persistenza) ── */
@@ -5912,7 +6328,7 @@ function baseGroundSet(){
       var cx=(e.touches&&e.touches[0]?e.touches[0].clientX:e.clientX);
       // il pannello è a destra: la larghezza è (bordo destro finestra - x) meno la barra icone (48px)
       // maniglia sul bordo sinistro del pannello: larghezza drawer = (bordo dx finestra - x) - barra icone(48)
-      var w=setW(window.innerWidth - cx - 48);
+      setW(window.innerWidth - cx - 48);
       e.preventDefault();
     }
     function onUp(){ if(!dragging) return; dragging=false;
@@ -5959,7 +6375,7 @@ function baseGroundSet(){
       setW(cx-side.getBoundingClientRect().left);   // la maniglia è sul bordo destro: larghezza = x - bordo sinistro
       e.preventDefault(); }
     function onUp(){ if(!dragging) return; dragging=false;
-      side.classList.remove('resizing'); document.body.style.userSelect=''; save(curW());
+      side.classList.remove('resizing'); document.body.style.userSelect=''; save(curW()); ensureMapRoom('left');
       window.removeEventListener('mousemove',onMove); window.removeEventListener('mouseup',onUp);
       window.removeEventListener('touchmove',onMove); window.removeEventListener('touchend',onUp); }
     function onDown(e){
@@ -5981,25 +6397,34 @@ function baseGroundSet(){
   /* schede sidebar sinistra */
   var _tabs=Array.prototype.slice.call(document.querySelectorAll('#sideRail button'));
   var _tabTitle={ricerca:'Ricerca particelle',disegno:'Disegno',geoproc:'Geoprocessi',contesto:'Contesto sito',\u0069mport:'Importa dati'};
+  var _side0=$g('side');
+  _tabs.forEach(function(b){ var n=b.dataset.tab, pane=_side0&&_side0.querySelector('.tabpane[data-tab="'+n+'"]');
+    b.setAttribute('role','tab'); b.id='tab-'+n;
+    if(pane){ pane.id='pane-'+n; pane.setAttribute('role','tabpanel'); pane.setAttribute('aria-labelledby', b.id); b.setAttribute('aria-controls', pane.id); }
+    b.addEventListener('keydown', function(e){ var i=_tabs.indexOf(b), j=-1;
+      if(e.key==='ArrowDown'||e.key==='ArrowRight') j=(i+1)%_tabs.length; else if(e.key==='ArrowUp'||e.key==='ArrowLeft') j=(i-1+_tabs.length)%_tabs.length;
+      else if(e.key==='Home') j=0; else if(e.key==='End') j=_tabs.length-1;
+      if(j<0) return; e.preventDefault(); document.body.classList.remove('side-collapsed'); showTab(_tabs[j].dataset.tab); _tabs[j].focus(); }); });
   function showTab(name){
-    _tabs.forEach(function(b){ b.classList.toggle('active', b.dataset.tab===name); });
+    _tabs.forEach(function(b){ var on=b.dataset.tab===name; b.classList.toggle('active', on); b.setAttribute('aria-selected', on? 'true' : 'false'); b.tabIndex=on? 0 : -1; });
     var side=$g('side'); if(side) Array.prototype.forEach.call(side.querySelectorAll('.tabpane'),function(p){ p.classList.toggle('active', p.dataset.tab===name); });
     var st=$g('sideTitle'); if(st) st.textContent=_tabTitle[name]||'';
   }
   _tabs.forEach(function(b){ b.onclick=function(){
     if(typeof sideUndocked==='function'&&sideUndocked()){ showTab(b.dataset.tab); return; }   // sganciato: niente pannello da comprimere
-    if(document.body.classList.contains('side-collapsed')){ document.body.classList.remove('side-collapsed'); showTab(b.dataset.tab); }
+    if(document.body.classList.contains('side-collapsed')){ document.body.classList.remove('side-collapsed'); showTab(b.dataset.tab); ensureMapRoom('left'); }
     else if(b.classList.contains('active')){ document.body.classList.add('side-collapsed'); }
     else { showTab(b.dataset.tab); }
   }; });
   window.showTab=showTab;
+  showTab((_tabs.filter(function(b){ return b.classList.contains('active'); })[0]||_tabs[0]).dataset.tab);   // stato iniziale di aria-selected
 
   /* sezioni elenco comprimibili */
   Array.prototype.forEach.call(document.querySelectorAll('#drawerElenco .gsecH'),function(h){ h.onclick=function(){ h.parentNode.classList.toggle('collapsed'); }; });
 
   /* sidebar sx collassabile */
   if($g('sideToggle')) $g('sideToggle').onclick=function(){ document.body.classList.add('side-collapsed'); };   // si riapre dal rail
-  if($g('sideUndock')) $g('sideUndock').onclick=function(){ if(sideUndocked()) sideDock(); else { document.body.classList.remove('side-collapsed'); sideUndock(); } };   // ⧉ sgancia, ⇤ riaggancia
+  if($g('sideUndock')) $g('sideUndock').onclick=function(){ if(sideUndocked()){ sideDock(); ensureMapRoom('left'); } else { document.body.classList.remove('side-collapsed'); sideUndock(); } };   // ⧉ sgancia, ⇤ riaggancia
 
   /* help */
   if($g('helpBtn'))   $g('helpBtn').onclick=function(){ $g('helpModal').style.display='flex'; };
@@ -6229,9 +6654,13 @@ function baseGroundSet(){
   var DRW_INFO={
     drwDraw:{t:'Disegna sulla mappa', s:'Ogni disegno ha una categoria (il suo ruolo nel progetto), un tipo e, se serve, buffer, altezza, larghezza o tensione.', h:
       '<h3>Come si disegna</h3>'+DDIA.tools
-      +'<ol><li>Scegli la <b>categoria</b>: area lorda, area netta, esclusione, infrastruttura lineare, ostacolo, accesso e connessione, mitigazione, zona agricola, nota e riferimento.</li>'
+      +'<ol><li>Scegli la <b>categoria</b>: area lorda, area netta, percorso di connessione, esclusione, infrastruttura lineare, ostacolo, accesso e punto di connessione, mitigazione, zona agricola, nota e riferimento.</li>'
       +'<li>Scegli il <b>tipo</b> e scrivi i dati che compaiono (per un elettrodotto tensione e fascia DPA come buffer, per un albero l\'altezza), la <b>fonte</b> e, se vuoi, una <b>nota</b>: valgono per i disegni che fai da quel momento.</li>'
       +'<li>Premi <b>Punto</b>, <b>Linea</b>, <b>Area</b>, <b>Rettangolo</b> o <b>Cerchio</b> (sono attivi solo quelli adatti alla categoria) e disegna. Lo strumento resta attivo per il disegno successivo: di nuovo sul pulsante, o Esc, per smettere.</li></ol>'
+      +'<h3>Percorso di connessione su strada</h3><p>Con la categoria <b>Percorso di connessione</b> (tipo <b>Stimato</b> o <b>Confermato</b>) disegni la linea a mano, oppure premi <b>↝ Su strada</b>: clicca la partenza (nel sito) e l\'arrivo (cabina primaria, SE); <kbd>Maiusc</kbd>+clic in mezzo aggiunge un punto di passaggio. Il percorso segue le strade (servizio percorsi Esri: serve l\'accesso, 0,005 crediti a percorso), con i tratti dritti dai punti cliccati alla strada; nell\'Elenco vedi la lunghezza. <b>Strade e sentieri</b> sceglie il più corto in km senza autostrade e ignorando i sensi unici (un cavo non è un\'auto); <b>Solo strade carrabili</b> resta sulle strade percorribili in auto. È una stima: correggi i vertici dove il tracciato vero passa altrove, poi metti il tipo <b>Confermato</b>.</p>'
+      +'<h3>Rettangoli e cerchi di misura esatta</h3>'+DDIA2.shape
+      +'<p>Con <b>Rettangolo</b> o <b>Cerchio</b> premuto compare il riquadro <b>Con misure esatte</b>. Senza spunta disegni a mano libera (clicca e trascina); con la spunta scrivi larghezza, altezza e orientamento, o il raggio: la forma segue il puntatore, tratteggiata, e un clic la posa con il centro lì. Puoi posarne altre di seguito; Esc per finire.</p>'
+      +'<p>Per esempio, per vedere se un campo da <b>100 × 50 m</b> sta nella particella allineato al suo confine: spunta, scrivi le misure, premi <b>∥ Da un lato</b> e clicca il confine, poi clicca dove vuoi il centro. L\'orientamento è la direzione della larghezza, come azimut (<b>90</b> est-ovest, <b>0</b> nord-sud); le misure sono a terra, esatte al centimetro.</p>'
       +'<h3>Esempio</h3><p>Al sopralluogo hai visto una <b>linea elettrica</b> che non è sulle carte: scegli <b>Infrastruttura lineare</b>, tipo <b>Elettrodotto aereo</b>, tensione 20 kV, buffer 5 m, fonte <b>Sopralluogo</b>, nota «MT su pali, da verificare», poi premi <b>Linea</b> e ricalcala sull\'ortofoto. Il colore del disegno dice la categoria; PV Predesign taglierà la fascia di 5 m da solo.</p>'
       +'<h3>Cambiare la categoria</h3><p>Nell\'<b>Elenco</b>, l\'etichetta colorata di ogni riga apre la scheda con categoria, tipo, attributi, nota, fonte e stato: vale anche per importati e risultati dei geoprocessi. Un disegno vecchio con le categorie di Sites Notes prende da solo quella nuova (per esempio «DPA» → Esclusione · Fascia DPA).</p>'
       +'<h3>Correggere un disegno</h3><ul><li>Con nessuno strumento attivo, clicca il disegno: lo sposti trascinandolo, e con le maniglie lo ruoti o lo ridimensioni. Cliccalo di nuovo per spostarne i singoli vertici. Clic fuori per finire.</li>'
@@ -6239,12 +6668,17 @@ function baseGroundSet(){
       +'<li><b>↶ Annulla</b> e <b>↷ Ripeti</b> (anche <kbd>Ctrl</kbd>+<kbd>Z</kbd> e <kbd>Ctrl</kbd>+<kbd>Y</kbd>): mentre disegni tolgono o rimettono l\'ultimo vertice; dopo, annullano l\'ultima modifica a disegni, buffer, risultati e importati, anche uno spostamento o una cancellazione. Lo storico riparte quando apri un progetto o svuoti il lavoro.</li></ul>'
       +'<h3>Da sapere</h3><ul><li>I disegni vanno nell\'<b>Elenco</b>, sezione <b>Disegni</b>: da lì li rinomini, li colori, li togli, li esporti o li salvi sul portale con <b>⤴ Salva sul portale</b> (serve l\'accesso), nel layer <b>IT - Site Features</b>.</li>'
       +'<li>Restano in questo browser e si salvano nel progetto, con categoria, tipo e sito: PV Predesign li legge già divisi.</li>'
-      +'<li>Il numero nel titolo dice quanti disegni hai. <b>Cancella tutti i disegni</b>, in fondo, chiede conferma e non tocca i risultati dei geoprocessi.</li></ul>'},
-    drwSite:{t:'Sito di lavoro', s:'L\'area di AREAS COLLECTION a cui legare disegni, importati e risultati dei geoprocessi.', h:
+      +'<li>Il numero nel titolo dice quanti disegni hai. <b>Cancella tutti i disegni</b>, in fondo, fa come il cestino della sezione Disegni nell\'Elenco: chiede conferma, non tocca i risultati dei geoprocessi e, per quelli salvati sul portale, chiede se toglierli anche da lì.</li>'
+      +'<li><b>Misure esatte e aggancio</b> e <b>Griglia</b> stanno in fondo alla scheda, sotto «Supporto al disegno», sempre in vista: il titolo dice se sono accesi.</li></ul>'},
+    drwSite:{t:'Sito di lavoro', s:'Facoltativo: il legame all\'area di AREAS COLLECTION è automatico; qui lo forzi, e carichi gli elementi di un sito.', h:
       '<h3>A cosa serve</h3><p>Ogni oggetto salvato sul portale porta il GlobalID e il codice progetto dell\'area: gli elementi di un sito si ritrovano insieme, tornano nel Geoportale con <b>⤵ Carica i suoi elementi</b> e PV Predesign li prende tutti, con l\'area come area lorda.</p>'
+      +'<h3>Il legame è automatico</h3><p>Salvando sul portale, ogni oggetto senza sito prende l\'area di AREAS COLLECTION che tocca; se ne tocca più di una, quella che copre di più (in superficie per le aree, in lunghezza per le linee). Non serve compilare niente. Il codice progetto si rilegge dall\'area a ogni salvataggio: un\'area appena promossa lo riceve quando lo assegna il CRM.</p>'
+      +'<h3>Quando sceglierlo</h3><ul><li>Per legare a un sito anche ciò che sta <b>fuori</b> da ogni area (una fascia di rispetto oltre il confine, il percorso fino alla cabina): gli oggetti fuori area prendono il sito di lavoro.</li>'
+      +'<li>Per <b>forzare</b> un\'area: i disegni fatti con il sito scelto lo prendono subito, anche dentro un\'altra area.</li>'
+      +'<li>Per caricare nell\'Elenco gli elementi di un sito già salvati.</li></ul>'
       +'<h3>Come si sceglie</h3><ol><li><b>📍 Dalla mappa</b>, poi un clic dentro l\'area (se due aree si sovrappongono prende la più piccola).</li>'
       +'<li>Oppure scrivi il <b>codice progetto</b> (es. C0000) e premi <b>Cerca</b>.</li></ol>'
-      +'<h3>Da sapere</h3><ul><li>I disegni nuovi prendono il sito scelto; quelli senza sito lo prendono quando li salvi sul portale.</li>'
+      +'<h3>Da sapere</h3><ul><li>I disegni nuovi prendono il sito scelto; senza sito scelto, il sito lo decide il salvataggio.</li>'
       +'<li>Il sito si salva nel progetto .axpo. <b>× Togli il sito</b> non cambia gli oggetti che ne hanno già uno.</li>'
       +'<li>Serve l\'accesso ad AGOL: AREAS COLLECTION non è pubblico.</li></ul>'},
     drwAid:{t:'Misure esatte e aggancio', s:'Lati con la lunghezza e l\'angolo che scrivi tu, e vertici agganciati a quelli che ci sono già.', h:
@@ -6259,27 +6693,19 @@ function baseGroundSet(){
       +'<h3>Da sapere</h3><ul><li>Se scrivi un solo valore, l\'altro lo decide il mouse: per esempio fissi la distanza e scegli la direzione muovendo il puntatore.</li>'
       +'<li>Un secondo Invio chiude il disegno senza aggiungere il vertice: prima clicca.</li>'
       +'<li>Tieni premuto <b>Ctrl</b> per staccarti al volo dall\'aggancio; togli le spunte se ti ostacola.</li>'
-      +'<li>Parallelo e perpendicolare valgono tra i lati dello stesso disegno. Per stare paralleli al lato di una particella usa la <b>Griglia</b> allineata a quel lato, o <b>∥ Da un lato</b> nelle forme con misure.</li>'
+      +'<li>Parallelo e perpendicolare valgono tra i lati dello stesso disegno. Per stare paralleli al lato di una particella usa la <b>Griglia</b> allineata a quel lato, o <b>∥ Da un lato</b> nelle misure esatte del Rettangolo.</li>'
       +'<li>Con l\'opzione delle lunghezze accesa vedi sempre, mentre disegni, la lunghezza del lato e quella totale.</li></ul>'},
-    drwShape:{t:'Forme con misure', s:'Rettangoli e cerchi di misura esatta, messi sulla mappa con un clic.', h:
-      '<h3>Esempio</h3>'+DDIA2.shape
-      +'<p>Vuoi vedere se un campo da <b>100 × 50 m</b> sta nella particella, allineato al suo confine: scrivi le misure, premi <b>∥ Da un lato</b> e clicca il confine, poi <b>Posiziona sulla mappa</b> e clicca dove vuoi il centro.</p>'
-      +'<h3>Come si usa</h3><ol><li>Scegli <b>Rettangolo</b> (larghezza, altezza e orientamento) o <b>Cerchio</b> (raggio).</li>'
-      +'<li>Premi <b>Posiziona sulla mappa</b>: la forma segue il puntatore, tratteggiata.</li>'
-      +'<li>Clicca dove va il centro. Puoi metterne altre; Esc per finire.</li></ol>'
-      +'<h3>L\'orientamento</h3><p>È la direzione della larghezza, come azimut: <b>90</b> est-ovest, <b>0</b> nord-sud, <b>45</b> nord-est. Con <b>∥ Da un lato</b> lo prendi da un lato di un disegno, di una particella, di un DWG o di un layer della mappa.</p>'
-      +'<h3>Da sapere</h3><ul><li>Le misure sono a terra, esatte al centimetro.</li>'
-      +'<li>La forma è un disegno come gli altri: prende categoria e nota della sezione <b>Disegna sulla mappa</b>, e poi la sposti, la ruoti o la cancelli come ogni disegno.</li></ul>'},
-    drwOffset:{t:'Copia parallela', s:'Una linea o un\'area alla distanza che scrivi da una che c\'è già.', h:
-      '<h3>Esempio</h3>'+DDIA2.offLine+DDIA2.offArea
-      +'<p>Devi stare a <b>10 m</b> dai confini della particella: scrivi 10, premi <b>∥ Scegli e copia</b>, clicca il confine e poi dentro la particella. Ottieni l\'area che resta, con la sua superficie nell\'Elenco.</p>'
-      +'<h3>Come si usa</h3><ol><li>Scrivi la distanza in metri e premi <b>∥ Scegli e copia</b>.</li>'
-      +'<li>Clicca vicino al bordo dell\'oggetto da copiare: disegno, risultato, importato, particella, DWG o layer della mappa. Si evidenzia in arancione.</li>'
-      +'<li>Clicca dalla parte dove vuoi la copia. Per un\'area: dentro fa un <b>rientro</b>, fuori un <b>allargamento</b>.</li></ol>'
-      +'<h3>Solo il lato cliccato</h3><p>Con la spunta copi solo quel lato, come una linea: per esempio la parallela a 30 m dal confine lungo la strada.</p>'
-      +'<h3>Da sapere</h3><ul><li>Gli angoli restano vivi, non arrotondati come nel buffer.</li>'
-      +'<li>La copia è un nuovo disegno; puoi farne altre di seguito, Esc per finire.</li>'
-      +'<li>Copiando l\'oggetto intero la distanza ha un errore dello 0,15% (1,5 cm su 10 m); copiando un solo lato è esatta.</li></ul>'},
+    drwCopy:{t:'Copia', s:'Un oggetto copiato dove clicchi, oppure una linea o un\'area parallela, alla distanza che scrivi.', h:
+      '<h3>Copia semplice</h3><ol><li>Premi <b>⧉ Scegli e copia</b> e clicca l\'oggetto: un disegno (anche un punto), un risultato, un importato, una particella o un oggetto di un layer della mappa. Si evidenzia in arancione.</li>'
+      +'<li>Muovi il puntatore: la copia lo segue, tenuta per il punto dove hai cliccato. Clicca dove metterla.</li>'
+      +'<li>Ogni clic posa un\'altra copia dello stesso oggetto; Esc per finire.</li></ol>'
+      +'<p>La copia di un tuo disegno ne tiene categoria, tipo, attributi, nota e sito, ma è un oggetto nuovo: sul portale va salvata a parte. La copia di una particella o di un layer diventa un disegno con la categoria scelta nella scheda.</p>'
+      +'<h3>Parallela, a distanza fissa</h3>'+DDIA2.offLine+DDIA2.offArea
+      +'<p>Con la spunta <b>Parallela</b> scrivi la distanza. Clicca vicino al bordo dell\'oggetto, poi dalla parte dove vuoi la copia: per un\'area dentro fa un <b>rientro</b>, fuori un <b>allargamento</b>. Per esempio, per stare a <b>10 m</b> dai confini della particella: 10, clic sul confine, clic dentro la particella.</p>'
+      +'<p><b>Solo il lato cliccato</b> copia solo quel lato, come una linea: la parallela a 30 m dal confine lungo la strada.</p>'
+      +'<h3>Da sapere</h3><ul><li>Nella parallela gli angoli restano vivi, non arrotondati come nel buffer.</li>'
+      +'<li>Copiando in parallelo l\'oggetto intero la distanza ha un errore dello 0,15% (1,5 cm su 10 m); copiando un solo lato è esatta.</li>'
+      +'<li>Ogni copia va nell\'Elenco e si toglie con <b>↶ Annulla</b>.</li></ul>'},
     drwGrid:{t:'Griglia', s:'Una griglia in metri veri su cui agganciare i disegni, anche ruotata lungo un lato.', h:
       '<h3>Esempio</h3>'+DDIA2.grid
       +'<p>Per un layout allineato al confine della particella: accendi la griglia col passo che ti serve, premi <b>∥ Allinea a un lato</b> e clicca due punti lungo il confine. Poi disegna: i vertici si agganciano agli incroci e i lati restano paralleli o perpendicolari al confine.</p>'
@@ -6316,11 +6742,9 @@ function baseGroundSet(){
   });
 
   /* 5 ── una sola modalità mappa alla volta (riusa i toggle esistenti) */
-  var DRW_BTN={point:'drwPoint',polyline:'drwLine',polygon:'drwArea',rectangle:'drwRect',circle:'drwCircle'};
+  // lo spegnimento delle modalità sta nello script principale (modeOffSel/Draw/Sub, cadModesOff)
   var switching=false;
-  function offSel(){ try{ if(typeof selMode!=='undefined'&&selMode) setSelMode(selMode); }catch(e){} }
-  function offDraw(){ try{ if(typeof drawType!=='undefined'&&drawType){ var b=$g(DRW_BTN[drawType]); if(b) b.click(); } }catch(e){} }
-  function offSub(){ try{ if(typeof subActive!=='undefined'&&subActive){ var b=$g('subToggle'); if(b) b.click(); } }catch(e){} }
+  var offSel=modeOffSel, offDraw=modeOffDraw, offSub=modeOffSub;
   function familyOf(el){
     if(el.closest('#selModeBox')) return 'sel';
     if(el.id==='drwPoint'||el.id==='drwLine'||el.id==='drwArea'||el.id==='drwRect'||el.id==='drwCircle') return 'draw';
@@ -6331,7 +6755,7 @@ function baseGroundSet(){
     if(switching) return;
     var b=e.target&&e.target.closest? e.target.closest('button') : null; if(!b) return;
     var fam=familyOf(b); if(!fam) return;
-    try{ if(typeof drwModeEnd==='function') drwModeEnd(); if(typeof grdPlaceEnd==='function') grdPlaceEnd(); }catch(x){}
+    try{ if(typeof drwModeEnd==='function') drwModeEnd(fam==='draw'); if(typeof grdPlaceEnd==='function') grdPlaceEnd(); }catch(x){}
     switching=true;
     if(fam!=='sel') offSel();
     if(fam!=='draw') offDraw();
@@ -6347,6 +6771,7 @@ function baseGroundSet(){
       if(typeof gpPick!=='undefined'&&gpPick) return 'Scegli gli oggetti per <b>'+gpPick+'</b> cliccandoli sulla mappa. <kbd>Esc</kbd> per finire.';
       if(typeof srRefOn==='function'&&srRefOn()) return 'Clicca <b>dove dovrebbero cadere</b> le coordinate incollate. <kbd>Esc</kbd> per annullare.';
       if(typeof sfPickOn==='function'&&sfPickOn()) return 'Clicca <b>dentro l\'area</b> di AREAS COLLECTION che è il sito di lavoro. <kbd>Esc</kbd> per annullare.';
+      if(typeof drwMode!=='undefined'&&drwMode&&typeof drwModeInfo==='function'){ var dm0=drwModeInfo(); if(dm0) return dm0; }   // forma esatta, copia, su strada: prima dello strumento armato
       if(typeof drawType!=='undefined'&&drawType&&typeof sfDrawCat!=='undefined'){ var sc=sfCat(sfDrawCat);
         var dn2={point:'punti',polyline:'linee',polygon:'aree',rectangle:'rettangoli',circle:'cerchi'}[drawType];
         var ex2=(drawType==='point')?'':(drawType==='rectangle'||drawType==='circle'?', clicca e trascina':', doppio click per chiudere');
@@ -6387,7 +6812,7 @@ function baseGroundSet(){
     if(typeof selRunning==='function'&&selRunning()){ selAbort(); return; }             // selezione su area in corso: interrompi
     if(typeof cadAlignOn==='function'&&cadAlignOn()){ cadAlignEnd(true); return; }   // allineamento DWG: Esc = Annulla
     if(typeof gpPickOn==='function'&&gpPickOn()){ gpPickEnd(); return; }               // scelta oggetti per A/B
-    if(typeof drwModeOn==='function'&&drwModeOn()){ drwModeEnd(); return; }            // forma con misure, lato, copia parallela
+    if(typeof drwModeOn==='function'&&drwModeOn()){ var dk=drwMode.kind; drwModeEnd(); if(dk==='angle') shpSync(); return; }   // forma con misure (spegne anche lo strumento), lato, copia
     if(typeof grdPlaceOn==='function'&&grdPlaceOn()){ grdPlaceEnd(); return; }         // allineamento della griglia
     if(typeof srRefOn==='function'&&srRefOn()){ srRefEnd(); toolMsg('srMsg','Scelta del riferimento annullata.'); return; }
     if(document.querySelector('#toolsBody .drawer.open')){ openPanel(null); return; }
@@ -6411,19 +6836,15 @@ function baseGroundSet(){
   /* coordinate del puntatore (basso-dx) + pin */
   var txt=$g('curCoordTxt'), pin=$g('pinCoordBtn');
   var pinArmed=false, pinFrozen=false, wired=false;
-  function offModes(){
-    try{ if(typeof selMode!=='undefined'&&selMode) setSelMode(selMode); }catch(e){}
-    try{ if(typeof drawType!=='undefined'&&drawType){ var m={point:'drwPoint',polyline:'drwLine',polygon:'drwArea',rectangle:'drwRect',circle:'drwCircle'}[drawType]; var b=$g(m); if(b) b.click(); } }catch(e){}
-    try{ if(typeof subActive!=='undefined'&&subActive){ var sb=$g('subToggle'); if(sb) sb.click(); } }catch(e){}
-  }
   if(pin) pin.onclick=function(){
     if(pinFrozen){ pinFrozen=false; pin.classList.remove('active'); return; }   /* sblocca */
     pinArmed=!pinArmed; pin.classList.toggle('arm', pinArmed);
-    if(pinArmed) offModes();
+    if(pinArmed) cadModesOff();   // come ogni modalità mappa: le altre si spengono
   };
-  var t=setInterval(function(){
-    if(wired || typeof window.view==='undefined' || !window.view) return;
-    wired=true; clearInterval(t);
+  // la vista nasce dopo (nel require dell'SDK): la aspetto con l'evento 'axpo-view' invece di un controllo ogni 400 ms
+  function wirePin(){
+    if(wired || !window.view) return;
+    wired=true;
     view.on('pointer-move', function(evt){
       if(pinFrozen||!txt) return;
       var p=view.toMap({x:evt.x,y:evt.y});
@@ -6435,7 +6856,8 @@ function baseGroundSet(){
       pinArmed=false; pinFrozen=true;
       pin.classList.remove('arm'); pin.classList.add('active');
     });
-  }, 400);
+  }
+  if(window.view) wirePin(); else window.addEventListener('axpo-view', wirePin, {once:true});
 })();
 </script>
 <script>
@@ -6450,14 +6872,14 @@ function baseGroundSet(){
     {sel:'#signin', title:'1 · Accedi ad AGOL', body:"Accedi col tuo account: serve per le mappe dei vincoli e i layer del portale, il contesto sito e per promuovere aree. La ricerca delle particelle funziona anche senza.", placement:'below'},
     {sel:'#rcSecFind', title:'2 · Ricerca particelle', body:"Scegli regione, provincia e comune, poi foglio e particelle. La regione carica anche la mappa Check Vincoli della zona (serve l'accesso).", open:function(){openTab('ricerca'); window.impOpen&&window.impOpen('rcSecFind');}, placement:'right'},
     {sel:'.tabpane[data-tab=ricerca]', title:'3 · I tre moduli', body:"<b>Ricerca particelle</b>, se conosci comune, foglio e particella; <b>Sulla mappa con selezione manuale particelle</b>, con un clic o disegnando un rettangolo, un poligono o una linea; <b>Seleziona da un disegno esistente</b>, per le particelle toccate da un disegno o da un buffer. Clicca un titolo per aprirlo; la <b>i</b> spiega ognuno con un esempio.", open:function(){openTab('ricerca');}, placement:'right'},
-    {sel:'#drawerElenco', title:'4 · Elenco & azioni', body:"Tutto ciò che raccogli finisce qui, diviso in <b>Particelle · Disegni · Geoprocessi · Importati</b>. Ogni riga si rinomina, si colora, si nasconde, si zooma — e la <b>casella a sinistra</b> la seleziona per usarla nei geoprocessi.", open:function(){openDrawer('elenco');}, placement:'left'},
+    {sel:'#drawerElenco', title:'4 · Elenco & azioni', body:"Tutto ciò che raccogli finisce qui, diviso in <b>Particelle · Disegni · Geoprocessi · Importati</b>. Ogni riga si rinomina, si colora (🪣), si nasconde, si zooma — e la <b>casella a sinistra</b> la seleziona per usarla nei geoprocessi. L'intestazione di ogni sezione fa lo stesso per tutte: spunta, mostra/nascondi, colore e 🗑 elimina.", open:function(){openDrawer('elenco');}, placement:'left'},
     {sel:'.colbtns', title:'5 · Esporta e salva sul portale', body:"Esporta in GeoJSON/KML/KMZ/SHP/XLSX, oppure <b>⤴ Salva sul portale</b> nel layer <b>IT - Site Features</b>, con categoria, tipo e sito (la seconda volta aggiorna, non duplica). Le aree vanno in <b>AREAS COLLECTION</b> con «Promuovi».", open:function(){openDrawer('elenco');}, placement:'left'},
     {sel:'#projSaveBtn', title:'6 · Salva il progetto', body:"<b>Salva progetto</b> mette tutto il lavoro in un file .axpo, come un progetto QGIS: mappa e layer, particelle, disegni, import, anche <b>DWG e immagini</b> già posizionati. Con <b>Apri progetto</b> lo ritrovi com'era, o lo passi a un collega. <kbd>Ctrl</kbd>+<kbd>S</kbd> risalva.", placement:'below'},
     {title:'Pronto!', body:"Questo è il flusso base. Riapri i tour quando vuoi dal <b>?</b> in alto a destra. Per gli strumenti avanzati, prova il tour <i>Tutti gli strumenti</i>."}
   ];
   var TOUR_ALL=[
     {sel:'#sideRail', title:'Le schede a sinistra', body:"Il rail di icone: Ricerca, Disegno, Geoprocessi, Contesto sito, Import. Cliccando l'icona già attiva, la sidebar si comprime a colonna.", placement:'right'},
-    {sel:'.tabpane[data-tab=disegno]', title:'Disegno', body:"<b>Disegna sulla mappa</b>: punti, linee, aree, rettangoli e cerchi, con categoria e nota, e <b>↶ Annulla</b> / <b>↷ Ripeti</b>. <b>Forme con misure</b>: rettangoli e cerchi esatti, anche paralleli a un lato. <b>Copia parallela</b>: una linea o un'area a distanza fissa, come il rientro dai confini. <b>Misure esatte e aggancio</b>: <b>Tab</b> mentre disegni per scrivere angolo e distanza, aggancio anche a DWG e layer. <b>Griglia</b> in metri, allineabile a un lato.", open:function(){openTab('disegno');}, placement:'right'},
+    {sel:'.tabpane[data-tab=disegno]', title:'Disegno', body:"<b>Disegna sulla mappa</b>: punti, linee, aree, rettangoli e cerchi (anche di misura esatta), con categoria e nota, e <b>↶ Annulla</b> / <b>↷ Ripeti</b>; il percorso di connessione anche <b>↝ Su strada</b>. <b>Copia</b>: un oggetto dove clicchi, o parallelo a distanza fissa, come il rientro dai confini. In fondo, sempre in vista: <b>Misure esatte e aggancio</b> (<b>Tab</b> mentre disegni per scrivere angolo e distanza) e <b>Griglia</b> in metri, allineabile a un lato.", open:function(){openTab('disegno');}, placement:'right'},
     {sel:'.tabpane[data-tab=geoproc]', title:'Geoprocessi', body:"Si lavora in due passi. Prima scegli gli <b>oggetti</b> e mettili in <b>A</b>: cliccandoli sulla mappa (👆), dalle righe spuntate nell'elenco (☑) o per categoria. Poi scegli l'operazione: <b>Buffer</b>; <b>Unisci</b>, <b>Contorno</b>, <b>Semplifica</b>; <b>Ritaglia</b> con un'area disegnata; oppure confronta A con <b>B</b> (<b>Parte comune</b>, <b>Sottrai B da A</b>). La <b>i</b> di ogni sezione mostra un esempio disegnato. I risultati vanno nell'Elenco, sezione Geoprocessi.", open:function(){openTab('geoproc');}, placement:'right'},
     {sel:'.tabpane[data-tab=contesto]', title:'Contesto sito', body:"Attiva e clicca un punto sulla mappa: trovi sottostazioni, linea AT e progetti FV vicini.", open:function(){openTab('contesto');}, placement:'right'},
     {sel:'.tabpane[data-tab=import]', title:'Importa dati', body:"Cinque moduli, ognuno nella sua sezione: <b>file di geometrie</b> (GeoJSON, KML, KMZ, Shapefile), <b>disegni CAD</b>, <b>immagini</b>, <b>servizi web</b> (WMS, WFS, ArcGIS REST) e <b>coordinate senza sistema</b>. Clicca un titolo per aprirlo; la <b>i</b> spiega come funziona il modulo.", open:function(){openTab('import');}, placement:'right'},

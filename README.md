@@ -4,7 +4,7 @@ A single-file web GIS workbench that sits alongside the corporate **ArcGIS Onlin
 (`sig-urbasolar.maps.arcgis.com`) and adds the one thing AGOL cannot do out of the box:
 **search an Italian cadastral parcel by _Comune + Foglio + Particella_ and zoom to it.**
 
-Everything lives in one file — [`geoportale_axpo.html`](geoportale_axpo.html) (~340 KB, ~4,500 lines, SDK 4.34,
+Everything lives in one file — [`geoportale_axpo.html`](geoportale_axpo.html) (~580 KB, ~6,950 lines, SDK 4.34,
 no build step, no bundler, no `node_modules`). Open it over HTTPS, log in with your org account, and it
 works.
 
@@ -86,8 +86,10 @@ changes.
 | **Sezione** (of the Elenco) | Particelle, Disegni, Geoprocessi, Importati | `.gsec` |
 | **Finestra** (modal) | Salva sul portale, Esporta, Promuovi, CAD… | `#…Modal` |
 
-Modules of *Disegno*: Sito di lavoro (`drwSecSite`), Disegna sulla mappa (`drwSecDraw`), Forme con misure
-(`drwSecShape`), Copia parallela (`drwSecOff`), Misure esatte e aggancio (`drwSecAid`), Griglia (`drwSecGrid`).
+Modules of *Disegno*: Sito di lavoro (`drwSecSite`), Disegna sulla mappa (`drwSecDraw`), Copia (`drwSecCopy`),
+then, pinned at the bottom under *Supporto al disegno* (`#drwDock`), Misure esatte e aggancio (`drwSecAid`) and
+Griglia (`drwSecGrid`). Since 2026-09-24 *Forme con misure* lives inside *Disegna sulla mappa* and *Copia
+parallela* became *Copia* with a *Parallela* option.
 Of *Ricerca particelle*: Ricerca particelle (`rcSecFind`), Sulla mappa con selezione manuale particelle
 (`rcSecMap`), Seleziona da un disegno esistente (`rcSecDraw`). Of *Geoprocessi*: Scegli gli
 oggetti, Buffer, Unisci/contorna/semplifica, Ritaglia, Confronta A con B. Of *Importa dati*: File di geometrie,
@@ -134,15 +136,46 @@ after 20 s with a message, instead of leaving the UI waiting forever.
   (deflection is relative to the previous side: 90 = right angle to the right, −90 to the left); **Enter**
   locks the values and a **click** anywhere places the vertex there. A second Enter completes the drawing
   *without* that vertex. The circle is drawn from its centre.
-- The *Disegno* tab has two sections (since 2026-09-23): *Disegna sulla mappa* (the five tools, category,
-  note; the title counts the drawings) and *Misure esatte e aggancio*. The **i** windows draw the gesture
-  of each tool and a typed side (`DRW_INFO`/`DDIA`). *Cancella tutti i disegni* sits below, asks first and
-  leaves geoprocessing results alone.
-- **Site Features model** (since 2026-09-24, replaces the Sites Notes categories). *Sito di lavoro* on top
-  picks the site — an area of AREAS COLLECTION, clicked on the map or found by `Project_Code` — and draws its
-  outline. *Disegna sulla mappa* starts from the **category** (the role in the project: gross area, net area,
-  exclusion, linear infrastructure, obstacle, access & grid connection, mitigation, agricultural zone, note &
-  reference), then the **type** (what it is: overhead power line, tree, landscape constraint…) and only the
+- The *Disegno* tab (reorganised on 2026-09-24): *Sito di lavoro* (optional, see below), *Disegna sulla mappa*
+  (category, type, attributes, note, the five tools; the title counts the drawings), *Copia*, *Cancella tutti i
+  disegni*, and at the bottom *Supporto al disegno* — *Misure esatte e aggancio* and *Griglia*, sticky
+  (`position:sticky; bottom:-10px` inside `#sideContent`, the −10 px being its bottom padding), always in view
+  while the tab scrolls, closed to one line each with their state in the title (*aggancio · misure*, *10 m* /
+  *spenta*, `drwDockSum`). From 640 px of panel width they sit side by side. The **i** windows draw the gesture
+  of each tool and a typed side (`DRW_INFO`/`DDIA`). *Cancella tutti i disegni* is the same as the trash of the
+  *Disegni* section in the *Elenco* (`sectionDelete('draw')`).
+- **Exact rectangles and circles** (since 2026-09-24 inside *Disegna sulla mappa*): with *Rettangolo* or
+  *Cerchio* armed, a box *Con misure esatte* appears (`#shpBox`). Unticked, the SDK draws freehand; ticked with
+  valid values, the sketch is cancelled and the map mode `shape` previews the shape under the pointer, a click
+  places it (`shpSync` switches between the two as the fields change). The armed tool stays armed across the
+  switch: `drwModeEnd(keepDraw)` and `cadModesOff(keepDraw)`; Esc ends the shape mode and the tool together.
+- **Copia** (since 2026-09-24): plain copy picks any object under the click — drawing (points too), result,
+  import, parcel, or a layer feature through `drwEdgeAt` — and moves it with the clicked point (`geomShift`, a
+  translation in Web Mercator: 1 km north changes the scale by ~0.02%, negligible); every further click places
+  another copy, Esc ends. A copy of our own object keeps category, type, attributes, note, site and style but
+  not `sf_gid`/`sf_saved` (a new object on the portal); a copy of a parcel or layer is a new drawing with the
+  tab's category. *Parallela* is the former parallel copy.
+- **Connection route on roads** (since 2026-09-24). Category *Percorso di connessione* (`connection`, lines
+  only, types *Stimato*/*Confermato*) shows a box with **↝ Su strada**: click the start, Shift+click via points,
+  click the end (`drwMode` `rte`, stops as temporary markers). `rteSolve` calls the organisation's route service
+  (`portal.helperServices.route.url`, fallback `route.arcgis.com/…/Route_World`) with `esri/rest/route`, stops in
+  the given order (a *simple route*, **0.005 credits** whatever the number of stops — Esri's credit table),
+  travel mode *Walking Distance* (shortest in km, no motorways, one-ways ignored) or *Rural Driving Distance* for
+  *Solo strade carrabili* (by name, else by type `WALK`/`AUTOMOBILE` with a distance impedance). The service
+  snaps to the nearest road: straight connectors from the clicked start and to the clicked end are added, z/m
+  dropped. The result is a normal drawing (`Su strada 3,4 km`), the list shows the length of every drawn line.
+  Needs sign-in; without it the button refuses (a token-less request would start a sign-in redirect).
+- **Site Features model** (since 2026-09-24, replaces the Sites Notes categories). The **link to the site is
+  automatic** (since 2026-09-24, `sfAutoSite`): on *Salva sul portale* every object without a site takes the
+  AREAS COLLECTION area it touches — one query on the extent of all of them, then locally the area with the
+  largest overlap (area for polygons, length for lines, any for points); outside every area it takes the working
+  site if there is one, otherwise it stays unlinked and the message says so. `sfRefreshCodes` then re-reads
+  `Project_Code` by GlobalID for links without a code (a freshly promoted area gets its code from the CRM later;
+  `GlobalID IN ('{…}')` with braces and upper case, checked on the real layer). *Sito di lavoro* is now optional
+  (closed by default): it forces a site on new drawings, covers objects outside every area and loads a site's
+  objects. *Disegna sulla mappa* starts from the **category** (the role in the project: gross area, net area,
+  connection route, exclusion, linear infrastructure, obstacle, access & connection point, mitigation,
+  agricultural zone, note & reference), then the **type** (what it is: overhead power line, tree, landscape constraint…) and only the
   attributes that apply (buffer, height, width for lines, voltage for power lines), the source (survey /
   desk / official) and a note. Only the tools of the category's geometries are enabled, and drawings take
   the category colour. In the *Elenco*, the coloured tag of every drawing, result or import opens a small
@@ -165,10 +198,11 @@ after 20 s with a message, instead of leaving the UI waiting forever.
     layer (DWG sublayers included). Map-image and WMS layers cannot be snapped to.
   - **Angles as azimuth**: `valueOptions.directionMode` `relative` (deflection, default) or `absolute`
     (azimuth from north, clockwise — verified: east = 90°). Remembered in `axpo_drw_dir`.
-  - **Shapes with measurements**: a rectangle (width × height, orientation of the width as azimuth) or a
-    circle (radius), previewed under the pointer and placed with a click on the centre. *Da un lato* takes the
-    orientation from the nearest side of a drawing, parcel, DWG or layer feature (full geometry re-queried).
-  - **Parallel copy**: pick an object, then click the side. A line gives a parallel line, an area an inset
+  - **Shapes with measurements** (the *Con misure esatte* box of *Disegna sulla mappa*): a rectangle (width ×
+    height, orientation of the width as azimuth) or a circle (radius), previewed under the pointer and placed
+    with a click on the centre. *Da un lato* takes the orientation from the nearest side of a drawing, parcel,
+    DWG or layer feature (full geometry re-queried), then goes back to placing.
+  - **Parallel copy** (*Copia* with *Parallela* ticked): pick an object, then click the side. A line gives a parallel line, an area an inset
     (click inside) or an outset (outside), with mitered corners (`geometryEngine.offset`); *Solo il lato
     cliccato* copies just that side.
   - **Metric grid**: the SDK's `GridControlsViewModel` (a "measured" grid, `view.grid`, spacing in real
@@ -207,7 +241,15 @@ after 20 s with a message, instead of leaving the UI waiting forever.
   **full geometry** and its original attributes, which go into exports, so it works with every
   operation, the export and the promotion. The same feature is copied only once. WMS layers are images
   and have no geometry to use.
-- Per-geometry **colour and visibility**, plus per-section colour/visibility, all persisted.
+- Per-geometry **colour and visibility**, plus per-section controls, all persisted. Since 2026-09-24 every
+  section header of the *Elenco* — *Importati* included, which had none — has: a tick box for all its rows
+  (with the *some* state; `sectionSelCount`/`setSectionSel`), show/hide all, a **paint bucket** for the colour
+  (the filled square looked like the selection tick box; the rows use the bucket too, `swatchPaint`) and a
+  **trash** for the whole section (`sectionDelete`: asks first; for objects saved on the portal asks again
+  whether to delete them there too, one `applyEdits` per layer, `sfDeleteRemoteMany`; ↶ Annulla restores what
+  was removed from the list). *Disegni* has no section colour: there the colour is the category. *Svuota
+  particelle* went away (the trash of *Particelle* does it). In *Importati* show/hide and the trash also act on
+  the images, which now have an eye too.
 
 **Site context**
 Nearby substations (380/220/150/132 kV), HV lines and PV projects, pulled live from the portal layers.
@@ -384,6 +426,16 @@ intersection (or the nearest within 100 m: 1 369 of 1 840). Sites Notes itself w
 `../backups/`. In the app the model lives in `SF_CATS` (codes, labels, colours, geometries, attributes, types).
 GlobalIDs are compared normalised (`sfGuid`: upper case, braces); the service returns them lower case without
 braces and accepts every form in a `where`.
+On 2026-09-24 the model went to 1.1.0 (user's request): new category **`connection` «Percorso di connessione»**
+(lines only, types `estimated`/`confirmed`, violet), placed after the net area; `access` is now labelled
+«Accesso e punto di connessione» (the point: primary substation, HV station; the cable route has its own
+category). On the layer: two coded values on the lines' CATEGORY and TYPE domains, the access label on points
+and lines, a violet renderer class and an editing template — additions only, done by
+`../scripts/archive/aggiungi_percorso_connessione.py` after checking the owner; definitions before the change in
+`../backups/site_features_layer{0,1,2}_def_pre-connection_2026-09-24.json`. Feature counts unchanged (114 / 556 /
+1 170). The same change is in `../schemas/site_features_model.json` and in PV Predesign (`categories.js`, where
+route words — *percorso di connessione*, *tracé de raccordement*, *Kabeltrasse*… — are tested before the power
+line words; a plain *cavidotto* stays an existing underground line).
 
 **The Search widget puts its default sources first.** With "All", it takes the first result in source
 order, and `defaultSources` always come before `sources` — so the geocoder won every time: `2789113
@@ -649,7 +701,7 @@ loose in `backups/`.)
 |---|---|
 | Console at load | 0 errors; on 4.34 only the one-off deprecation warnings listed in §5 |
 | Duplicate element IDs | 0 of 249 |
-| Functions, variables, CSS ids never used | 0 (dead code removed on 2026-09-23) |
+| Functions, variables, CSS ids never used | 0 (dead code removed on 2026-09-23; the second, hidden `msg()` and `#out` removed on 2026-09-24) |
 | Unresolved `$('id')` DOM references | 0 |
 | Insecure `http://` endpoints | none (only XML namespace URIs) |
 | Third-party library versions | all pinned |
@@ -747,6 +799,81 @@ loose in `backups/`.)
 transformation by itself, so Monte Mario GeoTIFFs are placed right; the AREAS `edits` handler gets the
 layer's own SR from `queryFeatures`, not Web Mercator.
 
+**Second audit (2026-09-24, by another model, read-only; checked here line by line)** — fixed:
+- The three messages about deleting from the portal passed the text through `esc()`, but the toast writes plain
+  text (`textContent`): an apostrophe showed as `&#39;`.
+- `onSignedIn` set `signedIn=true` *before* `portal.load()` and swallowed the error: a portal that failed to
+  load still showed «Connesso» and was retried at every `credential-create` (~20 with the General Map). Now
+  «connected» only after the load; on failure one message, no automatic retries, «Accedi» retries (`force`);
+  concurrent events share one load (`signInBusy`). Tested with a fake `Portal`: failing, slow ×3, then OK.
+- `Login annullato: undefined` when the rejection had no `message`.
+- `msg()` had two definitions: the first wrote into a hidden `#out`, the UI glue replaced it with the toast —
+  messages sent before the replacement were invisible. Now one definition, the toast.
+- **Mode logic written three times** (`cadModesOff`, `offSel/offDraw/offSub` in the UI glue, `offModes` of the
+  coordinate pin): now `modeOffSel/Draw/Sub` + `cadModesOff` in the main script, and the other two use them
+  (`DRW_BTN` once). While there, a bug of the same day: with an exact shape active, pressing *Rettangolo*
+  again re-armed it instead of switching it off — the family handler ended the shape mode together with the
+  tool before the button's own toggle (`drwModeEnd(fam==='draw')` now). The mode banner shows the exact-shape
+  hint before the armed tool's.
+- The pin waited for `window.view` polling every 400 ms: now the event `axpo-view`, fired where the view is born.
+- The `drawType` comment and the size in §0 of this README.
+
+Not taken: the 350 ms poll of the mode banner stays (cheap, rewrites only on change; events would mean touching
+every mode start and end); a `swallow()` wrapper around every catch (see item 6); duplicated listeners when the
+panel is undocked (they go on the new window's document and die with it); PKCE instead of the implicit flow — the
+right direction, but it needs an OAuth app without a client secret on the portal and a real login test (the
+comment at `registerOAuthInfos` explains why *implicit* was chosen).
+
+**Third audit (2026-09-24, another model, static reading plus mocks; every point checked here first)** — all
+confirmed; fixed and re-tested in the browser with fakes (no real AGOL or Zornade writes):
+- **Dissolve no longer produces a partial area.** A failed `turf.union` was swallowed: the result lacked a parcel
+  but declared all of them, in the export *and* in *Promuovi → AREAS*. Now `buildFC` stops with the parcels that
+  failed, or those without an outline (point only); export and promotion show it and write nothing. Promotion
+  also refuses parcels without an outline (AREAS is a polygon layer).
+- **The web map title from a `.axpo`** went into `cvNote.innerHTML` unescaped when the map failed to load: now
+  `esc(label)`.
+- **No Web Mercator area.** Without a valid geometry the parcel took Zornade's `area_m2`, which is Web Mercator
+  (~2× at 45°). Now the area stays empty (`area_nd`), the row says «area non disponibile» and the total counts them.
+- **XLSX** holds only parcels: the export window now says so and switches the other categories off; with no
+  parcels it stops with a message instead of writing an empty sheet.
+- **Area selection tells Zornade errors from «no parcel»:** failed `locate` calls and unreadable details are
+  counted; none answering → an error, some → a warning that the area may be incomplete.
+- **Save results**: every object needs its own result (a missing one is an error and the object stays to save);
+  after a failed update it is re-added only if a `GlobalID IN (…)` query says it is gone — permission or domain
+  errors stay errors.
+- **Fast region change**: `loadWebMap` numbers its requests; a map that arrives after a newer request is dropped
+  (before, the older one could win and take parcels, tools, DWGs and images with it).
+- **AREAS editor** is torn down also when the new map has no AREAS (a Check Vincoli map), with a note in the drawer.
+- **Automatic site**: if the query on the common extent is cut (`exceededTransferLimit`), one query per object;
+  still cut → a warning in the save message.
+- Minor: the unused `--axpo-sky/sun/earth` variables became a comment (brand values kept), `h1,h2,h3` weight set
+  once (700, as it was in effect), an unused `var w`.
+
+**UI/UX review (2026-09-24, another model with design skills; every claim checked here; applied in this order)**
+1. *Area selection is indicative, and says so.* A fixed note in *Sulla mappa…* and *Seleziona da un disegno
+   esistente*; the result reads «N individuate campionando l'area: una particella molto piccola può sfuggire»
+   instead of «N nell'area», which sounded like a complete inventory.
+2. *Errors and partial results stay on screen.* `msg()` keeps an `err` toast until its × or the next message
+   (role `alert`); others go after 6 s, 10 s with an action. `msg(t, cls, {action:{label, fn}})` adds a button:
+   one rule for where results go — no drawer forced open (it shrinks the map while you work), but «Vedi
+   nell'Elenco ›» (`vediElenco(sec)`, `showInElenco`) opens the Elenco on the right section. Used by the parcel
+   search, map clicks, area selection and every import (which used to open the Elenco on their own).
+3. *The map stays usable.* `ensureMapRoom(prefer)` in the UI glue: under 360 px of map it makes room one step at a
+   time, measured after the 0.2 s transition, honouring what was opened last — a drawer just opened narrows, then
+   collapses, the left panel; the left panel reopened or widened, or the window narrowed, closes the drawer first.
+   A message says what it closed. Runs at start-up too (at ~500 px the map used to get zero width and never load).
+4. *Dialogs*: Esporta, Promuovi, Salva sul portale, CAD, Guida, Aiuto get `role="dialog"`, `aria-modal`,
+   `aria-labelledby`; opening moves the focus to the first control, Tab/Shift+Tab stay inside, closing gives the
+   focus back to the button that opened it (a `MutationObserver` on the `style` of each modal).
+5. *Promotion labels in Italian* — «Classe dell'area», «Tipo di area», «Fonte del dato», «Tipo di progetto» — with the
+   field name beside them (`· Area class`…) for whoever knows the layer. To confirm with the people who fill AREAS.
+6. *Rail*: it declared `role="tablist"` without tabs; now `role="tab"`, `aria-selected`, `aria-controls` to the
+   `role="tabpanel"` panes, roving tabindex, arrows/Home/End.
+
+Not done: the 10–11 px texts (to try with browser zoom first) and the usability test the review proposes
+(5–8 prospection managers, tasks on staging data; the «site of work» task should become «after saving, which
+site did the object go to?», and it is worth asking whether *Promuovi → AREAS* and *Salva sul portale* are told apart).
+
 **Open, known, non-blocking**
 
 1. Third-party scripts from three CDNs (five on unpkg) **without Subresource Integrity**, on a page that
@@ -756,15 +883,22 @@ layer's own SR from `queryFeatures`, not Web Mercator.
 3. The **Legend** widgets created inside LayerList panels are never destroyed on a web map swap.
 4. `deleteEnabled: true` on the AREAS editor: the Esri Editor asks its own confirmation before deleting;
    check it when logged in before adding one of ours.
-5. **About 160 empty `catch` blocks.** Errors vanish silently — e.g. a Union that fails on one piece
-   skips it without saying so.
+5. **About 240 empty `catch` blocks** (260 with other variable names; counted again on 2026-09-24, the earlier
+   ~160 was low). Errors vanish silently — e.g. a Union that fails on one piece skips it without saying so. Many
+   are deliberate (localStorage in private browsing, optional bits of the UI); the ones on the critical paths —
+   promotion (ISTAT lookup, overlap check), restoring the saved work, re-reading project codes — now write a
+   `console.warn`. Rewriting all of them mechanically was ruled out: case by case, on the paths that matter.
 6. Not tested logged in: Check Vincoli maps, the real writes to AREAS and to IT - Site Features, the AREAS
    editor, site context, ISTAT zoom; DWG alignment with a real mouse; Print (CORS error from localhost). On 4.34
    in particular the logged-in branch has not been exercised at all. The Site Features flow (site of work by
    code, first save = adds with GlobalID, second save = one update, delete by GlobalID, load skipping objects
    already listed, old categories converted, .axpo with site and codes) was tested on 2026-09-24 with a fake
    `FeatureLayer` recording the calls; the REST forms it relies on (adds and GUID filters) were checked on the
-   real service with the API key while copying Sites Notes.
+   real service with the API key while copying Sites Notes. Also only with fakes (2026-09-24): the automatic
+   link to the site (fake AREAS layer: largest overlap, lines by length, points, outside, code re-read by GUID),
+   the section trash deleting from the portal, and **routing on roads** — the API key has no routing privilege
+   (403 on `Route_World`), so no real route was ever solved: the travel mode names, the service answer and the
+   users' *network analysis* privilege need a first try logged in.
 
 ## 8. Repository contents
 
