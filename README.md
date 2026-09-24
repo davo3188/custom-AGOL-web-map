@@ -874,6 +874,16 @@ Not done: the 10–11 px texts (to try with browser zoom first) and the usabilit
 (5–8 prospection managers, tasks on staging data; the «site of work» task should become «after saving, which
 site did the object go to?», and it is worth asking whether *Promuovi → AREAS* and *Salva sul portale* are told apart).
 
+**Example data (2026-09-24).** The user's rule, shared with PV Predesign: codes, GUIDs and parcels used as
+examples are always invented. The site code example was a real AREAS project code (placeholder and title of
+`sfSiteCode`, the `sfFindByCode` message, the **i** of the site): now **C0000**, checked read-only on layer 426
+(C0000: 0 features; the old one: 1). The foglio/particella placeholders are fictitious too (`es. 1`,
+`es. 1, 2, 3`; their origin was unknown). The test notes in this README no longer name the project site or a
+parcel. On the user's request the public repo history was rewritten the same day to take the real code,
+site and parcel out of every commit (`git filter-branch`, only those strings changed; the original history is
+kept locally as a git bundle in `backups/`). Backups: `geoportale_axpo_pre-codici-finti_2026-09-24.html`,
+`README_tools_pre-codici-finti_2026-09-24.md`, `geoportale_axpo_pre-esempi-particelle_2026-09-24.html`.
+
 **Open, known, non-blocking**
 
 1. Third-party scripts from three CDNs (five on unpkg) **without Subresource Integrity**, on a page that
