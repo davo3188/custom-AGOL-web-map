@@ -395,15 +395,20 @@
   .llopts .llflt .llfst.err{color:var(--err);opacity:1}
   .llopts .llflt summary{cursor:pointer;opacity:.8;font-size:11px;margin:5px 0 4px}
   /* scheda Import: un modulo per sezione collassabile (titolo + una riga), spiegazioni nella finestra «i» */
-  .imod{border:1px solid var(--line);border-radius:10px;margin:0 0 8px}
-  .imod[open]{border-color:var(--line-strong)}
+  .imod{border:1px solid var(--line);border-radius:10px;margin:0 0 8px;transition:border-color .15s,background-color .15s}
+  /* modulo aperto: bordo e fondo tinti d'accento, riconoscibile anche senza hover (chiaro: velo azzurro sul bianco; scuro: fondo più chiaro) */
+  .imod[open]{border-color:color-mix(in srgb, var(--accent) 55%, var(--line));background:color-mix(in srgb, var(--accent) 5%, var(--panel))}
+  [data-theme="dark"] .imod[open]{border-color:color-mix(in srgb, var(--accent) 50%, var(--line));background:color-mix(in srgb, var(--accent) 9%, var(--panel))}
   .imod>summary{list-style:none;display:flex;align-items:center;gap:10px;padding:9px 10px;cursor:pointer;border-radius:9px;user-select:none}
   .imod>summary::-webkit-details-marker{display:none}
   .imod>summary:hover{background:var(--hover)}
+  .imod[open]>summary:hover{background:color-mix(in srgb, var(--accent) 11%, var(--panel))}
+  [data-theme="dark"] .imod[open]>summary:hover{background:color-mix(in srgb, var(--accent) 16%, var(--panel))}
   .imod>summary:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
   .imod>summary::after{content:'';flex:none;width:6px;height:6px;margin:0 4px 2px 2px;border-right:2px solid var(--mut);border-bottom:2px solid var(--mut);transform:rotate(45deg);transition:transform .15s}
   .imod[open]>summary::after{transform:rotate(-135deg);margin-bottom:-3px}
   .imod .im-ico{flex:none;width:28px;height:28px;display:grid;place-items:center;font-size:15px;border-radius:7px;background:var(--hover)}
+  .imod[open] .im-ico{background:color-mix(in srgb, var(--accent) 18%, var(--panel))}   /* .im-a (lettera arancio) resta: è dichiarato dopo */
   .imod .im-t{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px;line-height:1.25}
   .imod .im-t b{font-size:13px;font-weight:600;color:var(--txt)}
   .imod .im-t small{font-size:11px;color:var(--mut)}

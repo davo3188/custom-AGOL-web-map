@@ -92,6 +92,8 @@ Of *Ricerca particelle*: Ricerca particelle (`rcSecFind`), Sulla mappa con selez
 (`rcSecMap`), Seleziona da un disegno esistente (`rcSecDraw`). Of *Geoprocessi*: Scegli gli
 oggetti, Buffer, Unisci/contorna/semplifica, Ritaglia, Confronta A con B. Of *Importa dati*: File di geometrie,
 Disegni CAD, Immagini sulla mappa, Servizi web, Coordinate senza sistema. *Contesto sito* has no modules.
+An open module is tinted with the accent colour — border, background and icon — so it stands out from the
+closed ones without hovering (since 2026-09-24; light theme: a pale blue veil on white, dark: a lighter background).
 
 **Undockable left panel** (since 2026-09-24). **⧉** in the header of the pannello sinistro moves it — rail and
 tabs — into a window of its own, to put on a second screen; the map takes the freed space and a thin strip keeps
