@@ -125,6 +125,25 @@
   #sideHead{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--panel-head);border-bottom:1px solid var(--line-strong)}
   #sideHead b{font-size:11px;text-transform:uppercase;letter-spacing:.6px;color:var(--txt);font-weight:700}
   #sideToggle{background:var(--panel);border:1px solid var(--line);border-radius:6px;color:var(--txt);cursor:pointer;padding:4px 9px;font-size:13px}
+  /* pannello sinistro sganciabile: pulsante ⧉/⇤, striscia al suo posto nella pagina, finestra del pannello */
+  #sideHead .sideHeadBtns{display:flex;gap:6px}
+  #sideUndock{background:var(--panel);border:1px solid var(--line);border-radius:6px;color:var(--txt);cursor:pointer;padding:4px 8px;font-size:13px;line-height:1.2}
+  #sideUndock:hover,#sideToggle:hover{border-color:var(--accent);color:var(--accent)}
+  #sideDockStrip{flex:none;width:36px;display:flex;flex-direction:column;align-items:center;gap:6px;padding:9px 0;background:var(--panel);border-right:1px solid var(--line-strong)}
+  #sideDockStrip button{width:28px;height:28px;padding:0;border:1px solid var(--line);border-radius:7px;background:transparent;color:var(--txt);cursor:pointer;font-size:14px}
+  #sideDockStrip button:hover{border-color:var(--accent);color:var(--accent)}
+  body.side-undocked{display:flex;flex-direction:column;height:100%;overflow:hidden}
+  body.side-undocked #side{flex:1;min-height:0;width:auto;min-width:0;border-right:0}
+  body.side-undocked #sideToggle{display:none}
+  body.side-undocked #sideContent{container-type:inline-size}
+  .sideScreens{flex:none;display:flex;align-items:center;gap:8px;padding:6px 10px;font-size:12px;background:color-mix(in srgb, var(--accent) 12%, var(--panel));border-bottom:1px solid var(--line)}
+  .sideScreens span{flex:1}
+  .sideScreens button{padding:4px 10px;border:1px solid var(--line);border-radius:6px;background:var(--panel);color:var(--txt);cursor:pointer;font-size:12px}
+  /* design adattivo della finestra del pannello: con spazio, i moduli di una scheda si dispongono su più colonne */
+  @container (min-width: 640px){
+    .paneBody{column-width:300px;column-gap:12px}
+    .paneBody>*{break-inside:avoid}
+  }
   label,.lbl-block{display:block;font-size:11px;color:var(--mut);text-transform:uppercase;letter-spacing:.5px;margin:9px 0 4px;font-weight:600}
   select,input{width:100%;padding:8px 10px;background:var(--bg);border:1px solid var(--line);border-radius:6px;color:var(--txt);font-size:13px}
   select:disabled,input:disabled{opacity:.45}
@@ -229,7 +248,7 @@
   .subsec:first-child{margin-top:0}
 
   /* ══ MODALI unificate (export / promote / help) ══ */
-  #promoteModal,#exportModal,#helpModal,#snModal,#helpMenu,#cadModal,#infoModal{position:fixed;inset:0;background:#000a;display:none;align-items:center;justify-content:center;z-index:1000}
+  #promoteModal,#exportModal,#helpModal,#sfModal,#helpMenu,#cadModal,#infoModal{position:fixed;inset:0;background:#000a;display:none;align-items:center;justify-content:center;z-index:1000}
   .card{position:relative;background:var(--panel);border:1px solid var(--line);border-radius:12px;width:440px;max-width:92vw;max-height:90vh;overflow-y:auto;padding:18px 20px;border-top:3px solid transparent;border-image:var(--axpo-gradient) 1 0 0 0}
   .card h2{margin:0 0 4px;font-size:16px}
   .card .sub{color:var(--mut);font-size:12px;margin-bottom:12px}
@@ -390,6 +409,33 @@
   .imod .im-info:hover,.imod .im-info:focus-visible{color:var(--accent);border-color:var(--accent);outline:none}
   .imod .im-body{padding:2px 10px 11px}
   .imod .im-main{width:100%;margin-top:0}
+  /* Site Features: categorie a bottoni colorati, attributi, sito di lavoro, categoria e scheda nelle righe dell'Elenco */
+  .sfchips{display:flex;flex-wrap:wrap;gap:5px;margin-top:2px}
+  .sfchips button{display:inline-flex;align-items:center;gap:5px;padding:4px 9px;border:1px solid var(--line);border-radius:14px;background:var(--bg);color:var(--txt);font-size:11.5px;cursor:pointer;line-height:1.3}
+  .sfchips button::before{content:'';flex:none;width:9px;height:9px;border-radius:3px;background:var(--c)}
+  .sfchips button:hover{border-color:var(--c)}
+  .sfchips button.active{border-color:var(--c);background:color-mix(in srgb, var(--c) 18%, transparent);font-weight:700}
+  .sfattrs{display:grid;grid-template-columns:1fr 1fr;gap:0 8px}
+  .sfattrs>.sfwide{grid-column:1/-1}
+  .sfattrs>[hidden]{display:none}
+  .sfsite{font-size:12px;padding:7px 9px;border:1px solid var(--line);border-left:4px solid #FF8C1A;border-radius:7px;margin:0 0 4px;line-height:1.4}
+  .sfsite small{color:var(--mut);font-size:11px}
+  .sfsite.empty{border-left-color:var(--line);color:var(--mut)}
+  .card .sfsite{margin:10px 0 0}
+  .sfsiterow{display:flex;gap:6px;margin-top:6px}
+  .sfsiterow input{flex:1;min-width:0;padding:6px 8px;font-size:12px}
+  .sfsiterow button.sec{flex:none;padding:6px 8px}
+  .drwgrid button.sec:disabled{opacity:.35;cursor:not-allowed}
+  .grow .sftag{flex:none;display:inline-flex;align-items:center;gap:4px;max-width:118px;padding:1px 7px 1px 5px;border:1px solid var(--line);border-radius:9px;background:transparent;color:var(--txt);font-size:10.5px;line-height:1.5;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .grow .sftag::before{content:'';flex:none;width:8px;height:8px;border-radius:2px;background:var(--c,#99AFC2)}
+  .grow .sftag:hover,.grow .sftag.open{border-color:var(--c,var(--accent))}
+  .grow .sftag.none{color:var(--mut);border-style:dashed}
+  .grow .sfst{flex:none;font-size:12px;color:var(--ok);cursor:default}
+  .grow .sfst.dirty{color:var(--warn)}
+  .gedit{margin:0 5px 8px 24px;padding:4px 9px 9px;border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:7px;background:var(--bg)}
+  .gedit label{margin:7px 0 3px}
+  .gedit select,.gedit input{padding:5px 7px;font-size:12px}
+  .gedit .thint{margin-top:8px}
   /* scheda Geoprocessi: stesse sezioni; ogni operazione = pulsante + una riga che dice cosa fa */
   .imod .im-ico.im-a{background:#FF8C1A;color:#fff;font-weight:700;font-size:13px}
   .gpbuf{display:flex;align-items:center;gap:7px}
@@ -532,7 +578,7 @@
       <button data-tab="import" title="Importa dati: file, disegni, immagini, servizi web" aria-label="Importa dati"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v10"/><polyline points="8,9 12,13 16,9"/><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg></button>
     </nav>
     <div id="sideContent">
-    <div id="sideHead"><b id="sideTitle">Ricerca particelle</b><button id="sideToggle" aria-label="Comprimi pannello" title="Comprimi">«</button></div>
+    <div id="sideHead"><b id="sideTitle">Ricerca particelle</b><span class="sideHeadBtns"><button id="sideUndock" aria-label="Sgancia il pannello in una finestra" title="Sgancia il pannello in una finestra (per il secondo schermo)">⧉</button><button id="sideToggle" aria-label="Comprimi pannello" title="Comprimi">«</button></span></div>
     <div id="authTodo" class="warn" style="display:none"></div>
 
     <div class="tabpane active" data-tab="ricerca"><div class="paneBody">
@@ -590,10 +636,40 @@
 
     <div class="tabpane" data-tab="disegno"><div class="paneBody">
         <!-- Come le altre schede: titolo + una riga per sezione, gli esempi nella finestra «i» (DRW_INFO nello script) -->
+        <details class="imod" id="drwSecSite" open>
+          <summary><span class="im-ico" aria-hidden="true">🏷️</span><span class="im-t"><b>Sito di lavoro</b><small>L'area di AREAS COLLECTION a cui legare i disegni</small></span>
+            <button type="button" class="im-info" data-info="drwSite" title="Come funziona, con un esempio" aria-label="Come funziona il sito di lavoro">i</button></summary>
+          <div class="im-body">
+            <div id="sfSiteBox" class="sfsite empty">Nessun sito: i disegni restano senza legame.</div>
+            <div class="sfsiterow">
+              <button type="button" class="sec" id="sfSitePick" disabled title="Clicca dentro un'area di AREAS COLLECTION sulla mappa">📍 Dalla mappa</button>
+              <input id="sfSiteCode" placeholder="Codice, es. C0000" aria-label="Codice progetto" title="Codice progetto dell'area, es. C0000" disabled>
+              <button type="button" class="sec" id="sfSiteFind" disabled>Cerca</button>
+            </div>
+            <div class="sfsiterow">
+              <button type="button" class="sec" id="sfLoad" disabled title="Porta nell'Elenco gli elementi del sito salvati sul portale">⤵ Carica i suoi elementi</button>
+              <button type="button" class="sec" id="sfSiteClear" disabled>× Togli il sito</button>
+            </div>
+            <div id="sfSiteMsg" class="thint">Serve l'accesso ad AGOL per scegliere il sito.</div>
+          </div>
+        </details>
         <details class="imod" id="drwSecDraw" open>
-          <summary><span class="im-ico" aria-hidden="true">✏️</span><span class="im-t"><b>Disegna sulla mappa</b><small>Punti, linee e aree, con categoria e nota</small></span>
+          <summary><span class="im-ico" aria-hidden="true">✏️</span><span class="im-t"><b>Disegna sulla mappa</b><small>Scegli la categoria, poi punti, linee o aree</small></span>
             <span class="im-n" id="drwNSum"></span><button type="button" class="im-info" data-info="drwDraw" title="Come funziona, con un esempio" aria-label="Come si disegna">i</button></summary>
           <div class="im-body">
+            <label>Categoria</label>
+            <div class="sfchips" id="sfCats" role="radiogroup" aria-label="Categoria"></div>
+            <div id="sfCatHint" class="thint"></div>
+            <div class="sfattrs" id="sfAttrs">
+              <div id="sfTypeBox" class="sfwide"><label for="sfType">Tipo</label><select id="sfType"></select></div>
+              <div data-a="buffer"><label for="sfBuffer">Buffer (m)</label><input id="sfBuffer" type="number" min="0" step="any" placeholder="fascia da escludere"></div>
+              <div data-a="height"><label for="sfHeight">Altezza (m)</label><input id="sfHeight" type="number" min="0" step="any" placeholder="per l'ombra"></div>
+              <div data-a="width"><label for="sfWidth">Larghezza (m)</label><input id="sfWidth" type="number" min="0" step="any" placeholder="delle linee"></div>
+              <div data-a="voltage"><label for="sfVoltage">Tensione (kV)</label><input id="sfVoltage" type="number" min="0" step="any"></div>
+              <div><label for="sfSrc">Fonte</label><select id="sfSrc"><option value="desk">Analisi a tavolino</option><option value="survey">Sopralluogo</option><option value="official">Dato ufficiale</option></select></div>
+            </div>
+            <label for="drwNote">Nota <span class="lbl-opt">(facoltativa)</span></label>
+            <input id="drwNote" placeholder="testo libero…">
             <div class="drwgrid">
               <button class="sec" id="drwPoint">• Punto</button>
               <button class="sec" id="drwLine">╱ Linea</button>
@@ -605,11 +681,7 @@
               <button class="sec" id="drwUndo" disabled title="Annulla l'ultima modifica a disegni, buffer, risultati e importati (Ctrl+Z)">↶ Annulla</button>
               <button class="sec" id="drwRedo" disabled title="Rifai ciò che hai annullato (Ctrl+Y)">↷ Ripeti</button>
             </div>
-            <label for="drwCat">Categoria</label>
-            <select id="drwCat"><option value="">— scegli prima cosa disegnare —</option></select>
-            <label for="drwNote">Nota <span class="lbl-opt">(facoltativa)</span></label>
-            <input id="drwNote" placeholder="testo libero…">
-            <div id="drwMsg" class="thint">Scegli cosa disegnare, poi clicca sulla mappa. I disegni vanno nell'<b>Elenco</b>, sezione <b>Disegni</b>.</div>
+            <div id="drwMsg" class="thint">Scegli la categoria e lo strumento, poi clicca sulla mappa. I disegni vanno nell'Elenco, sezione Disegni.</div>
           </div>
         </details>
         <details class="imod" id="drwSecShape">
@@ -929,7 +1001,7 @@
         <div class="colbtns">
           <button class="sec" id="dl" disabled>⬇ Esporta</button>
           <button class="primary" id="promote" disabled>★ Promuovi → AREAS</button>
-          <button class="sec" id="promoteSN" disabled>✎ Promuovi → Sites Notes</button>
+          <button class="sec" id="sfSave" disabled title="Salva disegni, geoprocessi e importati nel layer «IT - Site Features», con categoria, tipo e sito">⤴ Salva sul portale</button>
           <button class="ghost-danger" id="reset" disabled style="margin-top:6px" title="Toglie tutte le particelle; disegni, geoprocessi e import restano">Svuota particelle</button>
         </div>
       </div>
@@ -1019,20 +1091,20 @@
   </div>
 </div>
 
-<!-- ── MODALE PROMOTE SITES NOTES ── -->
-<div id="snModal">
+<!-- ── MODALE SALVA SUL PORTALE (IT - Site Features) ── -->
+<div id="sfModal">
   <div class="card">
-    <button id="snClose" class="mclose" title="Chiudi" aria-label="Chiudi">×</button>
-    <h2>Promuovi in Sites Notes</h2>
-    <div class="sub" id="snSub">—</div>
-    <div id="snPoints" style="display:none"><label for="snCatP">Punti (<span id="snNP">0</span>)</label><select id="snCatP"></select><div class="hint" id="snHP"></div></div>
-    <div id="snLines" style="display:none"><label for="snCatL">Linee (<span id="snNL">0</span>)</label><select id="snCatL"></select><div class="hint" id="snHL"></div></div>
-    <div id="snAreas" style="display:none"><label for="snCatA">Aree (<span id="snNA">0</span>)</label><select id="snCatA"></select><div class="hint" id="snHA"></div></div>
-    <div class="warn" style="margin:12px 0 0"><b>Scrittura sul portale.</b> Verranno aggiunte feature ai layer Site Notes come utente loggato. Ogni disegno tiene la <b>categoria</b> che gli hai dato; il <b>nome</b> finisce nel campo NOTE; area/lunghezza sono calcolate in automatico.</div>
-    <div id="snMsg"></div>
+    <button id="sfClose" class="mclose" title="Chiudi" aria-label="Chiudi">×</button>
+    <h2>Salva sul portale</h2>
+    <div class="sub" id="sfSub">—</div>
+    <div class="sfsite" id="sfSaveSite"></div>
+    <label class="chk" id="sfOnlySelRow" hidden><input type="checkbox" id="sfOnlySel"> <span id="sfOnlySelTxt"></span></label>
+    <div id="sfNoCat"></div>
+    <div class="warn" style="margin:12px 0 0"><b>Scrittura sul portale.</b> Gli oggetti vanno nel layer «IT - Site Features» come utente connesso, con categoria, tipo, nome, nota e sito. I nuovi si aggiungono, quelli già salvati si aggiornano: nessun doppione.</div>
+    <div id="sfMsg"></div>
     <div class="btns" style="margin-top:14px">
-      <button class="sec" id="snCancel">Annulla</button>
-      <button class="primary" id="snConfirm" style="margin-top:0">Conferma inserimento</button>
+      <button class="sec" id="sfCancel">Annulla</button>
+      <button class="primary" id="sfConfirm" style="margin-top:0">Salva</button>
     </div>
   </div>
 </div>
@@ -1067,13 +1139,13 @@
     <h2>Guida rapida</h2>
     <div class="sub">Geoportale AxpoSolar Italia — dati catastali AdE via Zornade · portale ArcGIS Online interno.</div>
     <ol style="margin:0;padding-left:18px;font-size:13px;line-height:1.7">
-      <li><b>Sidebar sinistra (rail di icone)</b> — Ricerca particelle, Disegno, Geoprocessi, Contesto sito, Importa dati. In ogni scheda ogni strumento ha la sua sezione: clicca il titolo per aprirla; la <b>i</b> spiega come funziona, spesso con un esempio disegnato.</li>
+      <li><b>Pannello sinistro</b> — il <b>rail</b> di icone sceglie la <b>scheda</b>: Ricerca particelle, Disegno, Geoprocessi, Contesto sito, Importa dati. Ogni scheda è fatta di <b>moduli</b>: clicca il titolo per aprirne uno; la <b>i</b> spiega come funziona, spesso con un esempio disegnato. <b>⧉</b> in alto sgancia il pannello in una finestra da mettere sul secondo schermo (con più spazio i moduli vanno su più colonne); <b>⇤</b> o chiudere la finestra lo riaggancia.</li>
       <li><b>Ricerca particelle</b> — scegli dove cerchi, poi uno dei tre modi: per foglio e particella, sulla mappa (clic, rettangolo, poligono, linea) o da un disegno.</li>
-      <li><b>Disegno</b> — punti, linee, aree, rettangoli e cerchi con categoria e nota. Mentre disegni, <kbd>Tab</kbd> fa scrivere lunghezza e angolo del lato (anche come azimut). Forme di misura esatta, copia parallela (rientri dai confini), griglia in metri allineabile a un lato, aggancio anche a DWG e layer. <kbd>Ctrl</kbd>+<kbd>Z</kbd> / <kbd>Ctrl</kbd>+<kbd>Y</kbd> annullano e ripetono. Un disegno cliccato sulla mappa si sposta e si rimodella.</li>
+      <li><b>Disegno</b> — prima il <b>sito di lavoro</b> (un'area di AREAS COLLECTION), poi la <b>categoria</b> (area lorda, area netta, esclusione, infrastruttura lineare, ostacolo, accesso, mitigazione, zona agricola, nota) con tipo e attributi, poi punti, linee, aree, rettangoli e cerchi. Mentre disegni, <kbd>Tab</kbd> fa scrivere lunghezza e angolo del lato (anche come azimut). Forme di misura esatta, copia parallela (rientri dai confini), griglia in metri allineabile a un lato, aggancio anche a DWG e layer. <kbd>Ctrl</kbd>+<kbd>Z</kbd> / <kbd>Ctrl</kbd>+<kbd>Y</kbd> annullano e ripetono. Un disegno cliccato sulla mappa si sposta e si rimodella.</li>
       <li><b>Action bar destra</b> — <b>Elenco &amp; azioni</b> (Particelle · Disegni · Geoprocessi · Importati): ogni riga si rinomina, si colora, si nasconde e si <b>spunta</b> per usarla nei geoprocessi. Poi Layer, Basemap, Segnalibri, Modifica AREAS, Stampa.</li>
       <li><b>Layer</b> — cerca un layer per nome; dal pannello di ogni layer (icona a cursori) trasparenza, popup e <b>filtro per attributo</b> (l'icona diventa un imbuto quando è attivo). I layer aggiunti da te (dal portale, servizi web, DWG, immagini) hanno il menu <b>…</b> con Zoom e <b>Rimuovi dalla mappa</b>.</li>
       <li><b>Servizi web</b> (scheda Importa dati) — WMS, WFS e ArcGIS REST per indirizzo, senza creare item sul portale. Il browser accetta solo servizi <b>https</b> che permettono la lettura da altri siti (CORS).</li>
-      <li><b>Esporta / Promuovi</b> — GeoJSON/KML/KMZ/SHP/XLSX; oppure promuovi in <b>AREAS COLLECTION</b> o <b>Sites Notes</b>.</li>
+      <li><b>Esporta / Salva sul portale</b> — GeoJSON/KML/KMZ/SHP/XLSX; oppure <b>⤴ Salva sul portale</b> nel layer <b>IT - Site Features</b> (categoria, tipo, attributi e sito: la seconda volta aggiorna, non duplica), o promuovi un'area in <b>AREAS COLLECTION</b>.</li>
       <li><b>Progetto</b> (in alto) — <b>💾 Salva progetto</b> mette tutto in un file .axpo, come un progetto QGIS: vista, basemap, area di lavoro, mappa e layer del portale (accesi, trasparenza, ordine), particelle, disegni, geoprocessi, import, e i file di <b>DWG e immagini</b> con il loro posizionamento. <b>📂 Apri progetto</b> lo ripristina (sostituisce il lavoro corrente). <kbd>Ctrl</kbd>+<kbd>S</kbd> risalva sullo stesso file, <kbd>Ctrl</kbd>+<kbd>Maiusc</kbd>+<kbd>S</kbd> salva con nome.</li>
     </ol>
     <div class="hint" style="margin-top:10px">Sulla mappa: ricerca di indirizzi e coordinate (lat, lon oppure X Y proiettate) e misura in alto a destra; scalimetro e coordinate del puntatore (con pin) in basso a destra; profilo di elevazione in basso a sinistra. <kbd>Esc</kbd> esce da qualsiasi modalità e interrompe la selezione su area. Riapri i tour dal <b>?</b>.</div>
@@ -1205,7 +1277,11 @@ const DOM={
 };
 
 const DEFAULT_KEY="zrn_290b2dd39e8da365efb9b08357643a6a9a0eb05a7bfe3250a4d5a3de95d98fba";
-const $=id=>document.getElementById(id);
+// Il pannello sinistro può vivere in una finestra propria (sganciato, vedi sideUndock): gli elementi per id si
+// cercano prima nella pagina, poi nella finestra del pannello.
+let sideWin=null;
+function byId(id){ return document.getElementById(id)||(sideWin&&!sideWin.closed? sideWin.document.getElementById(id) : null); }
+const $=byId;
 let parcels=[], signedIn=false, username=null, initialMapLoaded=false, portal=null;
 // tipi di item aggiungibili come layer (per la ricerca portale)
 const ADDABLE=new Set(["Feature Service","Map Service","Image Service","Vector Tile Service","WMS","WFS","KML","GeoJson","CSV","Feature Collection","Tiled Imagery Layer","Map Image Layer","Scene Service"]);
@@ -1224,12 +1300,51 @@ let addedPortalItems=[], BM_BY_ID={};   // auto-resume: layer aggiunti + basemap
 let sketchPurpose=null;   // 'selection' | 'drawing' | 'geoproc' (clip) — a cosa serve il disegno corrente
 let selMode=null;         // modalità selezione: null(nessuna)|point|rectangle|polygon|polyline
 let drawType=null;        // tipo disegno attivo: null|point|polyline|polygon
-// categorie disegno (dai domini del layer IT Sites Notes)
-const DRAW_CATS={
-  point:['Beni interesse culturale','Costruzioni e antropizzazioni','Rilievo Fotografico','Alberi e vegetazione','Idrografia'],
-  polyline:['Elettrodotto','Idrografia','Acquedotto','Gasdotti','Viabilità','Accessi','Manufatti e interferenze','Percorso Sopralluogo','Ferrovia'],
-  polygon:['Perimetro Netto','Vincoli paesaggistici','Vincoli Archeologici','Vincoli beni culturali','Vincoli da Piani','Vincoli da Piani di settore','Pendenze alte','Edifici ed aree rilevanti','Vegetazione','Misurazioni','DPA']
+// ── Site Features: un solo modello per disegno, archivio sul portale e PV Predesign ──
+// Categoria = ruolo nel progetto, tipo = cosa è. Codici uguali al layer «IT - Site Features» e a PV Predesign
+// (schemas/site_features_model.json, versione 1.0.0); qui ci sono le etichette italiane e i colori.
+const SF_URL="https://services-eu1.arcgis.com/Kxsn3iT6KEQ7OlSW/arcgis/rest/services/IT_Site_Features/FeatureServer";
+const SF_LID={point:0, polyline:1, polygon:2};
+const SF_CATS=[
+  {c:'gross', l:'Area lorda', col:'#FF8C1A', g:['polygon'], a:[], h:'Perimetro del sito, area in opzione o in locazione', t:[]},
+  {c:'net', l:'Area netta', col:'#2DBE7E', g:['polygon'], a:[], h:'Area disponibile, se già calcolata', t:[]},
+  {c:'exclusion', l:'Esclusione', col:'#E5484D', g:['polygon','polyline','point'], a:['buffer'], h:'Vincoli, aree protette, pendenze, fasce di rispetto; buffer facoltativo',
+    t:[['landscape','Vincolo paesaggistico'],['archaeological','Vincolo archeologico'],['cultural-heritage','Bene culturale'],['protected-area','Area protetta / Natura 2000'],
+       ['planning','Vincolo da piano'],['sector-plan','Vincolo da piano di settore'],['flood','Area a rischio idraulico'],['steep-slope','Pendenza elevata'],
+       ['woodland','Bosco e vegetazione'],['watercourse','Idrografia'],['dpa','Fascia DPA'],['setback','Fascia di rispetto'],['other','Altro']]},
+  {c:'linear', l:'Infrastruttura lineare', col:'#E91E8C', g:['polyline'], a:['buffer','voltage'], h:'Elettrodotti, condotte, fossi, strade, ferrovie; buffer per tipo',
+    t:[['overhead-power','Elettrodotto aereo'],['underground-power','Elettrodotto interrato'],['gas','Gasdotto'],['water','Acquedotto'],
+       ['ditch',"Fosso, canale, corso d'acqua"],['road','Strada'],['railway','Ferrovia'],['other','Altro']]},
+  {c:'obstacle', l:'Ostacolo', col:'#965A28', g:['point','polygon','polyline'], a:['height','buffer'], h:"Alberi, pali, edifici: l'altezza serve per l'ombra",
+    t:[['tree','Albero'],['pole','Palo o traliccio'],['building','Edificio o manufatto'],['other','Altro']]},
+  {c:'access', l:'Accesso e connessione', col:'#1F99CC', g:['point','polyline'], a:[], h:'Ingressi al sito e punto di connessione',
+    t:[['site-access','Accesso al sito'],['grid-connection','Punto di connessione']]},
+  {c:'mitigation', l:'Mitigazione', col:'#6EAA3C', g:['polygon','polyline'], a:['width'], h:'Siepi e fasce verdi; per le linee serve la larghezza',
+    t:[['hedge','Siepe o filare'],['green-screen','Fascia verde'],['other','Altro']]},
+  {c:'agri', l:'Zona agricola', col:'#C8AA28', g:['polygon','polyline'], a:['width'], h:"Terreno lasciato all'agricoltura; per le linee serve la larghezza",
+    t:[['crop','Coltivazione'],['pasture','Pascolo'],['other','Altro']]},
+  {c:'reference', l:'Nota e riferimento', col:'#7B8A99', g:['point','polyline','polygon'], a:[], h:'Appunti visuali: foto, percorso di sopralluogo, misure, note',
+    t:[['note','Nota'],['photo','Rilievo fotografico'],['survey-route','Percorso di sopralluogo'],['measurement','Misurazione'],['other','Altro']]}
+];
+const SF_VOLT=['overhead-power','underground-power'];   // la tensione vale solo per gli elettrodotti
+const SF_ATTR={buffer:['sf_buffer','BUFFER_M','Buffer (m)'], height:['sf_height','HEIGHT_M','Altezza (m)'],
+  width:['sf_width','WIDTH_M','Larghezza (m)'], voltage:['sf_voltage','VOLTAGE_KV','Tensione (kV)']};   // attributo del grafico, campo del layer, etichetta
+const SF_SRC=[['desk','Analisi a tavolino'],['survey','Sopralluogo'],['official','Dato ufficiale'],['geoprocess','Geoprocesso'],['import','Importato'],['site-notes','Da Site Notes']];
+const SF_STATUS=[['','—'],['to-verify','Da verificare'],['verified','Verificato']];
+// le vecchie categorie dei disegni (erano quelle di Sites Notes) → categoria e tipo, per geometria
+const SF_FROM_SN={
+  point:{'beni interesse culturale':['exclusion','cultural-heritage'], 'costruzioni e antropizzazioni':['obstacle','building'],
+    'rilievo fotografico':['reference','photo'], 'alberi e vegetazione':['obstacle','tree'], 'idrografia':['exclusion','watercourse']},
+  polyline:{'elettrodotto':['linear','overhead-power'], 'idrografia':['linear','ditch'], 'acquedotto':['linear','water'], 'gasdotti':['linear','gas'],
+    'viabilita':['linear','road'], 'accessi':['access','site-access'], 'manufatti e interferenze':['linear','other'],
+    'percorso sopralluogo':['reference','survey-route'], 'ferrovia':['linear','railway']},
+  polygon:{'perimetro netto':['net',null], 'vincoli paesaggistici':['exclusion','landscape'], 'vincoli archeologici':['exclusion','archaeological'],
+    'vincoli beni culturali':['exclusion','cultural-heritage'], 'vincoli da piani':['exclusion','planning'], 'vincoli da piani di settore':['exclusion','sector-plan'],
+    'pendenze alte':['exclusion','steep-slope'], 'edifici ed aree rilevanti':['obstacle','building'], 'vegetazione':['exclusion','woodland'],
+    'misurazioni':['reference','measurement'], 'dpa':['exclusion','dpa']}
 };
+let sfDrawCat='reference';   // categoria scelta nella scheda Disegno: «Nota e riferimento» va bene per ogni geometria
+let sfSite=null;             // sito di lavoro: {guid, code, comune, regione, ha, geom (GeoJSON 4326)} da AREAS COLLECTION
 
 require([
   "esri/Map","esri/views/MapView","esri/WebMap","esri/Basemap",
@@ -1418,9 +1533,9 @@ require([
       if(selMode && selMode!=='point'){ sketchPurpose='selection'; sketchVM.create(selMode); }  // ri-armo per un'altra selezione
     }else if(sketchPurpose==='geoproc'){  // clip: A ∩ poligono disegnato
       toolsGL.remove(e.graphic); gpDoClip(geom);
-    }else if(sketchPurpose==='drawing'){  // disegno locale con categoria (Sites Notes)
-      e.graphic.attributes={_kind:'drawing', geomType:geom.type, categoria:$('drwCat').value||'', note:$('drwNote').value||''};
-      const cat=$('drwCat').value; toolMsg('drwMsg','Disegnato'+(cat?' · '+cat:'')+'. Continua o cambia tipo.','ok'); refreshDl();
+    }else if(sketchPurpose==='drawing'){  // disegno locale con categoria, tipo e attributi (Site Features)
+      const at=sfNewAttrs(geom.type); e.graphic.attributes=at; e.graphic.symbol=symbolForColor(geom.type, at.color);
+      toolMsg('drwMsg','Disegnato'+(at.sf_cat?' · '+sfLabel(at.sf_cat, at.sf_type):' senza categoria')+'. Continua o cambia strumento.','ok'); refreshDl();
       if(drawType){ sketchPurpose='drawing'; sketchVM.create(drawType); }   // ri-armo per un altro disegno
     }else{                                // nessuno scopo noto: non lascio geometrie senza elenco
       toolsGL.remove(e.graphic);
@@ -1434,7 +1549,8 @@ require([
     if(e.state!=="complete") return;
     (e.graphics||[]).forEach(g=>{ const at=g.attributes;
       if(at&&at.area_ha!=null&&g.geometry&&/polygon/i.test(g.geometry.type)){
-        try{ at.area_ha=+Math.abs(esriMods.geometryEngine.geodesicArea(g.geometry,'hectares')||0).toFixed(4); }catch(x){} } });
+        try{ at.area_ha=+Math.abs(esriMods.geometryEngine.geodesicArea(g.geometry,'hectares')||0).toFixed(4); }catch(x){} }
+      if(at&&at.sf_saved&&!e.aborted) at.sf_dirty=true; });   // già sul portale: va risalvato
     refreshDl(); });
   sketchVM.on("delete", ()=>refreshDl());
   sketchVM.on(["create","update","undo","redo"], ()=>histUi());   // Annulla/Ripeti seguono anche i vertici del disegno in corso
@@ -1495,6 +1611,7 @@ async function onSignedIn(){
   $('signin').textContent='Esci';
   $('authTodo').style.display='none';
   $('itemQ').disabled=false; $('searchItem').disabled=false;
+  try{ sfRenderSite(); refreshDl(); }catch(e){}   // sito di lavoro e «Salva sul portale» richiedono l'accesso
   render();
   // mappa di default all'apertura: General Map (una sola volta) + ripristino layer salvati
   if(!initialMapLoaded&&projPortalPending){   // progetto aperto prima che il login finisse: la sua mappa, non la General Map
@@ -1515,6 +1632,7 @@ function onSignedOut(){
   $('authTxt').textContent='Non connesso ad AGOL';
   $('signin').textContent='Accedi con AGOL';
   portal=null; $('itemQ').disabled=true; $('searchItem').disabled=true; if($('itemResults')) $('itemResults').innerHTML='';
+  try{ sfPickEnd(); sfRenderSite(); refreshDl(); }catch(e){}
   const todo=$('authTodo');
   if(CLIENT_ID){
     const ru=location.origin+location.pathname;   // redirect_uri esatto usato dall'SDK
@@ -1606,8 +1724,8 @@ function wireContextMenu(){
     menu.style.left=Math.max(6, Math.min(e.clientX, window.innerWidth-mw-8))+'px';
     menu.style.top =Math.max(6, Math.min(e.clientY, window.innerHeight-mh-8))+'px';
   });
-  document.addEventListener('click', close);
-  document.addEventListener('keydown', e=>{ if(e.key==='Escape') close(); });
+  docOn('click', close);
+  docOn('keydown', e=>{ if(e.key==='Escape') close(); });
   try{ view.on('drag', close); view.on('mouse-wheel', close); }catch(e){}
 
   $('ctxParcel').onclick=()=>{ close(); if(ll) addByClick(ll.lat, ll.lng); };
@@ -1736,7 +1854,7 @@ function wireUI(){
   if($('projOpenBtn')) $('projOpenBtn').onclick=()=>projOpenPick();
   if($('projSaveBtn')) $('projSaveBtn').onclick=e=>projSave(!!e.shiftKey);
   if($('projFile')) $('projFile').onchange=e=>{ const f=e.target.files&&e.target.files[0]; e.target.value=''; if(f) projOpenFile(f,null); };
-  document.addEventListener('keydown',e=>{ if(!(e.ctrlKey||e.metaKey)||e.altKey) return; const k=String(e.key||'').toLowerCase();
+  docOn('keydown',e=>{ if(!(e.ctrlKey||e.metaKey)||e.altKey) return; const k=String(e.key||'').toLowerCase();
     if(k==='s'){ e.preventDefault(); projSave(e.shiftKey); } else if(k==='o'){ e.preventDefault(); projOpenPick(); } });
   $('dl').onclick=openExport;
   $('reset').onclick=()=>{if(parcels.length&&confirm('Togliere tutte le particelle dall\'elenco? Disegni, geoprocessi e import restano.')){parcels=[];render();msg('','');}};
@@ -1746,8 +1864,9 @@ function wireUI(){
   $('pmCancel').onclick=closePromote;
   $('pmClose').onclick=closePromote;
   $('pmConfirm').onclick=confirmPromote;
-  $('promoteSN').onclick=openPromoteSN;
-  $('snCancel').onclick=closePromoteSN; $('snClose').onclick=closePromoteSN; $('snConfirm').onclick=confirmPromoteSN;
+  $('sfSave').onclick=sfOpenSave;
+  $('sfCancel').onclick=sfCloseSave; $('sfClose').onclick=sfCloseSave; $('sfConfirm').onclick=sfConfirmSave;
+  $('sfOnlySel').onchange=sfRenderSave;
   // popola i menu del form promote
   const opt=arr=>arr.map(([c,n])=>`<option value="${String(c).replace(/"/g,'&quot;')}">${n}</option>`).join('');
   $('pmClass').innerHTML='<option value="">— nessuna —</option>'+opt(DOM.AREA_CLASS);
@@ -1777,14 +1896,13 @@ function wireTools(){
   // (ricerca coordinate lat,lon ora integrata nel widget Search in alto a destra)
   // modalità selezione particelle
   $('selModeBox').querySelectorAll('button').forEach(b=>b.onclick=()=>setSelMode(b.dataset.m));
-  // strumenti di disegno (locali, categorie da Sites Notes)
-  const setDrawBtns=()=>{ const m={point:'drwPoint',polyline:'drwLine',polygon:'drwArea',rectangle:'drwRect',circle:'drwCircle'};
-    Object.entries(m).forEach(([t,id])=>$(id).classList.toggle('active', drawType===t)); };
+  // strumenti di disegno (locali, con la categoria e il tipo scelti sopra: modello Site Features)
   const startDraw=t=>{
-    if(drawType===t){ drawType=null; try{sketchVM.cancel();}catch(e){} setDrawBtns(); toolMsg('drwMsg','Disegno disattivato.'); return; }
-    try{ drwModeEnd(); grdPlaceEnd(); }catch(e){}
-    drawType=t; setDrawBtns();
-    drwCatFor(t==='rectangle'||t==='circle'? 'polygon' : t);   // stesso tipo di prima: la categoria scelta resta
+    if(drawType===t){ drawType=null; try{sketchVM.cancel();}catch(e){} sfDrawBtns(); toolMsg('drwMsg','Disegno disattivato.'); return; }
+    const gt=t==='rectangle'||t==='circle'? 'polygon' : t;
+    if(!sfAccepts(sfDrawCat, gt)){ toolMsg('drwMsg', sfCat(sfDrawCat).l+' non si disegna come '+SF_GEOM_IT[gt]+': scegli un\'altra categoria.','err'); return; }
+    try{ drwModeEnd(); grdPlaceEnd(); sfPickEnd(); }catch(e){}
+    drawType=t; sfDrawBtns();
     drwSnapSync();                                              // aggancio anche ai layer accesi adesso
     sketchPurpose='drawing'; try{sketchVM.cancel();}catch(e){} sketchVM.create(t);
     toolMsg('drwMsg','Disegna sulla mappa'+(t==='point'?'':(t==='rectangle'||t==='circle'?' (clicca e trascina)':' (doppio click per finire)'))+'.');
@@ -1794,6 +1912,18 @@ function wireTools(){
   $('drwArea').onclick=()=>startDraw('polygon');
   $('drwRect').onclick=()=>startDraw('rectangle');
   $('drwCircle').onclick=()=>startDraw('circle');
+  // categoria, tipo e attributi dei disegni nuovi; sito di lavoro (modello Site Features)
+  try{ const c=localStorage.getItem('axpo_sf_cat'); if(c&&sfCat(c)) sfDrawCat=c; }catch(e){}
+  $('sfCats').onclick=e=>{ const b=e.target.closest('button[data-c]'); if(!b) return;
+    sfDrawCat=b.dataset.c; sfRenderDrawUi(); try{ localStorage.setItem('axpo_sf_cat', sfDrawCat); }catch(x){} };
+  $('sfType').onchange=sfSyncAttrUi;
+  $('sfSitePick').onclick=sfPickStart;
+  $('sfSiteFind').onclick=sfFindByCode;
+  $('sfSiteCode').onkeydown=e=>{ if(e.key==='Enter'){ e.preventDefault(); sfFindByCode(); } };
+  $('sfLoad').onclick=sfLoadSite;
+  $('sfSiteClear').onclick=()=>{ sfSite=null; sfShowSite(false); sfRenderSite(); saveStateDebounced();
+    toolMsg('sfSiteMsg','Sito tolto: i disegni nuovi restano senza legame.'); };
+  sfRenderDrawUi(); sfRenderSite();
   if($('drwSnap')) $('drwSnap').onchange=e=>{ try{ sketchVM.snappingOptions.enabled=e.target.checked; }catch(x){} };
   if($('drwTip')) $('drwTip').onchange=e=>{ try{ sketchVM.tooltipOptions.enabled=e.target.checked; sketchVM.labelOptions.enabled=e.target.checked; }catch(x){} };
   // disegno stile CAD: annulla/ripeti, forme con misure, copia parallela, aggancio ai layer, angoli, griglia
@@ -1819,7 +1949,7 @@ function wireTools(){
     $('grdStraight').onclick=()=>{ if(grdVM){ grdPlaceEnd(); grdVM.rotation=0; grdUi(); } };
     grdUi(); histUi();
     // Ctrl+Z / Ctrl+Y (anche Ctrl+Maiusc+Z): mentre si disegna sulla mappa li gestisce l'SDK (ultimo vertice)
-    document.addEventListener('keydown',e=>{ if(!(e.ctrlKey||e.metaKey)||e.altKey) return; const k=String(e.key||'').toLowerCase();
+    docOn('keydown',e=>{ if(!(e.ctrlKey||e.metaKey)||e.altKey) return; const k=String(e.key||'').toLowerCase();
       if(k!=='z'&&k!=='y') return; const t=e.target;
       if(t&&(t.isContentEditable||/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)||(t.closest&&t.closest('calcite-input,.esri-tooltip')))) return;   // nei campi resta l'annulla del testo
       if(sketchVM&&sketchVM.state==='active'&&t&&t.closest&&t.closest('#viewDiv')) return;
@@ -1858,8 +1988,8 @@ function wireTools(){
   // prima sparivano insieme ai disegni)
   $('drwClear').onclick=()=>{ const n=countDrawingsPure();
     if(!n){ toolMsg('drwMsg','Non ci sono disegni da cancellare.'); return; }
-    if(!confirm((n===1?'Cancellare il disegno?':'Cancellare tutti i '+n+' disegni?')+' I risultati dei geoprocessi e gli importati restano. Non si può annullare.')) return;
-    try{sketchVM.cancel();}catch(e){} drawType=null; setDrawBtns();
+    if(!confirm((n===1?'Cancellare il disegno?':'Cancellare tutti i '+n+' disegni?')+' I risultati dei geoprocessi e gli importati restano, e quelli salvati sul portale restano sul portale. Non si può annullare.')) return;
+    try{sketchVM.cancel();}catch(e){} drawType=null; sfDrawBtns();
     toolsGL.graphics.toArray().filter(g=>g.attributes&&g.attributes._kind==='drawing'&&g.attributes._sub!=='geoproc').forEach(g=>toolsGL.remove(g));
     toolMsg('drwMsg', n===1?'Disegno cancellato.':n+' disegni cancellati.'); refreshDl(); };
   // geoprocessi
@@ -2018,7 +2148,10 @@ function serializeToolGeoms(){
     if(!gj) return;
     out.push({ g:gj,
       a:{_kind:at._kind,_sub:at._sub,geomType:at.geomType,categoria:at.categoria,note:at.note,nome:at.nome,dist_m:at.dist_m,area_ha:at.area_ha,source:at.source,color:at.color,hidden:at.hidden,
-         _srcKey:at._srcKey, src_attrs:at.src_attrs},   // elementi presi dai layer della mappa: da dove vengono e i loro attributi
+         _srcKey:at._srcKey, src_attrs:at.src_attrs,   // elementi presi dai layer della mappa: da dove vengono e i loro attributi
+         // modello Site Features: categoria, tipo, attributi, fonte, stato, sito, GlobalID sul portale
+         sf_cat:at.sf_cat, sf_type:at.sf_type, sf_buffer:at.sf_buffer, sf_height:at.sf_height, sf_width:at.sf_width, sf_voltage:at.sf_voltage,
+         sf_src:at.sf_src, sf_status:at.sf_status, sf_site:at.sf_site, sf_gid:at.sf_gid, sf_saved:at.sf_saved, sf_dirty:at.sf_dirty},
       v:(g.visible!==false),
       s:(g.symbol&&g.symbol.toJSON)?g.symbol.toJSON():null });
   });
@@ -2030,7 +2163,8 @@ function captureWork(){
     basemap: view.map&&view.map.basemap? view.map.basemap.id:null,
     viewpoint: view.viewpoint? view.viewpoint.toJSON():null,
     parcels, addedItems:addedPortalItems,
-    services: svcBooting||addedServices };   // durante il ripristino all'avvio vale ancora l'elenco salvato
+    services: svcBooting||addedServices,   // durante il ripristino all'avvio vale ancora l'elenco salvato
+    site: sfSite };                        // sito di lavoro (AREAS COLLECTION): lo legge anche PV Predesign come area lorda
   let geoms=[]; try{ geoms=serializeToolGeoms(); }catch(e){}
   return {base:base, toolGeoms:geoms};
 }
@@ -2070,6 +2204,8 @@ function restoreState(){
 let svcBooting=null;
 // particelle e geometrie (disegni, buffer, geoprocessi, import): da salvataggio automatico o da progetto
 function applyWork(st){
+    sfSite=(st.site&&st.site.guid)? st.site : null;   // sito di lavoro salvato (i progetti vecchi non l'hanno)
+    try{ sfShowSite(false); sfRenderSite(); }catch(e){}
     if(Array.isArray(st.parcels)&&st.parcels.length){ parcels=st.parcels; render(); }
     if(Array.isArray(st.toolGeoms)&&st.toolGeoms.length&&toolsGL&&esriMods){
       st.toolGeoms.forEach(rec=>{ try{
@@ -2078,8 +2214,10 @@ function applyWork(st){
         // grafico tornava NERO e il salvataggio successivo registrava "nessun simbolo", perdendo il colore
         // per sempre. Ripiego sul colore negli attributi per gli stati già salvati così.
         let _sym; try{ _sym=rec.s? esriMods.symbolJsonUtils.fromJSON(rec.s) : null; }catch(e){ _sym=null; }
-        if(!_sym){ const a=rec.a||{}; _sym=symbolForColor(geom.type, a.color||(a._kind==='buffer'?'#79C0FF':'#2FB6E6')); }
-        const _gr=new esriMods.Graphic({geometry:geom, attributes:rec.a||{}, symbol:_sym});
+        const _at=rec.a||{}; sfUpgrade(_at, geom.type);   // disegni con le vecchie categorie di Sites Notes → categoria e tipo
+        if(!_sym){ const a=_at; _sym=symbolForColor(geom.type, a.color||(a.sf_cat? sfColor(a.sf_cat) : a._kind==='buffer'?'#79C0FF':'#2FB6E6')); }
+        Object.keys(_at).forEach(k=>{ if(_at[k]===undefined) delete _at[k]; });
+        const _gr=new esriMods.Graphic({geometry:geom, attributes:_at, symbol:_sym});
         if(rec.v===false || (rec.a&&rec.a.hidden)) _gr.visible=false;
         toolsGL.add(_gr);
       }catch(e){} });
@@ -2115,6 +2253,7 @@ function clearWork(){
   try{ view.map.layers.toArray().filter(l=>l._projSvc||(l.portalItem&&addedPortalItems.includes(l.portalItem.id))).forEach(l=>{ view.map.remove(l); if(l._projSvc) try{ if(l._blobUrl) URL.revokeObjectURL(l._blobUrl); l.destroy(); }catch(e){} }); }catch(e){}
   addedPortalItems=[]; addedServices=[]; svcBooting=null; svcGen++;   // un ripristino di servizi in corso si ferma
   parcels=[]; try{ toolsGL.removeAll(); }catch(e){} try{ window.__searchGL&&window.__searchGL.removeAll(); }catch(e){}
+  sfSite=null; sfEditOpen=null; try{ sfPickEnd(); sfShowSite(false); sfRenderSite(); }catch(e){}   // anche il sito di lavoro
   try{ gpSlots.A=[]; gpSlots.B=[]; }catch(e){}
   render(); renderGeoms(); refreshDl();
   try{ localStorage.removeItem('cat_state'); }catch(e){}
@@ -2236,8 +2375,9 @@ async function projSave(asNew){
   let handle=(!asNew&&projHandle)? projHandle : null, name;
   if(handle){ try{ if(handle.queryPermission&&await handle.queryPermission({mode:'readwrite'})!=='granted'
       &&await handle.requestPermission({mode:'readwrite'})!=='granted') handle=null; }catch(e){ handle=null; } }
-  if(!handle&&window.showSaveFilePicker){
-    try{ handle=await window.showSaveFilePicker({suggestedName:projSuggest()+PROJ_EXT,
+  const W=sideActiveWin();   // il selettore nella finestra dove hai premuto Ctrl+S (anche quella del pannello)
+  if(!handle&&W.showSaveFilePicker){
+    try{ handle=await W.showSaveFilePicker({suggestedName:projSuggest()+PROJ_EXT,
       types:[{description:'Progetto del Geoportale Axpo', accept:{'application/octet-stream':[PROJ_EXT]}}]}); }
     catch(e){ if(e&&e.name==='AbortError') return; handle=null; } }
   if(handle) name=handle.name.replace(/\.axpo$/i,'');
@@ -2257,8 +2397,9 @@ async function projSave(asNew){
 // ── apri ──
 async function projOpenPick(){
   if(projBusy){ msg('Attendi: sto già salvando o aprendo un progetto.','err'); return; }
-  if(window.showOpenFilePicker){
-    try{ const hs=await window.showOpenFilePicker({multiple:false,
+  const W=sideActiveWin();   // il selettore nella finestra dove hai premuto Ctrl+O (anche quella del pannello)
+  if(W.showOpenFilePicker){
+    try{ const hs=await W.showOpenFilePicker({multiple:false,
         types:[{description:'Progetto del Geoportale Axpo', accept:{'application/octet-stream':[PROJ_EXT]}}]});
       if(hs&&hs[0]) return projOpenFile(await hs[0].getFile(), hs[0]); }
     catch(e){ if(e&&e.name==='AbortError') return; } }   // altro errore: selettore classico
@@ -2915,92 +3056,372 @@ function genId(){ // ID_univoco stabile ~10 char
 }
 function pmMsg(t,cls){$('pmMsg').innerHTML=t?`<div class="msg ${cls}">${t}</div>`:'';}
 
-// ── FASE 3: promote disegni/buffer/geoprocessi -> IT - Sites Notes Layers ──
-const SN_URL="https://services-eu1.arcgis.com/Kxsn3iT6KEQ7OlSW/arcgis/rest/services/IT_Sites_Notes_Layers/FeatureServer";
-const SN_WKID=102100;
-// Domini CATEGORIA dei tre layer, come sul servizio al 2026-09-22 (il codice dei punti \u00abBeni interesse
-// culturale \u00bb ha davvero uno spazio finale). All'apertura del modale li rileggo dal servizio, cos\u00ec un
-// dominio cambiato sul portale non disallinea l'app; questi servono solo se la lettura fallisce.
-const SN_CATS={
-  points:['Beni interesse culturale ','Costruzioni e antropizzazioni','Rilievo Fotografico','Alberi e vegetazione','Idrografia'],
-  lines:['Elettrodotto','Idrografia','Acquedotto','Gasdotti','Viabilit\u00e0','Accessi','Manufatti e interferenze','Percorso Sopralluogo','Ferrovia'],
-  areas:['Perimetro Netto','Vincoli paesaggistici','Vincoli Archeologici','Vincoli beni culturali','Vincoli da Piani','Vincoli da Piani di settore','Pendenze alte','Edifici ed aree rilevanti','Vegetazione','Misurazioni','DPA']
-};
-const SN_LID={points:0, lines:1, areas:2};
-let snDom=null;   // codici CATEGORIA per tipo: dal servizio, altrimenti SN_CATS
-async function snLoadDomains(){
-  if(snDom) return snDom; const out={};
-  await Promise.all(Object.keys(SN_LID).map(async k=>{
-    try{ const l=new esriMods.FeatureLayer({url:SN_URL+'/'+SN_LID[k]}); await l.load();
-      const f=(l.fields||[]).find(x=>x.name==='CATEGORIA'), cv=f&&f.domain&&f.domain.codedValues;
-      out[k]= cv&&cv.length? cv.map(c=>String(c.code)) : SN_CATS[k]; }
-    catch(e){ out[k]=SN_CATS[k]; } }));
-  return snDom=out; }
-// la categoria scelta disegnando, riportata al codice esatto del dominio (spazi, accenti, maiuscole)
-const snKey=s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().toLowerCase();
-function snCode(k,cat){ const t=snKey(cat); return t? (((snDom||SN_CATS)[k])||[]).find(c=>snKey(c)===t)||null : null; }
-function snMsg(t,cls){$('snMsg').innerHTML=t?`<div class="msg ${cls}">${t}</div>`:'';}
-function collectSN(){
-  const r={points:[],lines:[],areas:[]};
-  if(!toolsGL) return r;
-  toolsGL.graphics.toArray().forEach(g=>{ const at=g.attributes||{}; if(at._kind!=='drawing'&&at._kind!=='buffer'&&at._kind!=='import') return;
-    const t=g.geometry&&g.geometry.type;
-    if(t==='point'||t==='multipoint') r.points.push(g);
-    else if(t==='polyline') r.lines.push(g);
-    else if(t==='polygon') r.areas.push(g);
-  });
-  return r;
+// ══ Pannello sinistro sganciabile: rail e schede in una finestra propria (per il secondo schermo) ══════════
+// Il pannello non si copia: il nodo #side si SPOSTA nel documento della finestra nuova con i suoi gestori e il suo
+// stato, e lo script resta quello della pagina (un solo stato: disegni, sito, accesso, annulla). Per questo byId
+// ($, $g) cerca anche lì, gli ascoltatori globali si registrano su entrambi i documenti (docOn), confirm/alert/
+// prompt, finestre «i» e messaggi compaiono dove stai lavorando. Chiudere la finestra lo riaggancia.
+const SIDE_KEY='axpo_pannello_finestra';   // posizione e dimensione della finestra del pannello, per la volta dopo
+let sideSlot=null, sideMoved=new Set(), sideObs=null;
+function sideDoc(){ return sideWin&&!sideWin.closed? sideWin.document : null; }
+function sideUndocked(){ return !!sideDoc(); }
+// il documento dove si sta lavorando: quello del pannello se ha il fuoco, altrimenti la pagina
+function sideActiveDoc(){ const d=sideDoc(); try{ return d&&d.hasFocus()? d : document; }catch(e){ return document; } }
+function sideActiveWin(){ return sideActiveDoc()===document? window : sideWin; }
+// ascoltatore globale (clic, tastiera) valido anche nella finestra del pannello
+function docOn(type, fn, opts){
+  (window.__docL=window.__docL||[]).push([type, fn, opts]);
+  document.addEventListener(type, fn, opts);
+  const d=sideDoc(); if(d) d.addEventListener(type, fn, opts); }
+// una finestra (modale) va nel documento dove si sta lavorando; al riaggancio torna nella pagina
+function sideModalHere(el){ if(!el) return; const d=sideActiveDoc();
+  if(el.ownerDocument!==d){ d.body.appendChild(d.adoptNode(el)); if(d!==document) sideMoved.add(el); } }
+// confirm, alert e prompt nella finestra dove si è cliccato (altrimenti comparirebbero sull'altro schermo)
+['confirm','alert','prompt'].forEach(k=>{ const orig=window[k].bind(window);
+  window[k]=function(){ const d=sideDoc(); let w=null; try{ w=d&&d.hasFocus()? sideWin : null; }catch(e){}
+    return w? w[k].apply(w, arguments) : orig.apply(null, arguments); }; });
+
+function sideGeom(){ try{ return JSON.parse(localStorage.getItem(SIDE_KEY)||'null')||{}; }catch(e){ return {}; } }
+function sideSaveGeom(){ const w=sideWin; if(!w||w.closed) return;
+  try{ localStorage.setItem(SIDE_KEY, JSON.stringify({x:w.screenX, y:w.screenY, w:w.innerWidth, h:w.innerHeight})); }catch(e){} }
+function sideSyncTheme(){ const d=sideDoc(); if(!d) return;
+  const t=document.documentElement.dataset.theme; if(t) d.documentElement.dataset.theme=t; else delete d.documentElement.dataset.theme;
+  ['esriLightCss','esriDarkCss'].forEach(id=>{ const a=document.getElementById(id), b=d.getElementById(id); if(a&&b) b.disabled=a.disabled; }); }
+function sideButtons(){ const on=sideUndocked(), b=$('sideUndock');
+  if(b){ b.textContent=on? '⇤' : '⧉'; b.title=on? 'Riaggancia il pannello alla finestra principale' : 'Sgancia il pannello in una finestra (per il secondo schermo)';
+    b.setAttribute('aria-label', b.title); } }
+
+function sideUndock(){
+  if(sideUndocked()){ try{ sideWin.focus(); }catch(e){} return; }
+  const side=document.getElementById('side'); if(!side) return;
+  const g=sideGeom(), w=Math.max(380, g.w||460), h=Math.max(420, g.h||Math.round(screen.availHeight*0.85));
+  const x=g.x!=null? g.x : window.screenX+Math.max(0, window.outerWidth-w-60), y=g.y!=null? g.y : window.screenY+70;
+  const win=window.open('', 'axpo_pannello', 'popup=yes,width='+w+',height='+h+',left='+x+',top='+y);
+  if(!win){ msg('Il browser ha bloccato la finestra: consenti i popup per questa pagina e riprova.','err'); return; }
+  sideWin=win;
+  const d=win.document;
+  d.open(); d.write('<!doctype html><html lang="it"><head><meta charset="utf-8"><title>Strumenti · Geoportale AxpoSolar Italia</title></head>'
+    +'<body class="side-undocked"><div id="toasts" aria-live="polite"></div></body></html>'); d.close();
+  document.querySelectorAll('head link[rel="stylesheet"], head style').forEach(n=>d.head.appendChild(d.importNode(n, true)));
+  sideSyncTheme();
+  sideObs=new MutationObserver(sideSyncTheme);
+  sideObs.observe(document.documentElement, {attributes:true, attributeFilter:['data-theme']});
+  ['esriLightCss','esriDarkCss'].forEach(id=>{ const l=document.getElementById(id); if(l) sideObs.observe(l, {attributes:true, attributeFilter:['disabled']}); });
+  // al suo posto, nella pagina, una striscia per riportarlo davanti o riagganciarlo
+  const strip=document.createElement('div'); strip.id='sideDockStrip';
+  strip.innerHTML='<button type="button" data-a="front" title="Porta davanti la finestra del pannello" aria-label="Porta davanti la finestra del pannello">⧉</button>'
+    +'<button type="button" data-a="dock" title="Riaggancia il pannello qui" aria-label="Riaggancia il pannello qui">⇤</button>';
+  strip.onclick=e=>{ const b=e.target.closest('button'); if(!b) return; if(b.dataset.a==='dock') sideDock(); else { try{ sideWin.focus(); }catch(x){} } };
+  side.parentNode.insertBefore(strip, side); sideSlot=strip;
+  d.body.insertBefore(d.adoptNode(side), d.body.firstChild);
+  (window.__docL||[]).forEach(l=>d.addEventListener(l[0], l[1], l[2]));
+  ['dragover','drop'].forEach(t=>d.addEventListener(t, e=>e.preventDefault()));   // un file lasciato cadere non porta via la finestra
+  side.querySelectorAll('#sideRail button[data-tip]').forEach(b=>{ b.title=b.dataset.tip; });   // i suggerimenti della pagina non arrivano lì
+  sideScreensHint(d);
+  win.addEventListener('pagehide', ()=>{ if(sideWin===win) sideDock(true); });
+  win.addEventListener('resize', ()=>{ clearTimeout(sideUndock._t); sideUndock._t=setTimeout(sideSaveGeom, 400); });
+  sideButtons();
+  try{ win.focus(); }catch(e){}
+  setTimeout(()=>{ try{ view&&view.container&&window.dispatchEvent(new Event('resize')); }catch(e){} }, 50);
+  msg('Pannello sganciato: spostalo dove vuoi. Per riagganciarlo chiudi la finestra o premi ⇤.','ok');
 }
-function snNote(g){ const at=g.attributes||{}; let s=at.nome||geomDefName(g); if(at.note&&at.note!==s) s+=' \u00b7 '+at.note; return String(s).slice(0,256); }
-// Ogni oggetto tiene la categoria scelta quando \u00e8 stato disegnato (prima il modale ne imponeva una sola
-// per tipo a tutti); il men\u00f9 vale solo per quelli senza una categoria valida (buffer, geoprocessi, import).
-const SN_UI={points:['snPoints','snCatP','snNP','snHP'], lines:['snLines','snCatL','snNL','snHL'], areas:['snAreas','snCatA','snNA','snHA']};
-async function openPromoteSN(){
-  if(typeof signedIn==='undefined'||!signedIn){ msg('Accedi ad AGOL per promuovere.','err'); return; }
-  const c=collectSN();
-  if(!c.points.length&&!c.lines.length&&!c.areas.length){ msg('Nessun disegno/buffer/geoprocesso da promuovere.','err'); return; }
-  $('snSub').textContent=`${c.points.length} punti \u00b7 ${c.lines.length} linee \u00b7 ${c.areas.length} aree \u2192 "IT - Sites Notes Layers".`;
-  const b=$('snConfirm'); b.disabled=true; b.textContent='Conferma inserimento';
-  Object.values(SN_UI).forEach(u=>{ $(u[0]).style.display='none'; });
-  snMsg('Leggo le categorie dal portale\u2026',''); $('snModal').style.display='flex';
-  const dom=await snLoadDomains();
-  Object.keys(SN_UI).forEach(k=>{ const u=SN_UI[k], arr=c[k], sel=$(u[1]);
-    const own=arr.filter(g=>snCode(k,(g.attributes||{}).categoria)).length, rest=arr.length-own;
-    sel.innerHTML=''; dom[k].forEach(code=>{ const o=document.createElement('option'); o.value=code; o.textContent=code.trim(); sel.appendChild(o); });
-    $(u[0]).style.display=arr.length?'block':'none'; $(u[2]).textContent=arr.length;
-    sel.style.display=rest?'':'none';
-    $(u[3]).textContent= !rest? 'Tutti con la categoria scelta quando li hai disegnati.'
-      : (rest===arr.length? 'Nessuno ha una categoria propria: vale quella scelta qui.'
-         : 'Questa vale per '+rest+(rest===1?' oggetto':' oggetti')+' senza categoria; '+own+(own===1?' tiene la sua.':' tengono la loro.')); });
-  snMsg(''); b.disabled=false;
+function sideDock(closing){
+  const d=sideDoc(), win=sideWin;
+  if(d){ sideSaveGeom();
+    const side=d.getElementById('side');
+    if(side&&sideSlot&&sideSlot.parentNode) sideSlot.parentNode.insertBefore(document.adoptNode(side), sideSlot);
+    else if(side) document.body.insertBefore(document.adoptNode(side), document.body.firstChild);
+    sideMoved.forEach(el=>{ if(el.ownerDocument!==document){ el.style.display='none'; document.body.appendChild(document.adoptNode(el)); } }); }
+  sideMoved=new Set();
+  if(sideSlot){ sideSlot.remove(); sideSlot=null; }
+  if(sideObs){ sideObs.disconnect(); sideObs=null; }
+  const side=document.getElementById('side');
+  if(side) side.querySelectorAll('#sideRail button[data-tip]').forEach(b=>b.removeAttribute('title'));
+  sideWin=null; sideButtons();
+  if(win&&!win.closed&&!closing){ try{ win.close(); }catch(e){} }
+  else if(win&&closing) setTimeout(()=>{ try{ if(!win.closed) win.close(); }catch(e){} }, 0);   // ricaricata a mano: non resta vuota
+  setTimeout(()=>{ try{ window.dispatchEvent(new Event('resize')); }catch(e){} }, 50);
 }
-function closePromoteSN(){ $('snModal').style.display='none'; const b=$('snConfirm'); b.disabled=false; b.textContent='Conferma inserimento'; }
-async function confirmPromoteSN(){
-  const btn=$('snConfirm'); if(btn.disabled) return; btn.disabled=true; btn.textContent='Inserimento\u2026';
-  const c=collectSN();
-  try{
-    await esriMods.projection.load();
-    await snLoadDomains();
-    const jobs=[['points',c.points,$('snCatP').value,false],['lines',c.lines,$('snCatL').value,false],['areas',c.areas,$('snCatA').value,true]];
-    let tot=0, errMsg='';
-    for(const job of jobs){
-      const k=job[0], lid=SN_LID[k], arr=job[1], cat=job[2], isPoly=job[3];
-      if(!arr.length) continue;
-      snMsg(`Inserisco ${arr.length} feature nel layer ${lid}\u2026`,'');
-      const layer=new esriMods.FeatureLayer({url:SN_URL+'/'+lid});
-      const adds=arr.map(g=>{
-        let geom=esriMods.projection.project(g.geometry,{wkid:SN_WKID});
-        if(isPoly){ try{ const gs=esriMods.geometryEngine.simplify(geom); if(gs) geom=gs; }catch(e){} }
-        return new esriMods.Graphic({geometry:geom, attributes:{CATEGORIA:snCode(k,(g.attributes||{}).categoria)||cat, NOTE:snNote(g)}});
-      });
-      const res=await layer.applyEdits({addFeatures:adds});
-      tot+=(res.addFeatureResults||[]).filter(r=>!r.error).length;
-      const e0=(res.addFeatureResults||[]).find(r=>r.error); if(e0&&e0.error) errMsg=e0.error.message||'';
+// Con più schermi Chrome riapre la finestra sull'altro schermo solo con il permesso «gestione finestre»: lo chiedo
+// con un clic nella finestra stessa, una volta sola.
+async function sideScreensHint(d){
+  try{ if(!(window.screen&&screen.isExtended)||typeof d.defaultView.getScreenDetails!=='function') return;
+    const st=await navigator.permissions.query({name:'window-management'}).catch(()=>null);
+    if(st&&st.state!=='prompt') return;
+    const bar=d.createElement('div'); bar.className='sideScreens';
+    bar.innerHTML='<span>Più schermi: consenti al Geoportale di riaprire questa finestra dove la lasci.</span><button type="button">Consenti</button><button type="button" aria-label="Chiudi">×</button>';
+    const bs=bar.querySelectorAll('button');
+    bs[0].onclick=async()=>{ try{ await d.defaultView.getScreenDetails(); }catch(e){} bar.remove(); };
+    bs[1].onclick=()=>bar.remove();
+    d.body.insertBefore(bar, d.body.firstChild);
+  }catch(e){} }
+window.addEventListener('pagehide', ()=>{ const w=sideWin; if(w&&!w.closed){ sideSaveGeom(); try{ w.close(); }catch(e){} } });   // la pagina si chiude: anche il pannello
+
+// ══ Site Features: categorie, sito di lavoro, salvataggio sul portale ════════════════════════════
+// Sostituisce il «Promuovi → Sites Notes». Il layer «IT - Site Features» usa lo stesso modello di questa scheda e di
+// PV Predesign: categoria (ruolo nel progetto) e tipo (cosa è), più buffer, altezza, larghezza e tensione. Ogni
+// oggetto ha un GlobalID scelto qui (sf_gid): il primo salvataggio lo aggiunge, i successivi lo aggiornano, niente
+// doppioni. Il sito di lavoro è un'area di AREAS COLLECTION (GlobalID e codice progetto) e lega a sé i disegni.
+const SF_GEOM_IT={point:'punto', polyline:'linea', polygon:'area'};
+const SF_GEOM_PL={point:'punti', polyline:'linee', polygon:'aree'};
+function sfKey(s){ return String(s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').trim().toLowerCase(); }
+function sfCat(code){ return SF_CATS.find(c=>c.c===code)||null; }
+function sfGk(t){ return (t==='point'||t==='multipoint')? 'point' : t==='polyline'? 'polyline' : (t==='polygon'||t==='extent')? 'polygon' : null; }
+function sfAccepts(code, gt){ const c=sfCat(code); return !!c && c.g.indexOf(sfGk(gt))>=0; }
+function sfTypeOk(code, type){ const c=sfCat(code); return !!(c&&type&&c.t.some(t=>t[0]===type)); }
+// attributi numerici di una categoria: la tensione solo per gli elettrodotti, la larghezza solo per le linee
+function sfAttrKeys(code, type, gt){ const c=sfCat(code); if(!c) return [];
+  return c.a.filter(k=> k==='voltage'? SF_VOLT.indexOf(type)>=0 : k==='width'? sfGk(gt)==='polyline' : true); }
+function sfLabel(code, type){ const c=sfCat(code); if(!c) return ''; const t=type&&c.t.find(x=>x[0]===type); return c.l+(t? ' · '+t[1] : ''); }
+function sfColor(code){ const c=sfCat(code); return c? c.col : '#2FB6E6'; }
+// categoria e tipo di un oggetto: i suoi, oppure dedotti dalla vecchia categoria (quella di Sites Notes)
+function sfOf(g){ const at=(g&&g.attributes)||{};
+  if(at.sf_cat) return {cat:at.sf_cat, type:at.sf_type||null};
+  const m=at.categoria&&(SF_FROM_SN[sfGk(at.geomType||(g&&g.geometry&&g.geometry.type))]||{})[sfKey(at.categoria)];
+  return m? {cat:m[0], type:m[1]} : {cat:null, type:null}; }
+// i disegni fatti prima del modello Site Features (salvataggi e progetti vecchi) prendono categoria e tipo una volta
+function sfUpgrade(at, gt){ if(!at||at.sf_cat||!at.categoria) return;
+  const m=(SF_FROM_SN[sfGk(at.geomType||gt)]||{})[sfKey(at.categoria)]; if(m){ at.sf_cat=m[0]; if(m[1]) at.sf_type=m[1]; } }
+function sfGuid(v){ return v? '{'+String(v).replace(/[{}]/g,'').toUpperCase()+'}' : null; }
+function sfNewGuid(){
+  if(window.crypto&&crypto.randomUUID) return sfGuid(crypto.randomUUID());
+  const b=crypto.getRandomValues(new Uint8Array(16)); b[6]=(b[6]&15)|64; b[8]=(b[8]&63)|128;
+  const h=Array.from(b, x=>x.toString(16).padStart(2,'0')).join('');
+  return sfGuid(h.slice(0,8)+'-'+h.slice(8,12)+'-'+h.slice(12,16)+'-'+h.slice(16,20)+'-'+h.slice(20)); }
+function sfDefaultSrc(at){ return at._kind==='import'? 'import' : (at._kind==='buffer'||at._sub==='geoproc')? 'geoprocess' : 'desk'; }
+// da salvare: mai salvato, modificato dopo il salvataggio, oppure senza sito mentre c'è un sito di lavoro
+function sfNeedsSave(g){ const at=(g&&g.attributes)||{}; return !at.sf_saved||!!at.sf_dirty||(!at.sf_site&&!!sfSite); }
+
+// ── scheda Disegno: categoria, tipo e attributi dei disegni nuovi ──
+function sfDrawState(){ const vals={};
+  Object.keys(SF_ATTR).forEach(k=>{ const v=numIn('sf'+k[0].toUpperCase()+k.slice(1)); if(isFinite(v)&&v>=0) vals[k]=v; });
+  return {cat:sfDrawCat, type:($('sfType')&&$('sfTypeBox')&&!$('sfTypeBox').hidden&&$('sfType').value)||null, vals:vals,
+    src:($('sfSrc')&&$('sfSrc').value)||'desk'}; }
+function sfRenderDrawUi(){ const box=$('sfCats'); if(!box) return;
+  if(!box.childElementCount) box.innerHTML=SF_CATS.map(c=>`<button type="button" role="radio" data-c="${c.c}" style="--c:${c.col}" title="${esc(c.h)}">${esc(c.l)}</button>`).join('');
+  box.querySelectorAll('button').forEach(b=>{ const on=b.dataset.c===sfDrawCat; b.classList.toggle('active',on); b.setAttribute('aria-checked', on?'true':'false'); });
+  const c=sfCat(sfDrawCat), ts=$('sfType');
+  $('sfCatHint').textContent=c? c.h : '';
+  $('sfTypeBox').hidden=!(c&&c.t.length);
+  if(c&&ts.dataset.c!==c.c){ ts.innerHTML=c.t.map(t=>`<option value="${t[0]}">${esc(t[1])}</option>`).join(''); ts.dataset.c=c.c; }
+  sfSyncAttrUi(); sfDrawBtns(); }
+function sfSyncAttrUi(){ const s=sfDrawState(), c=sfCat(s.cat), keys=new Set();
+  if(c) c.g.forEach(gt=>sfAttrKeys(s.cat, s.type, gt).forEach(k=>keys.add(k)));
+  const box=$('sfAttrs'); if(box) box.querySelectorAll(':scope>[data-a]').forEach(d=>{ d.hidden=!keys.has(d.dataset.a); }); }
+// strumenti attivi solo per le geometrie della categoria; mentre si disegna, il colore della categoria
+function sfDrawBtns(){ const c=sfCat(sfDrawCat);
+  [['drwPoint','point','point'],['drwLine','polyline','polyline'],['drwArea','polygon','polygon'],['drwRect','rectangle','polygon'],['drwCircle','circle','polygon']].forEach(p=>{
+    const b=$(p[0]); if(!b) return; const ok=!c||c.g.indexOf(p[2])>=0;
+    b.disabled=!ok; b.title=ok? '' : c.l+' non si disegna come '+SF_GEOM_IT[p[2]]; b.classList.toggle('active', drawType===p[1]); });
+  if(drawType&&c){ const gt=drawType==='rectangle'||drawType==='circle'? 'polygon' : drawType;
+    if(c.g.indexOf(gt)<0){ drawType=null; try{ sketchVM.cancel(); }catch(e){} sfDrawBtns();
+      toolMsg('drwMsg','Strumento spento: '+c.l+' non si disegna come '+SF_GEOM_IT[gt]+'.'); return; } }
+  try{ const col=sfColor(sfDrawCat); sketchVM.polygonSymbol=symbolForColor('polygon',col); sketchVM.polylineSymbol=symbolForColor('polyline',col);
+    sketchVM.pointSymbol=symbolForColor('point',col); }catch(e){} }
+// attributi di un disegno nuovo: categoria e tipo se valgono per la sua geometria, attributi, nota, fonte e sito
+function sfNewAttrs(gtype){ const s=sfDrawState(), gt=sfGk(gtype)||gtype;
+  const a={_kind:'drawing', geomType:gt, note:($('drwNote')&&$('drwNote').value)||'', sf_src:s.src};
+  if(s.cat&&sfAccepts(s.cat, gt)){ a.sf_cat=s.cat; if(sfTypeOk(s.cat, s.type)) a.sf_type=s.type;
+    sfAttrKeys(s.cat, a.sf_type, gt).forEach(k=>{ if(s.vals[k]!=null) a[SF_ATTR[k][0]]=s.vals[k]; }); }
+  a.categoria=sfLabel(a.sf_cat, a.sf_type);   // etichetta leggibile: nome di partenza e colonna degli export
+  a.color=sfColor(a.sf_cat);
+  if(sfSite) a.sf_site={guid:sfSite.guid, code:sfSite.code||null};
+  return a; }
+
+// ── Elenco: la categoria di ogni oggetto, con la scheda per cambiarla ──
+let sfEditOpen=null;   // l'oggetto con la scheda aperta: resta aperta quando l'Elenco si ridisegna
+function sfToggleEditor(g){ sfEditOpen=(sfEditOpen===g)? null : g; renderGeoms(); }
+function sfTag(g){ const s=sfOf(g), c=sfCat(s.cat), b=document.createElement('button'); b.type='button';
+  b.className='sftag'+(c? '' : ' none')+(sfEditOpen===g? ' open' : ''); if(c) b.style.setProperty('--c', c.col);
+  b.textContent=c? c.l : 'Categoria?';
+  b.title=(c? sfLabel(s.cat, s.type) : 'Senza categoria')+' — clic per cambiare categoria, tipo e attributi';
+  b.onclick=e=>{ e.stopPropagation(); sfToggleEditor(g); }; return b; }
+function sfEditor(g){ const at=g.attributes, gt=sfGk(g.geometry.type), s=sfOf(g), c=sfCat(s.cat);
+  const opt=(v,l,sel)=>`<option value="${esc(v)}"${sel?' selected':''}>${esc(l)}</option>`;
+  let h='<label>Categoria</label><select data-f="cat">'+opt('','— senza categoria —',!c)
+    +SF_CATS.filter(x=>x.g.indexOf(gt)>=0).map(x=>opt(x.c, x.l, !!c&&x.c===c.c)).join('')+'</select>';
+  if(c&&c.t.length) h+='<label>Tipo</label><select data-f="type">'+opt('','—',!s.type)+c.t.map(t=>opt(t[0],t[1],t[0]===s.type)).join('')+'</select>';
+  const keys=sfAttrKeys(s.cat, s.type, gt);
+  if(keys.length) h+='<div class="sfattrs">'+keys.map(k=>{ const v=at[SF_ATTR[k][0]];
+    return `<div><label>${esc(SF_ATTR[k][2])}</label><input type="number" min="0" step="any" data-f="${k}" value="${v!=null? esc(v) : ''}"></div>`; }).join('')+'</div>';
+  h+='<label>Nota</label><input data-f="note" value="'+esc(at.note||'')+'">';
+  h+='<div class="sfattrs"><div><label>Fonte</label><select data-f="src">'+SF_SRC.map(x=>opt(x[0],x[1],(at.sf_src||sfDefaultSrc(at))===x[0])).join('')+'</select></div>'
+    +'<div><label>Stato</label><select data-f="status">'+SF_STATUS.map(x=>opt(x[0],x[1],(at.sf_status||'')===x[0])).join('')+'</select></div></div>';
+  const site=at.sf_site;
+  h+='<div class="thint">'+(site? 'Sito: '+esc(site.code||'area senza codice') : 'Senza sito'+(sfSite? ': salvando prende il sito di lavoro' : ''))
+    +' · '+(at.sf_saved? (sfNeedsSave(g)? 'sul portale, con modifiche da salvare' : 'salvato sul portale') : 'non ancora sul portale')+'</div>';
+  const ed=document.createElement('div'); ed.className='gedit'; ed.innerHTML=h;
+  ed.addEventListener('change', e=>{ const f=e.target.dataset.f; if(!f) return; const v=e.target.value;
+    const autoName=!at.nome||at.nome===at.categoria;   // nome di partenza (l'etichetta): segue la categoria
+    sfUpgrade(at, gt);
+    if(f==='cat'){ if(v){ at.sf_cat=v; } else delete at.sf_cat; delete at.sf_type;
+      const keep=sfAttrKeys(at.sf_cat, null, gt); Object.keys(SF_ATTR).forEach(k=>{ if(keep.indexOf(k)<0) delete at[SF_ATTR[k][0]]; });
+      applyGraphicColor(g, sfColor(at.sf_cat)); }
+    else if(f==='type'){ if(v) at.sf_type=v; else delete at.sf_type;
+      if(SF_VOLT.indexOf(at.sf_type)<0) delete at.sf_voltage; }
+    else if(f==='note') at.note=v;
+    else if(f==='src') at.sf_src=v;
+    else if(f==='status'){ if(v) at.sf_status=v; else delete at.sf_status; }
+    else if(SF_ATTR[f]){ const n=parseFloat(String(v).replace(',','.')); if(isFinite(n)&&n>=0) at[SF_ATTR[f][0]]=n; else delete at[SF_ATTR[f][0]]; }
+    at.categoria=sfLabel(at.sf_cat, at.sf_type);
+    if(autoName&&at.categoria) at.nome=at.categoria;
+    if(at.sf_saved) at.sf_dirty=true;
+    refreshDl(); });
+  ed.addEventListener('click', e=>e.stopPropagation());
+  return ed; }
+// riga dell'Elenco: tipo e attributi dopo il testo di base (linea, area, sorgente…)
+function sfSubtitle(g, base){ const at=g.attributes||{}, s=sfOf(g), c=sfCat(s.cat), out=[];
+  if(base) out.push(base);
+  const t=c&&s.type&&c.t.find(x=>x[0]===s.type); if(t) out.push(t[1]);
+  sfAttrKeys(s.cat, s.type, sfGk(g.geometry&&g.geometry.type)).forEach(k=>{ const v=at[SF_ATTR[k][0]]; if(v==null) return;
+    const n=String(+(+v).toFixed(2)).replace('.',',');
+    out.push(k==='buffer'? 'buffer '+n+' m' : k==='height'? 'h '+n+' m' : k==='width'? 'largo '+n+' m' : n+' kV'); });
+  return out.join(' · '); }
+
+// ── sito di lavoro: un'area di AREAS COLLECTION ──
+function sfRenderSite(){ const box=$('sfSiteBox'); if(!box) return; const on=typeof signedIn!=='undefined'&&signedIn;
+  if(!sfSite){ box.className='sfsite empty'; box.textContent='Nessun sito: i disegni restano senza legame.'; }
+  else { box.className='sfsite'; const ha=sfSite.ha!=null? String(sfSite.ha.toFixed(2)).replace('.',',')+' ha' : '';
+    box.innerHTML='<b>'+esc(sfSite.code||'Senza codice progetto')+'</b>'+(sfSite.comune? ' · '+esc(sfSite.comune) : '')
+      +(sfSite.regione? ' ('+esc(sfSite.regione)+')' : '')+'<br><small>'+[ha,'AREAS COLLECTION'].filter(Boolean).join(' · ')+'</small>'; }
+  ['sfSitePick','sfSiteCode','sfSiteFind'].forEach(id=>{ if($(id)) $(id).disabled=!on; });
+  if($('sfLoad')) $('sfLoad').disabled=!(on&&sfSite);
+  if($('sfSiteClear')) $('sfSiteClear').disabled=!sfSite;
+  const m=$('sfSiteMsg'), need='Serve l\'accesso ad AGOL per scegliere il sito.';
+  if(m&&!on) toolMsg('sfSiteMsg', need);
+  else if(m&&m.textContent===need) toolMsg('sfSiteMsg','Scegli l\'area sulla mappa o scrivi il codice progetto.'); }
+function sfShowSite(zoom){
+  try{ view.graphics.removeMany(view.graphics.toArray().filter(g=>g.__sfSite)); }catch(e){}
+  if(!sfSite||!sfSite.geom||!view) return; const geom=gjGeom(sfSite.geom); if(!geom) return;
+  const g=new esriMods.Graphic({geometry:geom, symbol:{type:'simple-fill', color:[255,140,26,0.06], outline:{color:[255,140,26], width:2.5, style:'dash'}}});
+  g.__sfSite=true; view.graphics.add(g);
+  if(zoom&&geom.extent) view.goTo(geom.extent.expand(1.4)).catch(()=>{}); }
+let sfPick=null;   // scelta del sito con un clic sulla mappa
+function sfPickOn(){ return !!sfPick; }
+function sfPickStart(){
+  if(sfPick){ sfPickEnd(); toolMsg('sfSiteMsg','Scelta del sito annullata.'); return; }
+  if(typeof signedIn==='undefined'||!signedIn){ toolMsg('sfSiteMsg','Serve l\'accesso ad AGOL.','err'); return; }
+  try{ drwModeEnd(); gpPickEnd(); grdPlaceEnd(); }catch(e){}
+  if(drawType){ drawType=null; try{ sketchVM.cancel(); }catch(e){} sfDrawBtns(); }
+  sfPick={sk:sketchClickPause(), popup:view.popupEnabled, cursor:view.container.style.cursor};
+  view.popupEnabled=false; view.container.style.cursor='crosshair'; $('sfSitePick').classList.add('active');
+  sfPick.h=view.on('click', e=>{ e.stopPropagation(); const mp=e.mapPoint; sfPickEnd(); if(mp) sfSiteQuery({geometry:mp, spatialRelationship:'intersects'}); });
+  toolMsg('sfSiteMsg','Clicca dentro l\'area sulla mappa (Esc per annullare).'); }
+function sfPickEnd(){ const p=sfPick; if(!p) return; sfPick=null;
+  try{ p.h&&p.h.remove(); }catch(e){} sketchClickResume(p.sk); view.popupEnabled=p.popup; view.container.style.cursor=p.cursor||'';
+  if($('sfSitePick')) $('sfSitePick').classList.remove('active'); }
+function sfFindByCode(){ const code=String(($('sfSiteCode')||{}).value||'').trim();
+  if(!/^[A-Za-z0-9_-]{2,20}$/.test(code)){ toolMsg('sfSiteMsg','Scrivi un codice progetto, es. C0000.','err'); return; }
+  sfSiteQuery({where:"Project_Code = '"+code+"'"}); }
+async function sfSiteQuery(q){
+  toolMsg('sfSiteMsg','Cerco l\'area…');
+  try{ const L=new esriMods.FeatureLayer({url:AREAS_LAYER_URL});
+    const r=await L.queryFeatures(Object.assign({outFields:['GlobalID','Project_Code','COMUNE','REGIONE'], returnGeometry:true, outSpatialReference:{wkid:4326}}, q));
+    const fs=(r&&r.features)||[];
+    if(!fs.length){ toolMsg('sfSiteMsg', q.where? 'Nessuna area con questo codice progetto.' : 'Lì non c\'è un\'area di AREAS COLLECTION.', 'err'); return; }
+    const ha=f=>{ try{ return Math.abs(esriMods.geometryEngine.geodesicArea(f.geometry,'hectares')); }catch(e){ return null; } };
+    // aree sovrapposte nel punto cliccato: la più piccola; più aree con lo stesso codice: la prima, e lo dico
+    const f=q.geometry? fs.slice().sort((a,b)=>(ha(a)||0)-(ha(b)||0))[0] : fs[0], a=f.attributes||{};
+    sfSite={guid:sfGuid(a.GlobalID), code:String(a.Project_Code||'').trim()||null, comune:a.COMUNE||'', regione:a.REGIONE||'', ha:ha(f), geom:esriGeomToGeojson(f.geometry)};
+    sfShowSite(true); sfRenderSite(); refreshDl();
+    toolMsg('sfSiteMsg', (q.where&&fs.length>1? fs.length+' aree con questo codice: presa la prima (per le altre usa «Dalla mappa»). ' : '')
+      +'Sito scelto: i disegni nuovi e quelli che salvi gli restano legati.', 'ok');
+  }catch(e){ console.warn('[sito]',e); toolMsg('sfSiteMsg','Area non letta: '+((e&&e.message)||e),'err'); } }
+// gli elementi del sito salvati sul portale → nell'Elenco (quelli che ci sono già restano come sono)
+function sfGraphicFromFeature(f, gt){ const a=f.attributes||{}, cat=sfCat(a.CATEGORY)? a.CATEGORY : null, typ=sfTypeOk(cat, a.TYPE)? a.TYPE : null;
+  const at={_kind:'drawing', geomType:gt, nome:a.NAME||sfLabel(cat,typ)||'Elemento', note:a.NOTE||'', categoria:sfLabel(cat,typ),
+    sf_src:a.SOURCE||null, sf_gid:sfGuid(a.GlobalID), sf_saved:true, color:sfColor(cat)};
+  if(cat) at.sf_cat=cat; if(typ) at.sf_type=typ; if(a.STATUS) at.sf_status=a.STATUS;
+  if(a.AREA_GUID) at.sf_site={guid:sfGuid(a.AREA_GUID), code:a.PROJECT_CODE||null};
+  Object.keys(SF_ATTR).forEach(k=>{ const v=a[SF_ATTR[k][1]]; if(v!=null) at[SF_ATTR[k][0]]=v; });
+  if(gt==='polygon'){ try{ at.area_ha=+Math.abs(esriMods.geometryEngine.geodesicArea(f.geometry,'hectares')||0).toFixed(4); }catch(e){} }
+  return new esriMods.Graphic({geometry:f.geometry, attributes:at, symbol:symbolForColor(gt, at.color)}); }
+async function sfLoadSite(){
+  if(typeof signedIn==='undefined'||!signedIn||!sfSite) return;
+  toolMsg('sfSiteMsg','Carico gli elementi del sito dal portale…');
+  const have=new Set(toolsGL.graphics.toArray().map(g=>g.attributes&&g.attributes.sf_gid).filter(Boolean));
+  let added=0, had=0;
+  try{ for(const gt of ['polygon','polyline','point']){
+      const L=new esriMods.FeatureLayer({url:SF_URL+'/'+SF_LID[gt]});
+      const r=await L.queryFeatures({where:"AREA_GUID = '"+sfSite.guid+"'", outFields:['*'], returnGeometry:true, outSpatialReference:view.spatialReference});
+      ((r&&r.features)||[]).forEach(f=>{ const gid=sfGuid((f.attributes||{}).GlobalID);
+        if(have.has(gid)){ had++; return; }
+        toolsGL.add(sfGraphicFromFeature(f, gt)); have.add(gid); added++; }); }
+    refreshDl();
+    toolMsg('sfSiteMsg', added? added+(added===1? ' elemento caricato' : ' elementi caricati')+' nell\'Elenco'+(had? ' ('+had+' c\'erano già)' : '')+'.'
+      : (had? 'Gli elementi del sito sono già tutti nell\'Elenco.' : 'Il sito non ha ancora elementi sul portale.'), 'ok');
+  }catch(e){ console.warn('[sito]',e); toolMsg('sfSiteMsg','Elementi non caricati: '+((e&&e.message)||e),'err'); } }
+
+// ── salva sul portale ──
+function sfMsg(t,cls){ $('sfMsg').innerHTML=t? `<div class="msg ${cls}">${t}</div>` : ''; }
+function sfCandidates(){ const all=toolsGL? toolsGL.graphics.toArray().filter(g=>{ const k=(g.attributes||{})._kind;
+    return (k==='drawing'||k==='buffer'||k==='import')&&g.geometry&&sfGk(g.geometry.type); }) : [];
+  const sel=all.filter(g=>g.attributes._sel);
+  return {all:all, sel:sel, use:($('sfOnlySel').checked&&sel.length)? sel : all}; }
+function sfOpenSave(){
+  if(typeof signedIn==='undefined'||!signedIn){ msg('Accedi ad AGOL per salvare sul portale.','err'); return; }
+  const c=sfCandidates(); if(!c.all.length){ msg('Niente da salvare: disegna, importa o crea un geoprocesso.','err'); return; }
+  $('sfOnlySel').checked=c.sel.length>0;
+  sfMsg(''); const b=$('sfConfirm'); b.textContent='Salva'; sfRenderSave(); $('sfModal').style.display='flex'; }
+function sfCloseSave(){ $('sfModal').style.display='none'; }
+function sfRenderSave(){ const c=sfCandidates(), todo=c.use.filter(sfNeedsSave), nNew=todo.filter(g=>!g.attributes.sf_saved).length;
+  $('sfOnlySelRow').hidden=!c.sel.length; $('sfOnlySelTxt').textContent='Solo gli spuntati nell\'Elenco ('+c.sel.length+' su '+c.all.length+')';
+  const parts=[]; if(nNew) parts.push(nNew+(nNew===1?' nuovo':' nuovi')); if(todo.length-nNew) parts.push((todo.length-nNew)+' da aggiornare');
+  if(c.use.length-todo.length) parts.push((c.use.length-todo.length)+' già salvati senza modifiche');
+  $('sfSub').textContent=(parts.join(' · ')||'Niente da salvare')+' → «IT - Site Features».';
+  const ss=$('sfSaveSite');
+  if(sfSite){ ss.className='sfsite'; ss.innerHTML='Sito di lavoro: <b>'+esc(sfSite.code||'area senza codice')+'</b>'+(sfSite.comune? ' · '+esc(sfSite.comune) : '')+'<br><small>Gli oggetti senza sito gli vengono legati.</small>'; }
+  else { ss.className='sfsite empty'; ss.textContent='Nessun sito di lavoro: gli oggetti senza sito si salvano senza legame. Per legarli, scegli il sito nella scheda Disegno.'; }
+  const noCat={point:0, polyline:0, polygon:0}; todo.forEach(g=>{ if(!sfOf(g).cat) noCat[sfGk(g.geometry.type)]++; });
+  $('sfNoCat').innerHTML=Object.keys(noCat).filter(k=>noCat[k]).map(k=>`<label for="sfDef_${k}">Categoria per ${noCat[k]} ${noCat[k]===1? SF_GEOM_IT[k] : SF_GEOM_PL[k]} senza categoria</label>`
+    +`<select id="sfDef_${k}">${SF_CATS.filter(x=>x.g.indexOf(k)>=0).map(x=>`<option value="${x.c}"${x.c==='reference'?' selected':''}>${esc(x.l)}</option>`).join('')}</select>`).join('');
+  $('sfConfirm').disabled=!todo.length; }
+function sfGeomOut(geom, gt){ let g=geom;
+  try{ const w=g.spatialReference&&(g.spatialReference.latestWkid||g.spatialReference.wkid); if(w!==3857&&w!==102100) g=esriMods.projection.project(g,{wkid:102100}); }catch(e){}
+  if(gt==='polygon'){ try{ const s=esriMods.geometryEngine.simplify(g); if(s) g=s; }catch(e){} }
+  return g; }
+function sfAttrsOut(g){ const at=g.attributes, gt=sfGk(g.geometry.type), cat=sfCat(at.sf_cat)? at.sf_cat : null, typ=sfTypeOk(cat, at.sf_type)? at.sf_type : null;
+  const site=at.sf_site||null, keys=sfAttrKeys(cat, typ, gt), o={
+    GlobalID:at.sf_gid, CATEGORY:cat, TYPE:typ,
+    NAME:String(at.nome||'').slice(0,120)||null, NOTE:String(at.note||'').slice(0,2000)||null,
+    PROJECT_CODE:(site&&site.code)||null, AREA_GUID:(site&&site.guid)||null,
+    SOURCE:at.sf_src||sfDefaultSrc(at), STATUS:at.sf_status||null };
+  Object.keys(SF_ATTR).forEach(k=>{ const v=at[SF_ATTR[k][0]]; o[SF_ATTR[k][1]]=(keys.indexOf(k)>=0&&v!=null&&isFinite(v))? +v : null; });
+  return o; }
+async function sfConfirmSave(){
+  const btn=$('sfConfirm'); if(btn.disabled) return; btn.disabled=true; btn.textContent='Salvo…';
+  const todo=sfCandidates().use.filter(sfNeedsSave), errs=[]; let added=0, updated=0;
+  try{ await esriMods.projection.load();
+    for(const gt of ['point','polyline','polygon']){
+      const arr=todo.filter(g=>sfGk(g.geometry.type)===gt); if(!arr.length) continue;
+      sfMsg('Salvo '+arr.length+' '+(arr.length===1? SF_GEOM_IT[gt] : SF_GEOM_PL[gt])+'…','');
+      const def=$('sfDef_'+gt)? $('sfDef_'+gt).value : null, adds=[], upds=[];
+      arr.forEach(g=>{ const at=g.attributes;
+        sfUpgrade(at, gt);
+        if(!at.sf_cat&&def){ at.sf_cat=def; delete at.sf_type; at.categoria=sfLabel(def,null); applyGraphicColor(g, sfColor(def)); }
+        if(!at.sf_site&&sfSite) at.sf_site={guid:sfSite.guid, code:sfSite.code||null};
+        if(!at.sf_gid) at.sf_gid=sfNewGuid();
+        (at.sf_saved? upds : adds).push({g:g, f:new esriMods.Graphic({geometry:sfGeomOut(g.geometry, gt), attributes:sfAttrsOut(g)})}); });
+      const L=new esriMods.FeatureLayer({url:SF_URL+'/'+SF_LID[gt]});
+      let res=await L.applyEdits({addFeatures:adds.map(x=>x.f), updateFeatures:upds.map(x=>x.f)}, {globalIdUsed:true, rollbackOnFailureEnabled:false});
+      (res.addFeatureResults||[]).forEach((r,i)=>{ const x=adds[i]; if(r.error) errs.push((x.g.attributes.nome||'oggetto')+': '+(r.error.message||'errore'));
+        else { x.g.attributes.sf_saved=true; x.g.attributes.sf_dirty=false; added++; } });
+      const lost=[];
+      (res.updateFeatureResults||[]).forEach((r,i)=>{ const x=upds[i]; if(r.error) lost.push(x); else { x.g.attributes.sf_dirty=false; updated++; } });
+      // aggiornamento non riuscito (l'oggetto non c'è più sul portale, magari cancellato altrove): lo riaggiungo
+      if(lost.length){ res=await L.applyEdits({addFeatures:lost.map(x=>x.f)}, {globalIdUsed:true, rollbackOnFailureEnabled:false});
+        (res.addFeatureResults||[]).forEach((r,i)=>{ const x=lost[i]; if(r.error) errs.push((x.g.attributes.nome||'oggetto')+': '+(r.error.message||'errore'));
+          else { x.g.attributes.sf_dirty=false; added++; } }); }
     }
-    if(errMsg){ snMsg(`${tot} inserite, con errori (${esc(errMsg)}).`,'err'); btn.disabled=false; btn.textContent='Conferma inserimento'; }
-    else { closePromoteSN(); msg(`\u2714 ${tot} feature aggiunte a Sites Notes.`,'ok'); }
-  }catch(e){ snMsg('Errore: '+esc(e&&e.message||e),'err'); btn.disabled=false; btn.textContent='Conferma inserimento'; }
-}
+    refreshDl();
+    const txt=[added? added+(added===1?' aggiunto':' aggiunti') : '', updated? updated+(updated===1?' aggiornato':' aggiornati') : ''].filter(Boolean).join(', ');
+    if(errs.length){ sfMsg((txt? txt+'. ' : '')+'Non salvati: '+esc(errs.slice(0,3).join(' · '))+(errs.length>3? ' …' : ''),'err'); btn.disabled=false; btn.textContent='Riprova'; }
+    else { sfCloseSave(); msg('✔ Salvati sul portale: '+(txt||'niente da cambiare')+'.','ok'); }
+  }catch(e){ console.warn('[salva sul portale]',e); sfMsg('Errore: '+esc((e&&e.message)||e),'err'); btn.disabled=false; btn.textContent='Riprova'; } }
+// togliere un oggetto salvato: su richiesta anche dal portale
+async function sfDeleteRemote(g){ const at=g.attributes, L=new esriMods.FeatureLayer({url:SF_URL+'/'+SF_LID[sfGk(g.geometry.type)]});
+  const r=await L.applyEdits({deleteFeatures:[{globalId:at.sf_gid}]}, {globalIdUsed:true});
+  const x=(r.deleteFeatureResults||[])[0]; if(x&&x.error) throw new Error(x.error.message||'errore'); }
 
 // ── export multi-formato (invariato) ──────────────────────────────────────
 function dlBlob(name,blob){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();URL.revokeObjectURL(a.href);}
@@ -3055,6 +3476,11 @@ function graphicsFeatures(kind){
       : kind==='import' ? Object.assign({}, at.src_attrs||{}, {nome:nome,tipo:'importato',source:at.source||''})   // + attributi originali se viene da un layer
       : kind==='geoproc' ? {nome:nome,tipo:'geoprocesso',categoria:at.categoria||'',nota:at.note||''}
       : {nome:nome,tipo:'disegno',categoria:at.categoria||'',nota:at.note||''};
+    // modello Site Features in chiaro (codici inglesi): PV Predesign li legge senza indovinare
+    const s=sfOf(g);
+    if(s.cat){ props.category=s.cat; if(s.type) props.type=s.type;
+      sfAttrKeys(s.cat, s.type, sfGk(g.geometry.type)).forEach(k=>{ const v=at[SF_ATTR[k][0]]; if(v!=null) props[k]=v; }); }
+    if(at.sf_site&&at.sf_site.code) props.project_code=at.sf_site.code;
     out.push({type:'Feature',geometry:gj,properties:props});
   });
   return out;
@@ -3391,7 +3817,7 @@ function countDrawingsPure(){ return toolsGL? toolsGL.graphics.toArray().filter(
 function countGeoproc(){ return toolsGL? toolsGL.graphics.toArray().filter(g=>g.attributes&&g.attributes._kind==='drawing'&&g.attributes._sub==='geoproc').length : 0; }
 var GEOM_ZOOM_SVG='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="6"/><line x1="20" y1="20" x2="15.5" y2="15.5"/></svg>';
 function refreshDl(){ const el=$('dl'); if(el) el.disabled=!(parcels.length||countKind('buffer')||countKind('drawing')||countKind('import'));
-  const _sn=$('promoteSN'); if(_sn) _sn.disabled=!((countKind('buffer')||countKind('drawing')||countKind('import')) && (typeof signedIn!=='undefined'&&signedIn));
+  const _sf=$('sfSave'); if(_sf) _sf.disabled=!((countKind('buffer')||countKind('drawing')||countKind('import')) && (typeof signedIn!=='undefined'&&signedIn));
   try{renderGeoms();}catch(e){} try{refreshSelDraw();}catch(e){} try{saveStateDebounced();}catch(e){} try{histRecord();}catch(e){} }
 // ── FASE 2: elenco geometrie (disegni/buffer/geoprocessi) + rinomina inline ──
 // ══ Visibilità + colore (righe elenco e header sezione) ═══════════════════
@@ -3489,17 +3915,31 @@ function geomRow(g, subtitle){
   row.appendChild(makeColorSwatch(()=>graphicColorHex(g), hex=>applyGraphicColor(g,hex)));
   const nm=document.createElement('input'); nm.className='gname'; nm.spellcheck=false;
   nm.value=g.attributes.nome||''; nm.title=nm.value;
-  nm.onchange=function(){ g.attributes.nome=nm.value.trim()||geomDefName(g); nm.value=g.attributes.nome; nm.title=nm.value; try{saveStateDebounced();}catch(e){} };
+  nm.onchange=function(){ g.attributes.nome=nm.value.trim()||geomDefName(g); nm.value=g.attributes.nome; nm.title=nm.value;
+    if(g.attributes.sf_saved) g.attributes.sf_dirty=true; try{saveStateDebounced();}catch(e){} };
   nm.onkeydown=function(e){ if(e.key==='Enter'){ e.preventDefault(); nm.blur(); } };
   row.appendChild(nm);
   if(subtitle){ const sub=document.createElement('span'); sub.className='gsub'; sub.textContent=subtitle; row.appendChild(sub); }
+  // categoria (clic: scheda per cambiarla) e stato sul portale (Site Features)
+  row.appendChild(sfTag(g));
+  if(g.attributes.sf_saved){ const st=document.createElement('span'), d=sfNeedsSave(g); st.className='sfst'+(d?' dirty':'');
+    st.textContent='☁'; st.title=d? 'Sul portale, con modifiche da salvare' : 'Salvato sul portale'; row.appendChild(st); }
   const zb=document.createElement('button'); zb.className='gact'; zb.title='Zoom'; zb.innerHTML=GEOM_ZOOM_SVG;
   zb.onclick=function(){ try{ const ge=g.geometry; view.goTo(ge.extent?ge.extent.expand(1.6):ge).catch(function(){}); }catch(e){} };
   row.appendChild(zb);
   const db=document.createElement('button'); db.className='gact'; db.title='Elimina'; db.textContent='×';
-  db.onclick=function(){ toolsGL.remove(g); renderGeoms(); refreshDl(); };
+  db.onclick=async function(){ const at=g.attributes||{};
+    // salvato sul portale: si chiede se toglierlo anche da lì (senza accesso resta sul portale)
+    if(at.sf_saved&&at.sf_gid&&typeof signedIn!=='undefined'&&signedIn
+      &&confirm('«'+(at.nome||'Oggetto')+'» è salvato sul portale (IT - Site Features).\n\nOK = eliminalo anche dal portale\nAnnulla = toglilo solo da qui')){
+      try{ await sfDeleteRemote(g); msg('Eliminato anche dal portale.','ok'); }
+      catch(e){ msg('Non eliminato dal portale ('+esc((e&&e.message)||e)+'): tolto solo da qui.','err'); } }
+    if(sfEditOpen===g) sfEditOpen=null;
+    toolsGL.remove(g); renderGeoms(); refreshDl(); };
   row.appendChild(db);
-  return row;
+  const wrap=document.createElement('div'); wrap.className='gitem'; wrap.appendChild(row);
+  if(sfEditOpen===g) wrap.appendChild(sfEditor(g));
+  return wrap;
 }
 function renderGeoms(){
   if(!toolsGL) return;
@@ -3518,12 +3958,14 @@ function renderGeoms(){
   fill('listDraw','cntDraw',draws,'Nessun disegno.', function(g){ const at=g.attributes;
     const t={point:'punto',polyline:'linea',polygon:'area'}[at.geomType]||at.geomType||'';
     const a=geomAreaHa(g), pezzi=[]; if(t) pezzi.push(t); if(a!=null) pezzi.push(a.toFixed(2)+' ha');
+    const s=sfSubtitle(g,''); if(s) pezzi.push(s);
     if(at.note) pezzi.push(at.note); return pezzi.join(' · '); });
   fill('listGeo','cntGeo',geos,'Nessun output.', function(g){ const at=g.attributes, pezzi=[];
     if(at._kind==='buffer'&&at.dist_m!=null) pezzi.push('buffer '+at.dist_m+' m');
     const a=geomAreaHa(g); if(a!=null) pezzi.push(a.toFixed(2)+' ha');
+    const s=sfSubtitle(g,''); if(s) pezzi.push(s);
     return pezzi.join(' · '); });
-  fill('listImport','cntImport',imports,'Nessun import.', function(g){ return g.attributes.source||''; });
+  fill('listImport','cntImport',imports,'Nessun import.', function(g){ return sfSubtitle(g, g.attributes.source||''); });
   try{ updateImportImages(); }catch(e){}
   try{ wireSectionTools(); }catch(e){}
   try{ gpSelInfo(); }catch(e){}
@@ -3612,9 +4054,6 @@ function mercK(y){ const k=mercK2(y); return Math.sqrt(k.x*k.y); }   // una scal
 function toWM(geom){ try{ if(geom&&geom.spatialReference&&geom.spatialReference.isWGS84) return esriMods.webMercatorUtils.geographicToWebMercator(geom); }catch(e){} return geom; }
 function numIn(id){ const v=parseFloat(String(($(id)||{}).value||'').replace(',','.')); return isFinite(v)? v : NaN; }
 function mkLine(paths){ return new esriMods.Graphic({geometry:{type:'polyline', paths:paths, spatialReference:view.spatialReference}}).geometry; }
-// categorie del menu per un tipo di geometria; se il menu è già di quel tipo resta la voce scelta
-function drwCatFor(t){ const s=$('drwCat'); if(!s||s.dataset.t===t) return;
-  s.innerHTML=(DRAW_CATS[t]||DRAW_CATS.polygon||[]).map(c=>`<option>${c}</option>`).join(''); s.dataset.t=t; }
 
 // aggancio: disegni e particelle sempre; con la spunta anche DWG, layer del portale e servizi vettoriali accesi.
 // Si ricalcola quando parte un disegno o una modifica (così vale per ciò che è acceso in quel momento).
@@ -3697,7 +4136,8 @@ function drwModeStart(kind){
   grdPlaceEnd(); cadModesOff();   // una sola modalità mappa alla volta
   drwMode={kind:kind, popup:view.popupEnabled, cursor:view.container.style.cursor, sk:sketchClickPause()};
   drwMode.h=view.on('click', drwModeClick);
-  if(kind==='shape'){ drwCatFor('polygon'); let raf=0;
+  if(kind==='shape'){ let raf=0;
+    if(!sfAccepts(sfDrawCat,'polygon')) toolMsg('shpMsg', sfCat(sfDrawCat).l+' non è un\'area: la forma resta senza categoria (la scegli poi nell\'Elenco).');
     drwMode.hm=view.on('pointer-move', e=>{ if(raf) return; raf=requestAnimationFrame(()=>{ raf=0; if(!drwMode||drwMode.kind!=='shape') return;
       const mp=view.toMap({x:e.x, y:e.y}); drwTmpShow(mp? shpGeom(mp, shpParams()) : null); }); }); }
   view.popupEnabled=false; view.container.style.cursor='crosshair'; drwModeUi(); }
@@ -3748,16 +4188,14 @@ async function drwEdgeAt(e){
   const k=mercK2((s.a[1]+s.b[1])/2);   // azimut a terra (un lato non ha verso: 0–180°)
   const az=(Math.atan2((s.b[0]-s.a[0])/k.x, (s.b[1]-s.a[1])/k.y)*180/Math.PI+360)%180;
   return {geom:geom, seg:mkLine([[s.a,s.b]]), a:s.a, b:s.b, az:az, name:String(name||'oggetto')}; }
-// un disegno nuovo, come quelli fatti a mano: categoria (se il menu è di quel tipo) e nota della scheda
+// un disegno nuovo, come quelli fatti a mano: categoria e tipo della scheda (se valgono per la geometria), nota, sito
 function drwAddGraphic(geom, extra){
-  const t=geom.type, s=$('drwCat'), cat=(s&&s.dataset.t===t)? (s.value||'') : '';
-  const base=t==='polygon'? sketchVM.polygonSymbol : t==='polyline'? sketchVM.polylineSymbol : sketchVM.pointSymbol;
-  const g=new esriMods.Graphic({geometry:geom, symbol:base&&base.clone? base.clone() : base,
-    attributes:Object.assign({_kind:'drawing', geomType:t, categoria:cat, note:($('drwNote')&&$('drwNote').value)||''}, extra||{})});
+  const a=Object.assign(sfNewAttrs(geom.type), extra||{});
+  const g=new esriMods.Graphic({geometry:geom, symbol:symbolForColor(geom.type, a.color), attributes:a});
   toolsGL.add(g); refreshDl(); return g; }
 
 // ── forme con misure: rettangolo (larghezza × altezza, orientamento) e cerchio (raggio), centrati sul clic ──
-function shpParams(){ const b=document.querySelector('#shpKind .active');
+function shpParams(){ const b=$('shpKind')&&$('shpKind').querySelector('.active');
   return {kind:b? b.dataset.k : 'rect', w:numIn('shpW'), h:numIn('shpH'), rot:numIn('shpRot'), r:numIn('shpR')}; }
 function shpGeom(center, p){
   const k=mercK2(center.y), cx=center.x, cy=center.y, sr=view.spatialReference;   // metri a terra: x·k.x, y·k.y
@@ -4657,7 +5095,7 @@ function srPick(L){ if(!L) return null;
 function cadEstimate(st){ return srEstimate(st.stt.mx, st.stt.my, {}); }
 
 // ── finestra di conferma (promessa: risolve con la scelta, oppure null se annullata) ──
-function cadAsk(st,est){ return new Promise(res=>{ _cadAsk={st:st, est:est, res:res}; cadDlgFill(); $('cadModal').style.display='flex'; }); }
+function cadAsk(st,est){ return new Promise(res=>{ _cadAsk={st:st, est:est, res:res}; cadDlgFill(); sideModalHere($('cadModal')); $('cadModal').style.display='flex'; }); }
 function cadDlgClose(v){ const a=_cadAsk; _cadAsk=null; $('cadModal').style.display='none'; if(a) a.res(v); }
 function cadWhereTxt(L){
   const pos=L.lat.toFixed(4)+'° N, '+L.lon.toFixed(4)+'° E';
@@ -5412,7 +5850,7 @@ function baseGroundSet(){
    6) Esc: chiude modali/drawer/modalità; click sul backdrop chiude le modali
 */
 (function(){
-  var $g=function(id){return document.getElementById(id);};
+  var $g=byId;   // cerca anche nella finestra del pannello sganciato
 
   /* 1 ── TEMA */
   var darkCss=$g('esriDarkCss'), lightCss=$g('esriLightCss');
@@ -5434,11 +5872,13 @@ function baseGroundSet(){
   /* 2 ── TOAST: override di msg(t,cls) mantenendo la firma */
   var toastBox=$g('toasts'), lastToast=null, lastTimer=null;
   window.msg=function(t,cls){
-    if(!toastBox) return;
+    // con il pannello sganciato, il messaggio compare nella finestra dove stai lavorando
+    var box=(typeof sideActiveDoc==='function'&&sideActiveDoc()!==document&&sideActiveDoc().getElementById('toasts'))||toastBox;
+    if(!box) return;
     if(!t){ if(lastToast){lastToast.remove();lastToast=null;} return; }
-    if(!lastToast||!toastBox.contains(lastToast)){ lastToast=document.createElement('div'); toastBox.appendChild(lastToast); }
+    if(!lastToast||!box.contains(lastToast)){ if(lastToast) lastToast.remove(); lastToast=document.createElement('div'); box.appendChild(lastToast); }
     lastToast.className='toast '+(cls||'info'); lastToast.textContent=t;
-    while(toastBox.children.length>3) toastBox.firstChild.remove();
+    while(box.children.length>3) box.firstChild.remove();
     clearTimeout(lastTimer); lastTimer=setTimeout(function(){ if(lastToast){lastToast.remove();lastToast=null;} },6000);
   };
 
@@ -5502,10 +5942,11 @@ function baseGroundSet(){
   var _tabTitle={ricerca:'Ricerca particelle',disegno:'Disegno',geoproc:'Geoprocessi',contesto:'Contesto sito',\u0069mport:'Importa dati'};
   function showTab(name){
     _tabs.forEach(function(b){ b.classList.toggle('active', b.dataset.tab===name); });
-    Array.prototype.forEach.call(document.querySelectorAll('#side .tabpane'),function(p){ p.classList.toggle('active', p.dataset.tab===name); });
+    var side=$g('side'); if(side) Array.prototype.forEach.call(side.querySelectorAll('.tabpane'),function(p){ p.classList.toggle('active', p.dataset.tab===name); });
     var st=$g('sideTitle'); if(st) st.textContent=_tabTitle[name]||'';
   }
   _tabs.forEach(function(b){ b.onclick=function(){
+    if(typeof sideUndocked==='function'&&sideUndocked()){ showTab(b.dataset.tab); return; }   // sganciato: niente pannello da comprimere
     if(document.body.classList.contains('side-collapsed')){ document.body.classList.remove('side-collapsed'); showTab(b.dataset.tab); }
     else if(b.classList.contains('active')){ document.body.classList.add('side-collapsed'); }
     else { showTab(b.dataset.tab); }
@@ -5517,6 +5958,7 @@ function baseGroundSet(){
 
   /* sidebar sx collassabile */
   if($g('sideToggle')) $g('sideToggle').onclick=function(){ document.body.classList.add('side-collapsed'); };   // si riapre dal rail
+  if($g('sideUndock')) $g('sideUndock').onclick=function(){ if(sideUndocked()) sideDock(); else { document.body.classList.remove('side-collapsed'); sideUndock(); } };   // ⧉ sgancia, ⇤ riaggancia
 
   /* help */
   if($g('helpBtn'))   $g('helpBtn').onclick=function(){ $g('helpModal').style.display='flex'; };
@@ -5743,18 +6185,26 @@ function baseGroundSet(){
         'La griglia allineata con due clic lungo un lato (arancione): un rettangolo agganciato ai suoi incroci gli resta parallelo'); })()
   };
   var DRW_INFO={
-    drwDraw:{t:'Disegna sulla mappa', s:'Punti, linee e aree tuoi, ognuno con una categoria e una nota.', h:
+    drwDraw:{t:'Disegna sulla mappa', s:'Ogni disegno ha una categoria (il suo ruolo nel progetto), un tipo e, se serve, buffer, altezza, larghezza o tensione.', h:
       '<h3>Come si disegna</h3>'+DDIA.tools
-      +'<ol><li>Premi <b>Punto</b>, <b>Linea</b>, <b>Area</b>, <b>Rettangolo</b> o <b>Cerchio</b>.</li>'
-      +'<li>Scegli la <b>categoria</b> (le voci cambiano con il tipo) e, se vuoi, scrivi una <b>nota</b>: valgono per i disegni che fai da quel momento.</li>'
-      +'<li>Disegna. Lo strumento resta attivo per il disegno successivo: di nuovo sul pulsante, o Esc, per smettere.</li></ol>'
-      +'<h3>Esempio</h3><p>Al sopralluogo hai visto una <b>linea elettrica</b> che non è sulle carte: premi <b>Linea</b>, scegli la categoria <b>Elettrodotto</b>, scrivi nella nota «MT su pali, da verificare» e ricalcala sull\'ortofoto. Poi, in <b>Geoprocessi</b>, un buffer ti dà la fascia di rispetto.</p>'
+      +'<ol><li>Scegli la <b>categoria</b>: area lorda, area netta, esclusione, infrastruttura lineare, ostacolo, accesso e connessione, mitigazione, zona agricola, nota e riferimento.</li>'
+      +'<li>Scegli il <b>tipo</b> e scrivi i dati che compaiono (per un elettrodotto tensione e fascia DPA come buffer, per un albero l\'altezza), la <b>fonte</b> e, se vuoi, una <b>nota</b>: valgono per i disegni che fai da quel momento.</li>'
+      +'<li>Premi <b>Punto</b>, <b>Linea</b>, <b>Area</b>, <b>Rettangolo</b> o <b>Cerchio</b> (sono attivi solo quelli adatti alla categoria) e disegna. Lo strumento resta attivo per il disegno successivo: di nuovo sul pulsante, o Esc, per smettere.</li></ol>'
+      +'<h3>Esempio</h3><p>Al sopralluogo hai visto una <b>linea elettrica</b> che non è sulle carte: scegli <b>Infrastruttura lineare</b>, tipo <b>Elettrodotto aereo</b>, tensione 20 kV, buffer 5 m, fonte <b>Sopralluogo</b>, nota «MT su pali, da verificare», poi premi <b>Linea</b> e ricalcala sull\'ortofoto. Il colore del disegno dice la categoria; PV Predesign taglierà la fascia di 5 m da solo.</p>'
+      +'<h3>Cambiare la categoria</h3><p>Nell\'<b>Elenco</b>, l\'etichetta colorata di ogni riga apre la scheda con categoria, tipo, attributi, nota, fonte e stato: vale anche per importati e risultati dei geoprocessi. Un disegno vecchio con le categorie di Sites Notes prende da solo quella nuova (per esempio «DPA» → Esclusione · Fascia DPA).</p>'
       +'<h3>Correggere un disegno</h3><ul><li>Con nessuno strumento attivo, clicca il disegno: lo sposti trascinandolo, e con le maniglie lo ruoti o lo ridimensioni. Cliccalo di nuovo per spostarne i singoli vertici. Clic fuori per finire.</li>'
       +'<li>Al primo clic, con le maniglie attorno, <b>Canc</b> lo cancella.</li>'
       +'<li><b>↶ Annulla</b> e <b>↷ Ripeti</b> (anche <kbd>Ctrl</kbd>+<kbd>Z</kbd> e <kbd>Ctrl</kbd>+<kbd>Y</kbd>): mentre disegni tolgono o rimettono l\'ultimo vertice; dopo, annullano l\'ultima modifica a disegni, buffer, risultati e importati, anche uno spostamento o una cancellazione. Lo storico riparte quando apri un progetto o svuoti il lavoro.</li></ul>'
-      +'<h3>Da sapere</h3><ul><li>I disegni vanno nell\'<b>Elenco</b>, sezione <b>Disegni</b>: da lì li rinomini, li colori, li togli, li esporti o li promuovi in <b>Sites Notes</b> (serve l\'accesso), con la loro categoria.</li>'
-      +'<li>Restano in questo browser e si salvano nel progetto.</li>'
+      +'<h3>Da sapere</h3><ul><li>I disegni vanno nell\'<b>Elenco</b>, sezione <b>Disegni</b>: da lì li rinomini, li colori, li togli, li esporti o li salvi sul portale con <b>⤴ Salva sul portale</b> (serve l\'accesso), nel layer <b>IT - Site Features</b>.</li>'
+      +'<li>Restano in questo browser e si salvano nel progetto, con categoria, tipo e sito: PV Predesign li legge già divisi.</li>'
       +'<li>Il numero nel titolo dice quanti disegni hai. <b>Cancella tutti i disegni</b>, in fondo, chiede conferma e non tocca i risultati dei geoprocessi.</li></ul>'},
+    drwSite:{t:'Sito di lavoro', s:'L\'area di AREAS COLLECTION a cui legare disegni, importati e risultati dei geoprocessi.', h:
+      '<h3>A cosa serve</h3><p>Ogni oggetto salvato sul portale porta il GlobalID e il codice progetto dell\'area: gli elementi di un sito si ritrovano insieme, tornano nel Geoportale con <b>⤵ Carica i suoi elementi</b> e PV Predesign li prende tutti, con l\'area come area lorda.</p>'
+      +'<h3>Come si sceglie</h3><ol><li><b>📍 Dalla mappa</b>, poi un clic dentro l\'area (se due aree si sovrappongono prende la più piccola).</li>'
+      +'<li>Oppure scrivi il <b>codice progetto</b> (es. C0000) e premi <b>Cerca</b>.</li></ol>'
+      +'<h3>Da sapere</h3><ul><li>I disegni nuovi prendono il sito scelto; quelli senza sito lo prendono quando li salvi sul portale.</li>'
+      +'<li>Il sito si salva nel progetto .axpo. <b>× Togli il sito</b> non cambia gli oggetti che ne hanno già uno.</li>'
+      +'<li>Serve l\'accesso ad AGOL: AREAS COLLECTION non è pubblico.</li></ul>'},
     drwAid:{t:'Misure esatte e aggancio', s:'Lati con la lunghezza e l\'angolo che scrivi tu, e vertici agganciati a quelli che ci sono già.', h:
       '<h3>Esempio</h3>'+DDIA.typed
       +'<p>Stai disegnando il confine di un lotto e il secondo lato deve essere lungo <b>120 m</b>, ad angolo retto con il primo. Dopo il primo vertice premi Tab, scrivi <b>90</b> e <b>120</b>, Invio, poi un clic.</p>'
@@ -5800,6 +6250,7 @@ function baseGroundSet(){
   };
   function impInfo(k){ var d=IMP_INFO[k]||GP_INFO[k]||RC_INFO[k]||DRW_INFO[k], m=$g('infoModal'); if(!d||!m) return;
     $g('infoTitle').textContent=d.t; $g('infoSub').textContent=d.s; $g('infoBody').innerHTML=d.h;
+    if(typeof sideModalHere==='function') sideModalHere(m);   // nella finestra dove hai cliccato la «i»
     m.style.display='flex'; var c=$g('infoClose'); if(c) c.focus(); }
   function impInfoClose(){ var m=$g('infoModal'); if(m) m.style.display='none'; }
   if($g('infoClose')) $g('infoClose').onclick=impInfoClose;
@@ -5817,7 +6268,7 @@ function baseGroundSet(){
   window.impInfo=impInfo;
 
   /* 6a ── click sul backdrop chiude (riusa i pulsanti esistenti) */
-  [['exportModal','exCancel'],['promoteModal','pmCancel'],['snModal','snCancel'],['helpModal','helpClose'],['cadModal','cadCancel'],['infoModal','infoClose']].forEach(function(p){
+  [['exportModal','exCancel'],['promoteModal','pmCancel'],['sfModal','sfCancel'],['helpModal','helpClose'],['cadModal','cadCancel'],['infoModal','infoClose']].forEach(function(p){
     var el=$g(p[0]); if(!el) return;
     el.addEventListener('click',function(e){ if(e.target===el){ var b=$g(p[1]); if(b) b.click(); else el.style.display='none'; } });
   });
@@ -5834,7 +6285,7 @@ function baseGroundSet(){
     if(el.id==='subToggle') return 'sub';
     return null;
   }
-  document.addEventListener('click',function(e){
+  docOn('click',function(e){
     if(switching) return;
     var b=e.target&&e.target.closest? e.target.closest('button') : null; if(!b) return;
     var fam=familyOf(b); if(!fam) return;
@@ -5853,6 +6304,11 @@ function baseGroundSet(){
       if(typeof selRunning==='function'&&selRunning()) return 'Cerco le particelle nell\'area… <kbd>Esc</kbd> per interrompere.';
       if(typeof gpPick!=='undefined'&&gpPick) return 'Scegli gli oggetti per <b>'+gpPick+'</b> cliccandoli sulla mappa. <kbd>Esc</kbd> per finire.';
       if(typeof srRefOn==='function'&&srRefOn()) return 'Clicca <b>dove dovrebbero cadere</b> le coordinate incollate. <kbd>Esc</kbd> per annullare.';
+      if(typeof sfPickOn==='function'&&sfPickOn()) return 'Clicca <b>dentro l\'area</b> di AREAS COLLECTION che è il sito di lavoro. <kbd>Esc</kbd> per annullare.';
+      if(typeof drawType!=='undefined'&&drawType&&typeof sfDrawCat!=='undefined'){ var sc=sfCat(sfDrawCat);
+        var dn2={point:'punti',polyline:'linee',polygon:'aree',rectangle:'rettangoli',circle:'cerchi'}[drawType];
+        var ex2=(drawType==='point')?'':(drawType==='rectangle'||drawType==='circle'?', clicca e trascina':', doppio click per chiudere');
+        return 'Disegno <b>'+dn2+'</b> · '+(sc? esc(sc.l) : 'senza categoria')+ex2+'. <kbd>Esc</kbd> per uscire.'; }
       if(typeof drwModeInfo==='function'){ var dm=drwModeInfo(); if(dm) return dm; }   // forme con misure, copia parallela, griglia
       if(typeof subActive!=='undefined'&&subActive) return 'Modalità <b>Contesto sito</b> attiva — clicca un punto sulla mappa. <kbd>Esc</kbd> per uscire.';
       if(typeof drawType!=='undefined'&&drawType){
@@ -5876,14 +6332,15 @@ function baseGroundSet(){
   },350);
 
   /* 6b ── Esc: modali → drawer → modalità */
-  document.addEventListener('keydown',function(e){
+  docOn('keydown',function(e){
     if(e.key!=='Escape') return;
     var hm=$g('helpModal'), em=$g('exportModal'), pm=$g('promoteModal'), im=$g('infoModal');
     if(im&&im.style.display==='flex'){ im.style.display='none'; return; }
     if(hm&&hm.style.display==='flex'){ hm.style.display='none'; return; }
     if(em&&getComputedStyle(em).display==='flex'){ $g('exCancel').click(); return; }
     if(pm&&getComputedStyle(pm).display==='flex'){ $g('pmCancel').click(); return; }
-    var sn=$g('snModal'); if(sn&&getComputedStyle(sn).display==='flex'){ $g('snCancel').click(); return; }
+    var sf=$g('sfModal'); if(sf&&getComputedStyle(sf).display==='flex'){ $g('sfCancel').click(); return; }
+    if(typeof sfPickOn==='function'&&sfPickOn()){ sfPickEnd(); toolMsg('sfSiteMsg','Scelta del sito annullata.'); return; }   // sito dalla mappa
     var cm=$g('cadModal'); if(cm&&getComputedStyle(cm).display==='flex'){ $g('cadCancel').click(); return; }
     if(typeof selRunning==='function'&&selRunning()){ selAbort(); return; }             // selezione su area in corso: interrompi
     if(typeof cadAlignOn==='function'&&cadAlignOn()){ cadAlignEnd(true); return; }   // allineamento DWG: Esc = Annulla
@@ -5906,7 +6363,7 @@ function baseGroundSet(){
 <script>
 /* ══ RIORG 2026-07-24: popover misura + coordinate puntatore con pin ══ */
 (function(){
-  var $g=function(id){return document.getElementById(id);};
+  var $g=byId;   // cerca anche nella finestra del pannello sganciato
   var mBtn=$g('measureBtn'), mCtl=$g('measureCtl');
   if(mBtn) mBtn.onclick=function(){ mCtl.classList.toggle('open'); };
   /* coordinate del puntatore (basso-dx) + pin */
@@ -5942,7 +6399,7 @@ function baseGroundSet(){
 <script>
 /* ══ TOUR virtuale (spotlight) + menu '?' + tooltip icone sidebar ══ */
 (function(){
-  var $=function(id){return document.getElementById(id);};
+  var $=byId;
   function openTab(name){ document.body.classList.remove('side-collapsed'); if(window.showTab) window.showTab(name); }
   function openDrawer(name){ if(window.openPanel) window.openPanel(name); }
 
@@ -5952,7 +6409,7 @@ function baseGroundSet(){
     {sel:'#rcSecArea', title:'2 · Dove cerchi', body:"Scegli regione, provincia e comune. La regione carica anche la mappa Check Vincoli della zona (serve l'accesso).", open:function(){openTab('ricerca'); window.impOpen&&window.impOpen('rcSecArea');}, placement:'right'},
     {sel:'.tabpane[data-tab=ricerca]', title:'3 · Ricerca particelle', body:"Tre modi, ognuno nella sua sezione: <b>Foglio e particella</b>, se conosci i numeri; <b>Sulla mappa</b>, con un clic o disegnando un rettangolo, un poligono o una linea; <b>Da un disegno</b>, per le particelle toccate da un disegno o da un buffer. Clicca un titolo per aprirlo; la <b>i</b> spiega ognuno con un esempio.", open:function(){openTab('ricerca');}, placement:'right'},
     {sel:'#drawerElenco', title:'4 · Elenco & azioni', body:"Tutto ciò che raccogli finisce qui, diviso in <b>Particelle · Disegni · Geoprocessi · Importati</b>. Ogni riga si rinomina, si colora, si nasconde, si zooma — e la <b>casella a sinistra</b> la seleziona per usarla nei geoprocessi.", open:function(){openDrawer('elenco');}, placement:'left'},
-    {sel:'.colbtns', title:'5 · Esporta e promuovi', body:"Esporta in GeoJSON/KML/KMZ/SHP/XLSX, oppure promuovi in <b>AREAS COLLECTION</b> o <b>Sites Notes</b>.", open:function(){openDrawer('elenco');}, placement:'left'},
+    {sel:'.colbtns', title:'5 · Esporta e salva sul portale', body:"Esporta in GeoJSON/KML/KMZ/SHP/XLSX, oppure <b>⤴ Salva sul portale</b> nel layer <b>IT - Site Features</b>, con categoria, tipo e sito (la seconda volta aggiorna, non duplica). Le aree vanno in <b>AREAS COLLECTION</b> con «Promuovi».", open:function(){openDrawer('elenco');}, placement:'left'},
     {sel:'#projSaveBtn', title:'6 · Salva il progetto', body:"<b>Salva progetto</b> mette tutto il lavoro in un file .axpo, come un progetto QGIS: mappa e layer, particelle, disegni, import, anche <b>DWG e immagini</b> già posizionati. Con <b>Apri progetto</b> lo ritrovi com'era, o lo passi a un collega. <kbd>Ctrl</kbd>+<kbd>S</kbd> risalva.", placement:'below'},
     {title:'Pronto!', body:"Questo è il flusso base. Riapri i tour quando vuoi dal <b>?</b> in alto a destra. Per gli strumenti avanzati, prova il tour <i>Tutti gli strumenti</i>."}
   ];
@@ -6007,7 +6464,9 @@ function baseGroundSet(){
       $('tourNext').textContent = (idx===steps.length-1) ? 'Fine' : 'Avanti';
     }, st.open?280:20);
   }
-  function startTour(list){ steps=list; idx=0; active=true; $('tourOverlay').style.display='block'; render(); }
+  function startTour(list){
+    if(typeof sideUndocked==='function'&&sideUndocked()) sideDock();   // la guida indica elementi della pagina: il pannello torna al suo posto
+    steps=list; idx=0; active=true; $('tourOverlay').style.display='block'; render(); }
   function endTour(){ active=false; $('tourOverlay').style.display='none'; $('tourHole').style.display='none'; }
   $('tourNext').onclick=function(){ if(idx>=steps.length-1) endTour(); else { idx++; render(); } };
   $('tourPrev').onclick=function(){ if(idx>0){ idx--; render(); } };

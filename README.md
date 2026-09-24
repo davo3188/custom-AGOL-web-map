@@ -70,6 +70,37 @@ changes.
 
 ## 4. What it does
 
+**Names** (agreed with the user on 2026-09-24; Italian as in the UI, code names in brackets)
+
+| Name | What it is | Code |
+|---|---|---|
+| **Barra superiore** | Title, project, sign-in, theme, help | `#topbar` |
+| **Pannello sinistro** | Rail + tabs; this is what undocks | `#side` |
+| **Rail** | The column of icons that picks the tab | `#sideRail` |
+| **Scheda** | Ricerca particelle, Disegno, Geoprocessi, Contesto sito, Importa dati | `.tabpane[data-tab=ricerca\|disegno\|geoproc\|contesto\|import]` |
+| **Modulo** | A collapsible block of a tab, with title, one line and an **i** | `details.imod`, id `<tab prefix>Sec<Name>` (`rc`, `drw`, `gp`, `imp`) |
+| **Finestra «i»** | The *how it works* window of a module | `RC_INFO`, `DRW_INFO`, `GP_INFO`, `IMP_INFO` |
+| **Pannello destro** | Action bar + drawers | `#toolsPanel` |
+| **Action bar** | The icons on the right | `#actionIcons` |
+| **Cassetto** | Elenco & azioni, Layer, Basemap, Segnalibri, Modifica AREAS, Stampa | `.drawer[data-panel=…]` |
+| **Sezione** (of the Elenco) | Particelle, Disegni, Geoprocessi, Importati | `.gsec` |
+| **Finestra** (modal) | Salva sul portale, Esporta, Promuovi, CAD… | `#…Modal` |
+
+Modules of *Disegno*: Sito di lavoro (`drwSecSite`), Disegna sulla mappa (`drwSecDraw`), Forme con misure
+(`drwSecShape`), Copia parallela (`drwSecOff`), Misure esatte e aggancio (`drwSecAid`), Griglia (`drwSecGrid`).
+Of *Ricerca particelle*: Dove cerchi, Foglio e particella, Sulla mappa, Da un disegno. Of *Geoprocessi*: Scegli gli
+oggetti, Buffer, Unisci/contorna/semplifica, Ritaglia, Confronta A con B. Of *Importa dati*: File di geometrie,
+Disegni CAD, Immagini sulla mappa, Servizi web, Coordinate senza sistema. *Contesto sito* has no modules.
+
+**Undockable left panel** (since 2026-09-24). **⧉** in the header of the pannello sinistro moves it — rail and
+tabs — into a window of its own, to put on a second screen; the map takes the freed space and a thin strip keeps
+⧉ (bring the window to front) and ⇤ (dock it back). ⇤ in the window, or closing it, docks it back. In that window
+the tabs adapt to the width: from 640 px the modules of a tab flow into columns of about 300 px (a container
+query on `#sideContent`, only when undocked). Size and position are remembered (`axpo_pannello_finestra`); with
+more screens, Chrome reopens the window on the other screen only with the *window management* permission, which
+the window offers to ask once. The right panel stays docked for now (its ArcGIS widgets are not made to live in
+another window).
+
 **Parcel search**
 - By *Comune / Foglio / Particella*, with an administrative cascade (region → province → municipality).
 - By clicking the map, or by drawing a point, rectangle, polygon or line over an area.
@@ -96,6 +127,18 @@ after 20 s with a message, instead of leaving the UI waiting forever.
   note; the title counts the drawings) and *Misure esatte e aggancio*. The **i** windows draw the gesture
   of each tool and a typed side (`DRW_INFO`/`DDIA`). *Cancella tutti i disegni* sits below, asks first and
   leaves geoprocessing results alone.
+- **Site Features model** (since 2026-09-24, replaces the Sites Notes categories). *Sito di lavoro* on top
+  picks the site — an area of AREAS COLLECTION, clicked on the map or found by `Project_Code` — and draws its
+  outline. *Disegna sulla mappa* starts from the **category** (the role in the project: gross area, net area,
+  exclusion, linear infrastructure, obstacle, access & grid connection, mitigation, agricultural zone, note &
+  reference), then the **type** (what it is: overhead power line, tree, landscape constraint…) and only the
+  attributes that apply (buffer, height, width for lines, voltage for power lines), the source (survey /
+  desk / official) and a note. Only the tools of the category's geometries are enabled, and drawings take
+  the category colour. In the *Elenco*, the coloured tag of every drawing, result or import opens a small
+  form to change category, type, attributes, note, source and status; ☁ marks what is on the portal
+  (orange: changed since). Old drawings with a Sites Notes category get the new one when loaded
+  (`SF_FROM_SN`, e.g. *DPA* → exclusion · DPA corridor). The model and its codes are shared with the AGOL
+  layer and with PV Predesign: `../schemas/site_features_model.json`.
 - A drawing, buffer, result or import clicked on the map (no tool active) can be moved, rotated and
   scaled; a second click edits its vertices; Delete, on the first click, removes it. Since 2026-09-23 the
   end of an edit updates the stored area, the list and the auto-save (see §7).
@@ -207,9 +250,15 @@ The shapefile comes as one zip with a layer per geometry type (`_punti`, `_linee
 - Parcels → **AREAS COLLECTION** (layer 426). REGIONE and PROVINCIA are the parcel's own (Zornade names,
   the same spelling already in the layer), COMUNE and PRO_COM_T come from ISTAT, the area is geodesic —
   the same number the list shows.
-- Drawings, buffers, geoprocessing output and imports → **Sites Notes**. Each drawing keeps the category
-  it was drawn with; the dialog's menu only applies to objects without a valid one (buffers, results,
-  imports).
+- Drawings, buffers, geoprocessing output and imports → **IT - Site Features** with *⤴ Salva sul portale*
+  (since 2026-09-24; it replaces *Promuovi → Sites Notes*). Category, type, attributes, name, note, source,
+  status and the site (`AREA_GUID` = GlobalID of the AREAS COLLECTION area, `PROJECT_CODE`) are written. Each
+  object gets a GlobalID made in the browser (`sf_gid`) and is saved with `applyEdits(…, {globalIdUsed:true})`:
+  the first save adds it, the next ones update it — no duplicates; an update that fails (object deleted on the
+  portal meanwhile) is retried as an add. Objects without a site take the site of work. *Solo gli spuntati*
+  saves only the ticked rows; objects without a category get the one chosen in the dialog (default: note).
+  *⤵ Carica i suoi elementi* brings the site's features back into the list (skipping those already there).
+  Removing a saved object with × asks whether to delete it on the portal too.
 
 **Map & reporting**
 - Loads the 17 regional *Check Vincoli* web maps (16 of 20 regions covered) plus the General Map.
@@ -297,11 +346,33 @@ The recalculation after an edit in the Editor asks the server for WGS 84 geometr
 **`queryFeatures` with a plain query object and no `outSpatialReference` returns the layer's native SR**,
 even when the layer is in a Web Mercator view (verified). Ask for the SR you need explicitly.
 
-**Sites Notes is three layers, not one** — 0 Points / 1 Lines / 2 Areas, each with its **own** coded-value
-domain on `CATEGORIA`. There is no name field, so the geometry name goes into `NOTE`. The point domain's
-code for *Beni interesse culturale* has a **trailing space** (`'Beni interesse culturale '`): the app
-matches categories ignoring spaces, accents and case and always writes the exact domain code. The
-domains are read from the service when the dialog opens; the copy in the source is only a fallback.
+**The undocked panel is moved, not copied.** `sideUndock()` opens an empty window (`window.open`, from the click),
+copies the page's stylesheets into it and moves the `#side` node there with `adoptNode`: handlers, state and the
+script stay those of the page, so there is nothing to synchronise. What that requires:
+- every id lookup goes through `byId` (`$`, `$g`), which looks in the page and then in the panel window; the few
+  `querySelector` calls made while working start from an element found that way;
+- global listeners (clicks that switch modes, Esc, Ctrl+Z/Y, Ctrl+S/O) are registered with `docOn`, which also
+  attaches them to the panel window;
+- `confirm`/`alert`/`prompt`, the **i** windows, the CAD dialog, the messages and the project file pickers open in
+  the window where the user is working (`sideActiveDoc`, `sideModalHere`); dialogs moved there come back on docking;
+- the panel window's `pagehide` (closing it, or reloading it by hand) docks the panel back before the document
+  goes; the page's `pagehide` closes the panel window; the guided tour docks it first (it points at page elements).
+Tested on 2026-09-24 in the built-in browser with an iframe standing in for the window (the built-in browser
+blocks popups): tab switching, drawing from the panel onto the map, **i**, Esc, theme, columns, both ways of
+docking. Not yet tested as a real window on two screens.
+
+**IT - Site Features replaced Sites Notes on 2026-09-24.** Sites Notes (`719dd7038c5547eb93896e2c2a11c0bf`) had
+only `CATEGORIA` and `NOTE` (256 characters, name and note glued together), no editor tracking and no link to
+the site, and its categories mixed what an object is with what it means for the design. The new service
+(`aec2f4fb317f4aa4918b42d947ab8ad3`, private until shared) has three layers with the same fields — CATEGORY,
+TYPE, NAME, NOTE, BUFFER_M, HEIGHT_M, WIDTH_M, VOLTAGE_KV, PROJECT_CODE, AREA_GUID, SOURCE, STATUS, LEGACY —
+coded domains with English codes and Italian labels, editor tracking and attachments. It was created by
+`../scripts/archive/crea_site_features.py` from the model, and the 1 840 Sites Notes features (with their 30
+attachments) were copied by `../scripts/archive/migra_site_notes.py`, which also assigned the AREAS COLLECTION area by
+intersection (or the nearest within 100 m: 1 369 of 1 840). Sites Notes itself was not changed; a snapshot is in
+`../backups/`. In the app the model lives in `SF_CATS` (codes, labels, colours, geometries, attributes, types).
+GlobalIDs are compared normalised (`sfGuid`: upper case, braces); the service returns them lower case without
+braces and accepts every form in a `where`.
 
 **The Search widget puts its default sources first.** With "All", it takes the first result in source
 order, and `defaultSources` always come before `sources` — so the geocoder won every time: `2789113
@@ -676,9 +747,13 @@ layer's own SR from `queryFeatures`, not Web Mercator.
    check it when logged in before adding one of ours.
 5. **About 160 empty `catch` blocks.** Errors vanish silently — e.g. a Union that fails on one piece
    skips it without saying so.
-6. Not tested logged in: Check Vincoli maps, the real writes to AREAS and Sites Notes, the AREAS editor,
-   site context, ISTAT zoom; DWG alignment with a real mouse; Print (CORS error from localhost). On 4.34
-   in particular the logged-in branch has not been exercised at all.
+6. Not tested logged in: Check Vincoli maps, the real writes to AREAS and to IT - Site Features, the AREAS
+   editor, site context, ISTAT zoom; DWG alignment with a real mouse; Print (CORS error from localhost). On 4.34
+   in particular the logged-in branch has not been exercised at all. The Site Features flow (site of work by
+   code, first save = adds with GlobalID, second save = one update, delete by GlobalID, load skipping objects
+   already listed, old categories converted, .axpo with site and codes) was tested on 2026-09-24 with a fake
+   `FeatureLayer` recording the calls; the REST forms it relies on (adds and GUID filters) were checked on the
+   real service with the API key while copying Sites Notes.
 
 ## 8. Repository contents
 
