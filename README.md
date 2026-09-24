@@ -88,7 +88,8 @@ changes.
 
 Modules of *Disegno*: Sito di lavoro (`drwSecSite`), Disegna sulla mappa (`drwSecDraw`), Forme con misure
 (`drwSecShape`), Copia parallela (`drwSecOff`), Misure esatte e aggancio (`drwSecAid`), Griglia (`drwSecGrid`).
-Of *Ricerca particelle*: Dove cerchi, Foglio e particella, Sulla mappa, Da un disegno. Of *Geoprocessi*: Scegli gli
+Of *Ricerca particelle*: Ricerca particelle (`rcSecFind`), Sulla mappa con selezione manuale particelle
+(`rcSecMap`), Seleziona da un disegno esistente (`rcSecDraw`). Of *Geoprocessi*: Scegli gli
 oggetti, Buffer, Unisci/contorna/semplifica, Ritaglia, Confronta A con B. Of *Importa dati*: File di geometrie,
 Disegni CAD, Immagini sulla mappa, Servizi web, Coordinate senza sistema. *Contesto sito* has no modules.
 
@@ -96,20 +97,28 @@ Disegni CAD, Immagini sulla mappa, Servizi web, Coordinate senza sistema. *Conte
 tabs — into a window of its own, to put on a second screen; the map takes the freed space and a thin strip keeps
 ⧉ (bring the window to front) and ⇤ (dock it back). ⇤ in the window, or closing it, docks it back. In that window
 the tabs adapt to the width: from 640 px the modules of a tab flow into columns of about 300 px (a container
-query on `#sideContent`, only when undocked). Size and position are remembered (`axpo_pannello_finestra`); with
+query on `#sideContent`). Size and position are remembered (`axpo_pannello_finestra`); with
 more screens, Chrome reopens the window on the other screen only with the *window management* permission, which
 the window offers to ask once. The right panel stays docked for now (its ArcGIS widgets are not made to live in
 another window).
+
+**Resizable left panel** (since 2026-09-24, like the right one). Drag its right edge (`#sideResizer`) between
+300 and 900 px (never leaving less than 360 px to the map); double click goes back to 352 px, ←/→ on the focused
+edge move it by 20 px. The width is kept in `--side-w` and remembered in `axpo_side_w`; the edge is hidden when
+the panel is collapsed or undocked. The container query also works docked, so a panel wider than 640 px shows
+the modules in columns as the undocked window does.
 
 **Parcel search**
 - By *Comune / Foglio / Particella*, with an administrative cascade (region → province → municipality).
 - By clicking the map, or by drawing a point, rectangle, polygon or line over an area.
 - From a geometry you already drew — a drawing, a buffer, a geoprocessing result or an import; a point
   finds the parcel under it (since 2026-09-23; before, a point gave a sampling error).
-- The tab has the same layout as *Importa dati* and *Geoprocessi* (since 2026-09-23): *Dove cerchi*
-  (the cascade; the closed title shows the chosen comune), then one section per way of searching —
-  *Foglio e particella*, *Sulla mappa*, *Da un disegno* (its title counts the usable objects). The **i**
-  windows draw each mode on a small parcel grid, found parcels in the map's amber (`RC_INFO`/`RDIA`).
+- The tab has the same layout as *Importa dati* and *Geoprocessi* (since 2026-09-23), one module per way of
+  searching: *Ricerca particelle* (the cascade, foglio and particelle together; the closed title shows the
+  chosen comune), *Sulla mappa con selezione manuale particelle*, *Seleziona da un disegno esistente* (its title
+  counts the usable objects). On 2026-09-24 the former *Dove cerchi* and *Foglio e particella* were merged into
+  the first one and the other two renamed. The **i** windows draw each mode on a small parcel grid, found
+  parcels in the map's amber (`RC_INFO`/`RDIA`).
 
 Because Zornade exposes **no spatial query**, area selection works by sampling a grid of points inside
 the geometry and calling `/parcels/locate` on each. It is bounded by explicit caps and is slow on large
