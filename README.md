@@ -449,10 +449,14 @@ geocoder always won).
 refuses; the WMS layer needs an explicit `spatialReferences: [3857]`. The same trap applies to the
 regional WMS layers inside the Check Vincoli maps.
 
-**Do not add the internal cadastral WMS blindly.** Several web maps already carry their own cadastre.
-The loader matches **by item ID** (national item `382d9c13…`), brings the existing layer to the top and
-turns it on; only if none is found does it add the internal WMS. Matching by title would be wrong —
-there are ~20 regional and provincial cadastres with similar names.
+**One cadastre only: the app's WMS** (since 2026-10-01, the user's choice). Several web maps carry their own
+national cadastre. The loader finds it **by item ID** (`382d9c13…`, `05ccc51f…`; title fallback only with
+«AdE» and «catast»: there are ~20 regional and provincial cadastres with similar names, which stay) and
+**removes it from the map loaded in the browser** — the web map item on the portal is untouched — then puts
+the app's WMS on top, under parcels and tools. Until then the web map's layer was used instead of the app's.
+The app's WMS starts at 50% transparency with the popup off (the GeoServer does not answer GetFeatureInfo from
+the browser); a project keeps its own saved values. The ids removed go into `wmCatGone`, so an older project
+that mentions that layer does not report it as missing.
 
 **Zornade's `area_m2` is computed in Web Mercator** and is inflated by roughly 1/cos²(lat) — ×1.85 at
 Rome's latitude. Never surface it as a real area; the tool computes
@@ -522,8 +526,24 @@ so it never touches the AMD loader. Worth knowing before editing:
 - **No DXF.** The DXF branch of their `dwg_read_data` is commented out upstream.
 - **Data model.** Angles are radians; an entity's true colour (`color`) beats its ACI index
   (`colorIndex`: 0 = ByBlock, 256 = ByLayer); a closed LWPOLYLINE is `flag & 512` (DWG encoding, not
-  DXF's `& 1`); OCS entities with extrusion Z < 0 are mirrored on X. The DWG version is read from the
-  first six bytes of the file (`AC1032` = 2018+), because the converted header leaves `ACADVER` empty.
+  DXF's `& 1`). The DWG version is read from the first six bytes of the file (`AC1032` = 2018+), because
+  the converted header leaves `ACADVER` empty. **Flags come out as numbers, not booleans** (`isCCW: 0`,
+  not `false`): a hatch arc edge with `isCCW === false` never matched, so clockwise arcs were drawn on the
+  wrong side of their chord (road fillets and turning areas became half-discs; fixed 2026-10-02, §7). For a
+  clockwise edge the stored angles are mirrored: the real arc is (−end, −start) counter-clockwise, then
+  reversed, as ezdxf does.
+- **OCS (tilted planes).** Entities with an extrusion normal (LWPOLYLINE, POLYLINE2D, ARC, CIRCLE, SOLID,
+  HATCH, TEXT, INSERT) are mapped to the world with AutoCAD's *arbitrary axis algorithm*, **including the OCS
+  z** (elevation, centre z, insertion z). This is not academic: PVcase places every tracker block in a plane
+  tilted by fractions of a degree to follow the terrain, with an insertion z of thousands of metres that
+  shifts x and y by metres once projected; and above 1/64 of tilt the algorithm turns the OCS X axis by 90°
+  (Z×N instead of Y×N), which PVcase compensates with a 270° block rotation. Until 2026-10-01 the reader
+  only mirrored X for a −Z normal and dropped z: modules shifted by metres, rotated ones thrown to (y, −x).
+  The whole entity pipeline therefore runs on 3D affine matrices (`c3Mul/c3T/c3R/c3S/c3Ap/c3Ocs`,
+  column-major 3×4, `c3Ap` returns the plan x,y); the 2D ones (`cadMul`, `cadT`…) remain only for the
+  alignment matrix `ch.M`, which is saved in projects. Ground truth for any DWG: arcpy reads it natively
+  with INSERTs already exploded (`scripts/dwg_confronto_arcpy.py` in the AGOL Axpo repository; read only
+  `\Polyline` and `\Point`, a cursor on `\Polygon` or `\Annotation` crashes the process on PVcase files).
 - **SR estimation.** A DWG almost never declares its CRS. The robust centre (median, so a title block
   at the origin does not move it) is projected into each company SR. The trap is that the same UTM X
   read in the *adjacent* zone still lands inside Italy's bounding box, so candidates are ranked by land
@@ -671,7 +691,9 @@ so it never touches the AMD loader. Worth knowing before editing:
 
 - The Zornade key is a read-only token **embedded in the source** (`DEFAULT_KEY`). This is a deliberate,
   accepted choice for an internal, access-controlled host — and it is why the page must not go on GitHub
-  Pages or any public URL. In the longer run the key should leave the source (an Azure Function in
+  Pages or any public URL. **⚠ As of 2026-09-22 the GitHub repository `davo3188/custom-AGOL-web-map` is
+  public** and contains the very key still in use: make the repository private and regenerate the key
+  from the Zornade dashboard. In the longer run the key should leave the source (an Azure Function in
   front of Zornade on the future host would keep it server-side).
 - PV project fields are deliberately limited to non-sensitive ones (`plant_name`, `capacity_mw`,
   `status`, `procedure_type`). Commercial licensing on the elemens data means **internal use only, no
@@ -884,21 +906,63 @@ site and parcel out of every commit (`git filter-branch`, only those strings cha
 kept locally as a git bundle in `backups/`). Backups: `geoportale_axpo_pre-codici-finti_2026-09-24.html`,
 `README_tools_pre-codici-finti_2026-09-24.md`, `geoportale_axpo_pre-esempi-particelle_2026-09-24.html`.
 
+**Small changes (2026-10-01, the user's list).**
+- **Compass** always visible under the zoom buttons (SDK `Compass`, loaded on demand): the map can be rotated
+  (right-drag, two fingers), one click puts north back up.
+- **Cadastre**: the app's WMS is the only one, at 50% transparency with the popup off (§5).
+- **«Mostra etichette»** in each layer's panel in *Layer*, next to «Popup al click», only when the layer or
+  sublayer has labels configured (`llLabelable`: `labelsVisible` plus a non-empty `labelingInfo`; a layer still
+  loading gets it when ready). Saved in `.axpo` projects as `lab`.
+- **Aggiungi layer**: after a successful add the result list is cleared and the search text kept; if the add
+  fails the list stays, with one error line on top.
+
+  Tested signed out: compass after a 45° rotation (back to 0°); a public web map with a fake «IT - AdE -
+  Cartografia Catastale» layer injected (removed, the app's WMS on top at 0.5 with the popup off, a project state
+  for it not counted as missing); a REST layer with labels (checkbox, on/off, saved and restored) and one without
+  (no checkbox, nor on the WMS); a public item added (list cleared) and a non-existent id (list kept, one error
+  line). Backup: `geoportale_axpo_pre-bussola-catasto-etichette_2026-10-01.html`.
+
+**DWG fix (2026-10-01, evening; ported from the UX prototype, its commit `772e554`).** The user's PVcase
+layout came in with the modules "scattered": 305 of 334 trackers shifted by metres and 29 thrown to (y, −x),
+7,000 km away, then dropped as "far elements". Cause and fix in §5, *OCS (tilted planes)*: the reader treated
+the tilted Object Coordinate System of each tracker block as the world plane and ignored the insertion z; now
+the entity pipeline runs on 3D matrices with the arbitrary axis algorithm (`c3Ocs`, `cadOcsM`), the INSERT
+carries x, y, z of the insertion point, `zScale` and the base point z, LWPOLYLINE/POLYLINE2D their elevation,
+ARC/CIRCLE/ELLIPSE the centre z, LINE/POLYLINE3D/LEADER/3DFACE/POINT the point z. Tested against arcpy as
+ground truth: on two PVcase layouts (334 and 325 trackers) the extent of the module layer matches arcpy to the
+millimetre, where before it was off by metres on both; a third DWG without tilted planes (163,344 items) gives
+a byte-identical result (same coordinate checksum); through the real import flow the layout loads with 2,608
+items in 18 layers, 334 modules inside the fence. The copy in `tools/` gives exactly the prototype's output on
+the three files. Not tested: blocks drawn in elevation views (vertical OCS), which degenerate to segments in
+plan as in AutoCAD. Backup: `geoportale_axpo_pre-dwg-ocs_2026-10-01.html`.
+
+**Hatch fix (2026-10-02).** After the module fix the user noticed the road hatches of another layout: a
+half-disc of 16 m radius over the site entrance and a turning area twice its size. Cause (§5, *Data model*):
+the library returns the counter-clockwise flag of hatch arc and ellipse edges as the number 0/1, the reader
+tested `=== false`, so clockwise edges were never mirrored and the arc went around the other side of its
+chord. One-line fix in `cadHatchRings` (`isCCW === 0` counts as clockwise). Checked on that layout: of 298
+hatches the 6 with clockwise arcs changed, and each now has exactly the extent of its boundary polyline
+(bulges included); on the three DWGs of 2026-10-01 only the layers with such hatches changed (heavy
+traffic, circulation, legend), and their extents now match arcpy's; the 163,344-item DWG keeps the same
+item count. Backup: `geoportale_axpo_pre-hatch-cw_2026-10-02.html`.
+
 **Open, known, non-blocking**
 
-1. Third-party scripts from three CDNs (five on unpkg) **without Subresource Integrity**, on a page that
+1. **The public GitHub repository with the Zornade key** (§6) — needs the owner: make it private,
+   regenerate the key.
+2. Third-party scripts from three CDNs (five on unpkg) **without Subresource Integrity**, on a page that
    holds a portal OAuth token. Best fixed by hosting the libraries on the future Azure site.
-2. **SDK 5.x.** The page is on 4.34, the last AMD release. 5.x on the CDN is ES modules only — no
+3. **SDK 5.x.** The page is on 4.34, the last AMD release. 5.x on the CDN is ES modules only — no
    `require` — so moving to 5 means rewriting module loading and replacing the widgets with components.
-3. The **Legend** widgets created inside LayerList panels are never destroyed on a web map swap.
-4. `deleteEnabled: true` on the AREAS editor: the Esri Editor asks its own confirmation before deleting;
+4. The **Legend** widgets created inside LayerList panels are never destroyed on a web map swap.
+5. `deleteEnabled: true` on the AREAS editor: the Esri Editor asks its own confirmation before deleting;
    check it when logged in before adding one of ours.
-5. **About 240 empty `catch` blocks** (260 with other variable names; counted again on 2026-09-24, the earlier
+6. **About 240 empty `catch` blocks** (260 with other variable names; counted again on 2026-09-24, the earlier
    ~160 was low). Errors vanish silently — e.g. a Union that fails on one piece skips it without saying so. Many
    are deliberate (localStorage in private browsing, optional bits of the UI); the ones on the critical paths —
    promotion (ISTAT lookup, overlap check), restoring the saved work, re-reading project codes — now write a
    `console.warn`. Rewriting all of them mechanically was ruled out: case by case, on the paths that matter.
-6. Not tested logged in: Check Vincoli maps, the real writes to AREAS and to IT - Site Features, the AREAS
+7. Not tested logged in: Check Vincoli maps, the real writes to AREAS and to IT - Site Features, the AREAS
    editor, site context, ISTAT zoom; DWG alignment with a real mouse; Print (CORS error from localhost). On 4.34
    in particular the logged-in branch has not been exercised at all. The Site Features flow (site of work by
    code, first save = adds with GlobalID, second save = one update, delete by GlobalID, load skipping objects
