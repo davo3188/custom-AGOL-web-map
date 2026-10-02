@@ -74,34 +74,42 @@ changes.
 
 | Name | What it is | Code |
 |---|---|---|
-| **Barra superiore** | Title, project, sign-in, theme, help | `#topbar` |
+| **Barra superiore** | Three zones (since 2026-10-01): brand on the left, the **🗺 Mappa** selector in the centre, on the right the project icons 📂 💾, one sign-in button (red/green dot + *Accedi*/*Esci*, user name in the tooltip), theme, help | `#topbar`, `.wmsel`, `#signin` |
 | **Pannello sinistro** | Rail + tabs; this is what undocks | `#side` |
 | **Rail** | The column of icons that picks the tab | `#sideRail` |
-| **Scheda** | Ricerca particelle, Disegno, Geoprocessi, Contesto sito, Importa dati | `.tabpane[data-tab=ricerca\|disegno\|geoproc\|contesto\|import]` |
-| **Modulo** | A collapsible block of a tab, with title, one line and an **i** | `details.imod`, id `<tab prefix>Sec<Name>` (`rc`, `drw`, `gp`, `imp`) |
+| **Scheda** | Ricerca particelle, Disegna, Geoprocessi, Importa dati (four since 2026-10-01: *Contesto sito* moved to Tools) | `.tabpane[data-tab=ricerca\|disegno\|geoproc\|import]` |
+| **Modulo** | A collapsible block of a tab, with title, one line and an **i** (the **i** shows on hover or focus, always on touch) | `details.imod`, id `<tab prefix>Sec<Name>` (`rc`, `drw`, `gp`, `imp`) |
 | **Finestra «i»** | The *how it works* window of a module | `RC_INFO`, `DRW_INFO`, `GP_INFO`, `IMP_INFO` |
 | **Pannello destro** | Action bar + drawers | `#toolsPanel` |
-| **Action bar** | The icons on the right | `#actionIcons` |
-| **Cassetto** | Elenco & azioni, Layer, Basemap, Segnalibri, Modifica AREAS, Stampa | `.drawer[data-panel=…]` |
-| **Sezione** (of the Elenco) | Particelle, Disegni, Geoprocessi, Importati | `.gsec` |
+| **Action bar** | The icons on the right, in groups: Raccolta (with the object-count badge) \| Layer · Mappa di base · Segnalibri \| Modifica AREAS · Stampa | `#actionIcons`, `#rcBadge` |
+| **Cassetto** | Raccolta (ex *Elenco & azioni*, renamed 2026-10-01), Layer, Basemap, Segnalibri, Modifica AREAS, Stampa | `.drawer[data-panel=…]` |
+| **Sezione** (of the Raccolta) | Particelle, Disegni, Geoprocessi, Importati | `.gsec` |
+| **Tools** | The speed-dial menu bottom-left of the map: Misura, Profilo altimetrico, Analisi di contesto, Coordinate sconosciute, Percorso su strada (since 2026-10-01) | `#toolsFab`, `TOOLS`, `tool*` |
+| **Scheda Tools** | The floating card of the open tool (a bottom sheet when the map is narrower than 520 px) | `#toolCard` |
 | **Finestra** (modal) | Salva sul portale, Esporta, Promuovi, CAD… | `#…Modal` |
 
-Modules of *Disegno*: Sito di lavoro (`drwSecSite`), Disegna sulla mappa (`drwSecDraw`), Copia (`drwSecCopy`),
-then, pinned at the bottom under *Supporto al disegno* (`#drwDock`), Misure esatte e aggancio (`drwSecAid`) and
-Griglia (`drwSecGrid`). Since 2026-09-24 *Forme con misure* lives inside *Disegna sulla mappa* and *Copia
-parallela* became *Copia* with a *Parallela* option.
+Modules of *Disegna* (reorganised on 2026-10-01, see *Drawing & geoprocessing*): a compact *Sito di lavoro* row
+at the top (`#sfRow`, opens only when needed), **①** *Cosa disegni* (category, type, attributes, source, note),
+**②** *Con quale strumento* (five tool cards, `.drwcards`, with the exact measurements under them and ↶ ↷ in the
+header), the *Ultimo disegno* box, then, pinned at the bottom under *Supporto al disegno* (`#drwDock`), Misure
+esatte e aggancio (`drwSecAid`) and Griglia (`drwSecGrid`). *Copia* is now a card of *Geoprocessi*.
 Of *Ricerca particelle*: Ricerca particelle (`rcSecFind`), Sulla mappa con selezione manuale particelle
-(`rcSecMap`), Seleziona da un disegno esistente (`rcSecDraw`). Of *Geoprocessi*: Scegli gli
-oggetti, Buffer, Unisci/contorna/semplifica, Ritaglia, Confronta A con B. Of *Importa dati*: File di geometrie,
-Disegni CAD, Immagini sulla mappa, Servizi web, Coordinate senza sistema. *Contesto sito* has no modules.
-An open module is tinted with the accent colour — border, background and icon — so it stands out from the
-closed ones without hovering (since 2026-09-24; light theme: a pale blue veil on white, dark: a lighter background).
+(`rcSecMap`), Seleziona da un disegno esistente (`rcSecDraw`). Of *Geoprocessi*: three steps — **①** Oggetti di
+partenza (A), **②** Cosa fare (eight cards: Buffer, Unione, Contorno, Semplificazione, Ritaglio, Parte comune,
+Sottrai B da A, Copia), **③** Parametri ed Esegui. Of *Importa dati*: four cards always open — File di geometrie,
+Disegni CAD, Immagini sulla mappa, Servizi web (`details.imod.always`); *Coordinate senza sistema* became the
+Tools entry *Coordinate sconosciute*. An open module is tinted with the accent colour — border, background and
+icon — so it stands out from the closed ones without hovering (since 2026-09-24; light theme: a pale blue veil on
+white, dark: a lighter background).
 
 **Undockable left panel** (since 2026-09-24). **⧉** in the header of the pannello sinistro moves it — rail and
 tabs — into a window of its own, to put on a second screen; the map takes the freed space and a thin strip keeps
 ⧉ (bring the window to front) and ⇤ (dock it back). ⇤ in the window, or closing it, docks it back. In that window
-the tabs adapt to the width: from 640 px the modules of a tab flow into columns of about 300 px (a container
-query on `#sideContent`). Size and position are remembered (`axpo_pannello_finestra`); with
+the tabs adapt to the width (a container query on `#sideContent`): from 640 px the modules of *Ricerca* and
+*Importa dati* go into columns of at least 360 px, and *Geoprocessi* and *Disegna* become a real grid — ① and ③
+on the left, ② (the cards, on as many columns of 150 px as fit) on the right (`.paneBody.gpflow` /
+`.paneBody.drwflow`, since 2026-10-01; before, CSS columns of about 300 px that the content did not fill). Size
+and position are remembered (`axpo_pannello_finestra`); with
 more screens, Chrome reopens the window on the other screen only with the *window management* permission, which
 the window offers to ask once. The right panel stays docked for now (its ArcGIS widgets are not made to live in
 another window).
@@ -113,7 +121,10 @@ the panel is collapsed or undocked. The container query also works docked, so a 
 the modules in columns as the undocked window does.
 
 **Parcel search**
-- By *Comune / Foglio / Particella*, with an administrative cascade (region → province → municipality).
+- By *Comune / Foglio / Particella*, with an administrative cascade (region → province → municipality). Since
+  2026-10-01 the region **no longer swaps the portal web map** as a side effect: under the select a shortcut
+  *Vincoli di <regione>: Carica la mappa Check Vincoli ›* appears (`wmSuggest`), and the map is chosen in the
+  **🗺 Mappa** selector of the top bar (see *Map & reporting*).
 - By clicking the map, or by drawing a point, rectangle, polygon or line over an area.
 - From a geometry you already drew — a drawing, a buffer, a geoprocessing result or an import; a point
   finds the parcel under it (since 2026-09-23; before, a point gave a sampling error).
@@ -136,27 +147,36 @@ after 20 s with a message, instead of leaving the UI waiting forever.
   (deflection is relative to the previous side: 90 = right angle to the right, −90 to the left); **Enter**
   locks the values and a **click** anywhere places the vertex there. A second Enter completes the drawing
   *without* that vertex. The circle is drawn from its centre.
-- The *Disegno* tab (reorganised on 2026-09-24): *Sito di lavoro* (optional, see below), *Disegna sulla mappa*
-  (category, type, attributes, note, the five tools; the title counts the drawings), *Copia*, *Cancella tutti i
-  disegni*, and at the bottom *Supporto al disegno* — *Misure esatte e aggancio* and *Griglia*, sticky
-  (`position:sticky; bottom:-10px` inside `#sideContent`, the −10 px being its bottom padding), always in view
-  while the tab scrolls, closed to one line each with their state in the title (*aggancio · misure*, *10 m* /
-  *spenta*, `drwDockSum`). From 640 px of panel width they sit side by side. The **i** windows draw the gesture
-  of each tool and a typed side (`DRW_INFO`/`DDIA`). *Cancella tutti i disegni* is the same as the trash of the
-  *Disegni* section in the *Elenco* (`sectionDelete('draw')`).
-- **Exact rectangles and circles** (since 2026-09-24 inside *Disegna sulla mappa*): with *Rettangolo* or
+- The *Disegna* tab (reorganised on 2026-09-24 as *Disegno*, and again on 2026-10-01 from the user tests —
+  the tab is a verb, the drawer on the right a noun, *Raccolta*, so the two stop being read as twin tool bars):
+  a compact *Sito di lavoro* row at the top (`#sfRow`, shows the chosen site, opens only to change it), **①
+  Cosa disegni** (category, type, attributes, source, note), **② Con quale strumento** (five tool cards,
+  `aria-pressed` on the armed one, lit only for the geometries the category allows; the exact measurements box
+  under them; ↶ ↷ in the header), the **Ultimo disegno** box (category chip that opens the object's form in
+  the Raccolta, name, measure, zoom, ×, *Tutti i disegni nella Raccolta ›*: the answer to "where did it go" is
+  given where the drawing was made, `drwLastRender`), and at the bottom *Supporto al disegno* — *Misure esatte e
+  aggancio* and *Griglia*, sticky (`position:sticky; bottom:-10px` inside `#sideContent`, the −10 px being its
+  bottom padding), always in view while the tab scrolls, closed to one line each with their state in the title
+  (*aggancio · misure*, *10 m* / *spenta*, `drwDockSum`). The **i** windows draw the gesture of each tool and a
+  typed side (`DRW_INFO`/`DDIA`). *Cancella tutti i disegni* went away: the trash of the *Disegni* section in
+  the *Raccolta* does it (`sectionDelete('draw')`). One lexicon everywhere: "nella Raccolta", "Vedi nella
+  Raccolta ›", in the tour, the help and the tooltips.
+- **Exact rectangles and circles** (since 2026-09-24, under the tool cards): with *Rettangolo* or
   *Cerchio* armed, a box *Con misure esatte* appears (`#shpBox`). Unticked, the SDK draws freehand; ticked with
   valid values, the sketch is cancelled and the map mode `shape` previews the shape under the pointer, a click
   places it (`shpSync` switches between the two as the fields change). The armed tool stays armed across the
   switch: `drwModeEnd(keepDraw)` and `cadModesOff(keepDraw)`; Esc ends the shape mode and the tool together.
-- **Copia** (since 2026-09-24): plain copy picks any object under the click — drawing (points too), result,
+- **Copia** (since 2026-09-24; since 2026-10-01 a card of *Geoprocessi*, always enabled because it needs no A;
+  its options — *Parallela*, distance, *Solo il lato cliccato* — and the button that arms the click are in step
+  ③): plain copy picks any object under the click — drawing (points too), result,
   import, parcel, or a layer feature through `drwEdgeAt` — and moves it with the clicked point (`geomShift`, a
   translation in Web Mercator: 1 km north changes the scale by ~0.02%, negligible); every further click places
   another copy, Esc ends. A copy of our own object keeps category, type, attributes, note, site and style but
   not `sf_gid`/`sf_saved` (a new object on the portal); a copy of a parcel or layer is a new drawing with the
-  tab's category. *Parallela* is the former parallel copy.
-- **Connection route on roads** (since 2026-09-24). Category *Percorso di connessione* (`connection`, lines
-  only, types *Stimato*/*Confermato*) shows a box with **↝ Su strada**: click the start, Shift+click via points,
+  category of *Disegna*. *Parallela* is the former parallel copy.
+- **Connection route on roads** (since 2026-09-24; since 2026-10-01 the Tools entry **Percorso su strada**, a
+  generic tool instead of a box inside the *Percorso di connessione* category — the result always gets category
+  `connection` and type `estimated`, the only data change of the UX round): click the start, Shift+click via points,
   click the end (`drwMode` `rte`, stops as temporary markers). `rteSolve` calls the organisation's route service
   (`portal.helperServices.route.url`, fallback `route.arcgis.com/…/Route_World`) with `esri/rest/route`, stops in
   the given order (a *simple route*, **0.005 credits** whatever the number of stops — Esri's credit table),
@@ -171,14 +191,14 @@ after 20 s with a message, instead of leaving the UI waiting forever.
   largest overlap (area for polygons, length for lines, any for points); outside every area it takes the working
   site if there is one, otherwise it stays unlinked and the message says so. `sfRefreshCodes` then re-reads
   `Project_Code` by GlobalID for links without a code (a freshly promoted area gets its code from the CRM later;
-  `GlobalID IN ('{…}')` with braces and upper case, checked on the real layer). *Sito di lavoro* is now optional
-  (closed by default): it forces a site on new drawings, covers objects outside every area and loads a site's
-  objects. *Disegna sulla mappa* starts from the **category** (the role in the project: gross area, net area,
+  `GlobalID IN ('{…}')` with braces and upper case, checked on the real layer). *Sito di lavoro* is optional
+  (a compact row at the top of *Disegna*): it forces a site on new drawings, covers objects outside every area
+  and loads a site's objects. *Cosa disegni* starts from the **category** (the role in the project: gross area, net area,
   connection route, exclusion, linear infrastructure, obstacle, access & connection point, mitigation,
   agricultural zone, note & reference), then the **type** (what it is: overhead power line, tree, landscape constraint…) and only the
   attributes that apply (buffer, height, width for lines, voltage for power lines), the source (survey /
   desk / official) and a note. Only the tools of the category's geometries are enabled, and drawings take
-  the category colour. In the *Elenco*, the coloured tag of every drawing, result or import opens a small
+  the category colour. In the *Raccolta*, the coloured tag of every drawing, result or import opens a small
   form to change category, type, attributes, note, source and status; ☁ marks what is on the portal
   (orange: changed since). Old drawings with a Sites Notes category get the new one when loaded
   (`SF_FROM_SN`, e.g. *DPA* → exclusion · DPA corridor). The model and its codes are shared with the AGOL
@@ -186,7 +206,7 @@ after 20 s with a message, instead of leaving the UI waiting forever.
 - A drawing, buffer, result or import clicked on the map (no tool active) can be moved, rotated and
   scaled; a second click edits its vertices; Delete, on the first click, removes it. Since 2026-09-23 the
   end of an edit updates the stored area, the list and the auto-save (see §7).
-- **CAD-style tools** (since 2026-09-23), all in the *Disegno* tab:
+- **CAD-style tools** (since 2026-09-23), in the *Disegna* tab (the parallel copy in *Geoprocessi › Copia*):
   - **Undo / redo** (buttons, Ctrl+Z / Ctrl+Y). The SDK's own undo only works inside the active sketch
     session (it removes the last vertex, and handles Ctrl+Z itself while the map has focus). For finished
     work the app keeps its own history (`drwHist`, 40 steps): "snapshots" of the tool layer holding references
@@ -202,7 +222,7 @@ after 20 s with a message, instead of leaving the UI waiting forever.
     height, orientation of the width as azimuth) or a circle (radius), previewed under the pointer and placed
     with a click on the centre. *Da un lato* takes the orientation from the nearest side of a drawing, parcel,
     DWG or layer feature (full geometry re-queried), then goes back to placing.
-  - **Parallel copy** (*Copia* with *Parallela* ticked): pick an object, then click the side. A line gives a parallel line, an area an inset
+  - **Parallel copy** (the *Copia* card with *Parallela* ticked): pick an object, then click the side. A line gives a parallel line, an area an inset
     (click inside) or an outset (outside), with mitered corners (`geometryEngine.offset`); *Solo il lato
     cliccato* copies just that side.
   - **Metric grid**: the SDK's `GridControlsViewModel` (a "measured" grid, `view.grid`, spacing in real
@@ -222,27 +242,40 @@ after 20 s with a message, instead of leaving the UI waiting forever.
   or with a whole category. On A: buffer (one per object, or merged), union, convex hull, simplify, clip
   against a polygon drawn on the spot; between A and B: intersect, difference. Every result lands in
   *Geoprocessi* with its area and can go back into A or B.
-- The tab has the same layout as *Importa dati* (since 2026-09-23), in working order. Each section
-  shows a title and one plain line, and each operation is a button with a line saying what it does:
-  - *Scegli gli oggetti* (slot A);
-  - *Buffer*;
-  - *Unisci, contorna, semplifica*;
-  - *Ritaglia*;
-  - *Confronta A con B* (slot B, *Parte comune*, *Sottrai B da A*).
+- The tab is a **three-step flow** (since 2026-10-01, from the user tests; before, one collapsible section
+  per operation with the "fill A first" prerequisite invisible and every message in a grey line at the bottom):
+  - **① Oggetti di partenza** — slot A, from the map, the ticked rows of the Raccolta or a whole category; the
+    title counts "n oggetti · n aree";
+  - **② Cosa fare** — eight cards in a radio group (`GP_OPS`, arrows, Home/End, Space/Enter): Buffer, Unione,
+    Contorno, Semplificazione, Ritaglio, Parte comune, Sottrai B da A, Copia. Each card states its own
+    condition ("solo aree", "serve B") and is disabled, with the reason and the way out, until A fits
+    (`gpFlowSync`); Copia needs no A and is always on;
+  - **③ Parametri ed Esegui** — the distance for Buffer, slot B for *Parte comune* and *Sottrai*, the Copia
+    options, then **Esegui** and a status line with a coloured dot: ready · in corso · **Eseguito** with the
+    measure and *Vedi nella Raccolta ›* · an error in plain words with what to do (`gpErrText`; the raw turf
+    message goes to the console). The logic is unchanged (`gpRun`, `makeBuffer`, `gpDoClip`, `gpExec`).
 
-  Button and result names are in plain Italian (Unione, Contorno, Semplificazione, Ritaglio, Parte
-  comune, Differenza); the GIS term stays in the tooltip. Each **i** opens an **example**: a small
-  "before → after" SVG drawing in the map colours (A orange, B purple, result blue), a real scouting
-  case, then how to use it and what to know (`GP_INFO`/`DIA` in the UI glue). A closed title shows
-  "A: n" / "B: n". *Buffer qui* in the right-click menu opens the Buffer section.
+  Operation and result names are in plain Italian (Unione, Contorno, Semplificazione, Ritaglio, Parte comune,
+  Differenza); the GIS term stays in the tooltip. Each card's **i** opens an **example**: a small "before →
+  after" SVG drawing in the map colours (A orange, B purple, result blue), a real scouting case, then how to
+  use it and what to know (`GP_INFO`/`DIA` in the UI glue). *Buffer qui* in the right-click menu preselects the
+  Buffer card (`gpOpenOp`).
 - **Features of the map's own layers as sources** (since 2026-09-23). In *Dalla mappa*, a click on a
   vector layer adds its feature to the slot: web map feature layers, REST services, WFS, GeoJSON, and
   map-service sublayers (the last through identify). The feature is copied into *Importati* with its
   **full geometry** and its original attributes, which go into exports, so it works with every
   operation, the export and the promotion. The same feature is copied only once. WMS layers are images
   and have no geometry to use.
+- **Raccolta** (the right drawer, ex *Elenco & azioni*, since 2026-10-01): its rail icon carries the number of
+  objects (`rcBadge`), the right rail is grouped (Raccolta | Layer · Mappa di base · Segnalibri | Modifica AREAS
+  · Stampa, `aria-expanded` on the icons), and a dock pinned at its bottom holds **Esporta** (full width) and,
+  under it, **Migra particelle in AREAS Collection** | **Salva disegni in Site Features** (see *Export* and
+  *Write-back*).
+- **Colour picker** (since 2026-10-01, `makeColorSwatch`/`colPopOpen`): a button that opens swatches — *Recenti*
+  (the last 8, `axpo_colori_recenti`), the model's *Categorie*, *Mappa* (the Okabe–Ito palette, safe for colour
+  blindness) and *Tenui* — plus *Altro colore…* for the native picker; Esc closes, `aria-pressed` on the chosen one.
 - Per-geometry **colour and visibility**, plus per-section controls, all persisted. Since 2026-09-24 every
-  section header of the *Elenco* — *Importati* included, which had none — has: a tick box for all its rows
+  section header of the *Raccolta* — *Importati* included, which had none — has: a tick box for all its rows
   (with the *some* state; `sectionSelCount`/`setSectionSel`), show/hide all, a **paint bucket** for the colour
   (the filled square looked like the selection tick box; the rows use the bucket too, `swatchPaint`) and a
   **trash** for the whole section (`sectionDelete`: asks first; for objects saved on the portal asks again
@@ -251,17 +284,19 @@ after 20 s with a message, instead of leaving the UI waiting forever.
   particelle* went away (the trash of *Particelle* does it). In *Importati* show/hide and the trash also act on
   the images, which now have an eye too.
 
-**Site context**
-Nearby substations (380/220/150/132 kV), HV lines and PV projects, pulled live from the portal layers.
+**Site context** — since 2026-10-01 the Tools entry **Analisi di contesto** (a floating card; the rail tab is
+gone). Nearby substations (380/220/150/132 kV), HV lines and PV projects, pulled live from the portal layers.
+Needs sign-in; signed out, the card says why and keeps the button disabled. *Analisi di contesto qui* in the
+right-click menu opens it on the clicked point.
 
 **Import** (the *Importa dati* tab)
-- Since 2026-09-23 the tab is five **collapsible sections**, one per module: files, CAD drawings,
-  images, web services, coordinates without a system. Each section shows a title and one plain line,
-  and remembers whether it is open (`axpo_import_aperte`). The complex modules have an **i** button that
-  opens a "how it works" window (`IMP_INFO` in the UI glue): steps, then things to know. A closed title
-  shows a counter ("2 in mappa") for DWGs, images and services. The code opens the right section when
-  it sends you there: a DWG picked through the generic file button, or a file without `.prj`
-  (`window.impOpen`). The tour steps do the same.
+- Since 2026-09-23 the tab is one module per way of importing: files, CAD drawings, images, web services. Since
+  2026-10-01 the four are **cards always open** (`details.imod.always`: no arrow, the saved state cannot close
+  them; side by side in a wide panel) and *Coordinate senza sistema* moved to Tools as **Coordinate
+  sconosciute** (a file without `.prj` opens that tool by itself). The complex modules have an **i** button that
+  opens a "how it works" window (`IMP_INFO` in the UI glue): steps, then things to know. A title shows a
+  counter ("2 in mappa") for DWGs, images and services. The code opens the right module when it sends you
+  there: a DWG picked through the generic file button (`window.impOpen`). The tour steps do the same.
 - Vectors: GeoJSON, KML, KMZ, SHP.
 - Georeferenced **images and GeoTIFF** — images get four draggable corner handles, GeoTIFFs are
   auto-placed from their bounding box and geokeys, reprojected into the view SR.
@@ -275,7 +310,8 @@ Nearby substations (380/220/150/132 kV), HV lines and PV projects, pulled live f
   ALIGN): a point on the drawing, where it really is, twice; vertices snap to the drawing, to loaded
   parcels, drawings and other DWGs. The placement is remembered per file and offered again next time.
   The drawings themselves are session-only.
-- **Coordinates whose CRS is unknown** — a decree, a survey, an email, a shapefile with no `.prj`.
+- **Coordinates whose CRS is unknown** (Tools › *Coordinate sconosciute*) — a decree, a survey, an email, a
+  shapefile with no `.prj`.
   Paste the pairs (decimal comma, thousands separators, DMS and a leading label are all understood)
   and the tool projects them through the Italian systems, keeping the ones that land in Italy and
   showing *where* each one falls, X/Y swapped included. With **📍 Dove dovrebbe stare** you click the
@@ -293,18 +329,26 @@ Nearby substations (380/220/150/132 kV), HV lines and PV projects, pulled live f
   projects, and are removed from the Layer panel.
 - The **top search box** takes addresses and coordinates: `lat, lon` (decimal comma and DMS included)
   or projected `X Y`, whose system it guesses and flies to. A coordinate pair wins over the geocoder;
-  anything with letters in it (an address with house number and postcode) goes to the geocoder.
+  anything with letters in it (an address with house number and postcode) goes to the geocoder. Since
+  2026-10-01 it is collapsed to a lens button on the map (`#searchToggle`, `window.searchCollapse`); open, it is
+  80% opaque and closes with Esc, a click outside or a result.
 
 **Export**
-GeoJSON, KML, KMZ, SHP, XLSX, with optional dissolve. Names you assign in the UI end up in the file.
-The shapefile comes as one zip with a layer per geometry type (`_punti`, `_linee`, `_aree`).
+The **Esporta** button of the Raccolta dock opens one window (since 2026-10-01, `openExport`/`exRender`): the
+format at the top (GeoJSON, KML, KMZ, SHP, XLSX), then one section per kind with *tutti* and one row per object;
+the ticks are the Raccolta's own, both ways; with nothing ticked everything is exported; XLSX disables the
+non-parcel sections (`buildFC`/`graphicsFeatures` take the chosen set). *Dissolve* moved to the AREAS migration
+window. Names you assign in the UI end up in the file. The shapefile comes as one zip with a layer per geometry
+type (`_punti`, `_linee`, `_aree`).
 
 **Write-back to the portal**
-- Parcels → **AREAS COLLECTION** (layer 426). REGIONE and PROVINCIA are the parcel's own (Zornade names,
+- Parcels → **AREAS COLLECTION** (layer 426) with **Migra particelle in AREAS Collection** in the Raccolta dock
+  (the *dissolvi* option is in its window). REGIONE and PROVINCIA are the parcel's own (Zornade names,
   the same spelling already in the layer), COMUNE and PRO_COM_T come from ISTAT, the area is geodesic —
   the same number the list shows.
-- Drawings, buffers, geoprocessing output and imports → **IT - Site Features** with *⤴ Salva sul portale*
-  (since 2026-09-24; it replaces *Promuovi → Sites Notes*). Category, type, attributes, name, note, source,
+- Drawings, buffers, geoprocessing output and imports → **IT - Site Features** with **Salva disegni in Site
+  Features** in the dock (since 2026-09-24 as *⤴ Salva sul portale*, replacing *Promuovi → Sites Notes*; renamed
+  2026-10-01 — "salva", not "migra", because the second time it updates). Category, type, attributes, name, note, source,
   status and the site (`AREA_GUID` = GlobalID of the AREAS COLLECTION area, `PROJECT_CODE`) are written. Each
   object gets a GlobalID made in the browser (`sf_gid`) and is saved with `applyEdits(…, {globalIdUsed:true})`:
   the first save adds it, the next ones update it — no duplicates; an update that fails (object deleted on the
@@ -314,17 +358,40 @@ The shapefile comes as one zip with a layer per geometry type (`_punti`, `_linee
   Removing a saved object with × asks whether to delete it on the portal too.
 
 **Map & reporting**
-- Loads the 17 regional *Check Vincoli* web maps (16 of 20 regions covered) plus the General Map.
+- Loads the 17 regional *Check Vincoli* web maps (16 of 20 regions covered) plus the General Map, chosen in the
+  **🗺 Mappa** selector at the centre of the top bar (since 2026-10-01, `wm*` functions): a menu with the General
+  Map and the 16 Check Vincoli, a search by name, the current one ticked, entries disabled when signed out,
+  arrows, Esc, closes on a click outside; the name is repeated at the top of the Layer drawer. On sign-in the
+  General Map always loads. A confirmation is asked only when something would be lost — layers switched on in
+  a Check Vincoli map or attribute filters (`wmHasStateToLose`); parcels, drawings, results, DWGs, images and
+  services survive the swap (`loadWebMap` moves them). The menu gets `z-index:1500` only while open: the centred
+  container has a CSS transform, hence a stacking context, and without it the menu was painted under the map.
 - LayerList with per-layer legend, transparency, popup toggle and drag-and-drop reordering, a search box
   by layer name, and an **attribute filter**, like QGIS *Filter…*: field, condition and value (values
   suggested from the data, domain values as a menu), `+ E` / `+ O` to combine, editable SQL, live count.
   The panel icon turns into a funnel while a filter is on. Layers you added (portal items, web services,
   DWGs, images) get a **…** menu with *Zoom al layer* and *Rimuovi dalla mappa*.
 - Bookmarks that also restore **layer visibility** (Esri's own bookmarks do not).
-- Right-click context menu acting on the clicked point: add parcel here, site context here, buffer here,
-  copy coordinates, open in Google Maps, centre here.
+- Right-click context menu acting on the clicked point: add parcel here, *Analisi di contesto qui*, *Buffer qui*
+  (preselects the Buffer card), copy coordinates, open in Google Maps, centre here.
 - Parcel labels on the map, hidden below 1:150,000; the on/off choice is remembered.
-- Measurement, coordinates + pin, scale bar, elevation profile.
+- **Tools** (since 2026-10-01): one speed-dial button bottom-left (`#toolsFab`, `aria-haspopup="menu"`,
+  `aria-expanded`), a vertical menu with icon, name and one line per entry (44 px rows, `role=menu`/`menuitem`,
+  arrows, Home/End, Esc with focus back, closes on a click outside or when a drawer opens): **Misura**, **Profilo
+  altimetrico**, **Analisi di contesto**, **Coordinate sconosciute**, **Percorso su strada**. One tool at a time,
+  in a floating card (`#toolCard`, 340 px, 560 for the profile; a bottom sheet when the map is narrower than 520
+  px; the button shows the open tool, `aria-current` in the menu). A tool that acts on the map joins the single
+  mode switch, the banner and the Esc chain (`toolModeOff`, `measureStop`, `elevStop`); opening one while a sketch
+  is in progress **completes** the sketch if it has enough vertices (2 for a line, 3 for an area) instead of
+  dropping it (`sketchFinishIfPossible`, also from `modeOffDraw`), and a toast says so. Signed out, context and
+  route show the reason with the button disabled.
+- Scale bar bottom-centre at 70% opacity (`#scaleDock`), coordinates widget glued to the bottom-right corner,
+  Esri attribution at 18 px and 0.75 opacity (full on hover), mode banner small at the top edge of the map
+  (11 px, ellipsis, full text in its tooltip) — the user's rule of 2026-10-01: lighten the map visually.
+- Contrast (2026-10-01, measured on the tokens): filled buttons and active states use `--accent-strong` with
+  white in the light theme (7.2:1) and `--accent` with dark text in the dark theme (8.9:1) — white on
+  `--accent` gave 3.2:1 / 2.1:1; accent-coloured texts (links, counters, section titles, banner) use `--link`;
+  ok/error outcomes are a coloured dot plus normal text, since green and yellow as text on white fail AA.
 - Printing through the Esri Print widget. The custom A3 PDF site report (jsPDF) was **removed on
   2026-09-22** — it never worked reliably and will be redesigned; the old code is in
   `geoportale_axpo_pre-bugfix-export-pdf-geoproc_2026-09-22.html`, inside `backups/archive_2026-09-22.zip`.
@@ -334,7 +401,7 @@ The shapefile comes as one zip with a layer per geometry type (`_punti`, `_linee
   (every key of the app, then reload). DWGs and images are never saved there; `localStorage` is capped
   at ~5 MB per site, and hitting the cap now shows a warning instead of failing silently.
 
-**Projects** (top bar, since 2026-09-23)
+**Projects** (top bar, since 2026-09-23; since 2026-10-01 the two icons 📂 💾 on the right, names in the tooltips)
 - **💾 Salva progetto** writes the whole working state to one `.axpo` file, like a QGIS `.qgz`:
   view (with rotation), basemap, work area (region/province/comune), the portal web map and every
   layer's visibility, transparency, popup toggle, attribute filter and order, the portal layers added by
@@ -687,6 +754,18 @@ so it never touches the AMD loader. Worth knowing before editing:
 - Filters go into projects (`def`, and `sdef` for sublayers), not into the auto-save. After a reload
   the layers come back unfiltered, like their visibility.
 
+- **UX refactor traps (2026-10-01).** Top-level function declarations are properties of `window`: assigning
+  `window.gpSelectOp = …` overwrote `gpSelectOp` itself and the function called itself forever (stack overflow)
+  — use another name (`gpOpenOp`). The **i** buttons are wired by the selector `.im-info`, not `.imod .im-info`:
+  the ones outside modules (geoprocessing steps, Tools card) were mute. A sketch interrupted by a tool is
+  completed in `modeOffDraw` as well as in `cadModesOff`: clicking an armed tool button cancels the sketch there
+  first, before `cadModesOff` ever runs. The centred `.wmsel` container has a CSS `transform`, which creates a
+  stacking context without a `z-index`: the open menu was painted under `#mapWrap`, so `.wmsel.open` gets
+  `z-index:1500` (and only while open, not to cover the modals). The wide-panel card grid needs
+  `.paneBody .gpcards` (specificity), the later base rule overrode `.gpcards`. The Raccolta's export ticks and
+  the export window share one state (`exSel`): keep them in sync both ways. The search box focus on open needs
+  the fallback `sb.querySelector('input').focus()` after 60 ms.
+
 ## 6. Security & distribution
 
 - The Zornade key is a read-only token **embedded in the source** (`DEFAULT_KEY`). This is a deliberate,
@@ -945,6 +1024,39 @@ hatches the 6 with clockwise arcs changed, and each now has exactly the extent o
 (bulges included); on the three DWGs of 2026-10-01 only the layers with such hatches changed (heavy
 traffic, circulation, legend), and their extents now match arcpy's; the 163,344-item DWG keeps the same
 item count. Backup: `geoportale_axpo_pre-hatch-cw_2026-10-02.html`.
+
+**UX refactor (2026-10-01/02, from the user tests; prototyped in `../prototipo_ux/`, approved and integrated on
+2026-10-02).** Four problems from the user tests, each a commit in the prototype's local git (its
+`REPORT_UX.md` has the diagnosis, the options, the decisions, the verifications, before/after screenshots and
+the backlog; `FASE2_diagnosi_e_proposte.md` the wireframes): **P1** *Disegno* and *Elenco & azioni* read as
+twin tool bars → *Disegna* (verb) / *Raccolta* (noun, count badge, grouped right rail, *Ultimo disegno* box, one
+lexicon); **P2** geoprocessing with an invisible prerequisite → three steps, operation cards with their own
+conditions, *Esegui → Eseguito*, errors in plain words; **P3** the web map swapped as a side effect of the
+search region → the **🗺 Mappa** selector in the top bar, region and map independent with a shortcut; **P4**
+four tools in four places → the **Tools** speed-dial (Misura, Profilo altimetrico, Analisi di contesto,
+Coordinate sconosciute, Percorso su strada), one floating card at a time, the elevation profile inside the
+single mode switch, a sketch in progress completed rather than dropped. Second round (the user's notes after
+trying it, signed in too): top bar in three zones, Raccolta dock (Esporta / Migra particelle in AREAS
+Collection / Salva disegni in Site Features), one export window with per-object ticks shared with the
+Raccolta, *dissolve* only in the AREAS migration, colour picker with swatches and recents, Misura as the first
+tool, scale bar bottom-centre at 70%, coordinates in the corner, search as a lens. Third round: the map menu
+painted under the map (transform → stacking context: `z-index` only while open), *Disegna* in two steps with the
+compact site row, *Copia* as a Geoprocessi card, *Importa dati* as four open cards, a real grid for the wide or
+undocked panel, and the "lighten the map" rule (OAuth notice in the sign-in tooltip, **i** on hover/focus,
+discreet attribution, small banner). Palette kept: contrast failures fixed with the existing tokens
+(`--accent-strong`, `--link`). No service, geoprocess, query or data model changed — the one data change is
+the road route always writing category `connection` / type `estimated`. Verified by the assistant without
+sign-in (keyboard order and Esc chain, ARIA roles and states, `prefers-reduced-motion`, 1366/1024/768/375
+layouts, contrast on the tokens, a real-click sketch completed from Tools, every former function still
+reachable) and by the user signed in (context, route, Check Vincoli swap, AREAS migration). Integration: the
+prototype file equals `tools/` plus its 15 UX commits replayed one by one, byte for byte (the two DWG fixes were
+already in both), so it was copied over; a headless smoke test of the copy loads the map, opens the Tools
+menu and the map menu, counts the cards (8 operations, 5 tools) and reports no script error. Still untested
+by the assistant: the undocked panel with the Tools menu, the profile widget with real clicks after a web map
+swap. Backups: `geoportale_axpo_pre-prototipo-ux_2026-10-02.html`, `README_tools_pre-prototipo-ux_2026-10-02.md`.
+Backlog (from the report, not done): geoprocessing in a Web Worker with a real cancel, Raccolta on the left, a
+phone layout, zoom and compass as a chip, *Impostazioni avanzate* in one place, Stampa and Modifica AREAS out
+of the rail, a user test with 5–8 project managers.
 
 **Open, known, non-blocking**
 
