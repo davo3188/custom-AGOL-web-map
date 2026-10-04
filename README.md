@@ -443,7 +443,8 @@ type (`_punti`, `_linee`, `_aree`).
   search, the web services added by URL, parcels,
   drawings, geoprocessing output, imports, label toggle — and the **original DWG and image files** with
   their placement (reference system, scale, two-point alignment, layer visibility and colours; image
-  corners and transparency).
+  corners and transparency), plus, since 2026-10-04, the **elevation grids of *Pendenze da DTM*** with their
+  slope limit (the DTM image is rebuilt from the grid on opening). PV Predesign opens the same file.
 - **📂 Apri progetto** replaces the current work (after a confirmation) and rebuilds all of it; the DWGs
   are re-read from the file without the confirmation dialog. `Ctrl+S` saves again to the same file,
   `Ctrl+Shift+S` or Shift+click is *save as*, `Ctrl+O` opens. The project name shows in the top bar and
@@ -1087,6 +1088,25 @@ in the fields; after removing the DTM (as after a reload) a new extraction updat
 The bottom sheet got 72 px of bottom padding: the Tools button covered the last command of a tall card.
 Backups: `geoportale_axpo_pre-pendenze-direzioni_2026-10-04.html`,
 `geoportale_axpo_pre-limiti-a-mano_2026-10-04.html`.
+
+**Guide, tours and info windows realigned (2026-10-04, the user's request: "are the .axpo save, the tour and
+the tutorial aligned with the changes?").** Audit of the three against the interface after the UX refactor and
+the slope tool. *Project file*: aligned — drawings with their codes and `sf_slope`, DTM grids, site of work,
+services, DWGs and images are all saved and restored (the round trip is in the slope test above); one gap closed:
+reopening a project now also puts the grid cell size back in its field. Still not saved, as before: the drawing
+grid (step, origin, rotation), an open proposal. *Quick guide* (`#helpModal`): it had no entry for Geoprocessi,
+Importa dati or Tools, and described neither the two steps of Disegna nor the DTM in projects; it now has eleven
+entries in the order of the interface (left panel, Ricerca, Disegna, Geoprocessi, Importa dati, right rail, Mappa,
+Layer, Esporta / Migra / Salva, Tools, Progetto), with *Pendenze da DTM* and the right-click menu. *Tours*: every
+selector of the two tours exists; texts updated (what sign-in is needed for, *Ultimo disegno*, the right rail in
+three groups, the project with the DTM and PV Predesign), the Tools step now lists *Pendenze da DTM*, and a new
+step opens that tool (the next step closes it): "Tutti gli strumenti" has 14 steps, "Inizia qui" 7. *Info
+windows*: the *Copia* text named a button that no longer exists and the *Disegna* text a counter in a title that
+is gone; both corrected, the *Disegna* window is now titled *Disegna*. Tested in headless Chrome: both tours
+walked step by step to the end with a highlight box on a different, existing element at every step and the
+popup inside the screen; the guide lists the eleven entries and none of the old names (Elenco, Contesto sito,
+Salva sul portale, Promuovi); nine info windows open with their titles; no script error. Backups:
+`geoportale_axpo_pre-guida-tour_2026-10-04.html`, `README_tools_pre-guida-tour_2026-10-04.md`.
 
 **UX refactor (2026-10-01/02, from the user tests; prototyped in `../prototipo_ux/`, approved and integrated on
 2026-10-02).** Four problems from the user tests, each a commit in the prototype's local git (its
