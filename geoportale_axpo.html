@@ -782,6 +782,22 @@
   #toolCard{width:min(340px, calc(100vw - 28px));max-height:min(72vh, 640px);display:flex;flex-direction:column;background:var(--panel);color:var(--txt);border:1px solid var(--line-strong);border-radius:12px;box-shadow:0 6px 18px rgba(0,0,0,.2);border-top:3px solid transparent;border-image:var(--axpo-gradient) 1 0 0 0}
   #toolCard[hidden]{display:none}
   #toolsFab[data-tool="elev"] #toolCard{width:min(560px, calc(100vw - 28px))}
+  /* Pendenze da DTM (2026-10-04) */
+  #toolsFab[data-tool="slope"] #toolCard{width:min(390px, calc(100vw - 28px))}
+  .slp-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:8px 0 10px}
+  .slp-row.two{grid-template-columns:repeat(4,1fr)}
+  .slp-row label{margin-top:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .slp-row input{width:100%}
+  .slp-row [hidden]{display:none}
+  .slp-seg{display:flex;gap:6px;margin:10px 0 6px}
+  .slp-seg button{flex:1;margin:0}
+  .slp-seg button[aria-pressed="true"]{border-color:var(--accent-strong);color:var(--link);font-weight:700}
+  .slp-leg{display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px;font-size:11px;color:var(--mut);margin:0 0 6px}
+  .slp-leg i{display:inline-block;width:12px;height:12px;border-radius:2px;margin-right:4px;vertical-align:-2px}
+  .slp-leg .bar{flex:1 1 100%;height:10px;border-radius:3px;background:linear-gradient(90deg,#267348,#96be5a,#eed678,#b08060,#f5f5f0)}
+  .slp-leg .hat{background:repeating-linear-gradient(45deg,#961428 0 2px,#d93046 2px 5px)}
+  #slpStats{margin:0 0 8px;line-height:1.45}
+  #slpRes[hidden]{display:none}
   .toolcard-h{display:flex;align-items:center;gap:8px;padding:8px 8px 7px 12px;border-bottom:1px solid var(--line)}
   .toolcard-h b{flex:1;font-size:13px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .toolcard-h .im-info{flex:none;width:22px;height:22px;margin:0;padding:0;border-radius:50%;border:1px solid var(--line-strong);background:transparent;
@@ -796,6 +812,7 @@
   #elevProfile{min-height:220px}
   #toolsFab.sheet #toolCard,#toolsFab.sheet[data-tool="elev"] #toolCard{position:fixed;left:0;right:0;bottom:28px;width:auto;max-width:none;max-height:60vh;border-radius:12px 12px 0 0}
   #toolsFab.sheet #toolMenu{min-width:min(260px, calc(100vw - 28px))}
+  #toolsFab.sheet .toolcard-b{padding-bottom:72px}   /* a foglio, il pulsante Tools sta sopra il fondo della scheda: l'ultimo comando deve poter scorrere più su */
 
   /* ══ PROTOTIPO UX · trasversali: contrasto WCAG AA con i colori già in palette (nessun colore nuovo) ══
      Pulsanti pieni e stati «attivo»: bianco su --accent dava 3,2:1 (chiaro) e 2,1:1 (scuro); --accent-strong con il
@@ -1248,11 +1265,40 @@
             <button type="button" class="primary" id="rteGo" style="margin-top:10px" title="Clicca la partenza e l'arrivo sulla mappa: il percorso segue le strade">↝ Clicca partenza e arrivo sulla mappa</button>
             <div id="rteMsg" class="thint">Clicca la partenza, poi l'arrivo; <kbd>Maiusc</kbd>+clic in mezzo aggiunge un punto di passaggio.</div>
           </div>
+          <!-- Pendenze da DTM (2026-10-04): quote sull'area lorda più 25 m, aree oltre la soglia → esclusione nella Raccolta -->
+          <div class="toolpane" data-tool="slope" hidden>
+            <label for="slpArea" style="margin-top:0">Area lorda</label>
+            <select id="slpArea"></select>
+            <label for="slpRule">Limite di pendenza</label>
+            <select id="slpRule">
+              <option value="any">In ogni direzione</option>
+              <option value="nsew">Nord–sud ed est–ovest, separati</option>
+            </select>
+            <div class="slp-row" id="slpRow">
+              <div id="slpMaxBox"><label for="slpMax" title="Tutto ciò che supera questa pendenza, in qualsiasi direzione, viene escluso">Escludi oltre (%)</label><input type="number" id="slpMax" min="1" max="100" step="1" value="10" inputmode="decimal"></div>
+              <div id="slpNSBox" hidden><label for="slpNS" title="Pendenza massima lungo la direzione nord–sud">N–S (%)</label><input type="number" id="slpNS" min="1" max="100" step="1" value="10" inputmode="decimal"></div>
+              <div id="slpEWBox" hidden><label for="slpEW" title="Pendenza massima lungo la direzione est–ovest">E–O (%)</label><input type="number" id="slpEW" min="1" max="100" step="1" value="10" inputmode="decimal"></div>
+              <div><label for="slpCell" title="Lato delle celle della griglia. Il DTM Esri in Italia ha circa 10 m di passo">Cella (m)</label><input type="number" id="slpCell" min="2" max="50" step="1" value="5" inputmode="decimal"></div>
+              <div><label for="slpMin" title="Area minima: le macchie più piccole di così non contano">Area min. (m²)</label><input type="number" id="slpMin" min="0" step="50" value="250" inputmode="decimal"></div>
+            </div>
+            <button type="button" class="primary" id="slpGo" style="margin-top:0">◢ Estrai le pendenze dal DTM</button>
+            <div id="slpMsg" class="thint" role="status" aria-live="polite"></div>
+            <div id="slpRes" hidden>
+              <div class="slp-seg" role="group" aria-label="Cosa mostrare sulla mappa">
+                <button type="button" class="sec" id="slpViewZ" aria-pressed="true">Quote</button>
+                <button type="button" class="sec" id="slpViewS" aria-pressed="false">Classi di pendenza</button>
+              </div>
+              <div id="slpLegend" class="slp-leg"></div>
+              <div id="slpStats" class="thint"></div>
+              <button type="button" class="primary" id="slpAdd" style="margin-top:0">Aggiungi l'esclusione alla Raccolta</button>
+            </div>
+          </div>
         </div>
       </div>
       <div id="toolMenu" role="menu" aria-label="Tools" hidden>
         <button type="button" role="menuitem" data-tool="measure"><span class="ti" aria-hidden="true">📏</span><span class="tl">Misura<small>distanza e area sulla mappa</small></span></button>
         <button type="button" role="menuitem" data-tool="elev"><span class="ti" aria-hidden="true">⛰</span><span class="tl">Profilo altimetrico<small>la quota del terreno lungo una linea</small></span></button>
+        <button type="button" role="menuitem" data-tool="slope"><span class="ti" aria-hidden="true">◢</span><span class="tl">Pendenze da DTM<small>dove l'area lorda è troppo ripida</small></span></button>
         <button type="button" role="menuitem" data-tool="ctx"><span class="ti" aria-hidden="true">◎</span><span class="tl">Analisi di contesto<small>sottostazioni, linee AT, progetti FV · serve l'accesso</small></span></button>
         <button type="button" role="menuitem" data-tool="sr"><span class="ti" aria-hidden="true">🧭</span><span class="tl">Coordinate sconosciute<small>in che sistema sono?</small></span></button>
         <button type="button" role="menuitem" data-tool="rte"><span class="ti" aria-hidden="true">↝</span><span class="tl">Percorso su strada<small>partenza e arrivo · serve l'accesso</small></span></button>
@@ -1452,7 +1498,7 @@
       <li><b>Esporta / Migra / Salva</b> — in fondo alla Raccolta, sempre in vista: <b>Esporta</b> apre la finestra con il formato (GeoJSON/KML/KMZ/SHP/XLSX) e i singoli oggetti (le spunte sono quelle della Raccolta; senza spunte esporta tutto); <b>Migra particelle in AREAS Collection</b> (l'opzione «dissolvi» sta nella sua finestra); <b>Salva disegni in Site Features</b> (categoria, tipo, attributi e sito: la seconda volta aggiorna, non duplica).</li>
       <li><b>Progetto</b> (in alto) — <b>💾 Salva progetto</b> mette tutto in un file .axpo, come un progetto QGIS: vista, basemap, area di lavoro, mappa e layer del portale (accesi, trasparenza, ordine), particelle, disegni, geoprocessi, import, e i file di <b>DWG e immagini</b> con il loro posizionamento. <b>📂 Apri progetto</b> lo ripristina (sostituisce il lavoro corrente). <kbd>Ctrl</kbd>+<kbd>S</kbd> risalva sullo stesso file, <kbd>Ctrl</kbd>+<kbd>Maiusc</kbd>+<kbd>S</kbd> salva con nome.</li>
     </ol>
-    <div class="hint" style="margin-top:10px">Sulla mappa: in alto a destra la lente della ricerca (indirizzi, lat, lon oppure X Y proiettate); in basso al centro lo scalimetro; nell'angolo in basso a destra le coordinate del puntatore (con pin); in basso a sinistra il menu <b>Tools</b>: misura, profilo altimetrico, analisi di contesto (sottostazioni, linee AT, progetti FV), coordinate sconosciute, percorso su strada, uno alla volta. <kbd>Esc</kbd> esce da qualsiasi modalità e interrompe la selezione su area. Riapri i tour dal <b>?</b>.</div>
+    <div class="hint" style="margin-top:10px">Sulla mappa: in alto a destra la lente della ricerca (indirizzi, lat, lon oppure X Y proiettate); in basso al centro lo scalimetro; nell'angolo in basso a destra le coordinate del puntatore (con pin); in basso a sinistra il menu <b>Tools</b>: misura, profilo altimetrico, pendenze da DTM (le zone troppo ripide dell'area lorda), analisi di contesto (sottostazioni, linee AT, progetti FV), coordinate sconosciute, percorso su strada, uno alla volta. <kbd>Esc</kbd> esce da qualsiasi modalità e interrompe la selezione su area. Riapri i tour dal <b>?</b>.</div>
   </div>
 </div>
 
@@ -2171,6 +2217,7 @@ function wireUI(){
       else if(e.key==='Home'){ e.preventDefault(); items[0].focus(); }
       else if(e.key==='End'){ e.preventDefault(); items[items.length-1].focus(); } });
     $('toolCardClose').onclick=toolClose;
+    try{ slpWire(); }catch(e){ console.warn('[pendenze]', e); }
     docOn('click', e=>{ const m=$('toolMenu'); if(m&&!m.hidden&&!(e.target.closest&&e.target.closest('#toolsFab'))) toolMenuClose(false); });
     if($('impSrGo')) $('impSrGo').onclick=()=>toolOpen('sr');
     window.addEventListener('resize', toolFabSheet);
@@ -2566,7 +2613,8 @@ function serializeToolGeoms(){
          _srcKey:at._srcKey, src_attrs:at.src_attrs,   // elementi presi dai layer della mappa: da dove vengono e i loro attributi
          // modello Site Features: categoria, tipo, attributi, fonte, stato, sito, GlobalID sul portale
          sf_cat:at.sf_cat, sf_type:at.sf_type, sf_buffer:at.sf_buffer, sf_height:at.sf_height, sf_width:at.sf_width, sf_voltage:at.sf_voltage,
-         sf_src:at.sf_src, sf_status:at.sf_status, sf_site:at.sf_site, sf_gid:at.sf_gid, sf_saved:at.sf_saved, sf_dirty:at.sf_dirty},
+         sf_src:at.sf_src, sf_status:at.sf_status, sf_site:at.sf_site, sf_gid:at.sf_gid, sf_saved:at.sf_saved, sf_dirty:at.sf_dirty,
+         sf_slope:at.sf_slope},   // esclusione da pendenza (Tools › Pendenze da DTM): soglia, cella e griglia, per PV Predesign
       v:(g.visible!==false),
       s:(g.symbol&&g.symbol.toJSON)?g.symbol.toJSON():null });
   });
@@ -2772,8 +2820,10 @@ async function projBuild(name){
   importedImages.forEach((im,i)=>{ const cps=(im.el&&im.el.georeference&&im.el.georeference.controlPoints)||[];
     const r={name:im.name, orig:im.file? im.file.name : null, file:im.file? fn('img',i,im.file.name) : null,
       corners:cps.map(c=>{ const p=c.mapPoint||{}, sr=p.spatialReference||{}; return {x:p.x, y:p.y, wkid:sr.wkid||sr.latestWkid||102100}; })};
-    if(im.file) zip.file(r.file, im.file); else miss.push('immagine «'+im.name+'»');
+    if(im._slp) r.slp=im._slp;   // DTM delle pendenze: non è un file, si rifà dalla griglia salvata in st.terrain
+    if(im.file) zip.file(r.file, im.file); else if(!im._slp) miss.push('immagine «'+im.name+'»');
     st.images.push(r); });
+  try{ st.terrain=slpProjSave(zip); }catch(e){ console.warn('[progetto] terreno', e); }
   cadFiles.forEach((f,i)=>{ const r={name:f.name, file:f.file? fn('dwg',i,f.name) : null, wkid:f.ch.wkid, sc:f.ch.sc, M:f.ch.M||null,
       drop:!!f.ch.drop, manual:/^Posizionato a mano/.test(f.srLabel||''), open:f.open!==false, layers:{}};
     f.layers.forEach(L=>{ r.layers[L.name]={v:L.grp.visible!==false, col:L.userCol? L.col : null}; });
@@ -2895,7 +2945,7 @@ async function projOpenFile(file, handle){
     applyWork(st);
     for(let j=0;j<imgs.length;j++){ const rec=imgs[j];
       try{ msg('Apro il progetto: immagine '+(j+1)+' di '+imgs.length+'…');
-        keyMap.set('img:'+j, (await projImgRestore(await projZipFile(zip,rec), rec)).layer); }
+        keyMap.set('img:'+j, (rec.slp? await slpProjRestore(zip, st, rec) : await projImgRestore(await projZipFile(zip,rec), rec)).layer); }
       catch(e){ warn.push('l\'immagine «'+rec.name+'» non si apre ('+((e&&e.message)||e)+')'); } }
     for(let i=0;i<dwgs.length;i++){ const rec=dwgs[i];
       try{ msg('Apro il progetto: DWG '+(i+1)+' di '+dwgs.length+' («'+rec.name+'»)…');
@@ -3230,7 +3280,7 @@ async function swapCheckVincoli(region){
 // ── P4 (prototipo UX): menu «Tools» in basso a sinistra sulla mappa (speed-dial con etichette) e scheda dello strumento ──
 // Uno strumento alla volta: aprirne un altro spegne la modalità sulla mappa del precedente. Le funzioni degli strumenti
 // (querySubstations, srFind/srRef, rteStart/rteSolve, il widget ElevationProfile) sono quelle di prima.
-const TOOLS={measure:{t:'Misura', i:'📏', info:null}, elev:{t:'Profilo altimetrico', i:'⛰', info:null}, ctx:{t:'Analisi di contesto', i:'◎', info:null, login:true},
+const TOOLS={measure:{t:'Misura', i:'📏', info:null}, elev:{t:'Profilo altimetrico', i:'⛰', info:null}, slope:{t:'Pendenze da DTM', i:'◢', info:'slope'}, ctx:{t:'Analisi di contesto', i:'◎', info:null, login:true},
   sr:{t:'Coordinate sconosciute', i:'🧭', info:'sr'}, rte:{t:'Percorso su strada', i:'↝', info:'drwDraw', login:true}};
 const GEAR_SVG='<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>';
 let toolCur=null;   // strumento aperto nella scheda
@@ -3238,7 +3288,7 @@ function toolFabSheet(){ const f=$('toolsFab'); if(!f) return; const mw=$('mapWr
 function toolFabUi(){ const b=$('toolsBtn'); if(!b) return; const on=!!toolCur;
   b.classList.toggle('on', on); b.querySelector('.tf-lbl').textContent= on? TOOLS[toolCur].t : 'Tools';
   b.querySelector('.tf-ico').innerHTML= on? '<span class="tf-em">'+TOOLS[toolCur].i+'</span>' : GEAR_SVG;
-  b.title= on? 'Strumento aperto: '+TOOLS[toolCur].t+'. Clicca per il menu Tools' : 'Tools: profilo altimetrico, analisi di contesto, coordinate sconosciute, percorso su strada';
+  b.title= on? 'Strumento aperto: '+TOOLS[toolCur].t+'. Clicca per il menu Tools' : 'Tools: misura, profilo altimetrico, pendenze da DTM, analisi di contesto, coordinate sconosciute, percorso su strada';
   b.setAttribute('aria-label', on? 'Tools, aperto: '+TOOLS[toolCur].t : 'Tools');
   const f=$('toolsFab'); if(f) f.dataset.tool=toolCur||'';
   document.querySelectorAll('#toolMenu [data-tool]').forEach(m=>m.setAttribute('aria-current', m.dataset.tool===toolCur? 'true' : 'false'));
@@ -3271,6 +3321,7 @@ function toolOpen(k){ if(!TOOLS[k]) return; toolMenuClose(false);
   $('toolCardT').textContent=TOOLS[k].t; $('toolCardIco').textContent=TOOLS[k].i;
   const inf=$('toolCardInfo'); if(inf){ inf.hidden=!TOOLS[k].info; if(TOOLS[k].info) inf.dataset.info=TOOLS[k].info; }
   toolAuthUi(); toolFabUi();
+  if(k==='slope'){ try{ slpOpen(); }catch(e){ console.warn('[pendenze]', e); } }
   const f=card.querySelector('.toolpane:not([hidden]) textarea, .toolpane:not([hidden]) button:not(:disabled), .toolpane:not([hidden]) select');
   try{ (f||$('toolCardClose')).focus(); }catch(e){} }
 function toolClose(){ if(!toolCur) return; toolModeOff(toolCur); toolCur=null; const c=$('toolCard'); if(c) c.hidden=true; toolFabUi(); try{ $('toolsBtn').focus(); }catch(e){} }
@@ -3281,6 +3332,300 @@ function elevCreating(){ try{ return !!(elevW&&elevW.viewModel&&elevW.viewModel.
 function elevStop(){ try{ if(!elevStarting&&elevCreating()) elevW.viewModel.stop(); }catch(e){} }
 function elevWatch(){ try{ watchProp(elevW.viewModel,'state', s=>{ if(s!=='creating') return;
   elevStarting=true; try{ cadModesOff(); gpPickEnd(); if(srRefOn()) srRefEnd(); }catch(e){} elevStarting=false; }); }catch(e){ console.warn('[profilo]', e); } }
+
+// ══ Pendenze da DTM (2026-10-04) ═══════════════════════════════════════════════════════════
+// Tools › Pendenze da DTM: quote del terreno sull'area lorda più 25 m, pendenza, aree oltre un limite scelto
+// dall'utente → un disegno «Esclusione · Pendenza elevata» nella Raccolta. Stesso metodo del modulo del terreno
+// di PV Predesign, così i due strumenti danno gli stessi numeri sulla stessa griglia:
+//  · griglia in un riferimento metrico locale (Mercatore trasversa centrata sul sito, scala 1: metri veri);
+//  · quote di Esri World Elevation al centro delle celle (queryElevation «finest-contiguous»; in Italia circa 10 m);
+//  · pendenza in percento con i pesi di Horn 3×3; limite sulla pendenza massima oppure sulle componenti N-S ed E-O;
+//  · macchie sotto l'area minima scartate, celle unite in anelli, taglio sull'area lorda.
+// La griglia (quote Float32, riga per riga dalla cella a sud-ovest) entra nel progetto .axpo come terreno/<id>.f32
+// con la stessa descrizione che PV Predesign usa per la sua griglia: il predesign può riusarla senza riscaricarla.
+// Qui i limiti li scrive l'utente e basta: il confronto con gli standard di progettazione lo fa PV Predesign
+// (decisione dell'utente del 2026-10-04: quei valori non stanno in questo strumento, che ha un repository pubblico).
+const SLP_BUF=25, SLP_MAXCELLS=400000, SLP_CHUNK=5000,
+  SLP_CLASSES=[[0,5],[5,10],[10,15],[15,25],[25,Infinity]], SLP_COLS=[[46,160,67],[160,200,60],[240,190,40],[235,110,40],[190,30,60]];
+let slpGrids=[], slpCur=null, slpBusy=false, slpSrc=[], _slpMods=null, _slpT=null;
+function slpMods(){ return _slpMods? Promise.resolve(_slpMods) : new Promise((res,rej)=>require(['esri/geometry/Multipoint','esri/geometry/SpatialReference'],
+  (Multipoint,SpatialReference)=>res(_slpMods={Multipoint:Multipoint, SR:SpatialReference}), rej)); }
+function slpN(v,d){ return (+v).toFixed(d==null? 0 : d).replace('.',','); }
+// Un limite è {maxAny} (pendenza massima, in ogni direzione) oppure {maxNS, maxEW} (le due componenti, nord–sud ed
+// est–ovest): gli stessi nomi e lo stesso significato dei limiti di PV Predesign.
+function slpPct(v){ return slpN(v, v%1? 1 : 0)+' %'; }
+function slpLimTxt(L){ const a=[];
+  if(L.maxAny!=null) a.push(slpPct(L.maxAny)+' in ogni direzione');
+  if(L.maxNS!=null&&L.maxEW!=null&&L.maxNS===L.maxEW) a.push(slpPct(L.maxNS)+' nord–sud ed est–ovest');
+  else { if(L.maxNS!=null) a.push(slpPct(L.maxNS)+' nord–sud'); if(L.maxEW!=null) a.push(slpPct(L.maxEW)+' est–ovest'); }
+  return a.join(', '); }
+function slpLimShort(L){ if(L.maxAny!=null) return slpPct(L.maxAny);
+  return (L.maxNS!=null&&L.maxNS===L.maxEW)? slpPct(L.maxNS)+' N-S/E-O' : [L.maxNS!=null? slpPct(L.maxNS)+' N-S' : '', L.maxEW!=null? slpPct(L.maxEW)+' E-O' : ''].filter(Boolean).join(', '); }
+// il limite scritto nella scheda, oppure null se manca un valore
+function slpLimitUi(){ const two=$('slpRule').value==='nsew';
+  if(two){ const ns=numIn('slpNS'), ew=numIn('slpEW'); return (ns>0&&ew>0)? {maxNS:ns, maxEW:ew} : null; }
+  const v=numIn('slpMax'); return v>0? {maxAny:v} : null; }
+function slpRuleUi(){ const two=$('slpRule').value==='nsew';
+  $('slpMaxBox').hidden=two; $('slpNSBox').hidden=!two; $('slpEWBox').hidden=!two; $('slpRow').classList.toggle('two', two); }
+function slpSetUi(L){ if(!L||!$('slpRule')) return; const two=L.maxAny==null;
+  if(two){ $('slpNS').value=L.maxNS; $('slpEW').value=L.maxEW; } else $('slpMax').value=L.maxAny;
+  $('slpRule').value= two? 'nsew' : 'any'; slpRuleUi(); }
+// la stessa definizione del riferimento locale di PV Predesign
+function slpWkt(lon0,lat0){ return 'PROJCS["PV Predesign local TM",GEOGCS["GCS_WGS_1984",DATUM["D_WGS_1984",'
+  +'SPHEROID["WGS_1984",6378137.0,298.257223563]],PRIMEM["Greenwich",0.0],UNIT["Degree",0.0174532925199433]],'
+  +'PROJECTION["Transverse_Mercator"],PARAMETER["False_Easting",0.0],PARAMETER["False_Northing",0.0],'
+  +'PARAMETER["Central_Meridian",'+lon0+'],PARAMETER["Scale_Factor",1.0],PARAMETER["Latitude_Of_Origin",'+lat0+'],UNIT["Meter",1.0]]'; }
+// aree lorde possibili: i disegni della categoria «Area lorda», il sito di lavoro, le particelle in elenco unite
+function slpSources(){ const out=[], GE=esriMods.geometryEngine;
+  try{ toolsGL.graphics.toArray().forEach(g=>{ const a=g.attributes||{};
+    if(a.sf_cat==='gross'&&g.geometry&&g.geometry.type==='polygon') out.push({name:String(a.nome||'Area lorda'), geom:g.geometry}); }); }catch(e){}
+  try{ if(sfSite&&sfSite.geom){ const p=geojsonToEsri(sfSite.geom); if(p&&p.rings) out.push({name:('Sito di lavoro '+(sfSite.code||sfSite.comune||'')).trim(), geom:p}); } }catch(e){}
+  try{ const ps=parcels.map(p=>geojsonToEsri(p.geometry)).filter(p=>p&&p.rings);
+    if(ps.length){ const u=ps.length===1? ps[0] : GE.union(ps);
+      if(u) out.push({name:ps.length===1? 'Particella in elenco' : ps.length+' particelle in elenco, unite', geom:u}); } }catch(e){}
+  out.forEach(s=>{ try{ s.ha=Math.abs(GE.geodesicArea(s.geom,'hectares')||0); }catch(e){ s.ha=0; } });
+  return out; }
+function slpFill(){ const sel=$('slpArea'); if(!sel) return; const keep=sel.value; slpSrc=slpSources(); sel.innerHTML='';
+  slpSrc.forEach((s,i)=>{ const o=document.createElement('option'); o.value=String(i); o.textContent=s.name+' · '+slpN(s.ha,2)+' ha'; sel.appendChild(o); });
+  if(!slpSrc.length){ const o=document.createElement('option'); o.value=''; o.textContent='— nessuna area lorda —'; sel.appendChild(o); }
+  else if(keep&&slpSrc[+keep]) sel.value=keep;
+  $('slpGo').disabled=!slpSrc.length||slpBusy;
+  if(slpBusy) return;
+  if(!slpSrc.length) toolMsg('slpMsg','Serve un\'area lorda: disegnala con la categoria «Area lorda», scegli un sito di lavoro oppure cerca le particelle.');
+  else if(!slpCur) toolMsg('slpMsg','Scarico le quote del terreno sull\'area lorda più '+SLP_BUF+' m, le mostro sulla mappa e segno dove la pendenza supera la soglia.'); }
+
+// ── griglia, pendenze, maschere e anelli: le stesse funzioni di PV Predesign ──
+function slpGridOver(b, cell, margin, maxCells){ let c=Math.max(0.5,cell), grown=false;
+  const w=b.xmax-b.xmin+2*margin, h=b.ymax-b.ymin+2*margin;
+  while(Math.ceil(w/c)*Math.ceil(h/c)>maxCells){ c*=1.25; grown=true; }
+  c=Math.round(c*100)/100;
+  return {x0:b.xmin-margin, y0:b.ymin-margin, cell:c, nx:Math.ceil(w/c), ny:Math.ceil(h/c), grown:grown}; }
+function slpGradients(G){ const nx=G.nx, ny=G.ny, z=G.z, cell=G.cell, gx=new Float32Array(nx*ny), gy=new Float32Array(nx*ny);
+  const at=(i,j)=>(i<0||j<0||i>=nx||j>=ny)? NaN : z[j*nx+i];
+  const d=(i,j,di,dj)=>{ const c=at(i,j), p=at(i+di,j+dj), m=at(i-di,j-dj);
+    if(!Number.isFinite(c)) return NaN;
+    if(Number.isFinite(p)&&Number.isFinite(m)) return (p-m)/(2*cell);
+    if(Number.isFinite(p)) return (p-c)/cell;
+    if(Number.isFinite(m)) return (c-m)/cell;
+    return NaN; };
+  const W=[[-1,1],[0,2],[1,1]];
+  for(let j=0;j<ny;j++) for(let i=0;i<nx;i++){ const k=j*nx+i;
+    if(!Number.isFinite(z[k])){ gx[k]=NaN; gy[k]=NaN; continue; }
+    let sx=0, wx=0, sy=0, wy=0;
+    for(const ow of W){ const o=ow[0], w=ow[1];
+      const ax=d(i,j+o,1,0); if(Number.isFinite(ax)){ sx+=w*ax; wx+=w; }
+      const ay=d(i+o,j,0,1); if(Number.isFinite(ay)){ sy+=w*ay; wy+=w; } }
+    gx[k]=wx? sx/wx : NaN; gy[k]=wy? sy/wy : NaN; }
+  return {gx:gx, gy:gy}; }
+function slpMask(g, limit){ const n=g.gx.length, mask=new Uint8Array(n);
+  for(let k=0;k<n;k++){ const x=g.gx[k], y=g.gy[k]; if(!Number.isFinite(x)||!Number.isFinite(y)) continue;
+    const ew=Math.abs(x)*100, ns=Math.abs(y)*100;
+    const bad=(limit.maxAny!=null&&Math.hypot(ew,ns)>limit.maxAny+1e-9)||(limit.maxNS!=null&&ns>limit.maxNS+1e-9)||(limit.maxEW!=null&&ew>limit.maxEW+1e-9);
+    if(bad) mask[k]=1; }
+  return mask; }
+function slpDropSmall(mask, nx, ny, minCells){ if(!(minCells>1)) return 0;
+  const seen=new Uint8Array(mask.length), stack=[], patch=[]; let removed=0;
+  for(let s=0;s<mask.length;s++){ if(!mask[s]||seen[s]) continue;
+    patch.length=0; stack.push(s); seen[s]=1;
+    while(stack.length){ const k=stack.pop(); patch.push(k); const i=k%nx, j=(k-i)/nx;
+      for(const q of [i>0? k-1 : -1, i<nx-1? k+1 : -1, j>0? k-nx : -1, j<ny-1? k+nx : -1]){
+        if(q>=0&&mask[q]&&!seen[q]){ seen[q]=1; stack.push(q); } } }
+    if(patch.length<minCells){ for(const k of patch) mask[k]=0; removed+=patch.length; } }
+  return removed; }
+// contorno delle celle di una maschera: anelli chiusi [[x,y],…], esterni antiorari e buchi orari
+function slpRings(mask, nx, ny, x0, y0, cell){
+  const on=(i,j)=>i>=0&&j>=0&&i<nx&&j<ny&&mask[j*nx+i]===1, W=nx+1, out=new Map(), V=(i,j)=>j*W+i;
+  const add=(a,b)=>{ const l=out.get(a); if(l) l.push(b); else out.set(a,[b]); };
+  for(let j=0;j<ny;j++) for(let i=0;i<nx;i++){ if(!on(i,j)) continue;
+    if(!on(i,j-1)) add(V(i,j), V(i+1,j));
+    if(!on(i+1,j)) add(V(i+1,j), V(i+1,j+1));
+    if(!on(i,j+1)) add(V(i+1,j+1), V(i,j+1));
+    if(!on(i-1,j)) add(V(i,j+1), V(i,j)); }
+  const rings=[], dir=(a,b)=>[(b%W)-(a%W), Math.floor(b/W)-Math.floor(a/W)];
+  for(const pair of out){ const start=pair[0], list=pair[1];
+    while(list.length){ const ring=[start]; let prev=start, cur=list.pop();
+      while(cur!==start){ ring.push(cur); const nexts=out.get(cur); let pick=0;
+        if(nexts.length>1){ const d0=dir(prev,cur);
+          pick=nexts.findIndex(n=>{ const e=dir(cur,n); return d0[0]*e[1]-d0[1]*e[0]>0; }); if(pick<0) pick=0; }
+        prev=cur; cur=nexts.splice(pick,1)[0]; }
+      const pts=[];
+      for(let k=0;k<ring.length;k++){ const a=ring[(k-1+ring.length)%ring.length], b=ring[k], c=ring[(k+1)%ring.length], d1=dir(a,b), d2=dir(b,c);
+        if(d1[0]*d2[1]-d1[1]*d2[0]!==0) pts.push([x0+(b%W)*cell, y0+Math.floor(b/W)*cell]); }
+      if(pts.length>=4){ pts.push([pts[0][0],pts[0][1]]); rings.push(pts); } } }
+  return rings; }
+// celle il cui centro cade nel poligono (coordinate locali): il poligono dipinto su un canvas di un pixel per cella
+function slpInside(def, poly){ const cv=document.createElement('canvas'); cv.width=def.nx; cv.height=def.ny;
+  const c=cv.getContext('2d', {willReadFrequently:true}); c.fillStyle='#000'; c.beginPath();
+  ((poly&&poly.rings)||[]).forEach(r=>{ r.forEach((p,i)=>{ const x=(p[0]-def.x0)/def.cell, y=def.ny-(p[1]-def.y0)/def.cell; if(i) c.lineTo(x,y); else c.moveTo(x,y); }); c.closePath(); });
+  c.fill('evenodd');
+  const d=c.getImageData(0,0,def.nx,def.ny).data, m=new Uint8Array(def.nx*def.ny);
+  for(let j=0;j<def.ny;j++) for(let i=0;i<def.nx;i++) if(d[4*((def.ny-1-j)*def.nx+i)+3]>127) m[j*def.nx+i]=1;
+  return m; }
+
+// quote di Esri World Elevation al centro delle celle, a blocchi (nessun credito, nessun accesso)
+async function slpSample(sr, def, onProg){ const M=await slpMods(), P=esriMods.projection; await P.load();
+  const n=def.nx*def.ny, z=new Float32Array(n), wgs=new M.SR({wkid:4326});
+  const el=new esriMods.ElevationLayer({url:WORLD_ELEV}); await el.load();
+  for(let s=0;s<n;s+=SLP_CHUNK){ const pts=[], e=Math.min(n, s+SLP_CHUNK);
+    for(let k=s;k<e;k++){ const i=k%def.nx, j=(k-i)/def.nx; pts.push([def.x0+(i+0.5)*def.cell, def.y0+(j+0.5)*def.cell]); }
+    const ll=P.project(new M.Multipoint({points:pts, spatialReference:sr}), wgs);
+    const r=await el.queryElevation(ll, {demResolution:'finest-contiguous', noDataValue:-99999}), out=r.geometry.points;
+    for(let q=0;q<out.length;q++){ const v=out[q][2]; z[s+q]=(v===-99999||!Number.isFinite(v))? NaN : v; }
+    if(onProg) onProg(e, n); }
+  return z; }
+// la griglia pronta per l'analisi: gradienti, celle dentro l'area lorda e dentro l'area lorda più il buffer
+function slpMake(meta, z, sr, gross){ const G={meta:meta, z:z, sr:sr, gross:gross, view:'z', im:null, limit:{maxAny:10}, minPatch:0};
+  G.g=slpGradients({nx:meta.nx, ny:meta.ny, z:z, cell:meta.cell});
+  let buf=null; try{ buf=esriMods.geometryEngine.buffer(gross, meta.buffer||SLP_BUF, 'meters'); }catch(e){}
+  G.inB=slpInside(meta, buf||gross); G.inG=slpInside(meta, gross);
+  try{ G.grossHa=Math.abs(esriMods.geometryEngine.planarArea(gross,'hectares')||0); }catch(e){ G.grossHa=0; }
+  return G; }
+// celle oltre la soglia (macchie piccole scartate) e i numeri per la scheda, contati dentro l'area lorda
+function slpAnalyse(G){ const m=G.meta, mask=slpMask(G.g, G.limit);
+  slpDropSmall(mask, m.nx, m.ny, Math.ceil((G.minPatch||0)/(m.cell*m.cell)));
+  let over=0, inside=0, sum=0, top=0;
+  for(let k=0;k<mask.length;k++){ if(!G.inG[k]) continue; const s=Math.hypot(G.g.gx[k], G.g.gy[k])*100; if(!Number.isFinite(s)) continue;
+    inside++; sum+=s; if(s>top) top=s; if(mask[k]) over++; }
+  G.mask=mask; G.st={overHa:over*m.cell*m.cell/1e4, pct:inside? over/inside*100 : 0, mean:inside? sum/inside : 0, top:top, cells:inside};
+  return G; }
+// l'immagine per la mappa: quote (o classi di pendenza) ombreggiate, trasparente fuori dall'area lorda più il buffer,
+// tratteggio rosso sulle celle escluse
+function slpCanvas(G){ const m=G.meta, k=Math.max(1, Math.min(8, Math.floor(1600/Math.max(m.nx,m.ny)))), W=m.nx*k, H=m.ny*k;
+  const cv=document.createElement('canvas'); cv.width=W; cv.height=H; const ctx=cv.getContext('2d'), img=ctx.createImageData(W,H), d=img.data;
+  const zr=(m.zmax-m.zmin)||1, RAMP=[[0,[38,115,72]],[0.3,[150,190,90]],[0.55,[238,214,120]],[0.8,[176,128,96]],[1,[245,245,240]]];
+  const ramp=t=>{ for(let i=1;i<RAMP.length;i++) if(t<=RAMP[i][0]){ const a=RAMP[i-1], b=RAMP[i], f=(t-a[0])/((b[0]-a[0])||1);
+      return [a[1][0]+(b[1][0]-a[1][0])*f, a[1][1]+(b[1][1]-a[1][1])*f, a[1][2]+(b[1][2]-a[1][2])*f]; }
+    return RAMP[RAMP.length-1][1]; };
+  const LX=-0.5, LY=0.5, LZ=0.7071, EX=3;   // luce da nord-ovest a 45°; rilievo esagerato 3 volte per leggerne le forme
+  for(let j=0;j<m.ny;j++) for(let i=0;i<m.nx;i++){ const c=j*m.nx+i; if(!G.inB[c]) continue;
+    const z=G.z[c], gx=G.g.gx[c], gy=G.g.gy[c]; if(!Number.isFinite(z)||!Number.isFinite(gx)||!Number.isFinite(gy)) continue;
+    let rgb;
+    if(G.view==='s'){ const s=Math.hypot(gx,gy)*100; let q=SLP_CLASSES.findIndex(x=>s>=x[0]&&s<x[1]); if(q<0) q=SLP_CLASSES.length-1; rgb=SLP_COLS[q]; }
+    else rgb=ramp((z-m.zmin)/zr);
+    const ax=-gx*EX, ay=-gy*EX, hs=Math.max(0, (ax*LX+ay*LY+LZ)/Math.hypot(ax,ay,1)), f=Math.min(1.3, Math.max(0.5, hs/LZ));
+    const over=G.mask[c]===1, py0=(m.ny-1-j)*k, px0=i*k;
+    for(let b=0;b<k;b++) for(let a=0;a<k;a++){ const o=4*((py0+b)*W+px0+a); let r=rgb[0]*f, g2=rgb[1]*f, b2=rgb[2]*f;
+      if(over){ const h=((px0+a+py0+b)%6)<2; r=h? 150 : r*0.35+215*0.65; g2=h? 20 : g2*0.35+40*0.65; b2=h? 40 : b2*0.35+60*0.65; }
+      d[o]=r; d[o+1]=g2; d[o+2]=b2; d[o+3]=255; } }
+  ctx.putImageData(img,0,0); return cv; }
+// l'immagine sulla mappa (un'immagine georiferita come quelle importate, senza maniglie); al cambio di soglia si rifà
+async function slpShow(G){ const M=await imgMods(), P=esriMods.projection, m=G.meta, cv=slpCanvas(G);
+  const xr=m.x0+m.nx*m.cell, yt=m.y0+m.ny*m.cell, mk=(x,y)=>P.project(new esriMods.Point({x:x, y:y, spatialReference:G.sr}), view.spatialReference);
+  const cs=[mk(m.x0,yt), mk(xr,yt), mk(xr,m.y0), mk(m.x0,m.y0)];
+  if(!G.im||importedImages.indexOf(G.im)<0){
+    G.im=await createGeorefImage(cv, cv.width, cv.height, 'DTM · '+m.area_name, cs, true);
+    G.im._slp=m.id; G.im.layer.opacity=0.8; renderGeoms(); }
+  else { const cp=[{sourcePoint:{x:0,y:0}, mapPoint:cs[0]}, {sourcePoint:{x:cv.width,y:0}, mapPoint:cs[1]},
+      {sourcePoint:{x:cv.width,y:cv.height}, mapPoint:cs[2]}, {sourcePoint:{x:0,y:cv.height}, mapPoint:cs[3]}];
+    const el=new M.ImageElement({image:cv, georeference:new M.CPG({controlPoints:cp, width:cv.width, height:cv.height})});
+    const els=G.im.layer.source.elements; els.removeAll(); els.add(el); G.im.el=el; G.im.pxW=cv.width; G.im.pxH=cv.height; } }
+function slpForget(id){ slpGrids=slpGrids.filter(G=>G.meta.id!==id);
+  if(slpCur&&slpCur.meta.id===id){ slpCur=slpGrids[slpGrids.length-1]||null;
+    try{ if(slpCur) slpSetUi(slpCur.limit); slpUi(); }catch(e){} } }
+
+async function slpExtract(){ if(slpBusy) return; const s=slpSrc[+$('slpArea').value]; if(!s){ slpFill(); return; }
+  const lu=slpLimitUi(); if(!lu){ toolMsg('slpMsg','Scrivi un limite di pendenza maggiore di zero.','err'); return; }
+  const cell=Math.min(50, Math.max(2, numIn('slpCell')||5));
+  slpBusy=true; $('slpGo').disabled=true; toolMsg('slpMsg','Preparo la griglia…');
+  try{ const M=await slpMods(), P=esriMods.projection; await P.load();
+    const wgs=new M.SR({wkid:4326}), g4=(s.geom.spatialReference&&s.geom.spatialReference.wkid===4326)? s.geom : P.project(s.geom, wgs);
+    const c=g4.extent.center, lon0=+c.x.toFixed(6), lat0=+c.y.toFixed(6), sr=new M.SR({wkt:slpWkt(lon0,lat0)});
+    const gross=P.project(g4, sr); if(!gross||!gross.extent) throw new Error('non riesco a proiettare l\'area lorda');
+    const e=gross.extent, def=slpGridOver({xmin:e.xmin, ymin:e.ymin, xmax:e.xmax, ymax:e.ymax}, cell, SLP_BUF+cell, SLP_MAXCELLS);
+    const z=await slpSample(sr, def, (a,b)=>toolMsg('slpMsg','Scarico le quote del terreno: '+cadN(a)+' di '+cadN(b)+' punti…'));
+    let zmin=Infinity, zmax=-Infinity, missing=0;
+    for(let k=0;k<z.length;k++){ const v=z[k]; if(Number.isFinite(v)){ if(v<zmin) zmin=v; if(v>zmax) zmax=v; } else missing++; }
+    if(!Number.isFinite(zmin)) throw new Error('nessuna quota disponibile in questa zona');
+    // stessa area estratta di nuovo: stessa griglia, stessa esclusione. Vale anche dopo un ricaricamento della pagina,
+    // quando la griglia non c'è più ma l'esclusione sì: ne riprendo l'identificativo, così «Aggiungi» la aggiorna
+    const old=slpGrids.find(G=>G.meta.area_name===s.name);
+    let prev=null; try{ prev=toolsGL.graphics.toArray().find(x=>x.attributes&&x.attributes.sf_slope&&x.attributes.sf_slope.area===s.name&&x.attributes.sf_slope.grid); }catch(x){}
+    const meta={id:old? old.meta.id : prev? prev.attributes.sf_slope.grid : 'slp'+Date.now().toString(36)+Math.random().toString(36).slice(2,6), lon0:lon0, lat0:lat0,
+      x0:def.x0, y0:def.y0, cell:def.cell, nx:def.nx, ny:def.ny, zmin:zmin, zmax:zmax, missing:missing, loadedAt:new Date().toISOString(),
+      source:'esri', name:'Esri World Elevation', buffer:SLP_BUF, area_name:s.name, area_geom:esriGeomToGeojson(g4)};
+    const now=slpLimitUi()||lu;   // il limite può essere cambiato mentre scaricavo
+    const G=slpMake(meta, z, sr, gross); G.limit=now; G.minPatch=Math.max(0, numIn('slpMin')||0);
+    if(old) G.view=old.view;
+    slpAnalyse(G);
+    if(old&&old.im) removeImage(old.im);
+    await slpShow(G); slpGrids.push(G); slpCur=G; slpUi();
+    try{ view.goTo(s.geom.extent.clone().expand(1.5)).catch(()=>{}); }catch(x){}
+    toolMsg('slpMsg','Fatto: sulla mappa c\'è il DTM dell\'area lorda più '+SLP_BUF+' m, con le zone oltre il limite tratteggiate in rosso. Cambia il limite per vederle aggiornarsi.'
+      +(def.grown? ' Cella portata a '+slpN(def.cell,2)+' m per restare sotto '+cadN(SLP_MAXCELLS)+' punti.' : '')
+      +(missing? ' '+cadN(missing)+' celle senza quota.' : ''), 'ok');
+  }catch(err){ console.warn('[pendenze]', err);
+    toolMsg('slpMsg','Pendenze non estratte: '+((err&&err.message)||err)+'. Controlla la connessione e riprova.','err'); }
+  finally{ slpBusy=false; $('slpGo').disabled=!slpSrc.length; } }
+// cambio di soglia, di area minima o di vista: nessun nuovo scaricamento, si rifanno maschera, immagine e numeri
+function slpRefresh(){ const G=slpCur; if(!G||slpBusy) return; const L=slpLimitUi(); if(!L) return;
+  G.limit=L; G.minPatch=Math.max(0, numIn('slpMin')||0); slpAnalyse(G); slpUi();
+  slpShow(G).catch(e=>console.warn('[pendenze]', e)); }
+function slpUi(){ const G=slpCur, res=$('slpRes'); if(!res) return; res.hidden=!G; if(!G) return;
+  const m=G.meta, s=G.st, lt=slpLimTxt(G.limit);
+  $('slpViewZ').setAttribute('aria-pressed', G.view==='z'? 'true' : 'false'); $('slpViewS').setAttribute('aria-pressed', G.view==='s'? 'true' : 'false');
+  $('slpLegend').innerHTML=(G.view==='s'
+    ? SLP_CLASSES.map((c,i)=>'<span><i style="background:rgb('+SLP_COLS[i].join(',')+')"></i>'+(c[1]===Infinity? '> '+c[0] : c[0]+'–'+c[1])+' %</span>').join('')
+    : '<span class="bar"></span><span>'+Math.round(m.zmin)+' m</span><span style="margin-left:auto">'+Math.round(m.zmax)+' m</span>')
+    +'<span style="flex:1 1 100%"><i class="hat"></i>oltre il limite: escluso</span>';
+  $('slpStats').innerHTML='<b>'+esc(m.area_name)+'</b>: '+slpN(G.grossHa,2)+' ha · quota '+Math.round(m.zmin)+'–'+Math.round(m.zmax)+' m · pendenza media '
+    +slpN(s.mean,1)+' %, massima '+slpN(s.top,0)+' %<br><b>Oltre il limite ('+esc(lt)+'): '+slpN(s.overHa,2)+' ha</b>, il '+slpN(s.pct, s.pct<10? 1 : 0)+' % dell\'area lorda'
+    +(G.minPatch? ' (macchie sotto '+cadN(G.minPatch)+' m² ignorate)' : '')
+    +'<br>DTM '+esc(m.name)+' · griglia '+m.nx+' × '+m.ny+' celle da '+slpN(m.cell, m.cell%1? 2 : 0)+' m';
+  $('slpAdd').textContent=toolsGL.graphics.toArray().some(x=>x.attributes&&x.attributes.sf_slope&&x.attributes.sf_slope.grid===m.id)
+    ? 'Aggiorna l\'esclusione nella Raccolta' : 'Aggiungi l\'esclusione alla Raccolta'; }
+// il poligono delle celle oltre soglia, tagliato sull'area lorda, nel sistema della mappa
+function slpPolygon(G){ const m=G.meta, rings=slpRings(G.mask, m.nx, m.ny, m.x0, m.y0, m.cell); if(!rings.length) return null;
+  const GE=esriMods.geometryEngine;
+  // ArcGIS vuole gli anelli esterni in senso orario: gli anelli di slpRings sono antiorari, li rovescio
+  let p=new esriMods.Polygon({rings:rings.map(r=>r.slice().reverse()), spatialReference:G.sr});
+  try{ p=GE.simplify(p)||p; }catch(e){}
+  let cut=null; try{ cut=GE.intersect(p, G.gross); }catch(e){ console.warn('[pendenze] taglio', e); }
+  if(!cut||!cut.rings||!cut.rings.length) return null;
+  return esriMods.projection.project(cut, view.spatialReference); }
+// l'esclusione nella Raccolta: un solo disegno per griglia (la seconda volta si aggiorna), categoria Esclusione ·
+// Pendenza elevata; sf_slope porta soglia e griglia a chi legge il progetto (PV Predesign)
+function slpAdd(){ const G=slpCur; if(!G) return; const m=G.meta, lt=slpLimTxt(G.limit), geom=slpPolygon(G);
+  if(!geom){ toolMsg('slpMsg','Dentro l\'area lorda niente supera il limite ('+lt+'): non c\'è nulla da escludere.','ok'); return; }
+  const nome='Pendenza > '+slpLimShort(G.limit), day=String(m.loadedAt||'').slice(0,10);
+  const note='Pendenza oltre il limite: '+lt+'. DTM '+m.name+', cella '+slpN(m.cell, m.cell%1? 2 : 0)+' m'
+    +(G.minPatch? ', macchie sotto '+cadN(G.minPatch)+' m² ignorate' : '')+'; '+m.area_name+', '+day;
+  // limit ha i nomi di PV Predesign: maxAny, oppure maxNS e maxEW
+  const sl={limit:Object.assign({}, G.limit), cell:m.cell, min_patch:G.minPatch||0, buffer:m.buffer, source:m.source, dtm:m.name, grid:m.id, area:m.area_name, date:day};
+  let g=toolsGL.graphics.toArray().find(x=>x.attributes&&x.attributes.sf_slope&&x.attributes.sf_slope.grid===m.id);
+  if(g){ g.geometry=geom; Object.assign(g.attributes, {nome:nome, note:note, sf_slope:sl}); delete g.attributes.area_ha;
+    if(g.attributes.sf_saved) g.attributes.sf_dirty=true; drwLastG=g; refreshDl(); }
+  else g=drwAddGraphic(geom, {nome:nome, note:note, sf_cat:'exclusion', sf_type:'steep-slope', categoria:sfLabel('exclusion','steep-slope'),
+    color:sfColor('exclusion'), sf_src:'geoprocess', sf_slope:sl, sf_buffer:undefined, sf_height:undefined, sf_width:undefined, sf_voltage:undefined});
+  const ha=Math.abs(esriMods.geometryEngine.geodesicArea(geom,'hectares')||0);
+  slpUi();
+  toolMsg('slpMsg','Nella Raccolta, tra i Disegni: «'+nome+'», '+slpN(ha,2)+' ha, categoria Esclusione · Pendenza elevata. Si salva in Site Features e nel progetto .axpo come ogni disegno.','ok'); }
+function slpOpen(){ slpFill(); slpRuleUi(); slpUi(); }
+function slpWire(){ if(!$('slpGo')) return;
+  $('slpGo').onclick=slpExtract; $('slpAdd').onclick=slpAdd;
+  $('slpRule').addEventListener('change', ()=>{ slpRuleUi(); slpRefresh(); });
+  ['slpMax','slpNS','slpEW','slpMin'].forEach(id=>$(id).addEventListener('input', ()=>{ clearTimeout(_slpT); _slpT=setTimeout(slpRefresh, 180); }));
+  $('slpViewZ').onclick=()=>{ if(slpCur){ slpCur.view='z'; slpRefresh(); } };
+  $('slpViewS').onclick=()=>{ if(slpCur){ slpCur.view='s'; slpRefresh(); } };
+  $('slpArea').addEventListener('focus', ()=>{ if(!slpBusy) slpFill(); });
+  $('slpCell').addEventListener('change', ()=>{ if(slpCur&&!slpBusy) toolMsg('slpMsg','Cella cambiata: premi di nuovo «Estrai» per riscaricare le quote sulla griglia nuova.'); }); }
+// progetto .axpo: le griglie ancora sulla mappa, nel formato di PV Predesign (descrizione + quote Float32)
+function slpProjSave(zip){ return slpGrids.filter(G=>G.im&&importedImages.indexOf(G.im)>=0).map(G=>{ const f='terreno/'+G.meta.id+'.f32';
+  zip.file(f, G.z.buffer.slice(G.z.byteOffset, G.z.byteOffset+G.z.byteLength));
+  return Object.assign({}, G.meta, {file:f, limit:Object.assign({}, G.limit), min_patch:G.minPatch||0, view:G.view}); }); }
+async function slpProjRestore(zip, st, rec){ const t=(st.terrain||[]).find(x=>x&&x.id===rec.slp), zf=t&&t.file&&zip.file(t.file);
+  if(!zf) throw new Error('la griglia del terreno non è nel progetto');
+  const z=new Float32Array(await zf.async('arraybuffer')); if(z.length!==t.nx*t.ny) throw new Error('griglia del terreno incompleta');
+  const M=await slpMods(), P=esriMods.projection; await P.load();
+  const sr=new M.SR({wkt:slpWkt(t.lon0,t.lat0)}), gross=P.project(geojsonToEsri(t.area_geom), sr);
+  if(!gross) throw new Error('area lorda della griglia non leggibile');
+  const meta=Object.assign({}, t); ['file','limit','rule','min_patch','view'].forEach(k=>{ delete meta[k]; });
+  const G=slpMake(meta, z, sr, gross), L=t.limit&&typeof t.limit==='object'? t.limit : null;
+  if(L&&(L.maxAny>0||(L.maxNS>0&&L.maxEW>0))) G.limit=L;
+  G.minPatch=+t.min_patch||0; G.view=t.view==='s'? 's' : 'z';
+  try{ slpSetUi(G.limit); if($('slpMin')) $('slpMin').value=G.minPatch; }catch(e){}
+  slpAnalyse(G); await slpShow(G);
+  if(rec.name){ G.im.name=rec.name; G.im.layer.title=rec.name; }
+  slpGrids.push(G); slpCur=G; try{ slpUi(); }catch(e){} return G.im; }
 
 // ── P3 (prototipo UX): selettore della web map nella barra superiore, indipendente dalla regione della ricerca ──
 // Il cambio di mappa passa sempre da loadWebMap (particelle, disegni, risultati, DWG, immagini e servizi vengono
@@ -5587,13 +5932,14 @@ function imgDone(){ if(imgHandlesGL) imgHandlesGL.removeAll(); imgEditing=null;
   var tb=$('imgToolbar'); if(tb) tb.style.display='none'; try{ imgVM&&imgVM.cancel(); }catch(e){} }
 function removeImage(im){ try{ view.map.remove(im.layer); }catch(e){}
   var i=importedImages.indexOf(im); if(i>=0) importedImages.splice(i,1);
+  try{ if(im._slp) slpForget(im._slp); }catch(e){}   // il DTM delle pendenze porta via la sua griglia
   if(imgEditing===im) imgDone(); renderGeoms(); }
 function imgRow(im){
   var row=document.createElement('div'); row.className='grow'; if(im.layer&&im.layer.visible===false) row.classList.add('hidden');
   row.appendChild(makeVisToggle(function(){ return !(im.layer&&im.layer.visible===false); }, function(on){ if(im.layer) im.layer.visible=on; row.classList.toggle('hidden',!on); try{ wireSectionTools(); }catch(x){} }));
   var nm=document.createElement('input'); nm.className='gname'; nm.spellcheck=false; nm.value=im.name; nm.title=im.name;
   nm.onchange=function(){ im.name=nm.value.trim()||im.name; im.layer.title=im.name; }; row.appendChild(nm);
-  var tag=document.createElement('span'); tag.className='gsub'; tag.textContent='immagine'; row.appendChild(tag);
+  var tag=document.createElement('span'); tag.className='gsub'; tag.textContent=im._slp? 'DTM' : 'immagine'; row.appendChild(tag);
   var op=document.createElement('input'); op.type='number'; op.className='opnum'; op.min=0; op.max=100; op.step=5;
   op.title='Opacità (0-100%)'; op.setAttribute('aria-label','Opacità immagine in percentuale');
   op.value=Math.round((im.layer.opacity==null?0.85:im.layer.opacity)*100);
@@ -5605,7 +5951,7 @@ function imgRow(im){
   row.appendChild(op);
   var suf=document.createElement('span'); suf.className='opsuf'; suf.textContent='%'; row.appendChild(suf);
   var eb=document.createElement('button'); eb.className='gact'; eb.title='Riposiziona (angoli)'; eb.textContent='⤢';
-  eb.onclick=function(){ editImage(im); }; row.appendChild(eb);
+  eb.onclick=function(){ editImage(im); }; if(!im._slp) row.appendChild(eb);   // il DTM è già al suo posto: niente maniglie
   var db=document.createElement('button'); db.className='gact'; db.title='Elimina'; db.textContent='×';
   db.onclick=function(){ removeImage(im); }; row.appendChild(db);
   return row;
@@ -7123,7 +7469,21 @@ function baseGroundSet(){
       +'<h3>Da sapere</h3><ul>'
       +'<li>Con il punto di riferimento distinguo anche sistemi vicini, come ED50 e WGS84 nello stesso fuso (circa 200 m di differenza).</li>'
       +'<li>Uno shapefile senza .prj passa da qui in automatico: scegli il sistema e il file intero viene convertito.</li>'
-      +'<li>Le coordinate restano sul tuo PC.</li></ul>'}
+      +'<li>Le coordinate restano sul tuo PC.</li></ul>'},
+    slope:{t:'Pendenze da DTM', s:'Dove l\'area lorda è troppo ripida per posare l\'impianto (menu Tools, in basso a sinistra sulla mappa).', h:
+      '<h3>Come si usa</h3><ol>'
+      +'<li>Scegli l\'<b>area lorda</b>: un disegno della categoria «Area lorda», il sito di lavoro, oppure le particelle in elenco unite.</li>'
+      +'<li>Scegli il <b>limite di pendenza</b>. <b>In ogni direzione</b>: con 10, tutto ciò che supera il 10 % viene escluso, comunque sia orientato il pendio. <b>Nord–sud ed est–ovest</b>: due limiti, uno per direzione; un pendio viene escluso se supera l\'uno o l\'altro.</li>'
+      +'<li>Premi <b>Estrai le pendenze dal DTM</b>: scarico le quote del terreno sull\'area lorda più 25 m e le metto sulla mappa, con le zone oltre il limite tratteggiate in rosso.</li>'
+      +'<li>Cambia il limite e guarda la mappa e i numeri aggiornarsi subito, senza scaricare di nuovo. <b>Quote</b> e <b>Classi di pendenza</b> cambiano quello che vedi.</li>'
+      +'<li>Premi <b>Aggiungi l\'esclusione alla Raccolta</b>: nasce un disegno «Pendenza &gt; 10 %» della categoria Esclusione · Pendenza elevata, tagliato sull\'area lorda. Se cambi limite e ripremi, si aggiorna.</li></ol>'
+      +'<h3>Da sapere</h3><ul>'
+      +'<li>I limiti li scegli tu. Il confronto con gli standard di progettazione, struttura per struttura, lo fa <b>PV Predesign</b> quando apre il progetto.</li>'
+      +'<li>Le quote sono di <b>Esri World Elevation</b>: in Italia il passo è di circa 10 m. Va bene per lo scouting, non sostituisce un rilievo.</li>'
+      +'<li>La pendenza è calcolata su celle di 5 m. Le macchie sotto l\'area minima non contano.</li>'
+      +'<li>È lo stesso calcolo di <b>PV Predesign</b>, con gli stessi limiti: salvando il progetto .axpo, il predesign ritrova l\'esclusione, il limite scelto e la griglia delle quote.</li>'
+      +'<li>Il DTM sulla mappa sta tra gli Importati della Raccolta: lì lo nascondi, ne cambi la trasparenza o lo togli. Resta nel progetto .axpo, non nel salvataggio automatico del browser.</li>'
+      +'<li>Non servono né l\'accesso né crediti.</li></ul>'}
   };
   // Geoprocessi: ogni «i» mostra un esempio disegnato, prima → dopo, con i colori della mappa
   // (A arancione, B viola, risultato azzurro), più un caso concreto di scouting

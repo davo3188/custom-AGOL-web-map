@@ -84,7 +84,7 @@ changes.
 | **Action bar** | The icons on the right, in groups: Raccolta (with the object-count badge) \| Layer · Mappa di base · Segnalibri \| Modifica AREAS · Stampa | `#actionIcons`, `#rcBadge` |
 | **Cassetto** | Raccolta (ex *Elenco & azioni*, renamed 2026-10-01), Layer, Basemap, Segnalibri, Modifica AREAS, Stampa | `.drawer[data-panel=…]` |
 | **Sezione** (of the Raccolta) | Particelle, Disegni, Geoprocessi, Importati | `.gsec` |
-| **Tools** | The speed-dial menu bottom-left of the map: Misura, Profilo altimetrico, Analisi di contesto, Coordinate sconosciute, Percorso su strada (since 2026-10-01) | `#toolsFab`, `TOOLS`, `tool*` |
+| **Tools** | The speed-dial menu bottom-left of the map: Misura, Profilo altimetrico, Pendenze da DTM (since 2026-10-04), Analisi di contesto, Coordinate sconosciute, Percorso su strada (since 2026-10-01) | `#toolsFab`, `TOOLS`, `tool*`, `slp*` |
 | **Scheda Tools** | The floating card of the open tool (a bottom sheet when the map is narrower than 520 px) | `#toolCard` |
 | **Finestra** (modal) | Salva sul portale, Esporta, Promuovi, CAD… | `#…Modal` |
 
@@ -385,6 +385,41 @@ type (`_punti`, `_linee`, `_aree`).
   is in progress **completes** the sketch if it has enough vertices (2 for a line, 3 for an area) instead of
   dropping it (`sketchFinishIfPossible`, also from `modeOffDraw`), and a toast says so. Signed out, context and
   route show the reason with the button disabled.
+- **Pendenze da DTM** (Tools, since 2026-10-04, `slp*`): where the gross area is too steep. Pick the **gross
+  area** (a drawing of category *Area lorda*, the site of work, or the parcels of the list merged), choose the
+  **slope limit** — *in ogni direzione* (one value: 10 = everything steeper than 10 % is excluded, whatever its
+  aspect) or *nord–sud ed est–ovest, separati* (two values: a cell is out when either component exceeds its
+  own limit) — and press *Estrai*: the terrain is
+  sampled over the gross area **plus 25 m** and shown on the map as a georeferenced image (hill-shaded
+  elevations, or the slope classes 0–5–10–15–25 %), transparent outside the buffer, with the cells over the
+  limit hatched in red. Changing the limit (or the minimum patch) redraws image and figures at once,
+  with no new download. The limits are the user's own, nothing else: the comparison with the company's design
+  standards, structure by structure, is PV Predesign's job when it opens the project (the user's decision of
+  2026-10-04: those values stay out of this tool, whose repository is public). *Aggiungi l'esclusione alla Raccolta* makes **one drawing** *Esclusione · Pendenza
+  elevata* (`exclusion` / `steep-slope`), clipped to the gross area, named *Pendenza > 10 %* (or *> 10 %
+  N-S/E-O*); pressing it again after a change updates the same drawing (and marks it to be updated on the
+  portal) — also after a page reload, when the grid is gone but the exclusion is not: a new extraction of the
+  same area takes the identifier back from the drawing. No sign-in, no credits:
+  a 10,560-cell grid took 1.9 s. The method is **PV Predesign's own** (its terrain module, ported function by
+  function so both tools give the same numbers on the same grid): a grid of
+  5 m cells (2–50, grown by 1.25 until under 400,000 cells) in a local Transverse Mercator frame centred on the
+  site with scale 1 (true ground metres; the same definition as Predesign's local frame); elevations of **Esri
+  World Elevation** at the cell centres (`ElevationLayer.queryElevation`, `finest-contiguous`, 5,000 points per
+  request; about 10 m of native resolution in Italy: fine for scouting, not a survey); slope in percent with
+  Horn's 3 × 3 weights; the limit is Predesign's own object — `{maxAny}` for the steepest slope in every
+  direction, `{maxNS, maxEW}` for the two components — and `slpMask` is its limit mask; patches under the
+  minimum area (250 m², as in Predesign) dropped; cells traced into rings. The image sits among the *Importati*
+  of the Raccolta (eye, opacity, ×; tagged *DTM*, no corner handles) and in the layer list.
+  **What PV Predesign receives** through the `.axpo` project: the exclusion drawing with its codes and
+  `sf_slope` = `{limit: {maxAny} | {maxNS, maxEW}, cell, min_patch, buffer, source:'esri', dtm, grid, area,
+  date}`; and `terrain`, a
+  list with one record per DTM still on the map — `{id, lon0, lat0, x0, y0, cell, nx, ny, zmin, zmax, missing,
+  loadedAt, source, name}` exactly as Predesign describes its own grid, plus `buffer`, `area_name`, `area_geom`
+  (GeoJSON 4326), `limit`, `min_patch`, `view` and `file` — with the elevations in `terreno/<id>.f32`
+  (Float32, little-endian, row by row from the south-west cell, NaN where unknown: the layout of Predesign's
+  own grid file). On the portal only category, type and the note go to *IT - Site Features*: the limit is
+  written in the note, and the user decided on 2026-10-04 **not** to add a field for it. The DTM is kept in projects, not in the browser
+  auto-save (after a reload the exclusion stays, the image does not).
 - Scale bar bottom-centre at 70% opacity (`#scaleDock`), coordinates widget glued to the bottom-right corner,
   Esri attribution at 18 px and 0.75 opacity (full on hover), mode banner small at the top edge of the map
   (11 px, ellipsis, full text in its tooltip) — the user's rule of 2026-10-01: lighten the map visually.
@@ -1024,6 +1059,34 @@ hatches the 6 with clockwise arcs changed, and each now has exactly the extent o
 (bulges included); on the three DWGs of 2026-10-01 only the layers with such hatches changed (heavy
 traffic, circulation, legend), and their extents now match arcpy's; the 163,344-item DWG keeps the same
 item count. Backup: `geoportale_axpo_pre-hatch-cw_2026-10-02.html`.
+
+**Slopes from the DTM (2026-10-04, the user's request; §4, *Pendenze da DTM*).** New Tools entry: threshold in
+percent chosen by the user, DTM shown over the gross area plus 25 m, exclusion *Pendenza elevata* into the
+Raccolta, grid and threshold passed to PV Predesign through the `.axpo` (Predesign computes the same cut today
+with a limit fixed by the structure; its import is to be adapted — request in `../COORDINAMENTO.md`, prompt in
+`../reports/prompt_pv_predesign_pendenze_2026-10-04.md`). Tested in headless Chrome and in the built-in browser
+on an invented 15.64 ha area in hilly ground: the ported functions give **the same arrays as Predesign's
+originals** loaded side by side (gradients, mask, small-patch removal, rings, grid definition) and 11.1803 % on
+a plane of 10 % × 5 %; the grid juts 30 m beyond the area (25 m plus one cell) and the buffer mask measures
+19.82 ha against 19.84 of the true 25 m buffer; a cell elevation equals the same point queried alone (309.31 m);
+at 10 % the exclusion is 13.66 ha with 0.00005 ha outside the gross area, at 20 % the same drawing becomes 7.26
+ha; the project keeps the grid bit for bit, and reopening it restores image, threshold and view; removing the
+image drops the grid; sources also checked with a fake site of work and three fake parcels (merged into two
+parts). Real time in the browser: 1.9 s for 10,560 cells. Not tested: saving the exclusion to the portal
+(sign-in), very large areas at the 400,000-cell cap, the undocked panel. Backups:
+`geoportale_axpo_pre-pendenze-dtm_2026-10-04.html`, `README_tools_pre-pendenze-dtm_2026-10-04.md`.
+The same day the user decided that **the two tools must compute alike in everything**: so the limit can also
+be two values, north–south and east–west, as in PV Predesign, which will get the same free choice of limits
+(request in `../COORDINAMENTO.md`); that no field for the limit goes on the layer; and that the comparison with
+the company's design standards **stays in PV Predesign only** — a first version that also listed those values
+here was withdrawn before reaching the public repository. Retested on a clean browser profile: `slpMask` equals
+Predesign's limit mask for `{maxNS:10, maxEW:10}`, `{maxAny:15}`, `{maxNS:8, maxEW:12}` and `{maxNS:10}`; on
+the same area 10 % north–south and east–west excludes 12.85 ha (13.66 with 10 % in every direction), 10 % and
+12 % give 12.62 ha, 15 % in every direction 10.91 ha; the limit survives the project round trip and comes back
+in the fields; after removing the DTM (as after a reload) a new extraction updates the one existing exclusion.
+The bottom sheet got 72 px of bottom padding: the Tools button covered the last command of a tall card.
+Backups: `geoportale_axpo_pre-pendenze-direzioni_2026-10-04.html`,
+`geoportale_axpo_pre-limiti-a-mano_2026-10-04.html`.
 
 **UX refactor (2026-10-01/02, from the user tests; prototyped in `../prototipo_ux/`, approved and integrated on
 2026-10-02).** Four problems from the user tests, each a commit in the prototype's local git (its
