@@ -5689,7 +5689,7 @@ function ownAdd(fc, srcName){
   refreshDl();
   if(zoom.length){ try{ view.goTo(zoom).catch(()=>{}); }catch(e){} }
   const nNo=recs.filter(r=>!r.own.k).length;
-  return {n:recs.length, note:'per intestatario: '+tot.size+(tot.size===1?' intestatario':' intestatari')+(nNo? ', '+nNo+' senza' : '')
+  return {n:recs.length, note:'per intestatario: '+tot.size+(tot.size===1?' gruppo di intestatari':' gruppi di intestatari')+(nNo? ', '+nNo+(nNo===1?' particella senza':' particelle senza') : '')
     +'. I nominativi restano in questa pagina e nel progetto .axpo: non vanno nel salvataggio automatico né sul portale'}; }
 function ownGroups(arr){ const m=new Map();
   arr.forEach(g=>{ const o=g.attributes.own, k=o.k||''; let G=m.get(k); if(!G){ G={k:k, t:o.t||'', gs:[], ha:0}; m.set(k,G); }
@@ -5736,7 +5736,8 @@ function ownRenderList(arr, total){ const box=$('listImport'), cnt=$('cntImport'
   const bar=document.createElement('div'); bar.className='gownbar';
   bar.title='Dati personali: restano in questa pagina e nel progetto .axpo. Non vanno nel salvataggio automatico del browser né sul portale.';
   const bt=document.createElement('b'); bt.textContent='Per intestatario'; bar.appendChild(bt);
-  const bs=document.createElement('span'); bs.textContent=nOwn+(nOwn===1?' intestatario':' intestatari')+' · '+arr.length+' part.'; bar.appendChild(bs);
+  // «gruppi», non «intestatari»: un gruppo è l'insieme dei cointestatari di una particella (due persone = un gruppo)
+  const bs=document.createElement('span'); bs.textContent=nOwn+(nOwn===1?' gruppo':' gruppi')+' · '+arr.length+' part.'; bar.appendChild(bs);
   const lb=document.createElement('label'), ck=document.createElement('input'); ck.type='checkbox'; ck.id='ownLbl'; ck.checked=ownLblOn();
   ck.onchange=()=>{ try{ localStorage.setItem('axpo_own_labels', ck.checked?'1':'0'); }catch(e){} ownLblSync(); };
   lb.appendChild(ck); lb.appendChild(document.createTextNode('Nomi sulla mappa')); bar.appendChild(lb); box.appendChild(bar);
@@ -5766,8 +5767,13 @@ function ownLblSync(){ if(!ownLblGL||!toolsGL||!esriMods) return; ownLblGL.remov
     ownLblGL.add(new esriMods.Graphic({geometry:an, symbol:{type:'text', text:String(t).slice(0,60), color:'#ffffff', haloColor:[0,0,0,0.85], haloSize:1.6, font:{size:10, weight:'bold'}}})); }); }
 function ownLblSoon(){ clearTimeout(ownLblT); ownLblT=setTimeout(()=>{ try{ ownLblSync(); }catch(e){} }, 80); }
 function impAdd(fc, srcName){
-  impAdd.note='';
+  impAdd.note=''; impAdd.hint='';
   if(ownFile(fc)){ const r=ownAdd(fc, srcName); impAdd.note=r.note; return r.n; }
+  // L'export delle particelle reimportato al posto del file degli intestatari: i due hanno lo stesso nome, cambia
+  // solo il prefisso «Intestatari_» (successo il 5/10). Si importa com'è, ma lo si dice.
+  if(((fc&&fc.features)||[]).some(f=>f&&f.properties&&exIsParcel(f.properties)&&(f.properties.belfiore||f.properties.ncr))){
+    impAdd.note='particelle senza intestatari';
+    impAdd.hint='«'+srcName+'» contiene le particelle senza intestatari. Per vederle per intestatario importa «Intestatari_'+srcName.replace(/\.[^.]+$/,'')+'.geojson», dalla cartella output di Estrazione intestatari.'; }
   const col=IMP_COLORS[impColorIdx++ % IMP_COLORS.length];
   const feats=(fc&&fc.features)||[]; let added=0; const zoom=[];
   feats.forEach((f,i)=>{
@@ -5798,7 +5804,7 @@ async function importOne(file){
     const chk=await gjCheckCoords(fc);               // niente import "fuori dal mondo"
     if(!chk.ok){ if(chk.proj) srFromImport(fc, name); throw new Error(chk.reason); }
     const n=impAdd(fc,name);
-    return {name, n:n, note:[chk.converted, impAdd.note].filter(Boolean).join('; ')};
+    return {name, n:n, note:[chk.converted, impAdd.note].filter(Boolean).join('; '), hint:impAdd.hint};
   }catch(e){ return {name, err:(e&&e.message)||String(e)}; }
 }
 async function onImportFiles(files){
@@ -5812,6 +5818,7 @@ async function onImportFiles(files){
   if(bad.length) m+=(m?' · ':'')+bad.map(r=>`${r.name}: errore (${r.err})`).join(' · ');
   toolMsg('impMsg', m||'Nessuna geometria importata.', (bad.length&&!ok.length)?'err':'ok');
   if(ok.length) impShowDone();
+  const hint=ok.map(r=>r.hint).filter(Boolean)[0]; if(hint) msg(hint, '', vediElenco('import')||undefined);   // al posto di «Importato: …»
 }
 
 // ══ Servizi web: WMS, WFS e ArcGIS REST aggiunti per indirizzo, senza item sul portale ═══════════════

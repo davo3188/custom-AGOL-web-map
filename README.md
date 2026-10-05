@@ -304,7 +304,12 @@ right-click menu opens it on the clicked point.
   parcel (`Fg 12 · 101 · Comune`), coloured **by owner** (same set of owners = same colour, grey without owners)
   and keeps all the file's properties in `src_attrs`, so an export gives them back. In *Raccolta › Importati* the
   parcels come after the plain imports under a bar *Per intestatario* (count, and a switch *Nomi sulla mappa*) in
-  **one collapsible group per owner**, largest total area first, *Senza intestatari* last. A group header has a
+  **one collapsible group per owner**, largest total area first, *Senza intestatari* last. A group is a set of
+  co-owners: ten parcels held by the same two people are one group and one colour, and the bar counts groups
+  ("1 gruppo · 10 part."). The parcels **export** reimported by mistake — same file name as the owners file,
+  without the `Intestatari_` prefix — has no owners: it is imported as before, and a message says which file to
+  import instead (`impAdd.hint`, for any plain import whose features carry `foglio`, `particella` and
+  `belfiore` or `ncr`). A group header has a
   tick box, eye and colour for the whole group, the owners' names and "n part. · ha"; each row has an **i**
   that opens the detail (one line per owner with tax code and share, then status, land use, cadastral area,
   notes). On the map every parcel carries the short name (`etichetta`, e.g. `ROSSI MARIO +1`) and **a click
@@ -1213,6 +1218,14 @@ municipalities plus a drawing (`Sant_Angelo_Lodigiano_e_altri_1_…_7part`), two
 and XLSX), an accented name (`Forli_…`), a drawing alone (`export_2026-10-05`), owners-file parcels (counted),
 an empty Raccolta (no file, the usual message). Not tested: a real download in the browser's folder. Backups:
 `geoportale_axpo_pre-nome-export_2026-10-05.html`, `README_tools_pre-nome-export_2026-10-05.md`.
+
+**Wrong file imported (2026-10-05, evening, from the user's first real try).** "No colour per owner": the file
+imported was the parcels export, not the tool's result — since the same day the two differ only by the
+`Intestatari_` prefix. Nothing to fix in the classification (the result file, read for structure only, gives
+10 parcels in one group of two co-owners, one colour, 10 labels); added the message that names the right file
+(§4 *Owners file*) and changed the wording of the count from "intestatari" to "gruppi", which was wrong for
+co-owners. Checked in headless Chrome with the user's two files (counts only) and with the invented-names
+suite again.
 
 **Open, known, non-blocking**
 
