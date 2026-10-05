@@ -460,6 +460,31 @@
   .grow .sftag::before{content:'';flex:none;width:8px;height:8px;border-radius:2px;background:var(--c,#99AFC2)}
   .grow .sftag:hover,.grow .sftag.open{border-color:var(--c,var(--accent))}
   .grow .sftag.none{color:var(--mut);border-style:dashed}
+  /* Importati › intestatari (file di «Estrazione intestatari»): una barra, poi un gruppo richiudibile per intestatario */
+  .gownbar{display:flex;flex-wrap:wrap;align-items:center;gap:2px 8px;margin:6px 2px 2px;padding:5px 6px 3px;border-top:1px dashed var(--line);font-size:11px;color:var(--mut)}
+  .gownbar b{color:var(--txt);font-weight:600;white-space:nowrap}
+  .gownbar span{white-space:nowrap}
+  .gownbar label{flex:none;display:inline-flex;align-items:center;gap:4px;margin:0 0 0 auto;cursor:pointer;white-space:nowrap;text-transform:none;letter-spacing:0;font-weight:400;font-size:11px;color:var(--txt)}
+  .gownbar input{width:13px;height:13px;margin:0;accent-color:var(--accent)}
+  .gown{display:flex;flex-wrap:wrap;align-items:center;gap:5px;padding:4px 5px;border-radius:7px;cursor:pointer}
+  .gown:hover{background:var(--hover)}
+  .gown .gown-car{flex:none;width:14px;border:none;background:transparent;color:var(--txt);opacity:.6;cursor:pointer;font-size:10px;line-height:1;padding:0;transition:transform .15s}
+  .gown[aria-expanded=false] .gown-car{transform:rotate(-90deg)}
+  .gown .gsel{flex:none;width:14px;height:14px;margin:0 1px 0 0;accent-color:var(--accent);cursor:pointer}
+  .gown .gown-n{flex:1;min-width:0;font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .gown.none .gown-n{font-weight:400;font-style:italic}
+  .gown .gown-s{order:10;flex:0 0 100%;padding-left:75px;margin-top:-3px;font-size:10px;opacity:.55;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .gownb{margin:0 0 3px 11px;padding-left:2px;border-left:2px solid var(--c,var(--line))}
+  .gownb[hidden]{display:none}
+  .gownb .grow{gap:3px}
+  .gownb .grow .gname{flex-basis:56px}
+  .grow .owni{font-style:italic;font-weight:700;font-family:Georgia,serif;width:20px}
+  .grow .owni.open{opacity:1;color:var(--accent)}
+  .owncard{margin:1px 4px 6px 28px;padding:7px 9px;border:1px solid var(--line);border-radius:7px;background:var(--panel);font-size:11.5px;line-height:1.45}
+  .owncard .oc-l,.ownpop .oc-l{white-space:pre-wrap;overflow-wrap:anywhere}
+  .owncard .oc-m,.ownpop .oc-m{margin-top:6px;color:var(--mut);font-size:10.5px}
+  .ownpop{font-size:12.5px;line-height:1.5}
+  .ownpop .oc-m{font-size:11.5px;opacity:.75;color:inherit}
   .grow .sfst{flex:none;font-size:12px;color:var(--ok);cursor:default}
   .grow .sfst.dirty{color:var(--warn)}
   .gedit{margin:0 5px 8px 24px;padding:4px 9px 9px;border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:7px;background:var(--bg)}
@@ -1110,7 +1135,7 @@
           <div class="im-body">
             <input type="file" id="impFile" accept=".geojson,.json,.kml,.kmz,.zip,.dwg" multiple hidden>
             <button class="sec im-main" id="impBtn">📂 Scegli uno o più file…</button>
-            <div class="thint">Le geometrie finiscono nella <b>Raccolta</b>, sezione <b>Importati</b>. Se il file non dice in che sistema di coordinate è, si apre da solo <b>Coordinate sconosciute</b> (menu Tools) con i sistemi possibili.</div>
+            <div class="thint">Le geometrie finiscono nella <b>Raccolta</b>, sezione <b>Importati</b>. Se il file non dice in che sistema di coordinate è, si apre da solo <b>Coordinate sconosciute</b> (menu Tools) con i sistemi possibili. Il GeoJSON di <b>Estrazione intestatari</b> viene riconosciuto: le particelle si colorano e si raggruppano per intestatario.</div>
             <div id="impMsg" class="thint"></div>
           </div>
         </details>
@@ -1492,11 +1517,11 @@
       <li><b>Ricerca particelle</b> — tre moduli: <b>Ricerca particelle</b> (comune, foglio e particella), <b>Sulla mappa con selezione manuale particelle</b> (clic, rettangolo, poligono, linea) e <b>Seleziona da un disegno esistente</b>.</li>
       <li><b>Disegna</b> — due passi. <b>1</b> Cosa disegni: la <b>categoria</b> (area lorda, area netta, percorso di connessione, esclusione, infrastruttura lineare, ostacolo, accesso e punto di connessione, mitigazione, zona agricola, nota) con tipo e attributi. <b>2</b> Con quale strumento: punto, linea, area, rettangolo e cerchio, anche di misura esatta. Sotto, il riquadro <b>Ultimo disegno</b> porta alla sua riga nella Raccolta. Salvando sul portale ogni oggetto si lega da solo all'area di AREAS COLLECTION che tocca; il <b>sito di lavoro</b>, la riga in cima, serve solo a forzarla. Mentre disegni, <kbd>Tab</kbd> fa scrivere lunghezza e angolo del lato (anche come azimut). In fondo, sempre in vista, misure e aggancio e la griglia in metri. <kbd>Ctrl</kbd>+<kbd>Z</kbd> / <kbd>Ctrl</kbd>+<kbd>Y</kbd> annullano e ripetono. Un disegno cliccato sulla mappa si sposta e si rimodella.</li>
       <li><b>Geoprocessi</b> — tre passi. <b>1</b> Metti gli oggetti di partenza in <b>A</b>: dalla mappa, dalle righe spuntate nella Raccolta, o una categoria intera. <b>2</b> Scegli cosa fare tra le schede: Buffer, Unione, Contorno, Semplificazione, Ritaglio, Parte comune, Sottrai B da A e <b>Copia</b> (anche parallela, per i rientri dai confini); ogni scheda dice cosa le serve e si accende quando A va bene. <b>3</b> Parametri ed <b>Esegui</b>: sotto il pulsante leggi l'esito, e il risultato è nella Raccolta.</li>
-      <li><b>Importa dati</b> — quattro schede sempre aperte: <b>file di geometrie</b> (GeoJSON, KML, KMZ, Shapefile), <b>disegni CAD</b> (DWG letti nel browser, con il sistema di coordinate proposto, oppure posizionati a mano con 2 punti), <b>immagini</b> (GeoTIFF, foto e planimetrie) e <b>servizi web</b> (WMS, WFS e ArcGIS REST per indirizzo, senza creare item sul portale; il browser accetta solo servizi <b>https</b> che permettono la lettura da altri siti, CORS).</li>
+      <li><b>Importa dati</b> — quattro schede sempre aperte: <b>file di geometrie</b> (GeoJSON, KML, KMZ, Shapefile; il GeoJSON di <b>Estrazione intestatari</b> si colora e si raggruppa per intestatario, e i nominativi restano fuori dal salvataggio automatico e dal portale), <b>disegni CAD</b> (DWG letti nel browser, con il sistema di coordinate proposto, oppure posizionati a mano con 2 punti), <b>immagini</b> (GeoTIFF, foto e planimetrie) e <b>servizi web</b> (WMS, WFS e ArcGIS REST per indirizzo, senza creare item sul portale; il browser accetta solo servizi <b>https</b> che permettono la lettura da altri siti, CORS).</li>
       <li><b>Rail destro</b> — in cima la <b>Raccolta</b>, con il numero di oggetti: tutto quello che hai raccolto (Particelle · Disegni · Geoprocessi · Importati); ogni riga si rinomina, si colora, si nasconde e si <b>spunta</b> per usarla nei geoprocessi; da qui esporti e salvi sul portale. Sotto, i pannelli della mappa (Layer, Mappa di base, Segnalibri) e le azioni (Modifica AREAS, Stampa).</li>
       <li><b>🗺 Mappa</b> (in alto) — la web map del portale in uso: la General Map o una Check Vincoli regionale, con ricerca per nome. Cambiarla non tocca particelle, disegni e risultati; si perdono solo i layer accesi e i filtri di quella mappa (te lo chiedo prima). Scegliendo una regione nella ricerca ti propongo i suoi vincoli con un clic.</li>
       <li><b>Layer</b> — cerca un layer per nome; dal pannello di ogni layer (icona a cursori) trasparenza, popup e <b>filtro per attributo</b> (l'icona diventa un imbuto quando è attivo). I layer aggiunti da te (dal portale, servizi web, DWG, immagini) hanno il menu <b>…</b> con Zoom e <b>Rimuovi dalla mappa</b>.</li>
-      <li><b>Esporta / Migra / Salva</b> — in fondo alla Raccolta, sempre in vista: <b>Esporta</b> apre la finestra con il formato (GeoJSON/KML/KMZ/SHP/XLSX) e i singoli oggetti (le spunte sono quelle della Raccolta; senza spunte esporta tutto); <b>Migra particelle in AREAS Collection</b> (l'opzione «dissolvi» sta nella sua finestra); <b>Salva disegni in Site Features</b> (categoria, tipo, attributi e sito: la seconda volta aggiorna, non duplica).</li>
+      <li><b>Esporta / Migra / Salva</b> — in fondo alla Raccolta, sempre in vista: <b>Esporta</b> apre la finestra con il formato (GeoJSON/KML/KMZ/SHP/XLSX) e i singoli oggetti (le spunte sono quelle della Raccolta; senza spunte esporta tutto); il file prende il nome da comune, data e numero di particelle, per esempio <i>Milano_2026-10-05_6part.geojson</i>; <b>Migra particelle in AREAS Collection</b> (l'opzione «dissolvi» sta nella sua finestra); <b>Salva disegni in Site Features</b> (categoria, tipo, attributi e sito: la seconda volta aggiorna, non duplica).</li>
       <li><b>Tools</b> (in basso a sinistra sulla mappa) — uno strumento alla volta, in una scheda: <b>Misura</b> (distanza e area); <b>Profilo altimetrico</b> lungo una linea; <b>Pendenze da DTM</b> (scegli l'area lorda e il limite di pendenza, in ogni direzione oppure nord–sud ed est–ovest: il terreno compare sulla mappa con le zone troppo ripide, che diventano un'esclusione nella Raccolta); <b>Analisi di contesto</b> (sottostazioni, linee AT e progetti FV intorno a un punto; serve l'accesso); <b>Coordinate sconosciute</b> (in che sistema sono?); <b>Percorso su strada</b> fino al punto di connessione (serve l'accesso).</li>
       <li><b>Progetto</b> (in alto) — <b>💾 Salva progetto</b> mette tutto in un file .axpo, come un progetto QGIS: vista, basemap, area di lavoro, mappa e layer del portale (accesi, trasparenza, ordine), servizi web, particelle, disegni, geoprocessi, import, sito di lavoro, i file di <b>DWG e immagini</b> con il loro posizionamento e il <b>DTM delle pendenze</b> con il suo limite. <b>📂 Apri progetto</b> lo ripristina (sostituisce il lavoro corrente). <kbd>Ctrl</kbd>+<kbd>S</kbd> risalva sullo stesso file, <kbd>Ctrl</kbd>+<kbd>Maiusc</kbd>+<kbd>S</kbd> salva con nome. Lo stesso file si apre in PV Predesign, che ne legge aree, esclusioni e terreno.</li>
     </ol>
@@ -1645,6 +1670,7 @@ let view, gl, labelsGL, catasto, esriMods;
 // vengono soppressi (sennò l'animazione asincrona sovrascrive la vista salvata).
 let bootVP=null;
 let toolsGL, measurement, sketchVM;   // strumenti: disegni, buffer, geoprocessi, import; misura; sketch
+let ownLblGL=null, ownClickAt=null;   // nomi degli intestatari sulle particelle importate, e ultimo clic (vedi «Intestatari»)
 let areasEditorExpand=null, areasLayer=null, recomputingArea=false;   // edit AREAS COLLECTION
 let subActive=false;      // modalità "contesto sito" (click su mappa)
 let promoteOverlapAck=false;   // avviso sovrapposizione promote già confermato
@@ -1731,13 +1757,14 @@ require([
   // etichette particelle: layer separato -> si spengono e spariscono a scala piccola
   labelsGL=new GraphicsLayer({title:"Etichette particelle", listMode:"hide", minScale:150000, maxScale:0});
   toolsGL=new GraphicsLayer({title:"Strumenti (misura/buffer)", listMode:"hide"});
+  ownLblGL=new GraphicsLayer({title:"Etichette intestatari", listMode:"hide", minScale:150000, maxScale:0});
 
   // Basemap da servizi Esri PUBBLICI (no token, non bloccate come i tile OSM volontari)
   const bm=(title,url,id)=>new Basemap({baseLayers:[new TileLayer({url})], title, id});
   const bmTopo=bm("Topografica","https://services.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer","topo");
   const bmImg=bm("Satellite","https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer","img");
   const bmStreets=bm("Stradale","https://services.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer","streets");
-  const map=new Map({basemap:bmTopo, ground:{layers:[new ElevationLayer({url:WORLD_ELEV})]}, layers:[catasto, gl, labelsGL, toolsGL]});
+  const map=new Map({basemap:bmTopo, ground:{layers:[new ElevationLayer({url:WORLD_ELEV})]}, layers:[catasto, gl, labelsGL, toolsGL, ownLblGL]});
   view=new MapView({container:"viewDiv", map, center:[12.5,42.0], zoom:6});
   window.view=view; window.dispatchEvent(new Event('axpo-view'));   // per chi aspetta la vista (pin delle coordinate)
   // bussola sempre visibile sotto lo zoom: la mappa si ruota (tasto destro trascinato, due dita), un clic rimette il nord in alto
@@ -1905,7 +1932,10 @@ require([
   // finita ricalcolo l'area memorizzata e aggiorno Elenco e salvataggio (prima la modifica restava solo sulla mappa
   // e al ricaricamento tornava la forma vecchia); Canc durante la modifica toglie l'oggetto, anche dalla Raccolta
   sketchVM.on("update", e=>{
-    if(e.state==="start"){ histFreeze(e.graphics); drwSnapSync(); return; }   // storico: la forma di prima resta ferma
+    if(e.state==="start"){
+      // particella con gli intestatari: il clic mostra chi è l'intestatario, non apre la modifica della forma
+      if(e.graphics&&e.graphics.length===1&&ownIs(e.graphics[0])){ const og=e.graphics[0]; setTimeout(()=>ownShow(og), 0); return; }
+      histFreeze(e.graphics); drwSnapSync(); return; }   // storico: la forma di prima resta ferma
     if(e.state!=="complete") return;
     (e.graphics||[]).forEach(g=>{ const at=g.attributes;
       if(at&&at.area_ha!=null&&g.geometry&&/polygon/i.test(g.geometry.type)){
@@ -1914,6 +1944,7 @@ require([
     refreshDl(); });
   sketchVM.on("delete", ()=>refreshDl());
   sketchVM.on(["create","update","undo","redo"], ()=>histUi());   // Annulla/Ripeti seguono anche i vertici del disegno in corso
+  view.on("immediate-click", e=>{ ownClickAt=e.mapPoint||null; });   // dove aprire il popup degli intestatari (ownShow)
 
   view.on("click", async e=>{
     if(subActive){ if(e.mapPoint) querySubstations(e.mapPoint); return; }   // modalità sottostazioni
@@ -2603,16 +2634,18 @@ async function querySubstations(pt){   // "Contesto sito": sottostazioni + linea
 }
 
 // ── Auto-resume (localStorage): elenco particelle + inquadratura + basemap + layer aggiunti ──
-function serializeToolGeoms(){
+function serializeToolGeoms(noOwn){
   if(!toolsGL) return [];
   const out=[];
   toolsGL.graphics.toArray().forEach(g=>{ const at=g.attributes||{};
     if(at._kind!=='drawing'&&at._kind!=='buffer'&&at._kind!=='import') return;   // no immagini (sono MediaLayer)
+    if(noOwn&&at.own) return;   // particelle con gli intestatari: dati personali, mai nel salvataggio automatico
     let gj=null; try{ gj=esriGeomToGeojson(to4326(g.geometry)); }catch(e){}
     if(!gj) return;
     out.push({ g:gj,
       a:{_kind:at._kind,_sub:at._sub,geomType:at.geomType,categoria:at.categoria,note:at.note,nome:at.nome,dist_m:at.dist_m,area_ha:at.area_ha,source:at.source,color:at.color,hidden:at.hidden,
          _srcKey:at._srcKey, src_attrs:at.src_attrs,   // elementi presi dai layer della mappa: da dove vengono e i loro attributi
+         own:at.own,   // file degli intestatari: classe, titolo del gruppo ed etichetta (solo nel progetto .axpo, vedi noOwn)
          // modello Site Features: categoria, tipo, attributi, fonte, stato, sito, GlobalID sul portale
          sf_cat:at.sf_cat, sf_type:at.sf_type, sf_buffer:at.sf_buffer, sf_height:at.sf_height, sf_width:at.sf_width, sf_voltage:at.sf_voltage,
          sf_src:at.sf_src, sf_status:at.sf_status, sf_site:at.sf_site, sf_gid:at.sf_gid, sf_saved:at.sf_saved, sf_dirty:at.sf_dirty,
@@ -2623,19 +2656,19 @@ function serializeToolGeoms(){
   return out;
 }
 // lo stesso stato serve al salvataggio automatico e al file di progetto (projCapture)
-function captureWork(){
+function captureWork(noOwn){   // noOwn: senza le particelle con gli intestatari (salvataggio automatico)
   const base={
     basemap: view.map&&view.map.basemap? view.map.basemap.id:null,
     viewpoint: view.viewpoint? view.viewpoint.toJSON():null,
     parcels, addedItems:addedPortalItems,
     services: svcBooting||addedServices,   // durante il ripristino all'avvio vale ancora l'elenco salvato
     site: sfSite };                        // sito di lavoro (AREAS COLLECTION): lo legge anche PV Predesign come area lorda
-  let geoms=[]; try{ geoms=serializeToolGeoms(); }catch(e){}
+  let geoms=[]; try{ geoms=serializeToolGeoms(noOwn); }catch(e){}
   return {base:base, toolGeoms:geoms};
 }
 function saveState(){
   try{ if(!view) return;
-    const w=captureWork(), base=w.base, geoms=w.toolGeoms;
+    const w=captureWork(true), base=w.base, geoms=w.toolGeoms;
     try{ localStorage.setItem('cat_state', JSON.stringify(Object.assign({toolGeoms:geoms}, base))); }
     catch(quota){ try{ localStorage.setItem('cat_state', JSON.stringify(base)); }catch(e2){}   // quota → salva senza geometrie
       // prima era silenzioso: disegni e import smettevano di sopravvivere al ricaricamento senza che nessuno lo sapesse
@@ -2685,7 +2718,7 @@ function applyWork(st){
         const _gr=new esriMods.Graphic({geometry:geom, attributes:_at, symbol:_sym});
         if(rec.v===false || (rec.a&&rec.a.hidden)) _gr.visible=false;
         toolsGL.add(_gr);
-      }catch(e){ console.warn('[ripristino] un oggetto salvato è stato saltato:', e, rec); } });
+      }catch(e){ console.warn('[ripristino] un oggetto salvato è stato saltato:', e, (rec&&rec.a&&rec.a.own)? '(particella con intestatari)' : rec); } });
       try{ refreshDl(); }catch(e){}
     }
 }
@@ -2858,8 +2891,10 @@ async function projSave(asNew){
     if(handle){ const wr=await handle.createWritable(); await wr.write(r.blob); await wr.close(); }
     else projDownload(r.blob, name+PROJ_EXT);
     projSetName(name, handle);
+    const nOwn=toolsGL? toolsGL.graphics.toArray().filter(ownIs).length : 0;
     msg('Progetto «'+name+'» salvato'+(handle? '' : ' nei Download')+' ('+projSize(r.blob.size)+').'
-      +(r.miss.length? ' Senza il file di: '+r.miss.join(', ')+'.' : ''), r.miss.length? 'err' : 'ok');
+      +(r.miss.length? ' Senza il file di: '+r.miss.join(', ')+'.' : '')
+      +(nOwn? ' Contiene gli intestatari di '+nOwn+(nOwn===1? ' particella' : ' particelle')+': trattalo come una visura.' : ''), r.miss.length? 'err' : 'ok');
   }catch(e){ console.warn('[progetto]',e); msg('Progetto non salvato: '+((e&&e.message)||e),'err'); }
   finally{ projBusy=false; projUi(); } }
 
@@ -3202,7 +3237,7 @@ async function loadWebMap(id, hideLayers, label){
         old.layers.toArray().filter(l=>imgs.has(l)).reverse().forEach(l=>mv(l,0));   // in fondo, nell'ordine di prima
         old.layers.toArray().filter(l=>l._projItem||l._projSvc).forEach(l=>mv(l));
         if(imgHandlesGL&&old.layers.includes(imgHandlesGL)) mv(imgHandlesGL); } }catch(e){}
-    wm.add(gl); wm.add(labelsGL); wm.add(toolsGL);       // particelle + etichette + strumenti sempre SOPRA il catasto
+    wm.add(gl); wm.add(labelsGL); wm.add(toolsGL); wm.add(ownLblGL);   // particelle + etichette + strumenti sempre SOPRA il catasto
     view.map=wm;
     try{ wmRefresh(); }catch(e){}   // P3: il selettore in alto mostra la mappa in uso
     if(bootVP){ try{ const _b=vpFromJSON(bootVP); if(_b) view.viewpoint=_b; }catch(e){} }   // post-login: vista com'era
@@ -4276,13 +4311,14 @@ async function sfLoadSite(){
 
 // ── salva sul portale ──
 function sfMsg(t,cls){ $('sfMsg').innerHTML=t? `<div class="msg ${cls}">${t}</div>` : ''; }
-function sfCandidates(){ const all=toolsGL? toolsGL.graphics.toArray().filter(g=>{ const k=(g.attributes||{})._kind;
+function sfCandidates(){ let own=0; const all=toolsGL? toolsGL.graphics.toArray().filter(g=>{ const at=g.attributes||{}, k=at._kind;
+    if(at.own){ own++; return false; }   // particelle con gli intestatari: dati personali, mai sul portale
     return (k==='drawing'||k==='buffer'||k==='import')&&g.geometry&&sfGk(g.geometry.type); }) : [];
   const sel=all.filter(g=>g.attributes._sel);
-  return {all:all, sel:sel, use:($('sfOnlySel').checked&&sel.length)? sel : all}; }
+  return {all:all, sel:sel, own:own, use:($('sfOnlySel').checked&&sel.length)? sel : all}; }
 function sfOpenSave(){
   if(typeof signedIn==='undefined'||!signedIn){ msg('Accedi ad AGOL per salvare sul portale.','err'); return; }
-  const c=sfCandidates(); if(!c.all.length){ msg('Niente da salvare: disegna, importa o crea un geoprocesso.','err'); return; }
+  const c=sfCandidates(); if(!c.all.length){ msg(c.own? 'Niente da salvare: le particelle con gli intestatari non vanno sul portale (dati personali).' : 'Niente da salvare: disegna, importa o crea un geoprocesso.','err'); return; }
   $('sfOnlySel').checked=c.sel.length>0;
   sfMsg(''); const b=$('sfConfirm'); b.textContent='Salva'; sfRenderSave(); $('sfModal').style.display='flex'; }
 function sfCloseSave(){ $('sfModal').style.display='none'; }
@@ -4290,7 +4326,8 @@ function sfRenderSave(){ const c=sfCandidates(), todo=c.use.filter(sfNeedsSave),
   $('sfOnlySelRow').hidden=!c.sel.length; $('sfOnlySelTxt').textContent='Solo gli spuntati nella Raccolta ('+c.sel.length+' su '+c.all.length+')';
   const parts=[]; if(nNew) parts.push(nNew+(nNew===1?' nuovo':' nuovi')); if(todo.length-nNew) parts.push((todo.length-nNew)+' da aggiornare');
   if(c.use.length-todo.length) parts.push((c.use.length-todo.length)+' già salvati senza modifiche');
-  $('sfSub').textContent=(parts.join(' · ')||'Niente da salvare')+' → «IT - Site Features».';
+  $('sfSub').textContent=(parts.join(' · ')||'Niente da salvare')+' → «IT - Site Features».'
+    +(c.own? ' Restano fuori '+c.own+(c.own===1? ' particella' : ' particelle')+' con gli intestatari (dati personali).' : '');
   const ss=$('sfSaveSite');
   const nFree=todo.filter(g=>!g.attributes.sf_site).length;
   if(sfSite){ ss.className='sfsite'; ss.innerHTML='Sito di lavoro: <b>'+esc(sfSite.code||'area senza codice')+'</b>'+(sfSite.comune? ' · '+esc(sfSite.comune) : '')
@@ -4634,7 +4671,7 @@ async function gpIdentifyAt(mp){
       layerTitle:(sub&&sub.title)||hit.layerName||l.title||'layer', name:gpFeatName(a, hit.displayFieldName, null, oid)}; }
   return null; }
 async function gpLayerFeatureAt(e){
-  const skip=new Set([gl,toolsGL,labelsGL]);
+  const skip=new Set([gl,toolsGL,labelsGL,ownLblGL]);
   const r=await view.hitTest(e);
   for(const x of (r.results||[])){ const l=x.layer||(x.graphic&&x.graphic.layer);
     if(!x.graphic||!l||skip.has(l)||l.listMode==='hide'||typeof l.queryFeatures!=='function'||!l.objectIdField) continue;   // layer interni e DWG esclusi
@@ -4910,6 +4947,7 @@ function applyGraphicColor(g, hex){
 function setGraphicVisible(g, on){
   if(!g) return; g.visible=!!on;
   if(g.attributes){ g.attributes.hidden = on?undefined:true; }
+  if(ownIs(g)) ownLblSoon();   // il nome dell'intestatario segue la particella
   try{ saveStateDebounced(); }catch(e){}
 }
 // ── controlli riga: occhio (visibilità) + swatch (colore) ──
@@ -5058,7 +5096,9 @@ function renderGeoms(){
     const a=geomAreaHa(g); if(a!=null) pezzi.push(a.toFixed(2)+' ha');
     const s=sfSubtitle(g,''); if(s) pezzi.push(s);
     return pezzi.join(' · '); });
-  fill('listImport','cntImport',imports,'Nessun import.', function(g){ return sfSubtitle(g, g.attributes.source||''); });
+  // le particelle con gli intestatari stanno in fondo agli Importati, un gruppo per intestatario
+  fill('listImport','cntImport',imports.filter(function(g){ return !ownIs(g); }),'Nessun import.', function(g){ return sfSubtitle(g, g.attributes.source||''); });
+  try{ ownRenderList(imports.filter(ownIs), imports.length); }catch(e){ console.warn('[intestatari] elenco non disegnato'); }
   try{ updateImportImages(); }catch(e){}
   try{ wireSectionTools(); }catch(e){}
   try{ gpSelInfo(); }catch(e){}
@@ -5356,7 +5396,7 @@ async function drwEdgeAt(e){
     if(x){ const g=x.graphic; geom=g.geometry;
       if(g.layer===gl){ const p=gpParcelOf.get(g); name=p? 'Fg '+p.foglio+' · Part. '+p.particella : 'particella'; }
       else name=(g.attributes&&g.attributes.nome)||geomDefName(g); } }catch(err){}
-  if(!geom){ try{ const skip=new Set([gl,toolsGL,labelsGL,cadTxtGL,window.__searchGL,imgHandlesGL].filter(Boolean)), r=await view.hitTest(e);
+  if(!geom){ try{ const skip=new Set([gl,toolsGL,labelsGL,ownLblGL,cadTxtGL,window.__searchGL,imgHandlesGL].filter(Boolean)), r=await view.hitTest(e);
     for(const x of (r.results||[])){ const l=x.layer||(x.graphic&&x.graphic.layer);
       if(!x.graphic||!l||skip.has(l)||typeof l.queryFeatures!=='function'||!l.objectIdField) continue;
       const oid=x.graphic.attributes&&x.graphic.attributes[l.objectIdField]; if(oid==null) continue;
@@ -5604,7 +5644,130 @@ async function gjCheckCoords(fc){
     +(plaus.length>1? ', '+plaus.length+' letture possibili' : '')
     +'): scegli il sistema in «Coordinate sconosciute» (menu Tools, in basso a sinistra sulla mappa), che si apre da solo'};
 }
+// ══ Intestatari: il file di «Estrazione intestatari» (le particelle esportate, con gli intestatari letti da SISTER) ══
+// Si riconosce da `sister_stato` sulle feature; gli altri import restano com'erano. Ogni particella prende il nome
+// catastale e il colore del suo intestatario (stessi nomi = stesso colore, grigio se non ne ha) e tiene le proprietà
+// del file in src_attrs, che tornano nell'export. In Raccolta › Importati le particelle stanno in un gruppo per
+// intestatario (ownRenderList); sulla mappa hanno il nome (ownLblGL) e un popup con il dettaglio.
+// ⚠️ Sono dati personali di terzi. Restano nella pagina e nel progetto .axpo, che è un file dell'utente; NON vanno
+// nel salvataggio automatico del browser (serializeToolGeoms(true)) né sul portale (sfCandidates), e nomi e codici
+// fiscali non si scrivono in console. Il nome della riga è la particella, non la persona: così non finisce nei
+// nomi dei geoprocessi che ne derivano.
+const OWN_COLS=['#E69F00','#56B4E9','#009E73','#D55E00','#CC79A7','#0072B2','#F0E442','#8250DC','#28B46E','#DC4678','#0096B4','#B45309'], OWN_GREY='#9AA0A6';
+let ownLblT=null, ownCard=null; const ownOpen=new Map();
+const ownIs=g=>!!(g&&g.attributes&&g.attributes.own);
+function ownFile(fc){ return ((fc&&fc.features)||[]).some(f=>f&&f.properties&&f.properties.sister_stato!=null); }
+function ownLines(v){ return String(v==null?'':v).split(/\r?\n/).map(s=>s.trim()).filter(Boolean); }
+// SISTER aggiunge al nome luogo e data di nascita, o la sede: per classificare ed etichettare serve solo il nome
+// (stessa regola di short_name nello strumento; i file della versione 1.1 non hanno ancora `nominativi_brevi`)
+function ownShort(s){ return String(s||'').split(/\s+(?:con sede in|nat[oa] a|nat[oa] il|nat[oa] in)\s+/i)[0].trim(); }
+function ownOf(pr){   // → {k: chiave della classe, t: titolo del gruppo, l: etichetta sulla mappa, n, st}
+  let names=ownLines(pr.nominativi_brevi); if(!names.length) names=ownLines(pr.nominativi).map(ownShort);
+  names=names.filter((x,i,a)=>x&&a.indexOf(x)===i);
+  const l=String(pr.etichetta||'').trim()||(names.length? names[0]+(names.length>1? ' +'+(names.length-1) : '') : '');
+  return {k:names.map(x=>x.toUpperCase().replace(/\s+/g,' ')).sort().join(' | '), t:names.join(' · '), l:l, n:names.length, st:String(pr.sister_stato==null?'':pr.sister_stato).trim()}; }
+function ownColor(i){ if(i<OWN_COLS.length) return OWN_COLS[i];   // oltre i campioni: tinte a passo aureo, sempre diverse
+  const h=(i*137.508)%360, s=.62, l=.5, a=s*Math.min(l,1-l), f=n=>{ const k=(n+h/30)%12; return 255*(l-a*Math.max(-1,Math.min(k-3,9-k,1))); };
+  return rgb2hex([f(0),f(8),f(4)]); }
+function ownParcelName(pr, fallback){ const pick=(a,b)=>{ const v=pr[a]!=null&&pr[a]!==''? pr[a] : pr[b]; return v!=null&&v!==''? String(v).trim() : null; };
+  const c=pick('comune','Comune'), f=pick('foglio','Foglio'), p=pick('particella','Particella');
+  return (f==null&&p==null)? fallback : 'Fg '+(f!=null?f:'?')+' · '+(p!=null?p:'?')+(c? ' · '+c : ''); }   // prima foglio e particella: nel pannello stretto il nome si tronca
+function ownAdd(fc, srcName){
+  const recs=[], base=srcName.replace(/\.[^.]+$/,'');
+  (fc.features||[]).forEach((f,i)=>{ const gm=gjGeom(f&&f.geometry); if(!gm) return; const pr=Object.assign({}, f.properties||{});
+    recs.push({gm:gm, pr:pr, own:ownOf(pr), nome:ownParcelName(pr, base+' '+(i+1)), ha:isFinite(+pr.area_ha)? +pr.area_ha : 0}); });
+  // un intestatario già sulla mappa tiene il suo colore; i nuovi li prendono in ordine di superficie
+  const col=new Map(); toolsGL.graphics.forEach(g=>{ if(ownIs(g)&&g.attributes.own.k&&!col.has(g.attributes.own.k)) col.set(g.attributes.own.k, g.attributes.color||graphicColorHex(g)||OWN_GREY); });
+  const tot=new Map(); recs.forEach(r=>{ if(r.own.k) tot.set(r.own.k, (tot.get(r.own.k)||0)+r.ha); });
+  const used=new Set([...col.values()].map(c=>String(c).toLowerCase())); let ci=0;   // mai un colore già preso da un altro intestatario
+  [...tot.keys()].filter(k=>!col.has(k)).sort((a,b)=>tot.get(b)-tot.get(a)).forEach(k=>{ let c; do{ c=ownColor(ci++); }while(used.has(c.toLowerCase())); used.add(c.toLowerCase()); col.set(k, c); });
+  const zoom=[];
+  recs.forEach(r=>{ const hex=r.own.k? col.get(r.own.k) : OWN_GREY;
+    const gr=new esriMods.Graphic({geometry:r.gm, symbol:symbolForColor(r.gm.type, hex),
+      attributes:{_kind:'import', geomType:r.gm.type, nome:String(r.nome).slice(0,120), source:srcName, color:hex, own:r.own, src_attrs:r.pr}});
+    toolsGL.add(gr); zoom.push(gr); });
+  refreshDl();
+  if(zoom.length){ try{ view.goTo(zoom).catch(()=>{}); }catch(e){} }
+  const nNo=recs.filter(r=>!r.own.k).length;
+  return {n:recs.length, note:'per intestatario: '+tot.size+(tot.size===1?' intestatario':' intestatari')+(nNo? ', '+nNo+' senza' : '')
+    +'. I nominativi restano in questa pagina e nel progetto .axpo: non vanno nel salvataggio automatico né sul portale'}; }
+function ownGroups(arr){ const m=new Map();
+  arr.forEach(g=>{ const o=g.attributes.own, k=o.k||''; let G=m.get(k); if(!G){ G={k:k, t:o.t||'', gs:[], ha:0}; m.set(k,G); }
+    G.gs.push(g); const a=geomAreaHa(g); if(a) G.ha+=a; });
+  return [...m.values()].sort((a,b)=> (a.k?0:1)-(b.k?0:1) || b.ha-a.ha || a.t.localeCompare(b.t)); }
+// dettaglio di una particella: una riga per intestatario, poi stato, qualità, superficie catastale e note.
+// Solo textContent: il testo arriva da un file. Serve alla scheda nell'elenco e al popup sulla mappa.
+function ownInfoEl(g){ const at=(g&&g.attributes)||{}, pr=at.src_attrs||{}, o=at.own||{}, d=document.createElement('div');
+  const L=ownLines(pr.intestatari), l=document.createElement('div'); l.className='oc-l';
+  l.textContent=L.length? L.join('\n') : (o.t||'Nessun intestatario nel file.'); d.appendChild(l);
+  const m=[]; if(o.st) m.push('Stato: '+o.st);
+  const q=ownLines(pr.qualita_catasto).join(', '); if(q) m.push('Qualità: '+q);
+  if(pr.superficie_catastale_ha!=null&&pr.superficie_catastale_ha!=='') m.push('Sup. catastale: '+pr.superficie_catastale_ha+' ha');
+  if(pr.sister_note) m.push('Note: '+pr.sister_note);
+  if(m.length){ const e=document.createElement('div'); e.className='oc-m'; e.textContent=m.join(' · '); d.appendChild(e); }
+  return d; }
+const OWN_POP={title:f=>{ const a=(f&&f.graphic&&f.graphic.attributes)||{}; return a.nome||'Particella'; },
+  content:f=>{ const e=ownInfoEl(f&&f.graphic); e.className='ownpop'; return e; }};
+// clic su una particella sulla mappa: l'SDK aprirebbe la modifica della forma (come per i disegni); per queste
+// serve sapere di chi sono, quindi la modifica si chiude subito e si apre il popup nel punto del clic
+function ownShow(g){ try{ if(sketchVM&&sketchVM.state==='active') sketchVM.cancel(); }catch(e){}
+  try{ if(!g.popupTemplate) g.popupTemplate=OWN_POP; const ge=g.geometry;
+    view.openPopup({features:[g], location:ownClickAt||(ge.type==='polygon'? centroidOf(ge) : ge.type==='point'? ge : ge.extent.center)}); }catch(e){} }
+function ownRow(g){ const at=g.attributes, pezzi=[], a=geomAreaHa(g); if(a!=null) pezzi.push(a.toFixed(2)+' ha');
+  const q=ownLines((at.src_attrs||{}).qualita_catasto).join(', '); if(q) pezzi.push(q);
+  if(at.own.st&&at.own.st!=='OK') pezzi.push(at.own.st);
+  const wrap=geomRow(g, pezzi.join(' · ')), row=wrap.firstChild, tag=row.querySelector('.sftag');
+  // al posto della categoria (queste particelle non si salvano sul portale) il pulsante del dettaglio
+  const ib=document.createElement('button'); ib.type='button'; ib.className='gact owni'+(ownCard===g? ' open' : ''); ib.textContent='i';
+  ib.title='Intestatari e dati catastali'; ib.setAttribute('aria-label','Intestatari e dati catastali'); ib.setAttribute('aria-expanded', ownCard===g? 'true' : 'false');
+  ib.onclick=e=>{ e.stopPropagation(); ownCard=(ownCard===g)? null : g; renderGeoms(); };
+  if(tag) tag.replaceWith(ib); else row.appendChild(ib);
+  if(ownCard===g){ const c=ownInfoEl(g); c.className='owncard'; wrap.appendChild(c); }
+  return wrap; }
+function ownLblOn(){ try{ return localStorage.getItem('axpo_own_labels')!=='0'; }catch(e){ return true; } }
+function ownRenderList(arr, total){ const box=$('listImport'), cnt=$('cntImport'); if(!box) return;
+  if(cnt) cnt.textContent=total;
+  if(ownCard&&arr.indexOf(ownCard)<0) ownCard=null;
+  arr.forEach(g=>{ if(!g.popupTemplate) g.popupTemplate=OWN_POP; });   // anche per quelle riaperte da un progetto
+  ownLblSoon();
+  if(!arr.length) return;
+  if(box.querySelector('.empty')) box.innerHTML='';
+  const groups=ownGroups(arr), nOwn=groups.filter(G=>G.k).length;
+  const bar=document.createElement('div'); bar.className='gownbar';
+  bar.title='Dati personali: restano in questa pagina e nel progetto .axpo. Non vanno nel salvataggio automatico del browser né sul portale.';
+  const bt=document.createElement('b'); bt.textContent='Per intestatario'; bar.appendChild(bt);
+  const bs=document.createElement('span'); bs.textContent=nOwn+(nOwn===1?' intestatario':' intestatari')+' · '+arr.length+' part.'; bar.appendChild(bs);
+  const lb=document.createElement('label'), ck=document.createElement('input'); ck.type='checkbox'; ck.id='ownLbl'; ck.checked=ownLblOn();
+  ck.onchange=()=>{ try{ localStorage.setItem('axpo_own_labels', ck.checked?'1':'0'); }catch(e){} ownLblSync(); };
+  lb.appendChild(ck); lb.appendChild(document.createTextNode('Nomi sulla mappa')); bar.appendChild(lb); box.appendChild(bar);
+  groups.forEach(G=>{ const open=ownOpen.has(G.k)? ownOpen.get(G.k) : (arr.length<=12||G.gs.indexOf(ownCard)>=0), hex=graphicColorHex(G.gs[0])||OWN_GREY;
+    const h=document.createElement('div'); h.className='gown'+(G.k?'':' none'); h.setAttribute('aria-expanded', open?'true':'false');
+    const body=document.createElement('div'); body.className='gownb'; body.hidden=!open; body.style.setProperty('--c', hex);
+    const car=document.createElement('button'); car.type='button'; car.className='gown-car'; car.textContent='▾'; car.setAttribute('aria-label','Apri o chiudi il gruppo');
+    h.onclick=()=>{ const o=body.hidden; body.hidden=!o; ownOpen.set(G.k, o); h.setAttribute('aria-expanded', o?'true':'false'); };
+    h.appendChild(car);
+    const sa=document.createElement('input'); sa.type='checkbox'; sa.className='gsel'; sa.title='Spunta tutte le particelle di questo intestatario'; sa.setAttribute('aria-label', sa.title);
+    const syncSel=()=>{ const n=G.gs.filter(g=>g.attributes._sel).length; sa.checked=n===G.gs.length; sa.indeterminate=n>0&&n<G.gs.length; }; syncSel();
+    sa.onclick=e=>e.stopPropagation();
+    sa.onchange=e=>{ e.stopPropagation(); G.gs.forEach(g=>{ g.attributes._sel=sa.checked; }); renderGeoms(); };
+    h.appendChild(sa);
+    h.appendChild(makeVisToggle(()=>G.gs.some(g=>g.visible!==false), on=>{ G.gs.forEach(g=>{ g.visible=!!on; g.attributes.hidden=on?undefined:true; }); renderGeoms(); }));
+    h.appendChild(makeColorSwatch(()=>graphicColorHex(G.gs[0])||hex, c=>{ G.gs.forEach(g=>applyGraphicColor(g,c));
+      body.style.setProperty('--c', c); body.querySelectorAll('.cswatch').forEach(b=>swatchPaint(b,c)); }));
+    const nm=document.createElement('span'); nm.className='gown-n'; nm.textContent=G.k? G.t : 'Senza intestatari'; nm.title=nm.textContent; h.appendChild(nm);
+    const st=document.createElement('span'); st.className='gown-s'; st.textContent=G.gs.length+' part. · '+G.ha.toFixed(2)+' ha'; h.appendChild(st);
+    G.gs.forEach(g=>{ if(!g.attributes.nome) g.attributes.nome=geomDefName(g); body.appendChild(ownRow(g)); });
+    body.addEventListener('change', e=>{ if(e.target&&e.target.classList.contains('gsel')) syncSel(); });
+    box.appendChild(h); box.appendChild(body); }); }
+// nomi sulla mappa: un testo sul centroide di ogni particella visibile, in un layer a parte (come le etichette delle particelle)
+function ownLblSync(){ if(!ownLblGL||!toolsGL||!esriMods) return; ownLblGL.removeAll(); if(!ownLblOn()) return;
+  toolsGL.graphics.forEach(g=>{ if(!ownIs(g)||g.visible===false||!g.geometry) return; const t=g.attributes.own.l; if(!t) return;
+    const ge=g.geometry, an= ge.type==='polygon'? centroidOf(ge) : ge.type==='point'? ge : (ge.extent&&ge.extent.center); if(!an) return;
+    ownLblGL.add(new esriMods.Graphic({geometry:an, symbol:{type:'text', text:String(t).slice(0,60), color:'#ffffff', haloColor:[0,0,0,0.85], haloSize:1.6, font:{size:10, weight:'bold'}}})); }); }
+function ownLblSoon(){ clearTimeout(ownLblT); ownLblT=setTimeout(()=>{ try{ ownLblSync(); }catch(e){} }, 80); }
 function impAdd(fc, srcName){
+  impAdd.note='';
+  if(ownFile(fc)){ const r=ownAdd(fc, srcName); impAdd.note=r.note; return r.n; }
   const col=IMP_COLORS[impColorIdx++ % IMP_COLORS.length];
   const feats=(fc&&fc.features)||[]; let added=0; const zoom=[];
   feats.forEach((f,i)=>{
@@ -5634,7 +5797,8 @@ async function importOne(file){
     if(!fc||!fc.features) throw new Error('nessuna geometria');
     const chk=await gjCheckCoords(fc);               // niente import "fuori dal mondo"
     if(!chk.ok){ if(chk.proj) srFromImport(fc, name); throw new Error(chk.reason); }
-    return {name, n:impAdd(fc,name), note:chk.converted||''};
+    const n=impAdd(fc,name);
+    return {name, n:n, note:[chk.converted, impAdd.note].filter(Boolean).join('; ')};
   }catch(e){ return {name, err:(e&&e.message)||String(e)}; }
 }
 async function onImportFiles(files){
@@ -7124,30 +7288,47 @@ function exRender(){ const list=$('exList'); if(!list) return; list.innerHTML=''
   const b=$('exConfirm'); if(b) b.textContent= n? 'Esporta '+n+(n===1? ' oggetto' : ' oggetti') : 'Esporta tutto'; }
 function openExport(){ exRender(); $('exportModal').style.display='flex'; }
 function closeExport(){ $('exportModal').style.display='none'; try{ render(); renderGeoms(); }catch(e){} }   // le spunte tornano nella Raccolta
+// Nome dei file esportati: comune, data e numero di particelle, es. «Milano_2026-10-05_6part» (più comuni:
+// «Milano_e_altri_2_…», dal comune con più particelle; senza particelle: «export_2026-10-05»). Fino al 5/10 era
+// sempre «export»: lo strumento degli intestatari chiama i risultati come il file che riceve, e due export
+// diversi finivano uno sull'altro. Solo lettere, cifre, «_» e «-»: il nome passa per console e shapefile.
+function exBaseName(items){   // items: le particelle esportate, oggetti con `comune` (o `Comune`)
+  const d=new Date(), p=n=>('0'+n).slice(-2), day=d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate());
+  const cnt=new Map(); (items||[]).forEach(o=>{ const c=String((o&&(o.comune||o.Comune))||'').trim(); if(c) cnt.set(c, (cnt.get(c)||0)+1); });
+  const top=[...cnt.entries()].sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0]));
+  const safe=s=>s.normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^A-Za-z0-9]+/g,'_').replace(/^_+|_+$/g,'');
+  const com=top.length? safe(top[0][0])+(top.length>1? '_e_altri_'+(top.length-1) : '') : '';
+  return (com||'export')+'_'+day+((items||[]).length? '_'+items.length+'part' : ''); }
+const exIsParcel=o=>!!o&&o.foglio!=null&&o.foglio!==''&&o.particella!=null&&o.particella!=='';
 async function doExport(){
-  const fmt=$('fmt').value, base='export';
+  const fmt=$('fmt').value;
   const exErr=t=>{ $('exMsg').innerHTML='<div class="msg err">'+esc(t)+'</div>'; };
+  const exDone=f=>{ closeExport(); msg('Esportato «'+f+'» nei Download.','ok'); };
   const picked=exPicked(), pick=picked.length? new Set(picked) : null;   // nessuna spunta = tutto
   const P=pick? parcels.filter(p=>pick.has(p)) : parcels;
   if(fmt==='xlsx'){   // tabellare → solo particelle (la finestra lo dice e spegne le altre sezioni)
     if(!P.length){ exErr('L\'XLSX contiene solo le particelle: aggiungine (o spuntane) almeno una, oppure scegli un altro formato.'); return; }
     const data=P.map(p=>({Comune:p.comune,Regione:p.regione,Provincia:p.provincia,Cod_Belfiore:p.belfiore,Foglio:p.foglio,Particella:p.particella,
       Area_m2:p.area_m2?Math.round(p.area_m2):'',Area_ha:p.area_m2?+(p.area_m2/10000).toFixed(4):'',Destinazione_uso:p.land_use,OMI:p.omi,NCR:p.ncr,FID_Zornade:p.fid,Lat:p.lat,Lng:p.lng}));
-    const ws=XLSX.utils.json_to_sheet(data),wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Particelle');XLSX.writeFile(wb,base+'.xlsx'); closeExport(); return;
+    const ws=XLSX.utils.json_to_sheet(data),wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Particelle');
+    const xn=exBaseName(P)+'.xlsx'; XLSX.writeFile(wb,xn); exDone(xn); return;
   }
   let fc; try{ fc=buildFC(false, {parcels:true,buffers:true,drawings:true,geoproc:true,imports:true}, pick); }catch(e){ exErr((e&&e.message)||String(e)); return; }
   if(!fc.features.length){ exErr('Niente da esportare con questa selezione.'); return; }
-  if(fmt==='geojson'){dlBlob(base+'.geojson',new Blob([JSON.stringify(fc,null,1)],{type:'application/geo+json'}));}
-  else if(fmt==='kml'){dlBlob(base+'.kml',new Blob([toKML(fc)],{type:'application/vnd.google-earth.kml+xml'}));}
-  else if(fmt==='kmz'){const zip=new JSZip();zip.file('doc.kml',toKML(fc));const b=await zip.generateAsync({type:'blob'});dlBlob(base+'.kmz',b);}
+  // le particelle del file: quelle della Raccolta e quelle importate che portano foglio e particella (file degli intestatari)
+  const base=exBaseName(fc.features.map(f=>f.properties).filter(exIsParcel)); let file=base+'.'+fmt;
+  if(fmt==='geojson'){dlBlob(file,new Blob([JSON.stringify(fc,null,1)],{type:'application/geo+json'}));}
+  else if(fmt==='kml'){dlBlob(file,new Blob([toKML(fc)],{type:'application/vnd.google-earth.kml+xml'}));}
+  else if(fmt==='kmz'){const zip=new JSZip();zip.file('doc.kml',toKML(fc));const b=await zip.generateAsync({type:'blob'});dlBlob(file,b);}
   else if(fmt==='shp'){
     // ⚠️ @mapbox/shp-write 0.4.3: download() nel browser non scarica nulla (verificato, ritorna undefined);
     // zip() invece funziona. Nomi distinti per tipo: con un nome solo i file si sovrascrivevano nello zip.
-    const blob=await shpwrite.zip(shpPrep(fc),{folder:base, outputType:'blob', compression:'DEFLATE',
-      types:{point:base+'_punti', polygon:base+'_aree', polyline:base+'_linee'}});
-    dlBlob(base+'_shp.zip', blob);
+    const sb=base.replace(/-/g,'_');   // dentro lo zip niente trattini: nei nomi degli shapefile è meglio evitarli
+    const blob=await shpwrite.zip(shpPrep(fc),{folder:sb, outputType:'blob', compression:'DEFLATE',
+      types:{point:sb+'_punti', polygon:sb+'_aree', polyline:sb+'_linee'}});
+    file=base+'_shp.zip'; dlBlob(file, blob);
   }
-  closeExport();
+  exDone(file);
 }
 // Shapefile: shp-write 0.4.3 SCARTA in silenzio i MultiPolygon (es. le particelle dissolte) e scrive gli
 // anelli nel verso del GeoJSON, mentre lo shapefile vuole gli esterni in senso orario (ArcGIS legge gli
@@ -7901,7 +8082,7 @@ function baseGroundSet(){
     {sel:'#sideRail', title:'Le schede a sinistra', body:"Il rail di icone: Ricerca particelle, Disegna, Geoprocessi, Importa dati. Cliccando l'icona già attiva, la sidebar si comprime a colonna. Gli strumenti sulla mappa stanno nel menu <b>Tools</b>, in basso a sinistra.", placement:'right'},
     {sel:'.tabpane[data-tab=disegno]', title:'Disegna', body:"Due passi: <b>1</b> cosa disegni (la categoria, con tipo e attributi), <b>2</b> con quale strumento (punto, linea, area, rettangolo e cerchio, anche con misure esatte), poi clicchi sulla mappa; ↶ ↷ annullano e ripetono. Sotto gli strumenti, <b>Ultimo disegno</b> ti porta alla sua riga nella Raccolta. Il <b>sito di lavoro</b>, facoltativo, è la riga in cima. <b>Copia</b> (anche parallela, per il rientro dai confini) è una scheda dei Geoprocessi; il percorso su strada è in <b>Tools</b>. In fondo, sempre in vista: <b>Misure esatte e aggancio</b> (<b>Tab</b> mentre disegni per scrivere angolo e distanza) e <b>Griglia</b> in metri, allineabile a un lato.", open:function(){openTab('disegno');}, placement:'right'},
     {sel:'.tabpane[data-tab=geoproc]', title:'Geoprocessi', body:"Tre passi, sempre nello stesso ordine. <b>1</b> Scegli gli oggetti e mettili in <b>A</b>: cliccandoli sulla mappa (👆), dalle righe spuntate nella Raccolta (☑) o per categoria. <b>2</b> Scegli cosa fare: ogni scheda dice su cosa lavora (solo aree, serve B) e si accende solo quando A va bene. <b>3</b> Parametri ed <b>Esegui</b>: sotto il pulsante leggi a che punto è, l'esito e dove trovare il risultato (Raccolta, sezione Geoprocessi). La <b>i</b> mostra un esempio disegnato.", open:function(){openTab('geoproc');}, placement:'right'},
-    {sel:'.tabpane[data-tab=import]', title:'Importa dati', body:"Quattro schede sempre aperte: <b>file di geometrie</b> (GeoJSON, KML, KMZ, Shapefile), <b>disegni CAD</b>, <b>immagini</b>, <b>servizi web</b> (WMS, WFS, ArcGIS REST); con il pannello largo si affiancano. La <b>i</b> spiega come funziona la scheda. Le <b>coordinate sconosciute</b> stanno nel menu Tools, sulla mappa.", open:function(){openTab('import');}, placement:'right'},
+    {sel:'.tabpane[data-tab=import]', title:'Importa dati', body:"Quattro schede sempre aperte: <b>file di geometrie</b> (GeoJSON, KML, KMZ, Shapefile; quello di <b>Estrazione intestatari</b> si colora e si raggruppa per intestatario), <b>disegni CAD</b>, <b>immagini</b>, <b>servizi web</b> (WMS, WFS, ArcGIS REST); con il pannello largo si affiancano. La <b>i</b> spiega come funziona la scheda. Le <b>coordinate sconosciute</b> stanno nel menu Tools, sulla mappa.", open:function(){openTab('import');}, placement:'right'},
     {sel:'#impCadBtn', title:'Disegni CAD (DWG)', body:"Carica un <b>DWG</b>: viene letto nel browser, senza uscire dal PC. Il <b>sistema di riferimento</b> è stimato dalle coordinate e lo confermi tu; layer e colori restano quelli del CAD, accendibili e ricolorabili dall'elenco sotto il pulsante. Se il disegno è in coordinate locali usa <b>📍 Posiziona a mano</b>: clicchi due punti del disegno e dove stanno davvero (si aggancia ai vertici di particelle, disegni e altri DWG). Il posizionamento viene ricordato per quel file.", open:function(){openTab('import'); window.impOpen&&window.impOpen('impSecCad');}, placement:'right'},
     {sel:'#toolCard', title:'Coordinate sconosciute', body:"Ti arrivano delle coordinate e non sai in che sistema sono — un decreto, un rilievo, una mail? Incollale qui: le provo nei sistemi usati in Italia (Gauss-Boaga, UTM, ED50…) e ti mostro <b>dove cadono</b>, anche con X e Y invertiti. Se sai già dove dovrebbero stare usa <b>📍 Dove dovrebbe stare</b>: clicchi il punto sulla mappa e i candidati vengono ordinati per <b>errore in metri</b>. Poi i punti (o l'area) finiscono negli Importati. Stessa strada per uno <b>shapefile senza .prj</b>: l'import lo passa qui.", open:function(){ window.toolOpen&&window.toolOpen('sr'); }, placement:'right'},
     {sel:'#actionIcons', title:'Raccolta, mappa e portale', body:"A destra, in tre gruppi: la <b>Raccolta</b> (tutto quello che hai raccolto, con il numero di oggetti); i pannelli della mappa: Layer (anche dal portale, con ricerca per nome e <b>filtro per attributo</b>; i layer aggiunti da te si tolgono dal menu …), Mappa di base, Segnalibri; e le azioni: Modifica AREAS COLLECTION e Stampa.", placement:'left'},

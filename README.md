@@ -298,6 +298,23 @@ right-click menu opens it on the clicked point.
   counter ("2 in mappa") for DWGs, images and services. The code opens the right module when it sends you
   there: a DWG picked through the generic file button (`window.impOpen`). The tour steps do the same.
 - Vectors: GeoJSON, KML, KMZ, SHP.
+- **Owners file** (since 2026-10-05). The GeoJSON written by the separate *Estrazione intestatari* tool — the
+  parcels exported from here, with the cadastral owners that tool reads from SISTER — is recognised by the
+  `sister_stato` property on its features; every other import behaves as before. Each parcel is named by sheet and
+  parcel (`Fg 12 · 101 · Comune`), coloured **by owner** (same set of owners = same colour, grey without owners)
+  and keeps all the file's properties in `src_attrs`, so an export gives them back. In *Raccolta › Importati* the
+  parcels come after the plain imports under a bar *Per intestatario* (count, and a switch *Nomi sulla mappa*) in
+  **one collapsible group per owner**, largest total area first, *Senza intestatari* last. A group header has a
+  tick box, eye and colour for the whole group, the owners' names and "n part. · ha"; each row has an **i**
+  that opens the detail (one line per owner with tax code and share, then status, land use, cadastral area,
+  notes). On the map every parcel carries the short name (`etichetta`, e.g. `ROSSI MARIO +1`) and **a click
+  opens a popup** with the same detail instead of starting the shape edit. Files of the tool's version 1.1
+  have no `nominativi_brevi`/`etichetta`: names are then cut from `nominativi` with the tool's own rule (what
+  SISTER appends — "nato a … il …", "con sede in …" — is dropped).
+  **Personal data.** Names and tax codes stay in the page and in the `.axpo` project (the save message says
+  so); they are **left out of the browser auto-save** — after a reload the file must be imported again or the
+  project reopened — and **never go to the portal** (*Salva sul portale* skips these parcels and says how many).
+  Nothing of them is written to the console.
 - Georeferenced **images and GeoTIFF** — images get four draggable corner handles, GeoTIFFs are
   auto-placed from their bounding box and geokeys, reprojected into the view SR.
 - **CAD drawings (DWG)**, read in the browser — the file never leaves the PC. Layers and colours are
@@ -340,6 +357,14 @@ the ticks are the Raccolta's own, both ways; with nothing ticked everything is e
 non-parcel sections (`buildFC`/`graphicsFeatures` take the chosen set). *Dissolve* moved to the AREAS migration
 window. Names you assign in the UI end up in the file. The shapefile comes as one zip with a layer per geometry
 type (`_punti`, `_linee`, `_aree`).
+**File name** (since 2026-10-05, `exBaseName`): municipality, date and number of parcels —
+`Milano_2026-10-05_6part.geojson`. With several municipalities, the one with most parcels and the count of the
+others (`Milano_e_altri_2_…`); with no parcel in the export, `export_2026-10-05`. A parcel is any exported
+feature with `foglio` and `particella`: the rows of *Particelle* and the imported owners-file parcels; drawings
+and results do not count. Letters, digits, `_` and `-` only (accents and apostrophes go), and inside the
+shapefile zip the hyphens of the date become `_`. A message names the file once it is downloaded. Until then
+every export was `export.<ext>`: the owners tool names its results after its input, so two different exports
+ended up in the same result file.
 
 **Write-back to the portal**
 - Parcels → **AREAS COLLECTION** (layer 426) with **Migra particelle in AREAS Collection** in the Raccolta dock
@@ -802,6 +827,27 @@ so it never touches the AMD loader. Worth knowing before editing:
   the export window share one state (`exSel`): keep them in sync both ways. The search box focus on open needs
   the fallback `sb.querySelector('input').focus()` after 60 ms.
 
+- **Owners file (2026-10-05).** The graphics are ordinary imports (`_kind:'import'`) with one more attribute,
+  `own = {k, t, l, n, st}`: class key (upper-cased short names, sorted — two parcels with the same owners in a
+  different order are one class), group title, map label, number of owners, SISTER status. `ownIs(g)` is the
+  test used everywhere.
+  - **Three places keep the personal data in:** `serializeToolGeoms(true)` (auto-save) skips these graphics,
+    `sfCandidates()` (portal) skips and counts them, and `applyWork` does not print the record when a restore
+    fails. A new way of saving or publishing imports must add the same test.
+  - The row name is the parcel, not the person, on purpose: geoprocessing results take their names from the
+    inputs and are saved everywhere.
+  - Text from the file goes to the DOM with `textContent` only (list, card, popup): it is a file from disk.
+  - `GraphicsLayer` has no labels: the names are text graphics on the centroids in a second layer
+    (`ownLblGL`, hidden from the layer list, same scale limit as the parcel labels), rebuilt 80 ms after any
+    list redraw or visibility change (`ownLblSoon`). It is added again after a web map swap, like `toolsGL`.
+  - A click on a graphic of `toolsGL` starts a `SketchViewModel` update, and while that is active the SDK turns
+    `view.popupEnabled` off — a `popupTemplate` alone never shows. For these parcels the update is cancelled at
+    its `start` event and the popup is opened by hand (`ownShow`, at the point of the last `immediate-click`).
+    Nothing in the app calls `sketchVM.update()` itself, so only clicks are intercepted; a shift-click on two
+    objects still edits.
+  - Colours: twelve fixed ones, then hues at the golden angle; a new owner never takes a colour already used
+    by another group, and an owner already on the map keeps the colour it has (also after a recolour).
+
 ## 6. Security & distribution
 
 - The Zornade key is a read-only token **embedded in the source** (`DEFAULT_KEY`). This is a deliberate,
@@ -1140,6 +1186,33 @@ swap. Backups: `geoportale_axpo_pre-prototipo-ux_2026-10-02.html`, `README_tools
 Backlog (from the report, not done): geoprocessing in a Web Worker with a real cancel, Raccolta on the left, a
 phone layout, zoom and compass as a chip, *Impostazioni avanzate* in one place, Stampa and Modifica AREAS out
 of the rail, a user test with 5–8 project managers.
+
+**Owners file classified by owner (2026-10-05, user request).** Importing the GeoJSON of the *Estrazione
+intestatari* tool gave rows without names in *Importati*: `impAdd` kept the geometry and dropped every
+property, and the file's `nome` is empty. Now the file is recognised and classified by owner (§4 *Owners file*,
+§5 for the traps). Checked in headless Chrome with a file of **invented** names (8 parcels: one company with
+two, two people in both orders, one alone, one "ente urbano", one not found, one never searched): 4 owner
+groups plus *Senza intestatari*, colours per group, 6 labels that follow the eyes and the switch, detail card
+and popup as text (a name containing `<b>` stays text), group tick, auto-save without the parcels and without
+any name in `localStorage`, project capture with all 8 and their properties, portal candidates without them,
+GeoJSON export with the original properties, reopen from the captured work (groups, colours, labels, popups
+back), a second file in the 1.1 format (same owners → same colours, a new one → an unused colour), undo, no
+name in the console. On screen (built-in browser): colours, labels, the grouped list in a 285 px drawer, and a
+real click opening the popup. The user's own file was imported once in the test page and only its structure
+read (6 parcels, one group). The quick guide, the *Importa dati* tour step and the hint under *File di
+geometrie* mention it; both tours still run to the end. Not tested: with the portal login (the save window's
+count line), files with hundreds of parcels, the undocked panel. Export check asked by the tool's author:
+GeoJSON and XLSX already carry `belfiore`/`Cod_Belfiore`, `foglio`, `particella`, `provincia`, `ncr`, and the
+export window already limits to the ticked rows — nothing changed there. Backups:
+`geoportale_axpo_pre-intestatari_2026-10-05.html`, `README_tools_pre-intestatari_2026-10-05.md`.
+
+**Export file name (2026-10-05, user request: "comune, data e numero di particelle").** §4 *Export*. Checked in
+headless Chrome with the downloads intercepted: one municipality in the five formats
+(`Borgo_Inventato_2026-10-05_3part.*`, the shapefile zip holding `…2026_10_05_3part_aree.shp`), two
+municipalities plus a drawing (`Sant_Angelo_Lodigiano_e_altri_1_…_7part`), two ticked rows (`…_2part`, GeoJSON
+and XLSX), an accented name (`Forli_…`), a drawing alone (`export_2026-10-05`), owners-file parcels (counted),
+an empty Raccolta (no file, the usual message). Not tested: a real download in the browser's folder. Backups:
+`geoportale_axpo_pre-nome-export_2026-10-05.html`, `README_tools_pre-nome-export_2026-10-05.md`.
 
 **Open, known, non-blocking**
 
