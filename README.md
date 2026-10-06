@@ -274,6 +274,41 @@ after 20 s with a message, instead of leaving the UI waiting forever.
 - **Colour picker** (since 2026-10-01, `makeColorSwatch`/`colPopOpen`): a button that opens swatches — *Recenti*
   (the last 8, `axpo_colori_recenti`), the model's *Categorie*, *Mappa* (the Okabe–Ito palette, safe for colour
   blindness) and *Tenui* — plus *Altro colore…* for the native picker; Esc closes, `aria-pressed` on the chosen one.
+- **Crea area lorda / Crea area netta** (since 2026-10-06, user request: the two steps that always follow the
+  choice of parcels, without going through Geoprocessi). Under the *Particelle* list, **Crea area lorda dalle
+  particelle** unions the ticked parcels — or all of them when none is ticked; the label says which — into a
+  drawing of category *gross* named `Area lorda · <comune> · n particelle`, with the area in the note; disabled
+  without parcels. One gross drawing: when one exists, a confirm asks to replace it — the geometry changes in
+  place, so a drawing already on the portal keeps its GlobalID and the next save updates it — or to add another
+  (`sfReplaceOrAdd` → `drwAddGraphic`, `sf_src: 'geoprocess'`).
+- **Automatic strips and automatic net area** (same evening, user: "many categories have a buffer but choosing
+  it creates no drawing; could the net area be automatic, with no selection?"). The rules are those of PV
+  Predesign (`areas.js`, `cutDistance`): the categories that **cut** are *exclusion*, *linear*, *obstacle*,
+  *mitigation* and *agri* (`SF_CUTS`); the distance is the buffer, or half the width for mitigation/agri lines
+  (`sfCutDist`); polygons of those categories cut as they are, buffered when they have a buffer; lines and points
+  cut only through a distance.
+  - **Fasce.** Every object with a cut distance gets a companion polygon drawing that follows it: geometry, name,
+    buffer/width, type. Exclusions, infrastructures and obstacles give an *Esclusione · Fascia di rispetto*
+    (*Fascia DPA* for power lines) named `Fascia 20 m · <nome>`; a hedge or an agricultural strip gives a polygon
+    of its own category, `Fascia larga 6 m · <nome>`. The link is `sf_of` → `sf_uid` (a persistent id given to
+    the source when first needed); `sf_sig` (extent, vertex count, distance, name, type) says when to recompute.
+    The strip disappears with its object or when the distance goes to 0; its × in the list refuses with a message
+    (remove the buffer instead). It is an ordinary drawing otherwise: portal, export and projects carry it.
+  - **Area netta automatica.** With at least one gross drawing and the switch under *Disegni* on (default), one
+    drawing `Area netta · x ha` exists and is recomputed on every change: gross union minus the union of all
+    cutting polygons (strips included, hidden ones included — the eye is display only). Its note says what was
+    subtracted and how many lines/points without a distance were ignored. The switch off freezes it (it stays as
+    it is, e.g. to save a precise version on the portal); on, it follows again. Deleting its row turns the
+    switch off, so it does not come back; no gross drawing → no net drawing; cuts covering everything → the
+    drawing is removed with a message. The flag travels with the work (`netAuto` in auto-save and project).
+  - **Rientro dal confine** (same night, user request): a metres field next to the switch. The gross union is
+    shrunk by that distance (`geodesicBuffer` with a negative distance) before the cuts — the setback from
+    cadastral boundaries, PV Predesign's `boundarySetback`. The note says "− rientro dal confine 10 m"; a
+    setback that eats the whole gross area removes the net drawing with a message. Saved with the work as
+    `netSetback` (auto-save and project).
+  - `sfAutoSync` runs 200 ms after every `renderGeoms` (`sfAutoSoon`), works in WGS 84 (`to4326`: sketch
+    geometries are Web Mercator, parcels and imports degrees) with the Esri `geometryEngine` (`geodesicBuffer`,
+    `union`, `difference`), and calls `refreshDl` only when it changed something; the signatures stop the loop.
 - Per-geometry **colour and visibility**, plus per-section controls, all persisted. Since 2026-09-24 every
   section header of the *Raccolta* — *Importati* included, which had none — has: a tick box for all its rows
   (with the *some* state; `sectionSelCount`/`setSectionSel`), show/hide all, a **paint bucket** for the colour
@@ -1326,6 +1361,48 @@ PDF written by hand asks the page (stub answers 2), renders 4096 × 2894 at 350 
 exports PNG + world file, and the project saves `page` and restores the same rendering without asking. On
 screen: the card next to the zoom control, a real drag to the lower right. Not tested: a real multi-page PDF
 from a CAD printer, very large PDFs (rendering time), Safari.
+
+**Gross and net area buttons (2026-10-06, user request with two placement candidates: the Raccolta's
+Particelle module or the search panel).** Placed in the Raccolta — under *Particelle* for the gross area, under
+*Disegni* for the net one — because the tick boxes that choose the parcels and the drawings that make the
+exclusions live there, and the result lands in the same drawer (§4 *Crea area lorda / Crea area netta*). The
+search panel knows nothing of the selection. Checked in headless Chrome with invented parcels: buttons disabled
+when empty; three parcels of two municipalities → one gross drawing of 2.62 ha named `Area lorda · Borgo
+Inventato +1 · 3 particelle`, orange, `sf_src geoprocess`, listed under Disegni with a toast; two ticked →
+the label says "dalle 2 spuntate" and the confirm (OK) replaces the same graphic (1.75 ha); confirm (Annulla)
+adds a second; net with no exclusion → message, no drawing; a half-parcel polygon, a line with a 20 m buffer
+and a point without buffer → net 0.93 ha out of 1.75, note "2 esclusioni (1 senza buffer, ignorata)"; a second
+click replaces in place; an exclusion covering everything → message, the previous net stays; the GeoJSON export
+carries `category: gross/net`; with the parcels removed the gross button goes off, the net one stays on. Guide
+and tour mention the buttons; both tours still run. Not tested: with the portal (a replaced gross area already
+saved, `sf_dirty`), multipolygon unions of parcels far apart (turf union returns a MultiPolygon, converted as
+such). Backups: `geoportale_axpo_pre-area-lorda-netta_2026-10-06.html`,
+`README_tools_pre-area-lorda-netta_2026-10-06.md`.
+
+**Automatic strips and net area (2026-10-06, late, user: "geoprocess results and imports may be exclusions too;
+the net area should be automatic, a layer that appears with the gross one and follows the exclusions; and a
+buffer should create its own drawing").** The manual net button became the automation above (§4 *Automatic
+strips and automatic net area*), with the cut rules copied from PV Predesign's `areas.js` (the user pointed at
+it; `cutDistance`: buffer, or half the width of mitigation/agri lines; categories with `cuts: true`). Checked in
+headless Chrome with invented data: the net drawing is born with the gross one and equals it; a power line with a
+20 m buffer gives a *Fascia DPA* of 0.44 ha and a smaller net; buffer 40 → the same strip grows and the net
+shrinks; a moved line moves its strip; an obstacle point with buffer 15 gives a *setback* strip, a point without
+buffer is counted as ignored; a hedge line 6 m wide gives a *mitigation* strip of 0.05 ha (inside other cuts in
+the test, so the net did not change) and width 0 removes it; × on a strip refuses with a message; buffer 0
+removes the strip; a hidden exclusion still counts; switch off freezes the net through a new exclusion, on
+resumes; × on the net turns the switch off and it stays gone, on again recreates it; auto-save keeps `netAuto`,
+`sf_uid`/`sf_of`/`sf_sig` and a restore gives one strip and one net without duplicates; removing the gross
+drawing removes the net. Guide, tour and the Disegna info window updated; both tours run. Not tested: speed with
+a slope exclusion of thousands of vertices (synchronous `geometryEngine`, 200 ms debounce, no simplification),
+the portal (a strip or net already saved gets `sf_dirty` on each recompute), PV Predesign reading a project that
+now holds strips as exclusion polygons (harmless duplicate of the buffered line, same area). Backups:
+`geoportale_axpo_pre-automatismi_2026-10-06.html`, `README_tools_pre-automatismi_2026-10-06.md`.
+
+**Boundary setback (2026-10-06, night, user: "next to the switch add the setback from the gross area, for the
+distances from cadastral boundaries").** §4 *Rientro dal confine*. Checked in headless Chrome: 10 m → the net
+goes from 0.381 to 0.132 ha and the note says it; 500 m → no net drawing and the message "il rientro di 500 m
+consuma tutta l'area lorda"; back to 0 → the previous value; `netSetback` saved and restored with the field.
+Backup: `geoportale_axpo_pre-rientro_2026-10-06.html`.
 
 **Open, known, non-blocking**
 

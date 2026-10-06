@@ -320,6 +320,11 @@
   .gsecH .gcount{background:var(--accent);color:var(--on-accent);border-radius:10px;min-width:20px;text-align:center;padding:1px 7px;font-size:11px;font-weight:700}
   .gsec.collapsed .glist{display:none}
   .glist{padding:5px 7px}
+  .gfoot{padding:6px 0 2px}
+  .gfoot button{width:100%;margin:0;font-size:12px;white-space:normal}
+  .gfoot label.chk{display:flex;align-items:center;gap:6px;margin:2px 0 0;text-transform:none;letter-spacing:0;font-weight:400;font-size:12px;color:var(--txt)}
+  .gfoot .netsb{margin-top:6px;padding-left:2px}
+  .gfoot .netsb .opnum{width:60px;font-size:12px;padding:3px 5px;background:var(--bg);border:1px solid var(--line);border-radius:5px;color:var(--txt)}
   .grow{display:flex;align-items:center;gap:5px;padding:4px 5px;border-radius:7px}
   .grow:hover{background:var(--hover)}
   .grow .gname{flex:1;min-width:0;font-size:12px;border:1px solid transparent;border-radius:5px;padding:3px 5px;background:transparent;color:var(--txt);text-overflow:ellipsis}
@@ -1409,11 +1414,11 @@
           <div class="gsecH"><input type="checkbox" class="gselall" data-sec="parcels" title="Spunta tutte" aria-label="Spunta tutte le particelle"><b>Particelle</b><span class="gtools" data-sec="parcels"><button class="vtoggle" data-role="visall" title="Mostra/nascondi tutte" aria-label="Mostra/nascondi tutte le particelle"></button><button type="button" class="cswatch" data-role="colall" data-col="#F5A623" title="Colore di tutte le particelle" aria-label="Colore di tutte le particelle"></button><button type="button" class="gdel" data-role="delall" title="Elimina tutte le particelle" aria-label="Elimina tutte le particelle"></button></span><span id="cnt" class="gcount">0</span></div>
           <div class="glist"><div id="listTot" class="hint"></div>
             <label class="chk" style="margin:2px 0 7px"><input type="checkbox" id="lblParcels" checked> Etichette sulla mappa</label>
-            <div id="list"><div class="empty">Nessuna particella. Cercala o cliccala sulla mappa.</div></div></div>
+            <div id="list"><div class="empty">Nessuna particella. Cercala o cliccala sulla mappa.</div></div><div class="gfoot"><button type="button" class="sec" id="grossBtn" disabled title="Prima aggiungi delle particelle">Crea area lorda dalle particelle</button></div></div>
         </div>
         <div class="gsec" data-sec="draw">
           <div class="gsecH"><input type="checkbox" class="gselall" data-sec="draw" title="Spunta tutti" aria-label="Spunta tutti i disegni"><b>Disegni</b><span class="gtools" data-sec="draw"><button class="vtoggle" data-role="visall" title="Mostra/nascondi tutti" aria-label="Mostra/nascondi tutti i disegni"></button><button type="button" class="gdel" data-role="delall" title="Elimina tutti i disegni" aria-label="Elimina tutti i disegni"></button></span><span id="cntDraw" class="gcount">0</span></div>
-          <div class="glist"><div id="listDraw"><div class="empty">Nessun disegno.</div></div></div>
+          <div class="glist"><div id="listDraw"><div class="empty">Nessun disegno.</div></div><div class="gfoot"><label class="chk" id="netAutoLbl" title="Con un'area lorda, l'area netta nasce da sola: lorda meno tutto ciò che taglia (esclusioni, fasce dei buffer, ostacoli, siepi e zone agricole, come in PV Predesign), ricalcolata a ogni cambiamento. Spenta, la netta resta com'è"><input type="checkbox" id="netAuto" checked> Area netta automatica (lorda − esclusioni)</label><label class="chk netsb" title="Distacco dai confini catastali: l'area lorda viene ristretta di tanti metri prima di togliere le esclusioni (come il rientro di PV Predesign). 0 = nessun rientro"><span>Rientro dal confine</span><input type="number" id="netSetback" class="opnum" min="0" step="1" value="0" inputmode="numeric" aria-label="Rientro dal confine catastale in metri"><span class="opsuf">m</span></label></div></div>
         </div>
         <div class="gsec" data-sec="geo">
           <div class="gsecH"><input type="checkbox" class="gselall" data-sec="geo" title="Spunta tutti" aria-label="Spunta tutti i risultati dei geoprocessi"><b>Geoprocessi</b><span class="gtools" data-sec="geo"><button class="vtoggle" data-role="visall" title="Mostra/nascondi tutti" aria-label="Mostra/nascondi tutti i geoprocessi"></button><button type="button" class="cswatch" data-role="colall" data-col="#2FB6E6" title="Colore di tutti i geoprocessi" aria-label="Colore di tutti i geoprocessi"></button><button type="button" class="gdel" data-role="delall" title="Elimina tutti i risultati dei geoprocessi" aria-label="Elimina tutti i risultati dei geoprocessi"></button></span><span id="cntGeo" class="gcount">0</span></div>
@@ -1583,7 +1588,7 @@
       <li><b>Disegna</b> — due passi. <b>1</b> Cosa disegni: la <b>categoria</b> (area lorda, area netta, percorso di connessione, esclusione, infrastruttura lineare, ostacolo, accesso e punto di connessione, mitigazione, zona agricola, nota) con tipo e attributi. <b>2</b> Con quale strumento: punto, linea, area, rettangolo e cerchio, anche di misura esatta. Sotto, il riquadro <b>Ultimo disegno</b> porta alla sua riga nella Raccolta. Salvando sul portale ogni oggetto si lega da solo all'area di AREAS COLLECTION che tocca; il <b>sito di lavoro</b>, la riga in cima, serve solo a forzarla. Mentre disegni, <kbd>Tab</kbd> fa scrivere lunghezza e angolo del lato (anche come azimut). In fondo, sempre in vista, misure e aggancio e la griglia in metri. <kbd>Ctrl</kbd>+<kbd>Z</kbd> / <kbd>Ctrl</kbd>+<kbd>Y</kbd> annullano e ripetono. Un disegno cliccato sulla mappa si sposta e si rimodella.</li>
       <li><b>Geoprocessi</b> — tre passi. <b>1</b> Metti gli oggetti di partenza in <b>A</b>: dalla mappa, dalle righe spuntate nella Raccolta, o una categoria intera. <b>2</b> Scegli cosa fare tra le schede: Buffer, Unione, Contorno, Semplificazione, Ritaglio, Parte comune, Sottrai B da A e <b>Copia</b> (anche parallela, per i rientri dai confini); ogni scheda dice cosa le serve e si accende quando A va bene. <b>3</b> Parametri ed <b>Esegui</b>: sotto il pulsante leggi l'esito, e il risultato è nella Raccolta.</li>
       <li><b>Importa dati</b> — quattro schede sempre aperte: <b>file di geometrie</b> (GeoJSON, KML, KMZ, Shapefile; il GeoJSON di <b>Estrazione intestatari</b> si colora e si raggruppa per intestatario, e i nominativi restano fuori dal salvataggio automatico e dal portale), <b>disegni CAD</b> (DWG letti nel browser, con il sistema di coordinate proposto, oppure posizionati a mano con 2 punti), <b>immagini</b> (GeoTIFF e world file si posizionano da soli; le altre, PDF compresi, con sposta/scala/ruota, angoli, coppie di punti noti o valori numerici, e si scaricano con il world file) e <b>servizi web</b> (WMS, WFS e ArcGIS REST per indirizzo, senza creare item sul portale; il browser accetta solo servizi <b>https</b> che permettono la lettura da altri siti, CORS).</li>
-      <li><b>Rail destro</b> — in cima la <b>Raccolta</b>, con il numero di oggetti: tutto quello che hai raccolto (Particelle · Disegni · Geoprocessi · Importati); ogni riga si rinomina, si colora, si nasconde e si <b>spunta</b> per usarla nei geoprocessi; da qui esporti e salvi sul portale. Sotto, i pannelli della mappa (Layer, Mappa di base, Segnalibri) e le azioni (Modifica AREAS, Stampa).</li>
+      <li><b>Rail destro</b> — in cima la <b>Raccolta</b>, con il numero di oggetti: tutto quello che hai raccolto (Particelle · Disegni · Geoprocessi · Importati; sotto le Particelle <b>Crea area lorda</b>, dalle spuntate o da tutte, e sotto i Disegni la spunta <b>Area netta automatica</b>: la lorda meno tutto ciò che taglia — esclusioni, fasce dei buffer, ostacoli, siepi e zone agricole — ricalcolata da sola, come in PV Predesign, con accanto il <b>rientro dal confine</b> in metri); ogni riga si rinomina, si colora, si nasconde e si <b>spunta</b> per usarla nei geoprocessi; da qui esporti e salvi sul portale. Sotto, i pannelli della mappa (Layer, Mappa di base, Segnalibri) e le azioni (Modifica AREAS, Stampa).</li>
       <li><b>🗺 Mappa</b> (in alto) — la web map del portale in uso: la General Map o una Check Vincoli regionale, con ricerca per nome. Cambiarla non tocca particelle, disegni e risultati; si perdono solo i layer accesi e i filtri di quella mappa (te lo chiedo prima). Scegliendo una regione nella ricerca ti propongo i suoi vincoli con un clic.</li>
       <li><b>Layer</b> — cerca un layer per nome; dal pannello di ogni layer (icona a cursori) trasparenza, popup e <b>filtro per attributo</b> (l'icona diventa un imbuto quando è attivo). I layer aggiunti da te (dal portale, servizi web, DWG, immagini) hanno il menu <b>…</b> con Zoom e <b>Rimuovi dalla mappa</b>.</li>
       <li><b>Esporta / Migra / Salva</b> — in fondo alla Raccolta, sempre in vista: <b>Esporta</b> apre la finestra con il formato (GeoJSON/KML/KMZ/SHP/XLSX) e i singoli oggetti (le spunte sono quelle della Raccolta; senza spunte esporta tutto); il file prende il nome da comune, data e numero di particelle, per esempio <i>Milano_2026-10-05_6part.geojson</i>; <b>Migra particelle in AREAS Collection</b> (l'opzione «dissolvi» sta nella sua finestra); <b>Salva disegni in Site Features</b> (categoria, tipo, attributi e sito: la seconda volta aggiorna, non duplica).</li>
@@ -2491,6 +2496,10 @@ function wireTools(){
   if($('tokBox')) $('tokBox').addEventListener('toggle', ()=>{ if($('tokBox').open) storeInfo(); });
   if($('imgDoneBtn')) $('imgDoneBtn').onclick=()=>imgDone();
   if($('imgDelBtn')) $('imgDelBtn').onclick=()=>{ if(imgEditing) removeImage(imgEditing); };
+  if($('grossBtn')) $('grossBtn').onclick=()=>sfGrossMake();   // scorciatoie della Raccolta
+  if($('netAuto')) $('netAuto').onchange=()=>netAutoSet($('netAuto').checked);
+  if($('netSetback')){ $('netSetback').onchange=()=>netSetbackSet($('netSetback').value);
+    $('netSetback').onkeydown=e=>{ if(e.key==='Enter'){ e.preventDefault(); netSetbackSet(e.target.value); e.target.blur(); } }; }
   if($('imgOpacity')){
     const applyTbOp=()=>{ const el=$('imgOpacity'); let v=parseInt(el.value,10); if(isNaN(v)) v=100;
       v=Math.max(0,Math.min(100,v)); el.value=v;
@@ -2714,7 +2723,8 @@ function serializeToolGeoms(noOwn){
          // modello Site Features: categoria, tipo, attributi, fonte, stato, sito, GlobalID sul portale
          sf_cat:at.sf_cat, sf_type:at.sf_type, sf_buffer:at.sf_buffer, sf_height:at.sf_height, sf_width:at.sf_width, sf_voltage:at.sf_voltage,
          sf_src:at.sf_src, sf_status:at.sf_status, sf_site:at.sf_site, sf_gid:at.sf_gid, sf_saved:at.sf_saved, sf_dirty:at.sf_dirty,
-         sf_slope:at.sf_slope},   // esclusione da pendenza (Tools › Pendenze da DTM): soglia, cella e griglia, per PV Predesign
+         sf_slope:at.sf_slope,   // esclusione da pendenza (Tools › Pendenze da DTM): soglia, cella e griglia, per PV Predesign
+         sf_uid:at.sf_uid, sf_auto:at.sf_auto, sf_of:at.sf_of, sf_sig:at.sf_sig},   // automatismi: id, fascia/netta, oggetto seguito, firma
       v:(g.visible!==false),
       s:(g.symbol&&g.symbol.toJSON)?g.symbol.toJSON():null });
   });
@@ -2727,7 +2737,8 @@ function captureWork(noOwn){   // noOwn: senza le particelle con gli intestatari
     viewpoint: view.viewpoint? view.viewpoint.toJSON():null,
     parcels, addedItems:addedPortalItems,
     services: svcBooting||addedServices,   // durante il ripristino all'avvio vale ancora l'elenco salvato
-    site: sfSite };                        // sito di lavoro (AREAS COLLECTION): lo legge anche PV Predesign come area lorda
+    site: sfSite,                          // sito di lavoro (AREAS COLLECTION): lo legge anche PV Predesign come area lorda
+    netAuto: netAutoOn, netSetback: netSetbackM };   // spunta «Area netta automatica» e rientro dal confine (m)
   let geoms=[]; try{ geoms=serializeToolGeoms(noOwn); }catch(e){}
   return {base:base, toolGeoms:geoms};
 }
@@ -2767,6 +2778,8 @@ function restoreState(){
 let svcBooting=null;
 // particelle e geometrie (disegni, buffer, geoprocessi, import): da salvataggio automatico o da progetto
 function applyWork(st){
+    netAutoOn=(st.netAuto!==false); netSetbackM=(+st.netSetback>0)? +st.netSetback : 0;
+    try{ const na=$('netAuto'); if(na) na.checked=netAutoOn; const sb=$('netSetback'); if(sb) sb.value=netSetbackM; }catch(e){}
     sfSite=(st.site&&st.site.guid)? st.site : null;   // sito di lavoro salvato (i progetti vecchi non l'hanno)
     try{ sfShowSite(false); sfRenderSite(); }catch(e){}
     if(Array.isArray(st.parcels)&&st.parcels.length){ parcels=st.parcels; render(); }
@@ -4866,6 +4879,113 @@ function gpDoClip(sketchGeom){
   catch(e){ toolMsg('gpMsg',gpErrText('Ritaglia',e),'err'); }
   gpPendingClip=null;
 }
+// ══ Scorciatoie della Raccolta (6/10/2026): area lorda dalle particelle, area netta = lorda − esclusioni ══════════
+// Sono i due passi che seguono sempre la scelta delle particelle: un pulsante sotto le Particelle e uno sotto i
+// Disegni, senza passare da Geoprocessi. Il risultato è un disegno con la categoria del modello (gross / net): lo
+// leggono l'export, il portale e PV Predesign. Una sola area per categoria: se c'è già, si chiede se sostituirla —
+// la geometria cambia sul posto, così il legame col portale (GlobalID) resta e il prossimo salvataggio aggiorna.
+function sfDrawingsOf(cat){ return toolsGL? toolsGL.graphics.toArray().filter(g=>{ const a=g.attributes||{}; return a._kind==='drawing'&&a._sub!=='geoproc'&&a.sf_cat===cat&&!!g.geometry; }) : []; }
+function sfShortcutsUi(){ const gb=$('grossBtn'), na=$('netAuto'); if(!gb) return;
+  const nSel=parcels.filter(p=>p.sel).length, n=parcels.length;
+  gb.disabled=!n; gb.textContent= nSel? 'Crea area lorda dalle '+nSel+' spuntate' : 'Crea area lorda dalle particelle'+(n? ' ('+n+')' : '');
+  gb.title= n? 'Unisce le particelle'+(nSel? ' spuntate' : ' della Raccolta (spuntane alcune per usare solo quelle)')+' in un disegno «Area lorda»' : 'Prima aggiungi delle particelle';
+  if(na) na.checked=!!netAutoOn;
+  const sb=$('netSetback'); if(sb&&document.activeElement!==sb) sb.value=netSetbackM||0; }
+function netSetbackSet(v){ const n=parseFloat(String(v==null?'':v).replace(',','.')); netSetbackM=(isFinite(n)&&n>0)? n : 0;
+  const sb=$('netSetback'); if(sb&&document.activeElement!==sb) sb.value=netSetbackM; try{ saveStateDebounced(); }catch(e){} sfAutoSoon(); }
+function sfReplaceOrAdd(cat, geom, attrs){
+  const old=sfDrawingsOf(cat), lbl=sfLabel(cat);
+  if(old.length){ const g=old[0];
+    if(confirm('C\'è già «'+(g.attributes.nome||lbl)+'».\n\nOK = la sostituisco con quella nuova\nAnnulla = la aggiungo accanto')){
+      g.geometry=geom; Object.assign(g.attributes, attrs); if(g.attributes.sf_saved) g.attributes.sf_dirty=true;
+      drwLastG=g; refreshDl(); return g; } }
+  return drwAddGraphic(geom, Object.assign({sf_cat:cat, categoria:lbl, color:sfColor(cat), sf_src:'geoprocess'}, attrs)); }
+function sfGrossMake(){
+  const sel=parcels.filter(p=>p.sel), src=sel.length? sel : parcels;
+  const feats=src.map(p=>p.geometry&&/polygon/i.test(p.geometry.type)? {type:'Feature', properties:{}, geometry:p.geometry} : null).filter(Boolean);
+  if(!feats.length){ msg('Le particelle non hanno un contorno (solo il punto): niente area lorda.','err'); return null; }
+  const u=gpUnionFeat(feats), geom=u&&u.geometry? geojsonToEsri(u.geometry) : null;
+  if(!geom){ msg('Unione delle particelle non riuscita.','err'); return null; }
+  const m=new Map(); src.forEach(p=>{ if(p.comune) m.set(p.comune, (m.get(p.comune)||0)+1); });
+  const tc=[...m.entries()].sort((a,b)=>b[1]-a[1]), com= tc.length? tc[0][0]+(tc.length>1? ' +'+(tc.length-1) : '') : '';
+  const ha=Math.abs(esriMods.geometryEngine.geodesicArea(geom,'hectares')||0), haT=ha.toFixed(2).replace('.',','), np=feats.length+(feats.length===1? ' particella' : ' particelle');
+  const g=sfReplaceOrAdd('gross', geom, {nome:'Area lorda'+(com? ' · '+com : '')+' · '+np, sf_type:null, note:'da '+np+(sel.length? ' spuntate' : '')+', '+haT+' ha', area_ha:+ha.toFixed(4)});
+  try{ view.goTo(geom.extent.expand(1.3)).catch(()=>{}); }catch(e){}
+  msg('Area lorda: '+np+', '+haT+' ha. È nella Raccolta, sezione Disegni; ora disegna le esclusioni e poi «Crea area netta».','ok', vediElenco('draw')||undefined);
+  return g; }
+// ══ Automatismi (6/10/2026): fasce dei buffer e area netta ══════════════════════════════════════════════════════
+// 1) Ogni oggetto con un buffer (categorie che lo prevedono: Esclusione, Infrastruttura lineare, Ostacolo) ha una
+//    «fascia» automatica: un disegno Esclusione · Fascia di rispetto (DPA per gli elettrodotti) che segue geometria,
+//    nome e buffer dell'oggetto, e sparisce con lui o con il buffer a 0. Per toglierla si toglie il buffer.
+// 2) Con un'area lorda, l'«Area netta» automatica = lorda − tutte le esclusioni (fasce comprese, nascoste comprese),
+//    ricalcolata a ogni cambiamento; la spunta sotto i Disegni la congela (resta com'è) o la rimette a seguire.
+// Il legame è sf_of → sf_uid (id persistente dell'oggetto); la firma sf_sig evita i ricalcoli inutili e ferma il giro
+// renderGeoms → sync → refreshDl → renderGeoms. Tutto in WGS 84 (to4326): lo sketch disegna in Web Mercator,
+// particelle e import sono in gradi, e il motore geometrico vuole un sistema solo.
+let netAutoOn=true, netSetbackM=0, sfAutoT=null, sfAutoBusy=false;   // netSetbackM: rientro dal confine catastale, in metri (0 = niente)
+// Le categorie che tagliano l'area netta e la distanza intorno a ogni oggetto: le stesse regole di PV Predesign
+// (areas.js, cutDistance): buffer per esclusioni, infrastrutture lineari e ostacoli; metà larghezza per le siepi e
+// le fasce agricole lineari; i poligoni di queste categorie tagliano così come sono (bufferizzati se hanno un buffer).
+const SF_CUTS=['exclusion','linear','obstacle','mitigation','agri'];
+function sfCutDist(g){ const a=g.attributes||{}; if(SF_CUTS.indexOf(a.sf_cat)<0) return 0;
+  if(a.sf_cat==='mitigation'||a.sf_cat==='agri') return (g.geometry&&g.geometry.type==='polygon')? 0 : (+a.sf_width||0)/2;
+  return +a.sf_buffer||0; }
+function sfUid(g){ const a=g.attributes; if(!a.sf_uid) a.sf_uid=Math.random().toString(36).slice(2,10)+Date.now().toString(36); return a.sf_uid; }
+function sfGeomSig(geom){ try{ const e= geom.type==='point'? {xmin:geom.x, ymin:geom.y, xmax:geom.x, ymax:geom.y} : geom.extent;
+    const n=(geom.rings||geom.paths||[]).reduce((s,r)=>s+r.length,0); return [e.xmin,e.ymin,e.xmax,e.ymax,n].map(v=>+(+v).toFixed(6)).join(','); }catch(e){ return 'x'+Math.random(); } }
+function sfAutoSoon(){ clearTimeout(sfAutoT); sfAutoT=setTimeout(()=>{ try{ sfAutoSync(); }catch(e){ console.warn('[automatismi]', e); } }, 200); }
+function netAutoSet(on){ netAutoOn=!!on; const na=$('netAuto'); if(na) na.checked=netAutoOn; try{ saveStateDebounced(); }catch(e){} if(netAutoOn) sfAutoSoon(); }
+function sfAutoSync(){ if(!toolsGL||!esriMods||sfAutoBusy) return; sfAutoBusy=true; let changed=false, born=null;
+  try{ const GE=esriMods.geometryEngine, all=toolsGL.graphics.toArray(), fmt=v=>v.toFixed(2).replace('.',',');
+    // 1) fasce
+    const srcs=all.filter(g=>{ const a=g.attributes||{}; return a._kind&&!a.sf_auto&&!a.own&&g.geometry&&sfCutDist(g)>0; });
+    const want=new Set();
+    srcs.forEach(s=>{ const uid=sfUid(s), a=s.attributes, who=a.nome||a.categoria||'oggetto', d=sfCutDist(s), strip=a.sf_cat==='mitigation'||a.sf_cat==='agri', sig=sfGeomSig(s.geometry)+'|'+d+'|'+who+'|'+(a.sf_type||''); want.add(uid);
+      let f=all.find(g=>g.attributes&&g.attributes.sf_auto==='buffer'&&g.attributes.sf_of===uid);
+      if(f&&f.attributes.sf_sig===sig) return;
+      let bg=null; try{ bg=GE.geodesicBuffer(to4326(s.geometry), d, 'meters'); }catch(e){ bg=null; }
+      if(!bg){ if(f){ toolsGL.remove(f); changed=true; } return; }
+      // siepi e fasce agricole: la striscia tiene la categoria dell'oggetto; il resto diventa un'esclusione (DPA per gli elettrodotti)
+      const cat= strip? a.sf_cat : 'exclusion', typ= strip? (a.sf_type||null) : (a.sf_cat==='linear'&&SF_VOLT.indexOf(a.sf_type)>=0)? 'dpa' : 'setback';
+      const dTxt=String(+(strip? d*2 : d).toFixed(2)).replace('.',','), nome=(strip? 'Fascia larga '+dTxt+' m · ' : 'Fascia '+dTxt+' m · ')+who;
+      const note='automatica: segue «'+who+'» e '+(strip? 'la sua larghezza; per toglierla metti la larghezza a 0' : 'il suo buffer; per toglierla metti il buffer a 0');
+      if(f){ f.geometry=bg; Object.assign(f.attributes, {sf_sig:sig, nome:nome, note:note, sf_cat:cat, sf_type:typ, categoria:sfLabel(cat,typ), color:sfColor(cat)}); applyGraphicColor(f, sfColor(cat)); if(f.attributes.sf_saved) f.attributes.sf_dirty=true; }
+      else { f=new esriMods.Graphic({geometry:bg, symbol:symbolForColor('polygon', sfColor(cat)),
+          attributes:{_kind:'drawing', geomType:'polygon', nome:nome, note:note, sf_cat:cat, sf_type:typ, categoria:sfLabel(cat,typ), color:sfColor(cat),
+            sf_src:'geoprocess', sf_auto:'buffer', sf_of:uid, sf_sig:sig, sf_site: sfSite? {guid:sfSite.guid, code:sfSite.code||null} : undefined}});
+        toolsGL.add(f); born=born||((strip? 'fascia larga '+dTxt+' m lungo «' : 'fascia di '+dTxt+' m intorno a «')+who+'»'); }
+      changed=true; });
+    all.forEach(g=>{ const a=g.attributes||{}; if(a.sf_auto==='buffer'&&!want.has(a.sf_of)){ toolsGL.remove(g); changed=true; } });
+    // 2) area netta
+    const cur=toolsGL.graphics.toArray();
+    const gross=cur.filter(g=>{ const a=g.attributes||{}; return a._kind&&!a.sf_auto&&a.sf_cat==='gross'&&g.geometry&&g.geometry.type==='polygon'; });
+    let net=cur.find(g=>g.attributes&&g.attributes.sf_auto==='net');
+    if(netAutoOn&&gross.length){
+      // tagliano: i poligoni delle categorie SF_CUTS (fasce automatiche comprese); linee e punti solo tramite la loro fascia
+      const ex=cur.filter(g=>{ const a=g.attributes||{}; return a._kind&&a.sf_auto!=='net'&&!a.own&&SF_CUTS.indexOf(a.sf_cat)>=0&&g.geometry&&g.geometry.type==='polygon'; });
+      const skipped=cur.filter(g=>{ const a=g.attributes||{}; return a._kind&&!a.sf_auto&&SF_CUTS.indexOf(a.sf_cat)>=0&&g.geometry&&g.geometry.type!=='polygon'&&!(sfCutDist(g)>0); }).length;
+      const sig=gross.map(g=>sfGeomSig(g.geometry)).join(';')+'||'+ex.map(g=>sfGeomSig(g.geometry)).join(';')+'||'+skipped+'||'+netSetbackM;
+      if(!net||net.attributes.sf_sig!==sig){
+        // base = lorda ristretta del rientro dal confine (buffer negativo), poi meno ciò che taglia
+        let u=null, base=null, d=null, why='';
+        try{ u=GE.union(gross.map(g=>to4326(g.geometry))); base=u;
+          if(netSetbackM>0){ base=GE.geodesicBuffer(u, -netSetbackM, 'meters'); if(!base||!base.rings||!base.rings.length){ base=null; why='il rientro di '+netSetbackM+' m consuma tutta l\'area lorda'; } }
+          d=base; if(base&&ex.length){ const ue=GE.union(ex.map(g=>to4326(g.geometry))); d=GE.difference(base, ue); if(!d) why='le esclusioni coprono tutta l\'area lorda'; } }
+        catch(e){ console.warn('[area netta]', e&&e.message); d=null; why=why||'calcolo non riuscito'; }
+        if(!u){ /* niente da fare */ }
+        else if(!d){ if(net){ toolsGL.remove(net); net=null; changed=true; } msg('Area netta: '+why+'.','err'); }
+        else { const haL=Math.abs(GE.geodesicArea(u,'hectares')||0), ha=Math.abs(GE.geodesicArea(d,'hectares')||0);
+          const nome='Area netta · '+fmt(ha)+' ha', note='automatica: lorda '+fmt(haL)+' ha'+(netSetbackM>0? ' − rientro dal confine '+String(netSetbackM).replace('.',',')+' m' : '')+' − '+ex.length+(ex.length===1? ' area che taglia' : ' aree che tagliano')+' (esclusioni, fasce, ostacoli, siepi, zone agricole)'+(skipped? '; '+skipped+' linee o punti senza buffer o larghezza non contano' : '');
+          if(net){ net.geometry=d; Object.assign(net.attributes, {sf_sig:sig, nome:nome, note:note, area_ha:+ha.toFixed(4)}); if(net.attributes.sf_saved) net.attributes.sf_dirty=true; }
+          else { net=new esriMods.Graphic({geometry:d, symbol:symbolForColor('polygon', sfColor('net')),
+              attributes:{_kind:'drawing', geomType:'polygon', nome:nome, note:note, sf_cat:'net', categoria:sfLabel('net'), color:sfColor('net'), sf_src:'geoprocess', sf_auto:'net', sf_sig:sig, area_ha:+ha.toFixed(4),
+                sf_site: sfSite? {guid:sfSite.guid, code:sfSite.code||null} : undefined}});
+            toolsGL.add(net); born='area netta automatica: '+fmt(ha)+' ha su '+fmt(haL)+' lordi. Si aggiorna da sola; la spunta sotto i Disegni la congela'; }
+          changed=true; } } }
+    else if(net&&netAutoOn&&!gross.length){ toolsGL.remove(net); changed=true; }   // senza lorda, niente netta
+  } finally { sfAutoBusy=false; }
+  if(changed) refreshDl();   // → renderGeoms → sfAutoSoon → sync con firme uguali: si ferma qui
+  if(born) msg('Creata '+born+'.','ok', vediElenco('draw')||undefined); }
 // ── P2 (prototipo UX): flusso in tre passi. La logica resta gpRun/makeBuffer/gpDoClip; qui solo cosa è attivo, e perché ──
 let gpOp=null;   // operazione scelta al passo 2
 const GP_OPS={buffer:{t:'Buffer', s:'Una fascia di tot metri intorno agli oggetti di A', info:'gpBuf'},
@@ -5093,7 +5213,7 @@ function gpSelCount(){
   try{ k+=parcels.filter(p=>p.sel).length; }catch(e){}
   return k;
 }
-function gpSelInfo(){ try{ gpRenderSlots(); }catch(e){} }   // conteggio degli spuntati sui pulsanti + pulizia degli slot
+function gpSelInfo(){ try{ gpRenderSlots(); }catch(e){} try{ sfShortcutsUi(); }catch(e){} }   // conteggio degli spuntati sui pulsanti + pulizia degli slot
 function geomDefName(g){ const at=g.attributes||{};
   if(at.nome) return at.nome;
   if(at._kind==='buffer') return 'Buffer'+(at.dist_m!=null?' '+at.dist_m+' m':'');
@@ -5128,6 +5248,8 @@ function geomRow(g, subtitle){
   row.appendChild(zb);
   const db=document.createElement('button'); db.className='gact'; db.title='Elimina'; db.textContent='×';
   db.onclick=async function(){ const at=g.attributes||{};
+    if(at.sf_auto==='buffer'){ msg('Questa fascia segue il suo oggetto: per toglierla metti a 0 il buffer (o la larghezza) nella scheda di quell\'oggetto.','err'); return; }
+    if(at.sf_auto==='net') netAutoSet(false);   // tolta a mano: l'automatismo si spegne, altrimenti rinascerebbe
     // salvato sul portale: si chiede se toglierlo anche da lì (senza accesso resta sul portale)
     if(at.sf_saved&&at.sf_gid&&typeof signedIn!=='undefined'&&signedIn
       &&confirm('«'+(at.nome||'Oggetto')+'» è salvato sul portale (IT - Site Features).\n\nOK = eliminalo anche dal portale\nAnnulla = toglilo solo da qui')){
@@ -5173,6 +5295,8 @@ function renderGeoms(){
   try{ gpSelInfo(); }catch(e){}
   impCounts();
   try{ rcBadge(); drwLastRender(); }catch(e){ console.warn('[raccolta]', e); }   // P1
+  try{ sfShortcutsUi(); }catch(e){}   // pulsante «Crea area lorda» e spunta dell'area netta automatica
+  try{ sfAutoSoon(); }catch(e){}      // fasce dei buffer e area netta: ricalcolo (solo se qualcosa è cambiato)
 }
 // ── P1 (prototipo UX): contatore della Raccolta sul rail destro e riquadro «Ultimo disegno» nella scheda Disegna ──
 let drwLastG=null;   // l'ultimo disegno fatto (sketch, forma esatta, copia, percorso); sparisce se viene tolto
@@ -8237,6 +8361,7 @@ function baseGroundSet(){
       +'<li>Al primo clic, con le maniglie attorno, <b>Canc</b> lo cancella.</li>'
       +'<li><b>↶ Annulla</b> e <b>↷ Ripeti</b> (anche <kbd>Ctrl</kbd>+<kbd>Z</kbd> e <kbd>Ctrl</kbd>+<kbd>Y</kbd>): mentre disegni tolgono o rimettono l\'ultimo vertice; dopo, annullano l\'ultima modifica a disegni, buffer, risultati e importati, anche uno spostamento o una cancellazione. Lo storico riparte quando apri un progetto o svuoti il lavoro.</li></ul>'
       +'<h3>Da sapere</h3><ul><li>I disegni vanno nella <b>Raccolta</b>, sezione <b>Disegni</b>: da lì li rinomini, li colori, li togli, li esporti o li salvi sul portale con <b>Salva disegni in Site Features</b> (serve l\'accesso), nel layer <b>IT - Site Features</b>.</li>'
+      +'<li>Se dai un <b>buffer</b> (esclusioni, infrastrutture lineari, ostacoli) o una <b>larghezza</b> a una siepe o a una fascia agricola lineare, nasce da sola una <b>fascia</b> che segue l\'oggetto: un\'esclusione «Fascia di rispetto» (DPA per gli elettrodotti), oppure la striscia della siepe o della zona agricola. Per toglierla metti a 0 il buffer o la larghezza. Con un\'area lorda, l\'<b>area netta</b> si ricalcola da sola: lorda, ristretta del <b>rientro dal confine</b> che scrivi accanto alla spunta sotto i Disegni, meno tutto ciò che taglia; le stesse regole di PV Predesign.</li>'
       +'<li>Restano in questo browser e si salvano nel progetto, con categoria, tipo e sito: PV Predesign li legge già divisi.</li>'
       +'<li>Sotto gli strumenti, <b>Ultimo disegno</b> mostra l\'ultimo fatto e porta alla sua riga nella Raccolta; il numero sull\'icona della Raccolta dice quanti oggetti hai. Per togliere tutti i disegni usa il cestino della sezione Disegni nella Raccolta: chiede conferma, non tocca i risultati dei geoprocessi e, per quelli salvati sul portale, chiede se toglierli anche da lì.</li>'
       +'<li><b>Misure esatte e aggancio</b> e <b>Griglia</b> stanno in fondo alla scheda, sotto «Supporto al disegno», sempre in vista: il titolo dice se sono accesi.</li></ul>'},
@@ -8451,7 +8576,7 @@ function baseGroundSet(){
     {sel:'#signin', title:'1 · Accedi ad AGOL', body:"Accedi col tuo account: serve per le mappe dei vincoli e i layer del portale, per l'analisi di contesto e il percorso su strada, per migrare le particelle in AREAS Collection e salvare i disegni in Site Features. Ricerca delle particelle, disegno, geoprocessi, import e pendenze funzionano anche senza.", placement:'below'},
     {sel:'#rcSecFind', title:'2 · Ricerca particelle', body:"Scegli regione, provincia e comune, poi foglio e particelle. La mappa del portale si sceglie in alto (🗺 Mappa): con una regione scelta ti propongo i suoi vincoli con un clic.", open:function(){openTab('ricerca'); window.impOpen&&window.impOpen('rcSecFind');}, placement:'right'},
     {sel:'.tabpane[data-tab=ricerca]', title:'3 · I tre moduli', body:"<b>Ricerca particelle</b>, se conosci comune, foglio e particella; <b>Sulla mappa con selezione manuale particelle</b>, con un clic o disegnando un rettangolo, un poligono o una linea; <b>Seleziona da un disegno esistente</b>, per le particelle toccate da un disegno o da un buffer. Clicca un titolo per aprirlo; la <b>i</b> spiega ognuno con un esempio.", open:function(){openTab('ricerca');}, placement:'right'},
-    {sel:'#drawerElenco', title:'4 · Raccolta', body:"Tutto ciò che raccogli finisce qui, diviso in <b>Particelle · Disegni · Geoprocessi · Importati</b>. Ogni riga si rinomina, si colora (🪣), si nasconde, si zooma — e la <b>casella a sinistra</b> la seleziona per usarla nei geoprocessi. L'intestazione di ogni sezione fa lo stesso per tutte: spunta, mostra/nascondi, colore e 🗑 elimina.", open:function(){openDrawer('elenco');}, placement:'left'},
+    {sel:'#drawerElenco', title:'4 · Raccolta', body:"Tutto ciò che raccogli finisce qui, diviso in <b>Particelle · Disegni · Geoprocessi · Importati</b>. Sotto le Particelle <b>Crea area lorda</b> (dalle spuntate, o da tutte); sotto i Disegni la spunta <b>Area netta automatica</b>: lorda meno tutte le esclusioni, ricalcolata da sola; un oggetto con un buffer genera da solo la sua <b>fascia</b>. Ogni riga si rinomina, si colora (🪣), si nasconde, si zooma — e la <b>casella a sinistra</b> la seleziona per usarla nei geoprocessi. L'intestazione di ogni sezione fa lo stesso per tutte: spunta, mostra/nascondi, colore e 🗑 elimina.", open:function(){openDrawer('elenco');}, placement:'left'},
     {sel:'#rcDock', title:'5 · Esporta, migra, salva', body:"In fondo alla Raccolta, sempre in vista: <b>Esporta</b> (formato e singoli oggetti nella finestra; senza spunte esporta tutto), <b>Migra particelle in AREAS Collection</b> e <b>Salva disegni in Site Features</b> (categoria, tipo e sito; la seconda volta aggiorna, non duplica).", open:function(){openDrawer('elenco');}, placement:'left'},
     {sel:'#projSaveBtn', title:'6 · Salva il progetto', body:"<b>Salva progetto</b> mette tutto il lavoro in un file .axpo, come un progetto QGIS: mappa e layer, particelle, disegni, risultati, import, anche <b>DWG e immagini</b> già posizionati e il <b>DTM delle pendenze</b>. Con <b>Apri progetto</b> lo ritrovi com'era, o lo passi a un collega; lo stesso file si apre in PV Predesign. <kbd>Ctrl</kbd>+<kbd>S</kbd> risalva.", placement:'below'},
     {title:'Pronto!', body:"Questo è il flusso base. Riapri i tour quando vuoi dal <b>?</b> in alto a destra. Per gli strumenti avanzati, prova il tour <i>Tutti gli strumenti</i>."}
