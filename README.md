@@ -320,8 +320,46 @@ right-click menu opens it on the clicked point.
   so); they are **left out of the browser auto-save** — after a reload the file must be imported again or the
   project reopened — and **never go to the portal** (*Salva sul portale* skips these parcels and says how many).
   Nothing of them is written to the console.
-- Georeferenced **images and GeoTIFF** — images get four draggable corner handles, GeoTIFFs are
-  auto-placed from their bounding box and geokeys, reprojected into the view SR.
+- Georeferenced **images and GeoTIFF** (rewritten on 2026-10-06, "immagini v2"). An image sits on the map
+  by its four corners (`ControlPointsGeoreference`, projective); that is all the project stores, whatever put it
+  there. Four ways to put it there, all in the browser:
+  - **Metadata.** GeoTIFF: geokeys, `ModelTransformation` (rotated rasters) or a `.prj` picked with the file
+    when the geokeys give no EPSG. **World file** (`.jgw`, `.pgw`, `.tfw`, `.wld`…) with its `.prj`: select
+    the image, the world file and the `.prj` together (same base name; the file input accepts several
+    files). Without a `.prj` the system is **estimated from the coordinates** with `srEstimate`, like a DWG;
+    degrees are taken as WGS 84; the message says which system was used and warns when it is uncertain.
+    Corner edges are at ±0.5 pixel of the original size, as the world file convention wants.
+  - **Sposta / scala / ruota.** A dashed frame polygon follows the corners; the SketchViewModel `transform`
+    tool gives drag, scale handles (*Proporzioni* locks the aspect ratio) and the rotation handle, with
+    snapping to parcels and drawings. Arrow keys nudge by one screen pixel (Shift: ten). *Ripristina* returns
+    to the placement at the start of the edit.
+  - **Angoli.** The `reshape` tool on the same frame, vertices only: perspective, as the old handles did.
+  - **Punti.** Pairs "point on the image → where it really is" (the target snaps to vertices of parcels,
+    drawings and DWGs; Esc drops a pending point). 2 pairs: similarity — translate, scale, rotate, no
+    distortion (the DWG alignment, for images); 3: affine; 4 or more: affine by least squares, or projective
+    on request (*Modello*). Each pair shows its residual in metres (Web Mercator corrected by cos φ) and the
+    text the RMS; pairs can be removed one by one and are kept with the image and in the `.axpo` (`cps`),
+    so a placement can be refined after reopening. Source points are stored as image pixels, found through
+    the inverse of the current placement.
+  - Everything degenerate is refused silently: a folded frame is not applied, collinear points give a
+    message, a transform that folds the image is not applied.
+  - **The card** (same afternoon, user feedback "fixed and bulky in the middle, does not match the UI"): the
+    toolbar became a floating card styled like the Tools card (`#imgToolbar`, header with name, **i** and ×),
+    docked top-left next to the zoom control by default, **draggable by its header** and remembered in
+    `localStorage` (`axpo_img_card`, clamped into the map on every open).
+  - **Valori** (E, collapsible): rotation in degrees (anticlockwise, 0 = upright), metres per pixel of the
+    original image — or "1 : N at dpi", which computes it; a PDF prefills its rendering dpi — and the centre in
+    WGS 84 degrees. *Applica i valori* rebuilds the four corners as a rectangle (`imgGeoApply`): perspective
+    is dropped, control points are cleared. The fields follow every placement change (`imgValsRefresh`).
+  - **PDF** (F): rendered in the browser with pdf.js (ESM build loaded with `import()`, worker in a blob
+    module so the cross-origin script can run off the main thread), the chosen page at 4096 px on the long
+    side; the project keeps the PDF and the page number and renders it again on open (`page` in the record).
+  - **World file export** (H, *World file* button): a zip with the image, its world file and a `.prj` in Web
+    Mercator. Affine placement (frame still a parallelogram): the original file untouched plus the world file
+    (full resolution); a PDF or an image without its file: the rendered PNG plus the world file; projective
+    placement: the image is **resampled north-up** (`imgWarp`, nearest neighbour, long side ≤ 4096 px) as
+    `<name>_nord.png` with its world file. World-file values are for the **original** pixel grid
+    (`Ho = H · scale(pxW/ow, pxH/oh)`), C and F at the centre of the top-left pixel.
 - **CAD drawings (DWG)**, read in the browser — the file never leaves the PC. Layers and colours are
   kept (ByLayer/ByBlock resolved, blocks and arrays exploded, ACI 7 flips black/white with the basemap).
   The spatial reference is **estimated from the coordinates** among the systems used in Italy (the eight
@@ -853,6 +891,33 @@ so it never touches the AMD loader. Worth knowing before editing:
   - Colours: twelve fixed ones, then hues at the golden angle; a new owner never takes a colour already used
     by another group, and an owner already on the map keeps the colour it has (also after a recolour).
 
+- **Images v2 (2026-10-06).** Transforms are 3×3 homogeneous matrices (`h3Ap`, `h3Mul`, `h3Inv`, `h3Fit`)
+  from image pixels (origin top-left, y down) to view coordinates. `h3Fit(pairs, model)` normalises both sides
+  (centroid to 0, mean distance √2) before the normal equations: pixels are thousands, map units millions, and
+  the projective rows carry their products. The similarity model is `X = a·px + b·py + c`, `Y = b·px − a·py + d`:
+  rotation and scale **with the reflection** that turns the pixels' y-down into the map's y-up — the
+  orientation-preserving form fits nothing (first attempt). `imgH(im)` is the current placement, an exact
+  projective fit of the four corners; its inverse turns a map click into a pixel.
+  - The SketchViewModel turns `view.popupEnabled` **off while an update is active** and restores it on
+    cancel/complete; capture the value before the first `update()` (`imgPop0`) and restore it yourself in
+    `imgDone`/`imgPtsEnd`, or the popups stay off after a points session.
+  - `cancel()` on the frame may leave the graphic where the user dragged it: the image georeference is the
+    source of truth, the frame is rebuilt from it (`imgFrameSync`) before every `update()`.
+  - Transform events arrive on every pointer move with the live geometry; setting a new
+    `ControlPointsGeoreference` each time is fine (Esri's own sample does it). A folded ring is skipped.
+  - While an image is edited the main sketch's `updateOnGraphicClick` is paused: a click on the frame over a
+    drawing would otherwise start two updates.
+  - Arrow keys: the SketchViewModel does not move the selection itself (checked in the browser), so the
+    one-pixel nudge is ours; it cancels and restarts the update, which is cheap.
+  - World files: the six numbers are A, D, B, E, C, F in that order (rotation terms in the middle); C and F
+    are the **centre** of the top-left pixel.
+  - **pdf.js and the AMD loader.** The UMD build of pdf.js sees the ArcGIS `define` and registers itself as an
+    AMD module instead of setting `window.pdfjsLib`: use the ESM build through a dynamic `import()` (the same
+    trick as the DWG reader). A cross-origin worker script cannot be given to `new Worker(url)`; a blob module
+    that `import`s it can, and `GlobalWorkerOptions.workerPort` takes it. Only loaded on the first PDF.
+  - The card gets the image's `ow/oh/page/dpi` through `createGeorefImage(..., extra)` **before** `editImage`
+    opens it: setting them after the call came too late for the dpi field (the first attempt).
+
 ## 6. Security & distribution
 
 - The Zornade key is a read-only token **embedded in the source** (`DEFAULT_KEY`). This is a deliberate,
@@ -1226,6 +1291,41 @@ imported was the parcels export, not the tool's result — since the same day th
 (§4 *Owners file*) and changed the wording of the count from "intestatari" to "gruppi", which was wrong for
 co-owners. Checked in headless Chrome with the user's two files (counts only) and with the invented-names
 suite again.
+
+**Images v2 (2026-10-06, user request: "spostamento, scala, ruota, o altri metodi di georiferimento", approved
+D + A + B + C of the review).** The image module was the weakest tool: four point handles moved one at a time,
+nothing else. Rewritten (§4 *images and GeoTIFF*, §5 *Images v2*): world file + `.prj` (or estimated system),
+GeoTIFF rotation and `.prj`, a frame with move/scale/rotate and aspect lock, corner reshape, control points
+with similarity/affine/projective fits and residuals, keyboard nudges, *Ripristina*, pairs saved in the project.
+Checked in headless Chrome: fits recover known transforms to 1e-9 (noisy affine: RMS as expected), inverse,
+too-few and collinear points refused, folded ring refused; world file + `.prj` lands on the projected corners
+exactly, without `.prj` the estimated system is 2·10⁻⁵ m away, a world file in degrees with rotation terms is
+placed and rotated, an orphan world file is reported; a photo without metadata opens the frame in transform
+mode with the main sketch paused; a simulated transform event moves the corners, a bow-tie is ignored, an arrow
+key moves one pixel, reshape mode sets the reshape tool, *Ripristina* restores; points: a click outside the
+image is refused, 2 pairs give a pure translation with zero residual, a third inconsistent pair gives an exact
+affine, a fourth gives least squares with four residuals around 0.9 m, *Proiettiva* makes it exact, removing a
+pair recomputes, Esc drops the pending point then leaves the mode with popups, cursor and sketch restored; the
+project carries `cps` and restores them without a frame; *Fatto* clears everything. On screen (built-in
+browser): the frame with its handles, a real drag, an arrow key (one pixel, no double move), the corner
+handles of *Angoli*, two picked pairs that moved and rotated the image with the markers and the panel. Not
+tested: a real GeoTIFF with `ModelTransformation`, a `.prj` in a system the projection engine does not know
+(it reports an error and centres the image), the undocked panel. Backups:
+`geoportale_axpo_pre-immagini-v2_2026-10-06.html`, `README_tools_pre-immagini-v2_2026-10-06.md`.
+
+**Images v2, second round (2026-10-06 afternoon, user: "the window is fixed and bulky in the middle, make it
+draggable and open at the side, align it with the rest of the UI; add E, F, H").** The toolbar became a
+draggable card docked top-left (§4 *The card*), and the three remaining items of the review were added: *Valori*
+(rotation, metres per pixel or scale + dpi, centre), PDF pages through pdf.js, and the world-file export (§4,
+§5). Checked in headless Chrome: default position 64/12 px, a simulated header drag moves and saves the
+position and the next open keeps it; values round-trip (30°, 0.25 m/px, centre 9.1/45.1 → read back exactly,
+100 × 75 m, convex); scale 1:2000 at 300 dpi → 0.169333 m/px; export of an affine placement gives the original
+PNG + `.pgw` + `.prj` with the six numbers equal to the placement matrix and C/F at the first pixel centre;
+a trapezoid placement gives `_nord.png` + `_nord.pgw` with zero rotation terms and the bbox origin; a two-page
+PDF written by hand asks the page (stub answers 2), renders 4096 × 2894 at 350 dpi, prefills the dpi field,
+exports PNG + world file, and the project saves `page` and restores the same rendering without asking. On
+screen: the card next to the zoom control, a real drag to the lower right. Not tested: a real multi-page PDF
+from a CAD printer, very large PDFs (rendering time), Safari.
 
 **Open, known, non-blocking**
 

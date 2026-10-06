@@ -353,8 +353,37 @@
   .gdel{border:none;background:transparent;cursor:pointer;padding:0;width:22px;height:22px;flex:none;display:grid;place-items:center;color:var(--txt);opacity:.6;border-radius:5px}
   .gdel:hover{opacity:1;color:var(--err);background:color-mix(in srgb, var(--err) 12%, transparent)}
   .gdel:disabled{opacity:.25;cursor:default;color:var(--txt);background:transparent}
-  #imgToolbar{position:absolute;top:60px;left:50%;transform:translateX(-50%);z-index:26;display:none;align-items:center;gap:12px;background:color-mix(in srgb,var(--panel) 92%,transparent);backdrop-filter:blur(6px);border:1px solid var(--line);border-radius:12px;padding:8px 14px;font-size:12px;color:var(--txt)}
-  #imgToolbar label{display:flex;align-items:center;gap:6px}
+  /* immagini v2 (6/10): scheda flottante come la scheda Tools — trascinabile dall'intestazione, in alto a sinistra di default (posizione ricordata) */
+  #imgToolbar{position:absolute;top:12px;left:64px;z-index:26;display:none;flex-direction:column;width:min(330px, calc(100% - 24px));max-height:calc(100% - 24px);background:var(--panel);color:var(--txt);border:1px solid var(--line-strong);border-radius:12px;box-shadow:0 6px 18px rgba(0,0,0,.2);border-top:3px solid transparent;border-image:var(--axpo-gradient) 1 0 0 0;font-size:12px}
+  #imgToolbar .toolcard-h{cursor:move;user-select:none;touch-action:none}
+  #imgToolbar .imgcard-grip{flex:none;opacity:.45;font-size:15px;line-height:1}
+  #imgCardClose{flex:none;width:28px;height:28px;padding:0;border:1px solid var(--line);border-radius:7px;background:transparent;color:var(--txt);font-size:17px;line-height:1;cursor:pointer}
+  #imgCardClose:hover{border-color:var(--accent);color:var(--accent)}
+  #imgToolbar .toolcard-b{display:flex;flex-direction:column;gap:8px}
+  #imgToolbar .imgtb-seg{display:flex;gap:4px}
+  #imgToolbar .imgtb-seg button{flex:1;margin:0;padding:6px 4px;font-size:11.5px;white-space:nowrap}
+  #imgToolbar .imgtb-seg button[aria-pressed="true"]{border-color:var(--accent-strong);color:var(--link);font-weight:700}
+  #imgToolbar .imgtb-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  #imgToolbar label{display:flex;align-items:center;gap:6px;margin:0;text-transform:none;letter-spacing:0;font-weight:400;font-size:12px;color:var(--txt)}
+  #imgToolbar label.chk input{width:13px;height:13px;margin:0;accent-color:var(--accent)}
+  #imgToolbar .btns,#imgToolbar .ghost-danger{margin-top:0}
+  #imgPts{border-top:1px solid var(--line);padding-top:8px;line-height:1.45}
+  #imgPts[hidden]{display:none}
+  #imgPtsStep .err{color:var(--err)}
+  #imgPts .imgpts-bar{display:flex;align-items:center;gap:8px;margin:6px 0 2px;flex-wrap:wrap}
+  #imgPts select,#imgVals .opnum{font-size:12px;padding:3px 5px;background:var(--bg);color:var(--txt);border:1px solid var(--line);border-radius:5px}
+  #imgPtsList{display:flex;flex-wrap:wrap;gap:2px 10px;max-height:96px;overflow:auto}
+  #imgPtsList .imgpt{display:inline-flex;align-items:center;gap:2px;font-variant-numeric:tabular-nums}
+  #imgPtsList .imgpt .gact{border:none;background:transparent;cursor:pointer;color:var(--txt);opacity:.6;padding:1px 4px;border-radius:4px;font-size:13px;line-height:1}
+  #imgPtsList .imgpt .gact:hover{opacity:1;background:var(--hover)}
+  #imgVals{border-top:1px solid var(--line);padding-top:6px}
+  #imgVals summary{cursor:pointer;font-weight:600;font-size:12px;list-style:none;display:flex;align-items:center;gap:6px}
+  #imgVals summary::-webkit-details-marker{display:none}
+  #imgVals summary::before{content:"\25be";font-size:10px;opacity:.55;transition:transform .15s}
+  #imgVals:not([open]) summary::before{transform:rotate(-90deg)}
+  #imgVals .imgval-grid{display:flex;flex-direction:column;gap:6px;margin-top:8px}
+  #imgVals .opnum{width:70px}
+  #imgVals .opnum.wide{width:98px}
   /* selettore numerico opacità (toolbar immagine + righe elenco Importati) */
   .opnum{width:62px;flex:none;padding:4px 6px;text-align:right;font-variant-numeric:tabular-nums}
   .grow .opnum{width:56px;font-size:12px;padding:3px 5px;background:var(--bg);border:1px solid var(--line);border-radius:5px;color:var(--txt)}
@@ -1151,12 +1180,12 @@
           </div>
         </details>
         <details class="imod always" id="impSecImg" open>
-          <summary><span class="im-ico" aria-hidden="true">🖼</span><span class="im-t"><b>Immagini sulla mappa</b><small>GeoTIFF, foto e planimetrie (PNG, JPG)</small></span>
+          <summary><span class="im-ico" aria-hidden="true">🖼</span><span class="im-t"><b>Immagini sulla mappa</b><small>GeoTIFF, foto e planimetrie (PNG, JPG, PDF)</small></span>
             <span class="im-n" id="impNImg"></span><button type="button" class="im-info" data-info="img" title="Come funziona" aria-label="Come funzionano le immagini">i</button></summary>
           <div class="im-body">
-            <input type="file" id="impImg" accept=".png,.jpg,.jpeg,.tif,.tiff,.geotiff" hidden>
+            <input type="file" id="impImg" accept=".png,.jpg,.jpeg,.tif,.tiff,.geotiff,.pdf,.jgw,.jpgw,.jpegw,.pgw,.pngw,.tfw,.tifw,.wld,.prj" multiple hidden>
             <button class="sec im-main" id="impImgBtn">🖼 Scegli un'immagine…</button>
-            <div class="thint">Il GeoTIFF si posiziona da solo. Una foto o una planimetria la sistemi trascinando i 4 angoli.</div>
+            <div class="thint">GeoTIFF e immagini con <b>world file</b> (.jgw, .pgw, .tfw) si posizionano da sole: seleziona insieme l'immagine, il world file e il .prj. Le altre, PDF compresi, le sistemi sulla mappa: <b>sposta, scala e ruota</b> dalla cornice, <b>Angoli</b> uno per uno, <b>Punti</b> noti (2 o più coppie) o <b>Valori</b> (rotazione, scala, centro). Poi puoi scaricarle con il world file.</div>
           </div>
         </details>
         <details class="imod always" id="impSecSvc" open>
@@ -1206,11 +1235,47 @@
   <div id="mapWrap">
     <div id="viewDiv"></div>
     <div id="modeBanner" role="status" hidden></div>
-    <div id="imgToolbar">
-      <span id="imgTbName"></span>
-      <label>Opacità <input type="number" id="imgOpacity" class="opnum" min="0" max="100" step="5" value="85" inputmode="numeric" aria-label="Opacità immagine in percentuale"><span class="opsuf">%</span></label>
-      <button class="sec" id="imgDoneBtn">Fatto</button>
-      <button class="ghost-danger" id="imgDelBtn">Elimina</button>
+    <div id="imgToolbar" role="dialog" aria-label="Posizionamento dell'immagine">
+      <div class="toolcard-h" id="imgCardH" title="Trascina per spostare la scheda">
+        <span class="imgcard-grip" aria-hidden="true">&#x2807;</span><b id="imgTbName"></b>
+        <button type="button" class="im-info" data-info="img" title="Come funziona" aria-label="Come funzionano le immagini">i</button>
+        <button type="button" id="imgCardClose" title="Fatto: chiude la scheda e tiene la posizione" aria-label="Fatto">&times;</button>
+      </div>
+      <div class="toolcard-b">
+        <div class="imgtb-seg" role="group" aria-label="Modo di posizionamento">
+          <button type="button" class="sec" id="imgModeT" aria-pressed="true" title="Trascina l'immagine; le maniglie la ridimensionano, quella in alto la ruota. Frecce della tastiera: spostamenti di un pixel (Maiusc: dieci)">&#x2927; Sposta / scala / ruota</button>
+          <button type="button" class="sec" id="imgModeR" aria-pressed="false" title="Trascina i 4 angoli uno per uno (prospettiva)">&#x25F1; Angoli</button>
+          <button type="button" class="sec" id="imgModeP" aria-pressed="false" title="Coppie di punti: uno sull'immagine e dove sta davvero. 2 coppie = sposta, scala e ruota; 3 o pi&ugrave; = anche la deformazione">&#x2316; Punti</button>
+        </div>
+        <div class="imgtb-row">
+          <label class="chk" title="Mantiene le proporzioni quando ridimensioni"><input type="checkbox" id="imgLock" checked> Proporzioni</label>
+          <label>Opacit&agrave; <input type="number" id="imgOpacity" class="opnum" min="0" max="100" step="5" value="85" inputmode="numeric" aria-label="Opacit&agrave; immagine in percentuale"><span class="opsuf">%</span></label>
+        </div>
+        <div id="imgPts" hidden>
+          <div id="imgPtsStep"></div>
+          <div class="imgpts-bar">
+            <label>Modello <select id="imgPtsModel" aria-label="Modello di trasformazione"><option value="auto">Automatico</option><option value="sim">Sposta, scala, ruota (2+ coppie)</option><option value="aff">Affine (3+ coppie)</option><option value="proj">Proiettiva (4+ coppie)</option></select></label>
+            <button type="button" class="sec" id="imgPtsClear" title="Toglie tutte le coppie; l'immagine resta dov'&egrave;">Svuota</button>
+          </div>
+          <div id="imgPtsList"></div>
+        </div>
+        <details id="imgVals">
+          <summary>Valori: rotazione, scala, centro</summary>
+          <div class="imgval-grid">
+            <label title="Gradi antiorari rispetto al nord (0 = immagine dritta)">Rotazione <input type="number" id="imgRot" class="opnum" step="0.1" inputmode="decimal"><span class="opsuf">&deg;</span></label>
+            <label title="Metri per pixel dell'immagine originale">Scala <input type="number" id="imgMpp" class="opnum wide" step="any" min="0" inputmode="decimal"><span class="opsuf">m/px</span></label>
+            <label title="Scala del disegno e risoluzione della scansione: calcolano i metri per pixel">1 : <input type="number" id="imgScaleN" class="opnum" min="1" step="1" placeholder="2000" inputmode="numeric"> a <input type="number" id="imgDpi" class="opnum" min="1" step="1" placeholder="300" inputmode="numeric"><span class="opsuf">dpi</span></label>
+            <label title="Centro dell'immagine, in gradi WGS 84">Centro <input type="number" id="imgLon" class="opnum wide" step="any" inputmode="decimal" aria-label="Longitudine del centro"> <input type="number" id="imgLat" class="opnum wide" step="any" inputmode="decimal" aria-label="Latitudine del centro"></label>
+          </div>
+          <div class="btns"><button type="button" class="sec" id="imgValApply">Applica i valori</button></div>
+        </details>
+        <div class="btns">
+          <button type="button" class="sec" id="imgReset" title="Torna alla posizione di quando hai aperto la scheda">&#x21BA; Ripristina</button>
+          <button type="button" class="sec" id="imgExport" title="Scarica uno zip con l'immagine, il world file e il .prj (Web Mercator), per QGIS o ArcGIS">&#x2B07; World file</button>
+        </div>
+        <div class="btns"><button class="primary" id="imgDoneBtn" style="margin-top:0">Fatto</button></div>
+        <button class="ghost-danger" id="imgDelBtn">Elimina</button>
+      </div>
     </div>
     <div id="cadAlign" role="dialog" aria-label="Allineamento del disegno CAD con 2 punti">
       <b id="cadAlTitle">Allinea il disegno</b>
@@ -1517,7 +1582,7 @@
       <li><b>Ricerca particelle</b> — tre moduli: <b>Ricerca particelle</b> (comune, foglio e particella), <b>Sulla mappa con selezione manuale particelle</b> (clic, rettangolo, poligono, linea) e <b>Seleziona da un disegno esistente</b>.</li>
       <li><b>Disegna</b> — due passi. <b>1</b> Cosa disegni: la <b>categoria</b> (area lorda, area netta, percorso di connessione, esclusione, infrastruttura lineare, ostacolo, accesso e punto di connessione, mitigazione, zona agricola, nota) con tipo e attributi. <b>2</b> Con quale strumento: punto, linea, area, rettangolo e cerchio, anche di misura esatta. Sotto, il riquadro <b>Ultimo disegno</b> porta alla sua riga nella Raccolta. Salvando sul portale ogni oggetto si lega da solo all'area di AREAS COLLECTION che tocca; il <b>sito di lavoro</b>, la riga in cima, serve solo a forzarla. Mentre disegni, <kbd>Tab</kbd> fa scrivere lunghezza e angolo del lato (anche come azimut). In fondo, sempre in vista, misure e aggancio e la griglia in metri. <kbd>Ctrl</kbd>+<kbd>Z</kbd> / <kbd>Ctrl</kbd>+<kbd>Y</kbd> annullano e ripetono. Un disegno cliccato sulla mappa si sposta e si rimodella.</li>
       <li><b>Geoprocessi</b> — tre passi. <b>1</b> Metti gli oggetti di partenza in <b>A</b>: dalla mappa, dalle righe spuntate nella Raccolta, o una categoria intera. <b>2</b> Scegli cosa fare tra le schede: Buffer, Unione, Contorno, Semplificazione, Ritaglio, Parte comune, Sottrai B da A e <b>Copia</b> (anche parallela, per i rientri dai confini); ogni scheda dice cosa le serve e si accende quando A va bene. <b>3</b> Parametri ed <b>Esegui</b>: sotto il pulsante leggi l'esito, e il risultato è nella Raccolta.</li>
-      <li><b>Importa dati</b> — quattro schede sempre aperte: <b>file di geometrie</b> (GeoJSON, KML, KMZ, Shapefile; il GeoJSON di <b>Estrazione intestatari</b> si colora e si raggruppa per intestatario, e i nominativi restano fuori dal salvataggio automatico e dal portale), <b>disegni CAD</b> (DWG letti nel browser, con il sistema di coordinate proposto, oppure posizionati a mano con 2 punti), <b>immagini</b> (GeoTIFF, foto e planimetrie) e <b>servizi web</b> (WMS, WFS e ArcGIS REST per indirizzo, senza creare item sul portale; il browser accetta solo servizi <b>https</b> che permettono la lettura da altri siti, CORS).</li>
+      <li><b>Importa dati</b> — quattro schede sempre aperte: <b>file di geometrie</b> (GeoJSON, KML, KMZ, Shapefile; il GeoJSON di <b>Estrazione intestatari</b> si colora e si raggruppa per intestatario, e i nominativi restano fuori dal salvataggio automatico e dal portale), <b>disegni CAD</b> (DWG letti nel browser, con il sistema di coordinate proposto, oppure posizionati a mano con 2 punti), <b>immagini</b> (GeoTIFF e world file si posizionano da soli; le altre, PDF compresi, con sposta/scala/ruota, angoli, coppie di punti noti o valori numerici, e si scaricano con il world file) e <b>servizi web</b> (WMS, WFS e ArcGIS REST per indirizzo, senza creare item sul portale; il browser accetta solo servizi <b>https</b> che permettono la lettura da altri siti, CORS).</li>
       <li><b>Rail destro</b> — in cima la <b>Raccolta</b>, con il numero di oggetti: tutto quello che hai raccolto (Particelle · Disegni · Geoprocessi · Importati); ogni riga si rinomina, si colora, si nasconde e si <b>spunta</b> per usarla nei geoprocessi; da qui esporti e salvi sul portale. Sotto, i pannelli della mappa (Layer, Mappa di base, Segnalibri) e le azioni (Modifica AREAS, Stampa).</li>
       <li><b>🗺 Mappa</b> (in alto) — la web map del portale in uso: la General Map o una Check Vincoli regionale, con ricerca per nome. Cambiarla non tocca particelle, disegni e risultati; si perdono solo i layer accesi e i filtri di quella mappa (te lo chiedo prima). Scegliendo una regione nella ricerca ti propongo i suoi vincoli con un clic.</li>
       <li><b>Layer</b> — cerca un layer per nome; dal pannello di ogni layer (icona a cursori) trasparenza, popup e <b>filtro per attributo</b> (l'icona diventa un imbuto quando è attivo). I layer aggiunti da te (dal portale, servizi web, DWG, immagini) hanno il menu <b>…</b> con Zoom e <b>Rimuovi dalla mappa</b>.</li>
@@ -2856,6 +2921,8 @@ async function projBuild(name){
     const r={name:im.name, orig:im.file? im.file.name : null, file:im.file? fn('img',i,im.file.name) : null,
       corners:cps.map(c=>{ const p=c.mapPoint||{}, sr=p.spatialReference||{}; return {x:p.x, y:p.y, wkid:sr.wkid||sr.latestWkid||102100}; })};
     if(im._slp) r.slp=im._slp;   // DTM delle pendenze: non è un file, si rifà dalla griglia salvata in st.terrain
+    if(im.cps&&im.cps.length) r.cps=im.cps.map(c=>({px:c.px, py:c.py, x:c.x, y:c.y}));   // coppie di punti noti (immagini v2), nel sistema della vista
+    if(im.page) r.page=im.page;   // PDF: la pagina resa (si rifà alla riapertura dallo stesso file)
     if(im.file) zip.file(r.file, im.file); else if(!im._slp) miss.push('immagine «'+im.name+'»');
     st.images.push(r); });
   try{ st.terrain=slpProjSave(zip); }catch(e){ console.warn('[progetto] terreno', e); }
@@ -2912,10 +2979,12 @@ async function projZipFile(zip, rec){
   const zf=rec.file&&zip.file(rec.file); if(!zf) throw new Error('il file non è nel progetto');
   return new File([await zf.async('blob')], rec.orig||rec.name||'file'); }
 async function projImgRestore(file, rec){
-  const r=/\.(tif|tiff|geotiff)$/i.test(file.name)? await loadGeoTIFF(file) : await loadPlainImage(file);
+  const r=/\.(tif|tiff|geotiff)$/i.test(file.name)? await loadGeoTIFF(file) : /\.pdf$/i.test(file.name)? await loadPDF(file, rec.page||1) : await loadPlainImage(file);
   const cs=(rec.corners||[]).length===4? rec.corners.map(c=>new esriMods.Point({x:c.x, y:c.y, spatialReference:{wkid:c.wkid||102100}})) : r.corners;
   const im=await createGeorefImage(r.image, r.w, r.h, rec.name||file.name, cs, true);
-  im.file=file; return im; }
+  im.file=file; im.ow=r.ow||r.w; im.oh=r.oh||r.h; if(r.page){ im.page=r.page; im.pages=r.pages; im.dpi=r.dpi; }
+  im.cps=Array.isArray(rec.cps)? rec.cps.filter(c=>c&&[c.px,c.py,c.x,c.y].every(isFinite)).map(c=>({px:+c.px, py:+c.py, x:+c.x, y:+c.y})) : [];
+  return im; }
 async function projCadRestore(file, rec){   // come cadImportOne, ma con il sistema e il posizionamento salvati: niente finestra
   const buf=await file.arrayBuffer(), ver=String.fromCharCode.apply(null, new Uint8Array(buf,0,Math.min(6,buf.byteLength)));
   if(!/^AC\d{4}$/.test(ver)) throw new Error('non è un file DWG');
@@ -6002,10 +6071,26 @@ async function svcRestoreAll(list, onEach){
     catch(e){ console.warn('[servizio] non ripristinato', rec&&rec.url, e); bad.push('«'+((rec&&(rec.title||rec.name))||'servizio')+'» ('+svcErr(e,rec&&rec.type,false)+')'); } }
   return bad; }
 
-// ── FASE 4b: immagini georeferenziate (MediaLayer + angoli trascinabili) ──
+// ── FASE 4b: immagini georeferenziate (MediaLayer) ──────────────────────────────────────────────────────────
+// Un'immagine sta sulla mappa con i suoi 4 angoli (ControlPointsGeoreference, proiettiva): è l'unica cosa che il
+// progetto salva, qualunque strada l'abbia messa lì. Le strade, tutte nel browser (dal 6/10/2026):
+//  - metadati: GeoTIFF (geokey o ModelTransformation, più un .prj se i geokey non bastano) e world file
+//    (.jgw/.pgw/.tfw/.wld) con il suo .prj; senza .prj il sistema si stima dalle coordinate come per i DWG;
+//  - «Sposta / scala / ruota»: lo strumento transform dello SketchViewModel su un poligono-cornice legato ai 4
+//    angoli (la stessa via dell'esempio Esri sulle MediaLayer); «Angoli»: reshape dei soli vertici (prospettiva);
+//  - «Punti»: coppie punto sull'immagine → punto vero. 2 coppie = sposta, scala e ruota senza deformare (come
+//    l'allineamento dei DWG), 3 = affine, 4 o più = affine ai minimi quadrati oppure proiettiva, con i residui in
+//    metri. Le coppie restano nel progetto (im.cps) e si possono rifinire alla riapertura.
+// Le trasformazioni sono matrici 3×3 omogenee (h3*), dai pixel dell'immagine (origine in alto a sinistra, y verso
+// il basso) alle coordinate della vista. Prima del 6/10 c'erano solo 4 maniglie puntiformi da trascinare una alla
+// volta: spostare un'immagine di 50 m voleva dire deformarla quattro volte.
 var MAX_IMG_DIM=4096, MAX_IMG_MB=30, MAX_TIF_MB=100;
 var importedImages=[], imgHandlesGL=null, imgVM=null, imgEditing=null, _imgMods=null;
-var IMG_HANDLE_SYM={type:'simple-marker', style:'square', color:[255,255,255], size:12, outline:{color:[31,153,204], width:2}};
+var imgMode='transform', imgFrameG=null, imgPts=null, imgPtsGL=null, imgPop0=true;   // imgPop0: popup della vista prima della modifica (lo SketchVM li spegne durante l'update)
+var IMG_FRAME_SYM={type:'simple-fill', color:[31,153,204,0.04], outline:{color:[31,153,204], width:2, style:'short-dash'}};
+var IMG_EXT=/\.(png|jpe?g|tiff?|geotiff|pdf)$/i, IMG_WORLD=/\.(jgw|jpgw|jpegw|pgw|pngw|tfw|tifw|wld)$/i;
+var IMG_WKT_3857='PROJCS["WGS_1984_Web_Mercator_Auxiliary_Sphere",GEOGCS["GCS_WGS_1984",DATUM["D_WGS_1984",SPHEROID["WGS_1984",6378137.0,298.257223563]],PRIMEM["Greenwich",0.0],UNIT["Degree",0.0174532925199433]],PROJECTION["Mercator_Auxiliary_Sphere"],PARAMETER["False_Easting",0.0],PARAMETER["False_Northing",0.0],PARAMETER["Central_Meridian",0.0],PARAMETER["Standard_Parallel_1",0.0],PARAMETER["Auxiliary_Sphere_Type",0.0],UNIT["Meter",1.0]]';
+var PDFJS_URL='https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/';
 function imgMods(){ return _imgMods?Promise.resolve(_imgMods):new Promise(function(res){
   require(["esri/layers/MediaLayer","esri/layers/support/ImageElement","esri/layers/support/ControlPointsGeoreference","esri/Graphic","esri/layers/GraphicsLayer","esri/widgets/Sketch/SketchViewModel"],
     function(MediaLayer,ImageElement,CPG,Graphic,GraphicsLayer,SketchVM){ _imgMods={MediaLayer:MediaLayer,ImageElement:ImageElement,CPG:CPG,Graphic:Graphic,GraphicsLayer:GraphicsLayer,SketchVM:SketchVM}; res(_imgMods); });
@@ -6017,26 +6102,184 @@ function makeCorners(pxW,pxH){
   return [ {x:cx-w/2,y:cy+h/2,spatialReference:sr}, {x:cx+w/2,y:cy+h/2,spatialReference:sr},
            {x:cx+w/2,y:cy-h/2,spatialReference:sr}, {x:cx-w/2,y:cy-h/2,spatialReference:sr} ];
 }
+// ── matrici 3×3 omogenee (riga per riga): pixel → mappa ──
+function h3Ap(H,x,y){ var w=H[6]*x+H[7]*y+H[8]; return [(H[0]*x+H[1]*y+H[2])/w, (H[3]*x+H[4]*y+H[5])/w]; }
+function h3Mul(A,B){ var C=new Array(9); for(var i=0;i<3;i++) for(var j=0;j<3;j++) C[3*i+j]=A[3*i]*B[j]+A[3*i+1]*B[3+j]+A[3*i+2]*B[6+j]; return C; }
+function h3Inv(H){ if(!H) return null;
+  var a=H[0],b=H[1],c=H[2],d=H[3],e=H[4],f=H[5],g=H[6],h=H[7],i=H[8];
+  var A=e*i-f*h, B=-(d*i-f*g), C=d*h-e*g, det=a*A+b*B+c*C;
+  if(!isFinite(det)||Math.abs(det)<1e-18) return null;
+  return [A/det, -(b*i-c*h)/det, (b*f-c*e)/det, B/det, (a*i-c*g)/det, -(a*f-c*d)/det, C/det, -(a*h-b*g)/det, (a*e-b*d)/det]; }
+// sistema lineare n×n (Gauss con pivot): null se singolare
+function solveLin(A,b){ var n=b.length, M=A.map(function(r,i){ return r.concat([b[i]]); });
+  for(var c=0;c<n;c++){ var p=c; for(var r=c+1;r<n;r++) if(Math.abs(M[r][c])>Math.abs(M[p][c])) p=r;
+    if(Math.abs(M[p][c])<1e-12) return null; if(p!==c){ var t=M[p]; M[p]=M[c]; M[c]=t; }
+    for(var r2=0;r2<n;r2++){ if(r2===c) continue; var k=M[r2][c]/M[c][c]; if(!k) continue; for(var j=c;j<=n;j++) M[r2][j]-=k*M[c][j]; } }
+  return M.map(function(r,i){ return r[n]/r[i]; }); }
+function lsq(rows, rhs, n){   // minimi quadrati via equazioni normali
+  var A=[], b=[]; for(var i=0;i<n;i++){ A.push(new Array(n).fill(0)); b.push(0); }
+  rows.forEach(function(r,k){ for(var i=0;i<n;i++){ b[i]+=r[i]*rhs[k]; for(var j=0;j<n;j++) A[i][j]+=r[i]*r[j]; } });
+  return solveLin(A,b); }
+// normalizzazione (baricentro in 0, distanza media √2): tiene ben condizionate le equazioni, i pixel valgono migliaia e
+// le coordinate milioni. H = Td⁻¹ · Hn · Ts
+function h3Norm(pts){ var n=pts.length, cx=0, cy=0; pts.forEach(function(p){ cx+=p[0]; cy+=p[1]; }); cx/=n; cy/=n;
+  var m=0; pts.forEach(function(p){ m+=Math.hypot(p[0]-cx,p[1]-cy); }); m/=n; var s= m>0? Math.SQRT2/m : 1;
+  return {T:[s,0,-s*cx, 0,s,-s*cy, 0,0,1], Ti:[1/s,0,cx, 0,1/s,cy, 0,0,1]}; }
+function h3Fit(pairs, model){   // model: 'sim' (≥2), 'aff' (≥3), 'proj' (≥4) → H pixel→mappa, o null
+  var need={sim:2,aff:3,proj:4}[model]; if(!pairs||pairs.length<need) return null;
+  var S=h3Norm(pairs.map(function(p){ return [p.px,p.py]; })), D=h3Norm(pairs.map(function(p){ return [p.x,p.y]; }));
+  var P=pairs.map(function(p){ var s=h3Ap(S.T,p.px,p.py), d=h3Ap(D.T,p.x,p.y); return {x:s[0], y:s[1], X:d[0], Y:d[1]}; }), Hn=null, v;
+  if(model==='sim'){   // X = a x + b y + c, Y = b x − a y + d: rotazione e scala, con il ribaltamento che porta la y dei pixel verso l'alto
+    var rows=[], rhs=[]; P.forEach(function(p){ rows.push([p.x,p.y,1,0]); rhs.push(p.X); rows.push([-p.y,p.x,0,1]); rhs.push(p.Y); });
+    v=lsq(rows,rhs,4); if(!v) return null; Hn=[v[0],v[1],v[2], v[1],-v[0],v[3], 0,0,1]; }
+  else if(model==='aff'){ var rx=P.map(function(p){ return [p.x,p.y,1]; });
+    var u=lsq(rx, P.map(function(p){ return p.X; }), 3), w=lsq(rx, P.map(function(p){ return p.Y; }), 3); if(!u||!w) return null;
+    Hn=[u[0],u[1],u[2], w[0],w[1],w[2], 0,0,1]; }
+  else { var r2=[], h2=[]; P.forEach(function(p){ r2.push([p.x,p.y,1,0,0,0,-p.x*p.X,-p.y*p.X]); h2.push(p.X); r2.push([0,0,0,p.x,p.y,1,-p.x*p.Y,-p.y*p.Y]); h2.push(p.Y); });
+    v=lsq(r2,h2,8); if(!v) return null; Hn=[v[0],v[1],v[2], v[3],v[4],v[5], v[6],v[7],1]; }
+  var H=h3Mul(D.Ti, h3Mul(Hn, S.T)); return H.every(isFinite)? H : null; }
+function imgCorners(im){ var cps=(im&&im.el&&im.el.georeference&&im.el.georeference.controlPoints)||[];
+  return cps.map(function(c){ var p=c.mapPoint||{}; return {x:p.x, y:p.y}; }); }
+function imgH(im){ var cs=imgCorners(im); if(cs.length<4) return null;
+  var q=[[0,0],[im.pxW,0],[im.pxW,im.pxH],[0,im.pxH]];
+  return h3Fit(cs.map(function(c,i){ return {px:q[i][0], py:q[i][1], x:c.x, y:c.y}; }), 'proj'); }
+function imgCornersFromH(H, pxW, pxH){ return [[0,0],[pxW,0],[pxW,pxH],[0,pxH]].map(function(q){ var p=h3Ap(H,q[0],q[1]); return {x:p[0], y:p[1]}; }); }
+function imgRingOk(cs){   // cornice convessa e non ripiegata: altrimenti la prospettiva non esiste
+  if(!cs||cs.length<4) return false; var sgn=0;
+  for(var i=0;i<4;i++){ var a=cs[i], b=cs[(i+1)%4], c=cs[(i+2)%4], z=(b.x-a.x)*(c.y-b.y)-(b.y-a.y)*(c.x-b.x);
+    if(!isFinite(z)||Math.abs(z)<1e-9) return false; var s=z>0?1:-1; if(sgn&&s!==sgn) return false; sgn=s; }
+  return true; }
+function mapMetres(d, y){   // distanza in unità della vista → metri (Web Mercator: ×cos lat)
+  try{ if(view.spatialReference.isWebMercator) return d*Math.cos(Math.atan(Math.sinh(y/6378137))); }catch(e){} return d; }
+function imgSetCorners(im, cs){ if(!im||!_imgMods||!cs||cs.length<4) return; var sr=view.spatialReference;
+  im.el.georeference=new _imgMods.CPG({controlPoints:[
+    {sourcePoint:{x:0,y:0},mapPoint:{x:cs[0].x,y:cs[0].y,spatialReference:sr}}, {sourcePoint:{x:im.pxW,y:0},mapPoint:{x:cs[1].x,y:cs[1].y,spatialReference:sr}},
+    {sourcePoint:{x:im.pxW,y:im.pxH},mapPoint:{x:cs[2].x,y:cs[2].y,spatialReference:sr}}, {sourcePoint:{x:0,y:im.pxH},mapPoint:{x:cs[3].x,y:cs[3].y,spatialReference:sr}}
+  ], width:im.pxW, height:im.pxH}); }
+function mapK(y){ return mapMetres(1, y); }   // metri per unità della vista alla latitudine di y
+function imgXYtoLL(x,y){ try{ if(view.spatialReference.isWebMercator) return esriMods.webMercatorUtils.xyToLngLat(x,y);
+    var p=esriMods.projection.project(new esriMods.Point({x:x, y:y, spatialReference:view.spatialReference}), {wkid:4326}); return [p.x,p.y]; }catch(e){ return null; } }
+// ── valori numerici (E): centro, rotazione antioraria in gradi, metri per pixel dell'originale ──
+function imgGeo(im){ var c=imgCorners(im); if(c.length<4) return null;
+  var cx=(c[0].x+c[1].x+c[2].x+c[3].x)/4, cy=(c[0].y+c[1].y+c[2].y+c[3].y)/4, k=mapK(cy);
+  var dx=c[1].x-c[0].x, dy=c[1].y-c[0].y, wM=Math.hypot(dx,dy)*k, hM=Math.hypot(c[3].x-c[0].x,c[3].y-c[0].y)*k;
+  return {cx:cx, cy:cy, rot:Math.atan2(dy,dx)*180/Math.PI, mpp:wM/(im.ow||im.pxW), wM:wM, hM:hM}; }
+function imgGeoApply(im, g){   // ricostruisce i 4 angoli come rettangolo: centro, rotazione, scala (la prospettiva si perde)
+  var k=mapK(g.cy), w=g.mpp*(im.ow||im.pxW)/k, h=g.mpp*(im.oh||im.pxH)/k, t=g.rot*Math.PI/180, cs=Math.cos(t), sn=Math.sin(t);
+  var R=function(x,y){ return {x:g.cx+x*cs-y*sn, y:g.cy+x*sn+y*cs}; };
+  var out=[R(-w/2,h/2), R(w/2,h/2), R(w/2,-h/2), R(-w/2,-h/2)]; if(!imgRingOk(out)) return false;
+  imgSetCorners(im, out); imgFrameSync(); return true; }
+function imgValsRefresh(){ var im=imgEditing, g=im&&imgGeo(im); if(!g||!$('imgRot')) return;
+  var fmt=function(v,d){ return isFinite(v)? String(+v.toFixed(d)) : ''; }, ll=imgXYtoLL(g.cx,g.cy)||[NaN,NaN];
+  $('imgRot').value=fmt(g.rot,2); $('imgMpp').value=fmt(g.mpp, g.mpp<0.01? 6 : 4); $('imgLon').value=fmt(ll[0],6); $('imgLat').value=fmt(ll[1],6);
+  if(im.dpi&&!$('imgDpi').value) $('imgDpi').value=Math.round(im.dpi); }
+function imgScaleCalc(){ var N=parseFloat($('imgScaleN').value), dpi=parseFloat($('imgDpi').value);
+  if(N>0&&dpi>0) $('imgMpp').value=String(+(N*0.0254/dpi).toPrecision(6)); }
+function imgValsApply(){ var im=imgEditing; if(!im) return; var g=imgGeo(im); if(!g) return;
+  var rot=parseFloat($('imgRot').value), mpp=parseFloat($('imgMpp').value), lon=parseFloat($('imgLon').value), lat=parseFloat($('imgLat').value);
+  if(isFinite(rot)) g.rot=rot; if(mpp>0) g.mpp=mpp;
+  if(isFinite(lon)&&isFinite(lat)){ var p=imgPtFromLL(lon,lat); if(p){ g.cx=p.x; g.cy=p.y; } }
+  try{ if(imgVM&&imgVM.state==='active') imgVM.cancel(); }catch(e){}
+  if(!imgGeoApply(im,g)){ msg('Valori non applicabili: scala o posizione non validi.','err'); return; }
+  im.cps=[]; if(imgPts){ imgPts.pairs=[]; imgPts.res=null; imgPtsDraw(); imgPtsUi(); } else imgStartUpdate();
+  imgValsRefresh(); }
+// ── PDF (F): resa in immagine nel browser con pdf.js (modulo ES, caricato con import() fuori dal loader AMD) ──
+async function pdfLib(){ if(window.__pdfjs) return window.__pdfjs;
+  var m=await import(PDFJS_URL+'pdf.min.mjs');
+  try{ var w=new Worker(URL.createObjectURL(new Blob(['import "'+PDFJS_URL+'pdf.worker.min.mjs";'],{type:'text/javascript'})), {type:'module'}); m.GlobalWorkerOptions.workerPort=w; }
+  catch(e){ m.GlobalWorkerOptions.workerSrc=PDFJS_URL+'pdf.worker.min.mjs'; }
+  window.__pdfjs=m; return m; }
+async function loadPDF(file, page){
+  var L=await pdfLib(), doc=await L.getDocument({data:await file.arrayBuffer()}).promise, n=doc.numPages, pg=page||1;
+  if(!page&&n>1){ var a=prompt('Il PDF ha '+n+' pagine: quale metto sulla mappa?','1'); if(a==null) throw new Error('annullato'); pg=Math.min(n, Math.max(1, parseInt(a,10)||1)); }
+  var p=await doc.getPage(Math.min(n, Math.max(1, pg))), v1=p.getViewport({scale:1});
+  var sc=Math.min(MAX_IMG_DIM/Math.max(v1.width,v1.height), 8), vp=p.getViewport({scale:sc});   // il lato lungo a 4096 px (72 dpi × scala)
+  var cv=document.createElement('canvas'); cv.width=Math.round(vp.width); cv.height=Math.round(vp.height);
+  await p.render({canvasContext:cv.getContext('2d'), viewport:vp}).promise;
+  try{ doc.destroy(); }catch(e){}
+  return {image:cv, w:cv.width, h:cv.height, ow:cv.width, oh:cv.height, corners:null, page:pg, pages:n, dpi:72*sc}; }
+// ── esporta con world file (H): originale + world file se la posizione è affine, altrimenti ricampionata nord-su ──
+function imgWarp(im){ var H=imgH(im), Hi=h3Inv(H), c=imgCorners(im); if(!Hi) return null;
+  var xs=c.map(function(p){ return p.x; }), ys=c.map(function(p){ return p.y; });
+  var xmin=Math.min.apply(null,xs), xmax=Math.max.apply(null,xs), ymin=Math.min.apply(null,ys), ymax=Math.max.apply(null,ys);
+  var res=Math.min(Math.hypot(c[1].x-c[0].x,c[1].y-c[0].y)/im.pxW, Math.hypot(c[3].x-c[0].x,c[3].y-c[0].y)/im.pxH);
+  var W=Math.ceil((xmax-xmin)/res), Hh=Math.ceil((ymax-ymin)/res), k=Math.max(1, Math.max(W,Hh)/MAX_IMG_DIM); res*=k;
+  W=Math.ceil((xmax-xmin)/res); Hh=Math.ceil((ymax-ymin)/res);
+  var src=im.el.image, sd=src.getContext('2d').getImageData(0,0,im.pxW,im.pxH).data, pw=im.pxW, ph=im.pxH;
+  var out=document.createElement('canvas'); out.width=W; out.height=Hh; var octx=out.getContext('2d'), od=octx.createImageData(W,Hh), dd=od.data;
+  for(var j=0;j<Hh;j++){ var Y=ymax-(j+0.5)*res;
+    for(var i=0;i<W;i++){ var X=xmin+(i+0.5)*res, w=Hi[6]*X+Hi[7]*Y+Hi[8], u=Math.floor((Hi[0]*X+Hi[1]*Y+Hi[2])/w), v=Math.floor((Hi[3]*X+Hi[4]*Y+Hi[5])/w);
+      if(u<0||v<0||u>=pw||v>=ph) continue; var s=4*(v*pw+u), d=4*(j*W+i); dd[d]=sd[s]; dd[d+1]=sd[s+1]; dd[d+2]=sd[s+2]; dd[d+3]=sd[s+3]; } }
+  octx.putImageData(od,0,0); return {canvas:out, world:[res,0,0,-res,xmin+res/2,ymax-res/2]}; }
+async function imgExportGeoref(im){ if(!im) return;
+  var H=imgH(im); if(!H){ msg('Immagine senza posizione valida.','err'); return; }
+  var base=im.name.replace(/\.[^.]+$/,'').normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^A-Za-z0-9]+/g,'_').replace(/^_+|_+$/g,'')||'immagine';
+  var ow=im.ow||im.pxW, oh=im.oh||im.pxH, Ho=h3Mul(H,[im.pxW/ow,0,0, 0,im.pxH/oh,0, 0,0,1]);   // pixel dell'originale → mappa
+  var affine=Math.abs(Ho[6])*ow<1e-4&&Math.abs(Ho[7])*oh<1e-4, isPdf=/\.pdf$/i.test(im.name), ext=(im.name.split('.').pop()||'png').toLowerCase();
+  var wext={jpg:'jgw',jpeg:'jgw',png:'pgw',tif:'tfw',tiff:'tfw',geotiff:'tfw'}[ext]||'wld';
+  var zip=new JSZip(), what, wf=function(M){ var c=h3Ap(M,0.5,0.5); return [M[0],M[3],M[1],M[4],c[0],c[1]].map(function(v){ return v.toPrecision(15); }).join('\n')+'\n'; };
+  msg('Preparo l\'immagine georiferita…');
+  if(affine&&im.file&&!isPdf&&!im._slp){ zip.file(im.file.name, im.file); zip.file(base+'.'+wext, wf(Ho)); what='l\'originale e il suo world file'; }
+  else if(affine){ zip.file(base+'.png', await new Promise(function(r){ im.el.image.toBlob(r,'image/png'); })); zip.file(base+'.pgw', wf(H)); what='l\'immagine resa (PNG) e il suo world file'; }
+  else { var wp=imgWarp(im); if(!wp){ msg('Posizione non esportabile.','err'); return; }
+    zip.file(base+'_nord.png', await new Promise(function(r){ wp.canvas.toBlob(r,'image/png'); })); zip.file(base+'_nord.pgw', wp.world.map(function(v){ return v.toPrecision(15); }).join('\n')+'\n');
+    what='l\'immagine ricampionata verso nord (la posizione era in prospettiva) e il suo world file'; }
+  zip.file(base+(affine? '' : '_nord')+'.prj', IMG_WKT_3857);
+  var blob=await zip.generateAsync({type:'blob'}); dlBlob(base+'_georef.zip', blob);
+  msg('Scaricato «'+base+'_georef.zip» nei Download: '+what+', in Web Mercator (.prj incluso).','ok'); }
+// ── scheda trascinabile: posizione ricordata nel browser, dentro la mappa ──
+var IMG_CARD_KEY='axpo_img_card';
+function imgCardPlace(){ var tb=$('imgToolbar'), wrap=$('mapWrap'); if(!tb||!wrap) return; var pos=null;
+  try{ pos=JSON.parse(localStorage.getItem(IMG_CARD_KEY)||'null'); }catch(e){}
+  var W=wrap.clientWidth, Hh=wrap.clientHeight, w=tb.offsetWidth||330, h=tb.offsetHeight||300;
+  var l= pos&&isFinite(pos.l)? pos.l : 64, t= pos&&isFinite(pos.t)? pos.t : 12;
+  l=Math.max(0, Math.min(l, W-Math.min(w,W))); t=Math.max(0, Math.min(t, Hh-Math.min(h,Hh)));
+  tb.style.left=l+'px'; tb.style.top=t+'px'; }
+function imgCardDrag(){ var h=$('imgCardH'), tb=$('imgToolbar'); if(!h||!tb) return; var st=null;
+  h.addEventListener('pointerdown', function(e){ if(e.button!==0||e.target.closest('button')) return;
+    st={x:e.clientX, y:e.clientY, l:tb.offsetLeft, t:tb.offsetTop}; try{ h.setPointerCapture(e.pointerId); }catch(x){} e.preventDefault(); });
+  h.addEventListener('pointermove', function(e){ if(!st) return; var wrap=$('mapWrap'), W=wrap.clientWidth, Hh=wrap.clientHeight;
+    var l=Math.max(0, Math.min(st.l+e.clientX-st.x, W-tb.offsetWidth)), t=Math.max(0, Math.min(st.t+e.clientY-st.y, Hh-40));
+    tb.style.left=l+'px'; tb.style.top=t+'px'; });
+  var end=function(){ if(!st) return; st=null; try{ localStorage.setItem(IMG_CARD_KEY, JSON.stringify({l:tb.offsetLeft, t:tb.offsetTop})); }catch(e){} };
+  h.addEventListener('pointerup', end); h.addEventListener('pointercancel', end); }
+// ── lettura dei file ──
 function loadPlainImage(file){ return new Promise(function(res,rej){
   var url=URL.createObjectURL(file), img=new Image();
   img.onload=function(){
     var sc=Math.min(1, MAX_IMG_DIM/Math.max(img.naturalWidth,img.naturalHeight));
     var w=Math.max(1,Math.round(img.naturalWidth*sc)), h=Math.max(1,Math.round(img.naturalHeight*sc));
     var cv=document.createElement('canvas'); cv.width=w; cv.height=h; cv.getContext('2d').drawImage(img,0,0,w,h);
-    URL.revokeObjectURL(url); res({image:cv, w:w, h:h, corners:null});
+    URL.revokeObjectURL(url); res({image:cv, w:w, h:h, ow:img.naturalWidth, oh:img.naturalHeight, corners:null});
   };
   img.onerror=function(){ URL.revokeObjectURL(url); rej(new Error('immagine non leggibile')); };
   img.src=url;
 }); }
-async function bboxToViewCorners(bbox, epsg){
-  await esriMods.projection.load();
-  var sr = epsg? {wkid:epsg} : {wkid:4326};
-  function mk(x,y){ var p=new esriMods.Point({x:x,y:y,spatialReference:sr}); return esriMods.projection.project(p, view.spatialReference); }
-  var tl=mk(bbox[0],bbox[3]), tr=mk(bbox[2],bbox[3]), br=mk(bbox[2],bbox[1]), bl=mk(bbox[0],bbox[1]);
-  if(!tl||!tr||!br||!bl) return null;
-  return [tl,tr,br,bl];
-}
-async function loadGeoTIFF(file){
+async function imgProjCorners(pts, sr){   // 4 [x,y] nel sistema sr ({wkid} o {wkt}) → punti nella vista, o null
+  await esriMods.projection.load(); var out=[];
+  for(var i=0;i<pts.length;i++){ var p=null;
+    try{ p=esriMods.projection.project(new esriMods.Point({x:pts[i][0], y:pts[i][1], spatialReference:sr}), view.spatialReference); }catch(e){ p=null; }
+    if(!p||!isFinite(p.x)) return null; out.push(p); }
+  return out; }
+async function bboxToViewCorners(bbox, epsg){ return imgProjCorners([[bbox[0],bbox[3]],[bbox[2],bbox[3]],[bbox[2],bbox[1]],[bbox[0],bbox[1]]], {wkid:epsg||4326}); }
+async function imgGuessSR(x, y){   // senza .prj: gradi, oppure il sistema stimato dalle coordinate (come per i DWG)
+  if(Math.abs(x)<=180&&Math.abs(y)<=90) return {sr:{wkid:4326}, label:'WGS 84 (gradi)', amb:false};
+  try{ await cadMods(); await esriMods.projection.load(); var est=await srEstimate(x, y, {scales:[1]});
+    if(est&&est.best&&est.best.s) return {sr:{wkid:est.best.s.wkid}, label:est.best.s.label, amb:!!est.amb}; }catch(e){}
+  return null; }
+async function imgWorldCorners(worldFile, prjFile, ow, oh){
+  var v=(await worldFile.text()).split(/[\r\n]+/).map(function(s){ return s.trim(); }).filter(Boolean).slice(0,6).map(function(s){ return parseFloat(s.replace(',','.')); });
+  if(v.length<6||v.some(function(x){ return !isFinite(x); })) throw new Error('world file non leggibile: servono 6 numeri, uno per riga');
+  var A=v[0], D=v[1], B=v[2], E=v[3], C=v[4], F=v[5];   // il file: A, D, B, E, C, F (C,F = centro del pixel in alto a sinistra)
+  var px=function(c,r){ return [A*c+B*r+C, D*c+E*r+F]; };
+  var pts=[px(-0.5,-0.5), px(ow-0.5,-0.5), px(ow-0.5,oh-0.5), px(-0.5,oh-0.5)], sr=null, how='world file';
+  if(prjFile){ var w=(await prjFile.text()).trim(); if(w){ sr={wkt:w}; how+=' e .prj'; } }
+  if(!sr){ var g=await imgGuessSR(pts[0][0], pts[0][1]);
+    if(!g) throw new Error('world file senza .prj e coordinate non riconosciute: seleziona anche il .prj');
+    sr=g.sr; how+=', sistema stimato '+g.label+(g.amb? ' (incerto: se è sbagliato seleziona anche il .prj)' : ''); }
+  var cs=await imgProjCorners(pts, sr); if(!cs) throw new Error('sistema di coordinate del .prj non riconosciuto');
+  return {corners:cs, how:how}; }
+async function loadGeoTIFF(file, aux){
   if(typeof GeoTIFF==='undefined') throw new Error('libreria GeoTIFF non caricata');
   var ab=await file.arrayBuffer();
   var tiff=await GeoTIFF.fromArrayBuffer(ab), image=await tiff.getImage();
@@ -6058,14 +6301,18 @@ async function loadGeoTIFF(file){
     for(i=0;i<N;i++){ var g=(Bb[i]-mn)/rng*255; d[4*i]=d[4*i+1]=d[4*i+2]=g; d[4*i+3]=255; }
   }
   ctx.putImageData(idata,0,0);
-  var corners=null;
-  try{ var bbox=image.getBoundingBox(); var keys=image.getGeoKeys()||{};
-    var epsg=keys.ProjectedCSTypeGeoKey||keys.GeographicTypeGeoKey||null;
-    corners=await bboxToViewCorners(bbox, epsg);
+  var corners=null, how='';
+  try{ var fd=image.getFileDirectory()||{}, keys=image.getGeoKeys()||{}, epsg=keys.ProjectedCSTypeGeoKey||keys.GeographicTypeGeoKey||null;
+    var sr= (epsg&&epsg!==32767)? {wkid:epsg} : null, pts, mt=fd.ModelTransformation;
+    if(!sr&&aux&&aux.prj){ var wk=(await aux.prj.text()).trim(); if(wk) sr={wkt:wk}; }
+    if(mt&&mt.length>=16){ pts=[[0,0],[fw,0],[fw,fh],[0,fh]].map(function(q){ return [mt[0]*q[0]+mt[1]*q[1]+mt[3], mt[4]*q[0]+mt[5]*q[1]+mt[7]]; }); how='GeoTIFF (con rotazione)'; }
+    else { var bb=image.getBoundingBox(); pts=[[bb[0],bb[3]],[bb[2],bb[3]],[bb[2],bb[1]],[bb[0],bb[1]]]; how='GeoTIFF'; }
+    if(!sr){ var gs=await imgGuessSR(pts[0][0], pts[0][1]); if(gs){ sr=gs.sr; how+=', sistema stimato '+gs.label+(gs.amb? ' (incerto: se è sbagliato seleziona anche il .prj)' : ''); } }
+    if(sr) corners=await imgProjCorners(pts, sr);
   }catch(e){ corners=null; }
-  return {image:cv, w:outW, h:outH, corners:corners};
+  return {image:cv, w:outW, h:outH, ow:fw, oh:fh, corners:corners, how:corners? how : ''};
 }
-async function createGeorefImage(image, pxW, pxH, name, corners, noEdit){   // noEdit: riapertura da progetto, senza maniglie
+async function createGeorefImage(image, pxW, pxH, name, corners, noEdit, extra){   // noEdit: riapertura da progetto o DTM, senza cornice; extra: file, ow/oh, pagina e dpi, prima che si apra la scheda
   var M=await imgMods();
   var cs = corners || makeCorners(pxW,pxH);
   function cp(){ return [ {sourcePoint:{x:0,y:0},mapPoint:cs[0]}, {sourcePoint:{x:pxW,y:0},mapPoint:cs[1]},
@@ -6073,36 +6320,147 @@ async function createGeorefImage(image, pxW, pxH, name, corners, noEdit){   // n
   var el=new M.ImageElement({image:image, georeference:new M.CPG({controlPoints:cp(), width:pxW, height:pxH})});
   var ml=new M.MediaLayer({source:[el], title:name, opacity:0.85});
   view.map.add(ml,0);
-  var im={name:name, layer:ml, el:el, pxW:pxW, pxH:pxH};
-  importedImages.push(im); renderGeoms(); if(!noEdit) editImage(im, cs); return im;
+  var im=Object.assign({name:name, layer:ml, el:el, pxW:pxW, pxH:pxH, cps:[]}, extra||{});
+  importedImages.push(im); renderGeoms(); if(!noEdit) editImage(im); return im;
 }
-async function editImage(im, cornersOverride){
+// ── modifica: cornice + SketchViewModel ──
+async function editImage(im){
   var M=await imgMods();
+  if(imgEditing&&imgEditing!==im) imgDone();
   if(!imgHandlesGL){ imgHandlesGL=new M.GraphicsLayer({title:'__img_handles', listMode:'hide'}); view.map.add(imgHandlesGL); }
   if(!imgVM){ imgVM=new M.SketchVM({view:view, layer:imgHandlesGL, updateOnGraphicClick:true,
-      defaultUpdateOptions:{tool:'move', enableRotation:false, enableScaling:false, toggleToolOnClick:false, multipleSelectionEnabled:false}});
-    imgVM.on('update', function(){ updateGeorefFromHandles(); }); }
-  imgEditing=im; imgHandlesGL.removeAll();
-  var cps=(im.el.georeference&&im.el.georeference.controlPoints)||[];
-  var corners = cornersOverride || cps.map(function(c){ return c.mapPoint; });
-  [0,1,2,3].forEach(function(i){ var p=corners[i]; if(!p) return;
-    var geom = (p.x!==undefined)?{type:'point',x:p.x,y:p.y,spatialReference:p.spatialReference||view.spatialReference}:p;
-    imgHandlesGL.add(new M.Graphic({geometry:geom, attributes:{corner:i}, symbol:IMG_HANDLE_SYM})); });
+      defaultUpdateOptions:{tool:'transform', enableRotation:true, enableScaling:true, preserveAspectRatio:true, toggleToolOnClick:false, multipleSelectionEnabled:false}});
+    try{ imgVM.snappingOptions={enabled:true, selfEnabled:false, featureEnabled:true, featureSources:[{layer:gl},{layer:toolsGL}]}; }catch(e){}
+    imgVM.on('update', imgOnUpdate); }
+  imgWire();
+  if(imgPts) imgPtsEnd(false);
+  if(!imgEditing){ im._sk=sketchClickPause(); imgPop0=view.popupEnabled; }   // un clic sulla cornice non deve aprire anche la modifica di un disegno sotto
+  imgEditing=im; im._cs0=imgCorners(im);        // per «Ripristina»
+  imgFrameMake(imgCorners(im));
   var tb=$('imgToolbar'); if(tb){ tb.style.display='flex'; $('imgTbName').textContent=im.name;
-    $('imgOpacity').value=Math.round((im.layer.opacity==null?0.85:im.layer.opacity)*100); }
-  try{ view.goTo(imgHandlesGL.graphics.toArray()).catch(function(){}); }catch(e){}
+    $('imgOpacity').value=Math.round((im.layer.opacity==null?0.85:im.layer.opacity)*100);
+    $('imgScaleN').value=''; $('imgDpi').value= im.dpi? String(Math.round(im.dpi)) : ''; imgCardPlace(); imgValsRefresh(); }
+  imgModeSet(imgMode==='points'? 'transform' : imgMode);
+  try{ view.goTo(imgFrameG.geometry.extent.expand(1.4)).catch(function(){}); }catch(e){}
 }
-function updateGeorefFromHandles(){
-  if(!imgEditing||!imgHandlesGL||!_imgMods) return;
-  var hs={}; imgHandlesGL.graphics.forEach(function(g){ hs[g.attributes.corner]=g.geometry; });
-  if(hs[0]&&hs[1]&&hs[2]&&hs[3]){ var im=imgEditing;
-    im.el.georeference = new _imgMods.CPG({controlPoints:[
-      {sourcePoint:{x:0,y:0},mapPoint:hs[0]}, {sourcePoint:{x:im.pxW,y:0},mapPoint:hs[1]},
-      {sourcePoint:{x:im.pxW,y:im.pxH},mapPoint:hs[2]}, {sourcePoint:{x:0,y:im.pxH},mapPoint:hs[3]}
-    ], width:im.pxW, height:im.pxH}); }
-}
-function imgDone(){ if(imgHandlesGL) imgHandlesGL.removeAll(); imgEditing=null;
-  var tb=$('imgToolbar'); if(tb) tb.style.display='none'; try{ imgVM&&imgVM.cancel(); }catch(e){} }
+function imgFrameMake(cs){ if(!imgHandlesGL||!_imgMods) return; imgHandlesGL.removeAll();
+  imgFrameG=new _imgMods.Graphic({geometry:imgFrameGeom(cs), symbol:IMG_FRAME_SYM, attributes:{img:1}}); imgHandlesGL.add(imgFrameG); }
+function imgFrameGeom(cs){ var r=cs.map(function(p){ return [p.x,p.y]; }); r.push([cs[0].x,cs[0].y]); return {type:'polygon', rings:[r], spatialReference:view.spatialReference}; }
+function imgFrameSync(){ if(imgFrameG&&imgEditing) imgFrameG.geometry=imgFrameGeom(imgCorners(imgEditing)); }
+function imgOnUpdate(e){
+  if(!imgEditing||!imgFrameG||e.aborted) return; var g=e.graphics&&e.graphics[0]; if(g!==imgFrameG||!g.geometry) return;
+  var r=g.geometry.rings&&g.geometry.rings[0]; if(!r||r.length<4) return;
+  var cs=r.slice(0,4).map(function(q){ return {x:q[0], y:q[1]}; });
+  if(!imgRingOk(cs)) return;   // cornice ripiegata: l'immagine resta dov'era, la cornice torna al suo posto al prossimo avvio
+  imgSetCorners(imgEditing, cs); if(imgPts) imgPtsDraw(); if(e.state==='complete') imgValsRefresh(); }
+function imgStartUpdate(){ if(!imgFrameG||!imgVM||imgMode==='points') return;
+  try{ if(imgVM.state==='active') imgVM.cancel(); }catch(e){} imgFrameSync();
+  var o= imgMode==='reshape'
+    ? {tool:'reshape', reshapeOptions:{edgeOperation:'none', shapeOperation:'none', vertexOperation:'move'}, toggleToolOnClick:false}
+    : {tool:'transform', enableRotation:true, enableScaling:true, preserveAspectRatio:!!($('imgLock')&&$('imgLock').checked), toggleToolOnClick:false};
+  try{ imgVM.update([imgFrameG], o); }catch(e){ console.warn('[immagine] modifica non avviata:', e&&e.message); } }
+function imgModeSet(mode){ imgMode=mode;
+  [['imgModeT','transform'],['imgModeR','reshape'],['imgModeP','points']].forEach(function(p){ var b=$(p[0]); if(b) b.setAttribute('aria-pressed', mode===p[1]? 'true':'false'); });
+  var lk=$('imgLock'); if(lk) lk.disabled=mode!=='transform';
+  if(mode==='points') imgPtsStart(); else { if(imgPts) imgPtsEnd(false); imgStartUpdate(); } }
+function imgReset(){ var im=imgEditing; if(!im||!im._cs0||im._cs0.length<4) return;
+  try{ if(imgVM&&imgVM.state==='active') imgVM.cancel(); }catch(e){}
+  imgSetCorners(im, im._cs0); imgFrameSync(); if(imgPts){ imgPtsDraw(); imgPtsUi(); } else imgStartUpdate(); imgValsRefresh(); }
+function imgKey(e){ if(!imgEditing) return; var t=e.target; if(t&&/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)) return;
+  if(e.key==='Escape'){ if(imgPts){ e.preventDefault(); if(imgPts.pend){ imgPts.pend=null; imgPtsDraw(); imgPtsUi(); } else imgModeSet('transform'); } return; }
+  if(imgPts) return;
+  var d={ArrowLeft:[-1,0],ArrowRight:[1,0],ArrowUp:[0,1],ArrowDown:[0,-1]}[e.key]; if(!d) return; e.preventDefault();
+  var k=(e.shiftKey?10:1)*view.resolution, cs=imgCorners(imgEditing).map(function(p){ return {x:p.x+d[0]*k, y:p.y+d[1]*k}; });
+  imgSetCorners(imgEditing, cs); imgStartUpdate(); imgValsRefresh(); }
+function imgWire(){ if(imgWire.done) return; imgWire.done=true;
+  var on0=function(id,ev,fn){ var el=$(id); if(el) el['on'+ev]=fn; };
+  on0('imgCardClose','click',function(){ imgDone(); });
+  on0('imgValApply','click',imgValsApply); on0('imgScaleN','input',imgScaleCalc); on0('imgDpi','input',imgScaleCalc);
+  on0('imgExport','click',function(){ if(imgEditing) imgExportGeoref(imgEditing).catch(function(e){ msg('Export non riuscito: '+((e&&e.message)||e),'err'); }); });
+  imgCardDrag();
+  var on=function(id,ev,fn){ var el=$(id); if(el) el['on'+ev]=fn; };
+  on('imgModeT','click',function(){ imgModeSet('transform'); }); on('imgModeR','click',function(){ imgModeSet('reshape'); }); on('imgModeP','click',function(){ imgModeSet('points'); });
+  on('imgLock','change',function(){ if(imgMode==='transform') imgStartUpdate(); });
+  on('imgReset','click',imgReset);
+  on('imgPtsModel','change',function(){ if(imgPts){ imgPtsFit(); imgPtsDraw(); imgPtsUi(); } });
+  on('imgPtsClear','click',function(){ if(imgPts){ imgPts.pairs=[]; imgPts.pend=null; imgPts.res=null; imgPts.im.cps=[]; imgPtsDraw(); imgPtsUi(); } });
+  document.addEventListener('keydown', imgKey); }
+function imgDone(){ if(imgPts) imgPtsEnd(false);
+  try{ imgVM&&imgVM.cancel(); }catch(e){} if(imgHandlesGL) imgHandlesGL.removeAll(); imgFrameG=null;
+  if(imgEditing){ sketchClickResume(imgEditing._sk); imgEditing._sk=null; try{ view.popupEnabled=imgPop0; }catch(e){} } imgEditing=null;
+  var tb=$('imgToolbar'); if(tb) tb.style.display='none'; }
+// ── punti di controllo ──
+function imgPtFromLL(lon,lat){ var p=new esriMods.Point({longitude:lon, latitude:lat});
+  try{ if(view.spatialReference.isWebMercator) return esriMods.webMercatorUtils.geographicToWebMercator(p); return esriMods.projection.project(p, view.spatialReference); }catch(e){ return p; } }
+function imgPtsStart(){ var im=imgEditing; if(!im||imgPts) return;
+  try{ if(imgVM&&imgVM.state==='active') imgVM.cancel(); }catch(e){} imgFrameSync();
+  try{ cadModesOff(); }catch(e){} try{ gpPickEnd(); }catch(e){} try{ if(typeof cadAlignOn==='function'&&cadAlignOn()) cadAlignEnd(false); }catch(e){}
+  if(!imgPtsGL) imgPtsGL=new _imgMods.GraphicsLayer({title:'__img_points', listMode:'hide'}); view.map.add(imgPtsGL);
+  imgPts={im:im, pairs:(im.cps||[]).map(function(p){ return {px:p.px, py:p.py, x:p.x, y:p.y}; }), pend:null, hover:null, res:null,
+    uog:imgVM.updateOnGraphicClick, cursor:view.container.style.cursor, tgt:[]};
+  try{ imgPts.tgt=cadAlignTargets(null); }catch(e){}
+  imgVM.updateOnGraphicClick=false; view.popupEnabled=false; view.container.style.cursor='crosshair';
+  imgPts.hClick=view.on('click', imgPtsClick); imgPts.hMove=view.on('pointer-move', imgPtsMove);
+  var box=$('imgPts'); if(box) box.hidden=false;
+  imgPtsFit(true); imgPtsDraw(); imgPtsUi(); }
+function imgPtsEnd(restart){ var a=imgPts; if(!a) return; imgPts=null;
+  try{ a.hClick.remove(); a.hMove.remove(); }catch(e){}
+  view.popupEnabled=imgPop0; view.container.style.cursor=a.cursor||''; if(imgVM) imgVM.updateOnGraphicClick=a.uog;
+  if(imgPtsGL){ imgPtsGL.removeAll(); try{ view.map.remove(imgPtsGL); }catch(e){} }
+  var box=$('imgPts'); if(box) box.hidden=true;
+  if(restart) imgStartUpdate(); }
+function imgPtsModel(n){ var m=($('imgPtsModel')||{}).value||'auto'; if(m!=='auto') return m; return n<=2? 'sim' : 'aff'; }
+var IMG_MODEL_TXT={sim:'sposta, scala e ruota', aff:'affine', proj:'proiettiva'};
+function imgPtsFit(quiet){   // ricalcola la posizione dalle coppie; quiet: all'apertura, senza toccare l'immagine se non cambia nulla
+  var a=imgPts; if(!a) return; var n=a.pairs.length, m=imgPtsModel(n), need={sim:2,aff:3,proj:4}[m];
+  a.pairs.forEach(function(p){ delete p.d; });
+  if(n<need){ a.res= n? {wait:need-n, model:m} : null; return; }
+  var H=h3Fit(a.pairs, m); if(!H){ a.res={err:'Punti allineati o coincidenti: scegline altri.'}; return; }
+  var cs=imgCornersFromH(H, a.im.pxW, a.im.pxH); if(!imgRingOk(cs)){ a.res={err:'La trasformazione ripiega l\'immagine: controlla le coppie di punti.'}; return; }
+  if(!quiet){ imgSetCorners(a.im, cs); imgFrameSync(); imgValsRefresh(); }
+  var s2=0; a.pairs.forEach(function(p){ var q=h3Ap(H,p.px,p.py), d=Math.hypot(q[0]-p.x, q[1]-p.y); p.d=mapMetres(d, p.y); s2+=p.d*p.d; });
+  a.res={model:m, rms:Math.sqrt(s2/n), n:n, over:n>need};
+  a.im.cps=a.pairs.map(function(p){ return {px:p.px, py:p.py, x:p.x, y:p.y}; }); }
+function imgPtsMove(e){ var a=imgPts; if(!a||!a.pend||imgPtsMove.raf) return;
+  imgPtsMove.raf=requestAnimationFrame(function(){ imgPtsMove.raf=0; var b=imgPts; if(!b||!b.pend) return;
+    var mp=view.toMap({x:e.x, y:e.y}); if(!mp||mp.longitude==null) return;
+    var sn=cadSnap(mp.longitude, mp.latitude, b.tgt), k=sn? sn.join(',') : ''; if(k===(b.hover||'')) return; b.hover=k; imgPtsDraw(); }); }
+function imgPtsClick(e){ var a=imgPts; if(!a||!e.mapPoint) return; e.stopPropagation(); var mp=e.mapPoint;
+  if(!a.pend){   // 1) un punto sull'immagine → pixel, tramite l'inversa della posizione attuale
+    var inside=false; try{ inside=esriMods.geometryEngine.contains(imgFrameG.geometry, mp); }catch(x){}
+    if(!inside){ a.res={err:'Il primo clic di ogni coppia va sull\'immagine.'}; imgPtsUi(); return; }
+    var Hi=h3Inv(imgH(a.im)); if(!Hi){ a.res={err:'Posizione dell\'immagine degenere: premi Ripristina.'}; imgPtsUi(); return; }
+    var q=h3Ap(Hi, mp.x, mp.y); a.pend={px:q[0], py:q[1]}; a.res=null; }
+  else {         // 2) dove sta davvero: si aggancia ai vertici di particelle, disegni e DWG
+    var sn= mp.longitude!=null? cadSnap(mp.longitude, mp.latitude, a.tgt) : null, t= sn? imgPtFromLL(sn[0],sn[1]) : mp;
+    a.pairs.push({px:a.pend.px, py:a.pend.py, x:t.x, y:t.y, snap:!!sn}); a.pend=null; a.hover=null; imgPtsFit(); }
+  imgPtsDraw(); imgPtsUi(); }
+function imgPtsDraw(){ if(!imgPtsGL) return; imgPtsGL.removeAll(); var a=imgPts; if(!a) return;
+  var G=esriMods.Graphic, sr=view.spatialReference, out=[], H=imgH(a.im);
+  var mark=function(x,y,src,txt){ out.push(new G({geometry:{type:'point', x:x, y:y, spatialReference:sr}, symbol:{type:'simple-marker', style:src?'circle':'square', size:11, color:src?[229,72,77]:[45,190,126], outline:{color:[255,255,255], width:1.5}}}));
+    if(txt) out.push(new G({geometry:{type:'point', x:x, y:y, spatialReference:sr}, symbol:{type:'text', text:txt, color:[255,255,255], haloColor:[0,0,0,0.8], haloSize:1.5, xoffset:10, yoffset:8, font:{size:11, weight:'bold'}}})); };
+  a.pairs.forEach(function(p,i){ var s=H? h3Ap(H,p.px,p.py) : null;
+    if(s){ mark(s[0],s[1],true,String(i+1)); out.push(new G({geometry:{type:'polyline', paths:[[[s[0],s[1]],[p.x,p.y]]], spatialReference:sr}, symbol:{type:'simple-line', style:'dash', color:[255,200,69], width:1.5}})); }
+    mark(p.x,p.y,false,(i+1)+'′'); });
+  if(a.pend&&H){ var s2=h3Ap(H,a.pend.px,a.pend.py); mark(s2[0],s2[1],true,String(a.pairs.length+1)); }
+  if(a.hover){ var q=a.hover.split(',').map(Number), hp=imgPtFromLL(q[0],q[1]);
+    out.push(new G({geometry:hp, symbol:{type:'simple-marker', style:'circle', size:16, color:[0,0,0,0], outline:{color:[255,200,69], width:2}}})); }
+  imgPtsGL.addMany(out); }
+function imgPtsUi(){ var a=imgPts, step=$('imgPtsStep'), list=$('imgPtsList'), rms=$('imgPtsRms'); if(!a||!step) return;
+  var n=a.pairs.length, h;
+  if(a.pend) h='<b>'+(n+1)+'</b> · ora clicca <b>dove sta davvero</b> quel punto: ortofoto, catasto, particelle o disegni (si aggancia ai loro vertici). Esc annulla il punto.';
+  else h='<b>'+(n+1)+'</b> · clicca un <b>punto riconoscibile sull\'immagine</b> (uno spigolo, un incrocio)'+(n? '' : '. Con 2 coppie l\'immagine si sposta, si scala e si ruota; con 3 o più si corregge anche la deformazione.');
+  var r=a.res;
+  if(r&&r.err) h+='<br><span class="err">'+r.err+'</span>';
+  else if(r&&r.wait) h+='<br>Con il modello «'+IMG_MODEL_TXT[r.model]+'» servono ancora '+r.wait+(r.wait===1?' coppia':' coppie')+'.';
+  else if(r) h+='<br><b>Posizionata</b> ('+IMG_MODEL_TXT[r.model]+(r.over? ', minimi quadrati' : '')+')'+(r.over? ': scarto medio '+r.rms.toLocaleString('it-IT',{maximumFractionDigits:2})+' m' : '')+'. Aggiungi coppie per rifinire, o togline una dall\'elenco.';
+  step.innerHTML=h;
+  if(rms) rms.textContent='';
+  if(list){ list.innerHTML=''; a.pairs.forEach(function(p,i){ var row=document.createElement('div'); row.className='imgpt';
+    var t=document.createElement('span'); t.textContent=(i+1)+(p.d!=null? ' · scarto '+p.d.toLocaleString('it-IT',{maximumFractionDigits:2})+' m' : '')+(p.snap? ' · agganciato' : ''); row.appendChild(t);
+    var x=document.createElement('button'); x.type='button'; x.className='gact'; x.textContent='×'; x.title='Togli questa coppia';
+    x.onclick=function(){ a.pairs.splice(i,1); imgPtsFit(); imgPtsDraw(); imgPtsUi(); }; row.appendChild(x); list.appendChild(row); }); } }
+// ── elenco nella Raccolta e avvio ──
 function removeImage(im){ try{ view.map.remove(im.layer); }catch(e){}
   var i=importedImages.indexOf(im); if(i>=0) importedImages.splice(i,1);
   try{ if(im._slp) slpForget(im._slp); }catch(e){}   // il DTM delle pendenze porta via la sua griglia
@@ -6112,7 +6470,7 @@ function imgRow(im){
   row.appendChild(makeVisToggle(function(){ return !(im.layer&&im.layer.visible===false); }, function(on){ if(im.layer) im.layer.visible=on; row.classList.toggle('hidden',!on); try{ wireSectionTools(); }catch(x){} }));
   var nm=document.createElement('input'); nm.className='gname'; nm.spellcheck=false; nm.value=im.name; nm.title=im.name;
   nm.onchange=function(){ im.name=nm.value.trim()||im.name; im.layer.title=im.name; }; row.appendChild(nm);
-  var tag=document.createElement('span'); tag.className='gsub'; tag.textContent=im._slp? 'DTM' : 'immagine'; row.appendChild(tag);
+  var tag=document.createElement('span'); tag.className='gsub'; tag.textContent=im._slp? 'DTM' : 'immagine'+((im.cps||[]).length? ' · '+im.cps.length+' punti' : ''); row.appendChild(tag);
   var op=document.createElement('input'); op.type='number'; op.className='opnum'; op.min=0; op.max=100; op.step=5;
   op.title='Opacità (0-100%)'; op.setAttribute('aria-label','Opacità immagine in percentuale');
   op.value=Math.round((im.layer.opacity==null?0.85:im.layer.opacity)*100);
@@ -6123,8 +6481,8 @@ function imgRow(im){
   op.onkeydown=function(e){ if(e.key==='Enter'){ e.preventDefault(); applyOp(); op.blur(); } };
   row.appendChild(op);
   var suf=document.createElement('span'); suf.className='opsuf'; suf.textContent='%'; row.appendChild(suf);
-  var eb=document.createElement('button'); eb.className='gact'; eb.title='Riposiziona (angoli)'; eb.textContent='⤢';
-  eb.onclick=function(){ editImage(im); }; if(!im._slp) row.appendChild(eb);   // il DTM è già al suo posto: niente maniglie
+  var eb=document.createElement('button'); eb.className='gact'; eb.title='Riposiziona (sposta, scala, ruota, angoli, punti)'; eb.textContent='⤢';
+  eb.onclick=function(){ editImage(im); }; if(!im._slp) row.appendChild(eb);   // il DTM è già al suo posto: niente cornice
   var db=document.createElement('button'); db.className='gact'; db.title='Elimina'; db.textContent='×';
   db.onclick=function(){ removeImage(im); }; row.appendChild(db);
   return row;
@@ -6136,21 +6494,30 @@ function updateImportImages(){
   importedImages.forEach(function(im){ box.appendChild(imgRow(im)); });
   if(cnt) cnt.textContent=(parseInt(cnt.textContent,10)||0)+importedImages.length;
 }
+// Più file insieme: l'immagine con il suo world file e il suo .prj (stesso nome, estensione diversa)
 async function startImageFiles(files){
-  var arr=Array.prototype.slice.call(files); if(!arr.length) return;
-  for(var i=0;i<arr.length;i++){ await startOneImage(arr[i]); }
+  var arr=Array.prototype.slice.call(files||[]); if(!arr.length) return;
+  var base=function(n){ return n.replace(/\.[^.]+$/,'').toLowerCase(); };
+  var imgs=arr.filter(function(f){ return IMG_EXT.test(f.name); }), side=arr.filter(function(f){ return !IMG_EXT.test(f.name); });
+  for(var i=0;i<imgs.length;i++){ var f=imgs[i], b=base(f.name);
+    await startOneImage(f, {world:side.find(function(s){ return IMG_WORLD.test(s.name)&&base(s.name)===b; })||null,
+                           prj:side.find(function(s){ return /\.prj$/i.test(s.name)&&base(s.name)===b; })||null}); }
+  var lost=side.filter(function(s){ return !imgs.some(function(f){ return base(f.name)===base(s.name); }); }).map(function(s){ return s.name; });
+  if(lost.length) toolMsg('impMsg', (imgs.length? ($('impMsg').textContent||'')+' · ' : '')+'Senza la loro immagine: '+lost.join(', ')+' (seleziona insieme l\'immagine e i suoi file, con lo stesso nome).', imgs.length? 'ok' : 'err');
 }
-async function startOneImage(file){
+async function startOneImage(file, aux){
   var name=file.name, ext=(name.split('.').pop()||'').toLowerCase();
-  var isTif = ext==='tif'||ext==='tiff'||ext==='geotiff', mb=file.size/1048576;
+  var isTif = ext==='tif'||ext==='tiff'||ext==='geotiff', isPdf = ext==='pdf', mb=file.size/1048576;
   if(isTif && mb>MAX_TIF_MB){ toolMsg('impMsg','GeoTIFF troppo grande ('+mb.toFixed(0)+' MB > '+MAX_TIF_MB+').','err'); return; }
   if(!isTif && mb>MAX_IMG_MB){ toolMsg('impMsg','Immagine troppo grande ('+mb.toFixed(0)+' MB > '+MAX_IMG_MB+').','err'); return; }
-  toolMsg('impMsg','Carico '+name+'\u2026');
+  toolMsg('impMsg','Carico '+name+'…');
   try{
-    var r = isTif ? await loadGeoTIFF(file) : await loadPlainImage(file);
-    const im=await createGeorefImage(r.image, r.w, r.h, name, r.corners);
-    im.file=file;   // l'originale entra nel file di progetto
-    toolMsg('impMsg', name+(r.corners?' \u2014 posizionata dai metadati; ':' \u2014 ')+'trascina gli angoli, poi Fatto.', 'ok');
+    var r = isTif ? await loadGeoTIFF(file, aux) : isPdf ? await loadPDF(file) : await loadPlainImage(file), how=r.how||'', note='';
+    if(!r.corners&&aux&&aux.world){ try{ var w=await imgWorldCorners(aux.world, aux.prj, r.ow||r.w, r.oh||r.h); r.corners=w.corners; how=w.how; }catch(e){ note=' ('+((e&&e.message)||e)+')'; } }
+    // file: l'originale entra nel progetto; ow/oh: i pixel veri, per scala ed export; PDF: pagina e dpi della resa
+    const im=await createGeorefImage(r.image, r.w, r.h, name, r.corners, false,
+      Object.assign({file:file, ow:r.ow||r.w, oh:r.oh||r.h}, isPdf? {page:r.page, pages:r.pages, dpi:r.dpi} : {}));
+    toolMsg('impMsg', name+(isPdf? ' (pagina '+r.page+(r.pages>1? ' di '+r.pages : '')+', '+Math.round(r.dpi)+' dpi)' : '')+(r.corners? ' — posizionata da '+how+'.' : ' — al centro della mappa'+note+'.')+' Trascina la cornice, ridimensiona e ruota dalle maniglie, oppure usa Angoli, Punti o i Valori; poi Fatto.', 'ok');
   }catch(e){ toolMsg('impMsg', name+': '+((e&&e.message)||e), 'err'); }
 }
 // ══ FASE 4c: disegni CAD (DWG) ════════════════════════════════════════════
@@ -7631,13 +7998,17 @@ function baseGroundSet(){
       +'<li>Solo file .dwg (non .dxf), fino a 150 MB.</li></ul>'},
     img:{t:'Immagini sulla mappa', s:'Ortofoto, planimetrie e mappe scansionate sopra la cartografia.', h:
       '<h3>Come si usa</h3><ol>'
-      +'<li>Premi <b>Scegli un\'immagine</b>: PNG, JPG oppure GeoTIFF.</li>'
-      +'<li>Un <b>GeoTIFF</b> contiene le sue coordinate: si posiziona da solo.</li>'
-      +'<li>Una <b>foto o planimetria</b> (PNG, JPG) compare al centro della mappa con 4 maniglie agli angoli: trascina ogni angolo sul punto giusto, poi premi <b>Fatto</b>.</li>'
-      +'<li>La ritrovi nella <b>Raccolta</b>, sezione <b>Importati</b>: da lì cambi la trasparenza, la riposizioni (<b>⤢</b>) o la togli.</li></ol>'
+      +'<li>Premi <b>Scegli un\'immagine</b>: PNG, JPG, GeoTIFF oppure <b>PDF</b> (scegli la pagina; viene resa a 4096 pixel sul lato lungo). Se l\'immagine ha un <b>world file</b> (.jgw, .pgw, .tfw) e un <b>.prj</b>, selezionali insieme a lei: hanno lo stesso nome.</li>'
+      +'<li>Un <b>GeoTIFF</b> o un\'immagine con world file <b>si posiziona da sola</b>. Senza .prj il sistema di coordinate viene stimato: il messaggio lo dice.</li>'
+      +'<li>Una <b>foto o planimetria</b> senza coordinate compare al centro della mappa dentro una cornice. <b>Sposta / scala / ruota</b>: trascina la cornice, ridimensiona dalle maniglie (con «Proporzioni» resta in proporzione), ruota dalla maniglia in alto; le frecce della tastiera la spostano di un pixel (Maiusc: dieci). <b>Angoli</b>: trascina i 4 angoli uno per uno, anche in prospettiva. <b>Punti</b>: clicca un punto riconoscibile sull\'immagine e poi dove sta davvero (si aggancia ai vertici di particelle e disegni); con 2 coppie l\'immagine si sposta, si scala e si ruota, con 3 o più si corregge anche la deformazione e vedi lo scarto in metri di ogni coppia.</li>'
+      +'<li><b>Valori</b> (nella scheda): rotazione in gradi antiorari, metri per pixel — oppure scala del disegno e dpi, che li calcolano; per un PDF i dpi sono già quelli della resa — e centro in gradi. «Applica i valori» rimette l\'immagine dritta con quei numeri.</li>'
+      +'<li><b>World file</b>: scarica uno zip con l\'immagine, il world file e il .prj (Web Mercator), da aprire in QGIS o ArcGIS. Se la posizione è in prospettiva, l\'immagine viene prima ricampionata verso nord.</li>'
+      +'<li>Premi <b>Fatto</b>. «Ripristina» torna a com\'era quando hai aperto la scheda. La scheda si trascina dall\'intestazione e la posizione viene ricordata.</li>'
+      +'<li>La ritrovi nella <b>Raccolta</b>, sezione <b>Importati</b>: da lì cambi la trasparenza, la riposizioni (<b>⤢</b>) o la togli. Le coppie di punti restano con l\'immagine e nel progetto.</li></ol>'
       +'<h3>Da sapere</h3><ul>'
       +'<li>Le immagini vengono ridotte a 4096 pixel sul lato lungo, per non bloccare il browser.</li>'
       +'<li>Limiti: 30 MB per un\'immagine, 100 MB per un GeoTIFF.</li>'
+      +'<li>Con i punti, «Automatico» usa sposta/scala/ruota con 2 coppie e l\'affine dalla terza; «Proiettiva» serve per le foto prese di sbieco e vuole almeno 4 coppie.</li>'
       +'<li>Chiuso il browser l\'immagine non resta: per ritrovarla usa <b>💾 Salva progetto</b>, in alto.</li></ul>'},
     svc:{t:'Servizi web', s:'Layer da WMS, WFS e servizi ArcGIS, senza caricarli prima sul portale.', h:
       '<h3>Come si usa</h3><ol>'
@@ -8089,7 +8460,7 @@ function baseGroundSet(){
     {sel:'#sideRail', title:'Le schede a sinistra', body:"Il rail di icone: Ricerca particelle, Disegna, Geoprocessi, Importa dati. Cliccando l'icona già attiva, la sidebar si comprime a colonna. Gli strumenti sulla mappa stanno nel menu <b>Tools</b>, in basso a sinistra.", placement:'right'},
     {sel:'.tabpane[data-tab=disegno]', title:'Disegna', body:"Due passi: <b>1</b> cosa disegni (la categoria, con tipo e attributi), <b>2</b> con quale strumento (punto, linea, area, rettangolo e cerchio, anche con misure esatte), poi clicchi sulla mappa; ↶ ↷ annullano e ripetono. Sotto gli strumenti, <b>Ultimo disegno</b> ti porta alla sua riga nella Raccolta. Il <b>sito di lavoro</b>, facoltativo, è la riga in cima. <b>Copia</b> (anche parallela, per il rientro dai confini) è una scheda dei Geoprocessi; il percorso su strada è in <b>Tools</b>. In fondo, sempre in vista: <b>Misure esatte e aggancio</b> (<b>Tab</b> mentre disegni per scrivere angolo e distanza) e <b>Griglia</b> in metri, allineabile a un lato.", open:function(){openTab('disegno');}, placement:'right'},
     {sel:'.tabpane[data-tab=geoproc]', title:'Geoprocessi', body:"Tre passi, sempre nello stesso ordine. <b>1</b> Scegli gli oggetti e mettili in <b>A</b>: cliccandoli sulla mappa (👆), dalle righe spuntate nella Raccolta (☑) o per categoria. <b>2</b> Scegli cosa fare: ogni scheda dice su cosa lavora (solo aree, serve B) e si accende solo quando A va bene. <b>3</b> Parametri ed <b>Esegui</b>: sotto il pulsante leggi a che punto è, l'esito e dove trovare il risultato (Raccolta, sezione Geoprocessi). La <b>i</b> mostra un esempio disegnato.", open:function(){openTab('geoproc');}, placement:'right'},
-    {sel:'.tabpane[data-tab=import]', title:'Importa dati', body:"Quattro schede sempre aperte: <b>file di geometrie</b> (GeoJSON, KML, KMZ, Shapefile; quello di <b>Estrazione intestatari</b> si colora e si raggruppa per intestatario), <b>disegni CAD</b>, <b>immagini</b>, <b>servizi web</b> (WMS, WFS, ArcGIS REST); con il pannello largo si affiancano. La <b>i</b> spiega come funziona la scheda. Le <b>coordinate sconosciute</b> stanno nel menu Tools, sulla mappa.", open:function(){openTab('import');}, placement:'right'},
+    {sel:'.tabpane[data-tab=import]', title:'Importa dati', body:"Quattro schede sempre aperte: <b>file di geometrie</b> (GeoJSON, KML, KMZ, Shapefile; quello di <b>Estrazione intestatari</b> si colora e si raggruppa per intestatario), <b>disegni CAD</b>, <b>immagini</b> (GeoTIFF e world file da soli; le altre si spostano, scalano e ruotano, o si allineano con punti noti), <b>servizi web</b> (WMS, WFS, ArcGIS REST); con il pannello largo si affiancano. La <b>i</b> spiega come funziona la scheda. Le <b>coordinate sconosciute</b> stanno nel menu Tools, sulla mappa.", open:function(){openTab('import');}, placement:'right'},
     {sel:'#impCadBtn', title:'Disegni CAD (DWG)', body:"Carica un <b>DWG</b>: viene letto nel browser, senza uscire dal PC. Il <b>sistema di riferimento</b> è stimato dalle coordinate e lo confermi tu; layer e colori restano quelli del CAD, accendibili e ricolorabili dall'elenco sotto il pulsante. Se il disegno è in coordinate locali usa <b>📍 Posiziona a mano</b>: clicchi due punti del disegno e dove stanno davvero (si aggancia ai vertici di particelle, disegni e altri DWG). Il posizionamento viene ricordato per quel file.", open:function(){openTab('import'); window.impOpen&&window.impOpen('impSecCad');}, placement:'right'},
     {sel:'#toolCard', title:'Coordinate sconosciute', body:"Ti arrivano delle coordinate e non sai in che sistema sono — un decreto, un rilievo, una mail? Incollale qui: le provo nei sistemi usati in Italia (Gauss-Boaga, UTM, ED50…) e ti mostro <b>dove cadono</b>, anche con X e Y invertiti. Se sai già dove dovrebbero stare usa <b>📍 Dove dovrebbe stare</b>: clicchi il punto sulla mappa e i candidati vengono ordinati per <b>errore in metri</b>. Poi i punti (o l'area) finiscono negli Importati. Stessa strada per uno <b>shapefile senza .prj</b>: l'import lo passa qui.", open:function(){ window.toolOpen&&window.toolOpen('sr'); }, placement:'right'},
     {sel:'#actionIcons', title:'Raccolta, mappa e portale', body:"A destra, in tre gruppi: la <b>Raccolta</b> (tutto quello che hai raccolto, con il numero di oggetti); i pannelli della mappa: Layer (anche dal portale, con ricerca per nome e <b>filtro per attributo</b>; i layer aggiunti da te si tolgono dal menu …), Mappa di base, Segnalibri; e le azioni: Modifica AREAS COLLECTION e Stampa.", placement:'left'},
