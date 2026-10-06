@@ -306,6 +306,18 @@
   /* drawer con widget Esri */
   .wbox{margin-top:8px;min-height:60px}
   .wbox .esri-widget{background:transparent}
+  /* legenda (6/10): widget Legend dell'SDK sopra, blocco della Raccolta sotto */
+  #legendBox .esri-legend{background:transparent;padding:0}
+  #legendBox .esri-legend__service{padding:6px 0}
+  #legendBox .esri-legend__message{display:none}   /* al suo posto #legendMsg, che tiene conto anche dei WMS */
+  #legendWms .wmsleg{margin:6px 0} #legendWms .wmsleg b{display:block;font-size:12px;margin-bottom:3px} #legendWms img{max-width:100%;background:#fff;border-radius:4px}
+  .legloc{margin-top:8px} .legloc .empty{padding:8px 0;text-align:left}
+  .legrow{display:flex;align-items:center;gap:9px;font-size:12px;padding:3px 0}
+  .legrow .legsw{flex:none;width:15px;height:15px;border-radius:3px;border:1px solid rgba(0,0,0,.25);background:var(--c,#888)}
+  .legrow .legsw.line{height:4px;border-radius:2px;border:none}
+  .legrow .legsw.point{border-radius:50%}
+  .legrow .legsw.poly{background:color-mix(in srgb, var(--c,#888) 30%, transparent);border-color:var(--c,#888);border-width:2px}
+  .legrow span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap} .legrow small{color:var(--mut)}
   #editorBox .esri-editor__scroller{max-height:60vh}
 
   /* ══ RIORG 2026-07-24 FASE 1: schede SX + sezioni elenco DX ══ */
@@ -1451,6 +1463,16 @@
         <div class="thint" id="wmLayersNote" style="margin:-4px 0 8px"></div>
         <div id="layerListBox" class="wbox"></div>
       </div>
+      <div class="drawer" data-panel="legend">
+        <div class="tlab">Legenda dei layer accesi</div>
+        <div class="thint" style="margin:-4px 0 8px">I layer accesi, anche se fuori scala. Si aggiorna da sola.</div>
+        <div id="legendBox" class="wbox"></div>
+        <div id="legendWms"></div>
+        <div id="legendMsg" class="thint"></div>
+        <div id="legendNo" class="thint"></div>
+        <div class="tlab" style="margin-top:14px">Raccolta</div>
+        <div id="legendLocal" class="legloc"><div class="empty">Niente di acceso nella Raccolta.</div></div>
+      </div>
       <div class="drawer" data-panel="basemaps">
         <div class="tlab">Mappa di base</div>
         <div id="bmGalleryBox" class="wbox"></div>
@@ -1473,6 +1495,7 @@
       <button data-panel="elenco" id="rcAction" aria-label="Raccolta" title="Raccolta" aria-expanded="false"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="4" width="19" height="4.5" rx="1"/><path d="M4 8.5v10A1.5 1.5 0 0 0 5.5 20h13a1.5 1.5 0 0 0 1.5-1.5v-10"/><path d="M10 13h4"/></svg><span class="abadge" id="rcBadge" hidden>0</span></button>
       <span class="arsep" role="separator" aria-orientation="horizontal"></span>
       <button data-panel="layers" aria-label="Layer" title="Layer" aria-expanded="false"><span class="esri-icon-layers" aria-hidden="true"></span></button>
+      <button data-panel="legend" aria-label="Legenda" title="Legenda dei layer accesi" aria-expanded="false"><span class="esri-icon-legend" aria-hidden="true"></span></button>
       <button data-panel="basemaps" aria-label="Mappa di base" title="Mappa di base" aria-expanded="false"><span class="esri-icon-basemap" aria-hidden="true"></span></button>
       <button data-panel="bookmarks" aria-label="Segnalibri" title="Segnalibri" aria-expanded="false"><span class="esri-icon-bookmark" aria-hidden="true"></span></button>
       <span class="arsep" role="separator" aria-orientation="horizontal"></span>
@@ -1588,8 +1611,8 @@
       <li><b>Disegna</b> — due passi. <b>1</b> Cosa disegni: la <b>categoria</b> (area lorda, area netta, percorso di connessione, esclusione, infrastruttura lineare, ostacolo, accesso e punto di connessione, mitigazione, zona agricola, nota) con tipo e attributi. <b>2</b> Con quale strumento: punto, linea, area, rettangolo e cerchio, anche di misura esatta. Sotto, il riquadro <b>Ultimo disegno</b> porta alla sua riga nella Raccolta. Salvando sul portale ogni oggetto si lega da solo all'area di AREAS COLLECTION che tocca; il <b>sito di lavoro</b>, la riga in cima, serve solo a forzarla. Mentre disegni, <kbd>Tab</kbd> fa scrivere lunghezza e angolo del lato (anche come azimut). In fondo, sempre in vista, misure e aggancio e la griglia in metri. <kbd>Ctrl</kbd>+<kbd>Z</kbd> / <kbd>Ctrl</kbd>+<kbd>Y</kbd> annullano e ripetono. Un disegno cliccato sulla mappa si sposta e si rimodella.</li>
       <li><b>Geoprocessi</b> — tre passi. <b>1</b> Metti gli oggetti di partenza in <b>A</b>: dalla mappa, dalle righe spuntate nella Raccolta, o una categoria intera. <b>2</b> Scegli cosa fare tra le schede: Buffer, Unione, Contorno, Semplificazione, Ritaglio, Parte comune, Sottrai B da A e <b>Copia</b> (anche parallela, per i rientri dai confini); ogni scheda dice cosa le serve e si accende quando A va bene. <b>3</b> Parametri ed <b>Esegui</b>: sotto il pulsante leggi l'esito, e il risultato è nella Raccolta.</li>
       <li><b>Importa dati</b> — quattro schede sempre aperte: <b>file di geometrie</b> (GeoJSON, KML, KMZ, Shapefile; il GeoJSON di <b>Estrazione intestatari</b> si colora e si raggruppa per intestatario, e i nominativi restano fuori dal salvataggio automatico e dal portale), <b>disegni CAD</b> (DWG letti nel browser, con il sistema di coordinate proposto, oppure posizionati a mano con 2 punti), <b>immagini</b> (GeoTIFF e world file si posizionano da soli; le altre, PDF compresi, con sposta/scala/ruota, angoli, coppie di punti noti o valori numerici, e si scaricano con il world file) e <b>servizi web</b> (WMS, WFS e ArcGIS REST per indirizzo, senza creare item sul portale; il browser accetta solo servizi <b>https</b> che permettono la lettura da altri siti, CORS).</li>
-      <li><b>Rail destro</b> — in cima la <b>Raccolta</b>, con il numero di oggetti: tutto quello che hai raccolto (Particelle · Disegni · Geoprocessi · Importati; sotto le Particelle <b>Crea area lorda</b>, dalle spuntate o da tutte, e sotto i Disegni la spunta <b>Area netta automatica</b>: la lorda meno tutto ciò che taglia — esclusioni, fasce dei buffer, ostacoli, siepi e zone agricole — ricalcolata da sola, come in PV Predesign, con accanto il <b>rientro dal confine</b> in metri); ogni riga si rinomina, si colora, si nasconde e si <b>spunta</b> per usarla nei geoprocessi; da qui esporti e salvi sul portale. Sotto, i pannelli della mappa (Layer, Mappa di base, Segnalibri) e le azioni (Modifica AREAS, Stampa).</li>
-      <li><b>🗺 Mappa</b> (in alto) — la web map del portale in uso: la General Map o una Check Vincoli regionale, con ricerca per nome. Cambiarla non tocca particelle, disegni e risultati; si perdono solo i layer accesi e i filtri di quella mappa (te lo chiedo prima). Scegliendo una regione nella ricerca ti propongo i suoi vincoli con un clic.</li>
+      <li><b>Rail destro</b> — in cima la <b>Raccolta</b>, con il numero di oggetti: tutto quello che hai raccolto (Particelle · Disegni · Geoprocessi · Importati; sotto le Particelle <b>Crea area lorda</b>, dalle spuntate o da tutte, e sotto i Disegni la spunta <b>Area netta automatica</b>: la lorda meno tutto ciò che taglia — esclusioni, fasce dei buffer, ostacoli, siepi e zone agricole — ricalcolata da sola, come in PV Predesign, con accanto il <b>rientro dal confine</b> in metri); ogni riga si rinomina, si colora, si nasconde e si <b>spunta</b> per usarla nei geoprocessi; da qui esporti e salvi sul portale. Sotto, i pannelli della mappa (Layer, <b>Legenda</b> dei layer accesi — compresa la Raccolta —, Mappa di base, Segnalibri) e le azioni (Modifica AREAS, Stampa).</li>
+      <li><b>🗺 Mappa</b> (in alto) — la web map del portale in uso: la General Map o una Check Vincoli regionale, con ricerca per nome. Cambiarla non tocca particelle, disegni e risultati; si perdono solo i layer accesi e i filtri di quella mappa (te lo chiedo prima). Scegliendo una regione nella ricerca ti propongo i suoi vincoli con un clic. Sulla mappa, sotto la bussola, il pulsante di <b>localizzazione GPS</b> porta la vista dove sei (il browser chiede il permesso).</li>
       <li><b>Layer</b> — cerca un layer per nome; dal pannello di ogni layer (icona a cursori) trasparenza, popup e <b>filtro per attributo</b> (l'icona diventa un imbuto quando è attivo). I layer aggiunti da te (dal portale, servizi web, DWG, immagini) hanno il menu <b>…</b> con Zoom e <b>Rimuovi dalla mappa</b>.</li>
       <li><b>Esporta / Migra / Salva</b> — in fondo alla Raccolta, sempre in vista: <b>Esporta</b> apre la finestra con il formato (GeoJSON/KML/KMZ/SHP/XLSX) e i singoli oggetti (le spunte sono quelle della Raccolta; senza spunte esporta tutto); il file prende il nome da comune, data e numero di particelle, per esempio <i>Milano_2026-10-05_6part.geojson</i>; <b>Migra particelle in AREAS Collection</b> (l'opzione «dissolvi» sta nella sua finestra); <b>Salva disegni in Site Features</b> (categoria, tipo, attributi e sito: la seconda volta aggiorna, non duplica).</li>
       <li><b>Tools</b> (in basso a sinistra sulla mappa) — uno strumento alla volta, in una scheda: <b>Misura</b> (distanza e area); <b>Profilo altimetrico</b> lungo una linea; <b>Pendenze da DTM</b> (scegli l'area lorda e il limite di pendenza, in ogni direzione oppure nord–sud ed est–ovest: il terreno compare sulla mappa con le zone troppo ripide, che diventano un'esclusione nella Raccolta); <b>Analisi di contesto</b> (sottostazioni, linee AT e progetti FV intorno a un punto; serve l'accesso); <b>Coordinate sconosciute</b> (in che sistema sono?); <b>Percorso su strada</b> fino al punto di connessione (serve l'accesso).</li>
@@ -1839,6 +1862,10 @@ require([
   window.view=view; window.dispatchEvent(new Event('axpo-view'));   // per chi aspetta la vista (pin delle coordinate)
   // bussola sempre visibile sotto lo zoom: la mappa si ruota (tasto destro trascinato, due dita), un clic rimette il nord in alto
   require(['esri/widgets/Compass'], Compass=>{ try{ view.ui.add(new Compass({view}), {position:'top-left', index:1}); }catch(e){ console.warn('Compass:', e&&e.message); } });
+  // localizzazione GPS (6/10): sotto la bussola; usa la geolocalizzazione del browser (serve https, come per il login)
+  require(['esri/widgets/Locate'], Locate=>{ try{ const loc=new Locate({view, popupEnabled:false, scale:2500});
+      loc.on('locate-error', e=>msg('Posizione non disponibile: '+((e&&e.error&&e.error.message)||'il browser non l\'ha concessa')+'.','err'));
+      view.ui.add(loc, {position:'top-left', index:2}); }catch(e){ console.warn('Locate:', e&&e.message); } });
   wireContextMenu();   // tasto destro sulla mappa
   // popup ancorato a SINISTRA (di default si ancorava in alto a destra)
   view.popup.dockEnabled=true;
@@ -4879,6 +4906,60 @@ function gpDoClip(sketchGeom){
   catch(e){ toolMsg('gpMsg',gpErrText('Ritaglia',e),'err'); }
   gpPendingClip=null;
 }
+// ══ Legenda dei layer accesi (6/10/2026): pannello del rail tra Layer e Mappa di base ════════════════════════════
+// Sopra, il widget Legend dell'SDK: i layer del portale e della web map, i servizi aggiunti, i GeoJSON; solo quelli
+// accesi (respectLayerVisibility) e visibili alla scala e nell'inquadratura attuali (hideLayersNotInCurrentView); segue
+// da sé il cambio di web map, perché legge view.map. Non copre: i WMS (per quelli le immagini GetLegendGraphic, solo
+// quando il servizio dichiara un legendUrl: niente icone rotte) e i GraphicsLayer della Raccolta (per quelli il
+// blocco «Raccolta»: particelle, categorie dei disegni accesi, risultati, importati, con i colori veri).
+let legendW=null, legendT=null;
+function legendMount(){ if(legendW||!view) { legendRefresh(); return; }
+  require(["esri/widgets/Legend"], function(Legend){
+    // hideLayersNotInCurrentView resta spento: un layer acceso ma fuori scala sparirebbe e sembrerebbe un difetto (6/10 sera)
+    try{ legendW=new Legend({view:view, container:'legendBox', respectLayerVisibility:true, hideLayersNotInCurrentView:false}); }
+    catch(e){ console.warn('[legenda]', e&&e.message); }
+    try{ esriMods.reactiveUtils.watch(()=>view.map&&view.map.allLayers.map(l=>(l.visible?'1':'0')+(l.type==='wms'? (l.sublayers? l.sublayers.map(s=>s.visible?'1':'0').join('') : '') : '')).join(','), legendSoon); }catch(e){}
+    try{ esriMods.reactiveUtils.watch(()=>Math.round(view.scale), legendSoon); }catch(e){}
+    try{ legendW.activeLayerInfos.on('change', legendSoon); }catch(e){}
+    legendRefresh(); }); }
+function legendSoon(){ clearTimeout(legendT); legendT=setTimeout(legendRefresh, 150); }
+function legendOpen(){ return !!document.querySelector('#toolsBody .drawer.open[data-panel="legend"]'); }
+function legendRefresh(){ if(!legendOpen()) return; try{ legendWmsRender(); }catch(e){} try{ legendMissingRender(); }catch(e){} try{ legendLocalRender(); }catch(e){} }
+// acceso davvero: il layer, i gruppi che lo contengono e la scala (come fa il widget per i suoi layer)
+function legendAncestorsOn(l){ let p=l.parent; while(p&&p.type==='group'){ if(p.visible===false) return false; p=p.parent; } return true; }
+function legendScaleOk(l){ const s=view.scale; return (!(l.minScale>0)||s<=l.minScale)&&(!(l.maxScale>0)||s>=l.maxScale); }
+function legendOpLayers(){ const out=[], walk=c=>c.forEach(l=>{ if(l.type==='group'){ walk(l.layers); return; } out.push(l); }); try{ walk(view.map.layers); }catch(e){} return out; }   // solo i layer operativi, non basemap né terreno
+function legendWmsRender(){ const box=$('legendWms'); if(!box||!view||!view.map) return; box.innerHTML='';
+  legendOpLayers().forEach(l=>{ if(l.type!=='wms'||!l.visible||l.listMode==='hide'||!legendAncestorsOn(l)||!legendScaleOk(l)) return;
+    (l.sublayers? l.sublayers.toArray() : []).forEach(s=>{ if(s.visible===false||!s.legendUrl) return;
+      const row=document.createElement('div'); row.className='wmsleg'; const b=document.createElement('b'); b.textContent=(l.title||'')+(s.title&&s.title!==l.title? ' · '+s.title : ''); row.appendChild(b);
+      const im=document.createElement('img'); im.src=s.legendUrl; im.alt=s.title||s.name||''; im.onerror=function(){ row.remove(); }; row.appendChild(im); box.appendChild(row); }); }); }
+// i layer accesi che il widget non mostra: tasselli, tasselli vettoriali, immagini, «nascosti nella legenda» nella web map
+const LEGEND_TYPES={'vector-tile':'tasselli vettoriali', wmts:'WMTS', media:'immagine', graphics:'grafica'};   // i servizi a tasselli ArcGIS invece una legenda ce l'hanno
+function legendMissingRender(){ const box=$('legendNo'), mb=$('legendMsg'); if(!box||!mb) return;
+  const shown=new Set(); const walk=c=>{ try{ c.forEach(a=>{ if(a.layer) shown.add(a.layer.uid); if(a.children) walk(a.children); }); }catch(e){} }; if(legendW) walk(legendW.activeLayerInfos);
+  const on=legendOpLayers().filter(l=>l.visible&&l.listMode!=='hide'&&legendAncestorsOn(l)), wmsOn=on.filter(l=>l.type==='wms');
+  const miss=on.filter(l=>l.type!=='wms'&&!shown.has(l.uid)&&legendScaleOk(l));
+  box.textContent= miss.length? 'Accesi ma senza legenda: '+miss.map(l=>(l.title||'layer')+(LEGEND_TYPES[l.type]? ' ('+LEGEND_TYPES[l.type]+')' : l.legendEnabled===false? ' (nascosto nella legenda della web map)' : '')).join(', ')+'.' : '';
+  const empty=!shown.size&&!$('legendWms').querySelector('.wmsleg'), outOfScale=on.filter(l=>l.type!=='wms'&&!legendScaleOk(l)).length;
+  mb.textContent= empty? (on.length? 'Nessun layer acceso ha una legenda da mostrare.' : 'Nessun layer acceso.') : (outOfScale? outOfScale+(outOfScale===1? ' layer acceso è' : ' layer accesi sono')+' fuori scala: in legenda, ma non sulla mappa a questo zoom.' : ''); }
+function legendLocalRender(){ const box=$('legendLocal'); if(!box) return; const rows=[];
+  const add=(label, hex, kind, n)=>rows.push({label:label, hex:hex, kind:kind, n:n});
+  const nP=(parcels||[]).filter(p=>!p.hidden).length; if(nP) add('Particelle', PARCEL_HEX, 'poly', nP);
+  const vis= toolsGL? toolsGL.graphics.toArray().filter(g=>g.visible!==false&&g.attributes&&g.attributes._kind&&g.geometry) : [];
+  const kinds={point:'point', polyline:'line', polygon:'poly'};
+  const cats=new Map(); vis.forEach(g=>{ const a=g.attributes; if(a._kind!=='drawing'||a._sub==='geoproc'||!a.sf_cat) return;
+    const k=a.sf_cat; const c=cats.get(k)||{n:0, hex:a.color||sfColor(k), kind:kinds[g.geometry.type]||'poly'}; c.n++; cats.set(k,c); });
+  SF_CATS.forEach(c=>{ const e=cats.get(c.c); if(e) add(c.l, e.hex, e.kind, e.n); });
+  const noCat=vis.filter(g=>g.attributes._kind==='drawing'&&g.attributes._sub!=='geoproc'&&!g.attributes.sf_cat).length; if(noCat) add('Disegni senza categoria', '#2FB6E6', 'poly', noCat);
+  const geo=vis.filter(g=>g.attributes._kind==='buffer'||g.attributes._sub==='geoproc'); if(geo.length) add('Risultati dei geoprocessi', geo[0].attributes.color||graphicColorHex(geo[0])||'#2FB6E6', 'poly', geo.length);
+  const imp=vis.filter(g=>g.attributes._kind==='import'&&!g.attributes.own); if(imp.length) add('Importati', graphicColorHex(imp[0])||'#2FB6E6', kinds[imp[0].geometry.type]||'poly', imp.length);
+  const own=vis.filter(g=>g.attributes.own); if(own.length){ const groups=new Map(); own.forEach(g=>{ const k=g.attributes.own.k||''; if(!groups.has(k)) groups.set(k, {t:k? g.attributes.own.t : 'Senza intestatari', hex:graphicColorHex(g)||OWN_GREY, n:0}); groups.get(k).n++; });
+    groups.forEach(G=>add(G.t, G.hex, 'poly', G.n)); }
+  const ims=(importedImages||[]).filter(im=>im.layer&&im.layer.visible!==false); if(ims.length) add(ims.length===1? 'Immagine: '+ims[0].name : ims.length+' immagini', '#9AA0A6', 'poly', ims.length);
+  box.innerHTML=''; if(!rows.length){ box.innerHTML='<div class="empty">Niente di acceso nella Raccolta.</div>'; return; }
+  rows.forEach(r=>{ const d=document.createElement('div'); d.className='legrow'; const sw=document.createElement('i'); sw.className='legsw '+r.kind; sw.style.setProperty('--c', r.hex); d.appendChild(sw);
+    const s=document.createElement('span'); s.textContent=r.label; s.title=r.label; d.appendChild(s); const n=document.createElement('small'); n.textContent=r.n; d.appendChild(n); box.appendChild(d); }); }
 // ══ Scorciatoie della Raccolta (6/10/2026): area lorda dalle particelle, area netta = lorda − esclusioni ══════════
 // Sono i due passi che seguono sempre la scelta delle particelle: un pulsante sotto le Particelle e uno sotto i
 // Disegni, senza passare da Geoprocessi. Il risultato è un disegno con la categoria del modello (gross / net): lo
@@ -5297,6 +5378,7 @@ function renderGeoms(){
   try{ rcBadge(); drwLastRender(); }catch(e){ console.warn('[raccolta]', e); }   // P1
   try{ sfShortcutsUi(); }catch(e){}   // pulsante «Crea area lorda» e spunta dell'area netta automatica
   try{ sfAutoSoon(); }catch(e){}      // fasce dei buffer e area netta: ricalcolo (solo se qualcosa è cambiato)
+  try{ legendSoon(); }catch(e){}      // blocco «Raccolta» della legenda
 }
 // ── P1 (prototipo UX): contatore della Raccolta sul rail destro e riquadro «Ultimo disegno» nella scheda Disegna ──
 let drwLastG=null;   // l'ultimo disegno fatto (sketch, forma esatta, copia, percorso); sparisce se viene tolto
@@ -7946,7 +8028,8 @@ function baseGroundSet(){
     var tp=$g('toolsPanel'); if(tp) tp.classList.toggle('open', !!name);
     if(name&&window.toolMenuClose) window.toolMenuClose(false);   // P4: un cassetto aperto chiude il menu Tools (non la scheda)
   }
-  icons.forEach(function(b){ b.onclick=function(){ var n=b.classList.contains('active')?null:b.dataset.panel; openPanel(n); if(n) ensureMapRoom('right'); }; });
+  icons.forEach(function(b){ b.onclick=function(){ var n=b.classList.contains('active')?null:b.dataset.panel; openPanel(n); if(n) ensureMapRoom('right');
+    if(n==='legend'&&window.legendMount) window.legendMount(); }; });
 
   /* 3b ── la mappa resta usabile (revisione UX 24/9): sotto MAP_MIN px faccio spazio da solo, rispettando l'ultima
      cosa aperta. Aperto un cassetto → stringo, poi chiudo, il pannello sinistro; aperto o allargato il pannello
@@ -8588,7 +8671,7 @@ function baseGroundSet(){
     {sel:'.tabpane[data-tab=import]', title:'Importa dati', body:"Quattro schede sempre aperte: <b>file di geometrie</b> (GeoJSON, KML, KMZ, Shapefile; quello di <b>Estrazione intestatari</b> si colora e si raggruppa per intestatario), <b>disegni CAD</b>, <b>immagini</b> (GeoTIFF e world file da soli; le altre si spostano, scalano e ruotano, o si allineano con punti noti), <b>servizi web</b> (WMS, WFS, ArcGIS REST); con il pannello largo si affiancano. La <b>i</b> spiega come funziona la scheda. Le <b>coordinate sconosciute</b> stanno nel menu Tools, sulla mappa.", open:function(){openTab('import');}, placement:'right'},
     {sel:'#impCadBtn', title:'Disegni CAD (DWG)', body:"Carica un <b>DWG</b>: viene letto nel browser, senza uscire dal PC. Il <b>sistema di riferimento</b> è stimato dalle coordinate e lo confermi tu; layer e colori restano quelli del CAD, accendibili e ricolorabili dall'elenco sotto il pulsante. Se il disegno è in coordinate locali usa <b>📍 Posiziona a mano</b>: clicchi due punti del disegno e dove stanno davvero (si aggancia ai vertici di particelle, disegni e altri DWG). Il posizionamento viene ricordato per quel file.", open:function(){openTab('import'); window.impOpen&&window.impOpen('impSecCad');}, placement:'right'},
     {sel:'#toolCard', title:'Coordinate sconosciute', body:"Ti arrivano delle coordinate e non sai in che sistema sono — un decreto, un rilievo, una mail? Incollale qui: le provo nei sistemi usati in Italia (Gauss-Boaga, UTM, ED50…) e ti mostro <b>dove cadono</b>, anche con X e Y invertiti. Se sai già dove dovrebbero stare usa <b>📍 Dove dovrebbe stare</b>: clicchi il punto sulla mappa e i candidati vengono ordinati per <b>errore in metri</b>. Poi i punti (o l'area) finiscono negli Importati. Stessa strada per uno <b>shapefile senza .prj</b>: l'import lo passa qui.", open:function(){ window.toolOpen&&window.toolOpen('sr'); }, placement:'right'},
-    {sel:'#actionIcons', title:'Raccolta, mappa e portale', body:"A destra, in tre gruppi: la <b>Raccolta</b> (tutto quello che hai raccolto, con il numero di oggetti); i pannelli della mappa: Layer (anche dal portale, con ricerca per nome e <b>filtro per attributo</b>; i layer aggiunti da te si tolgono dal menu …), Mappa di base, Segnalibri; e le azioni: Modifica AREAS COLLECTION e Stampa.", placement:'left'},
+    {sel:'#actionIcons', title:'Raccolta, mappa e portale', body:"A destra, in tre gruppi: la <b>Raccolta</b> (tutto quello che hai raccolto, con il numero di oggetti); i pannelli della mappa: Layer (anche dal portale, con ricerca per nome e <b>filtro per attributo</b>; i layer aggiunti da te si tolgono dal menu …), la <b>Legenda</b> dei layer accesi (anche la Raccolta), Mappa di base, Segnalibri; e le azioni: Modifica AREAS COLLECTION e Stampa.", placement:'left'},
     {sel:'#trStack', title:'Ricerca', body:"In alto a destra la lente apre la <b>ricerca</b> di indirizzi e coordinate — lat, lon, ma anche X Y in Gauss-Boaga o UTM, di cui indovina il sistema. Scelto un risultato, si richiude.", placement:'left'},
     {sel:'#brStack', title:'Coordinate del puntatore', body:"Nell'angolo in basso a destra le coordinate del puntatore; il <b>pin</b> fissa quelle del prossimo clic. Lo scalimetro sta in basso al centro.", placement:'left'},
     {sel:'#toolsFab', title:'Tools', body:"In basso a sinistra, un solo menu per gli strumenti sulla mappa: <b>Misura</b>, <b>Profilo altimetrico</b>, <b>Pendenze da DTM</b>, <b>Analisi di contesto</b> (sottostazioni, linee AT e progetti FV intorno a un punto), <b>Coordinate sconosciute</b>, <b>Percorso su strada</b>. Uno alla volta: il pulsante mostra quello aperto, <kbd>Esc</kbd> lo chiude.", open:function(){ window.toolClose&&window.toolClose(); }, placement:'right'},
@@ -8655,7 +8738,7 @@ function baseGroundSet(){
 
   /* --- tooltip ricchi sulle icone delle due sidebar --- */
   var RAIL_TIPS={ricerca:'Ricerca particelle — ambito e ricerca per foglio/particella',disegno:'Disegna — punti, linee, aree, forme, snapping, quote',geoproc:'Geoprocessi — buffer e operazioni (union, clip, intersect…)',import:'Importa dati — file di geometrie, disegni DWG, immagini, servizi web, coordinate da incollare'};
-  var PANEL_TIPS={elenco:'Raccolta — tutto quello che hai raccolto: particelle, disegni, risultati, importati; da qui esporti e salvi',layers:'Layer in mappa e aggiunta dal portale',basemaps:'Mappa di base',bookmarks:'Segnalibri',edit:'Modifica AREAS COLLECTION',print:'Stampa'};
+  var PANEL_TIPS={elenco:'Raccolta — tutto quello che hai raccolto: particelle, disegni, risultati, importati; da qui esporti e salvi',layers:'Layer in mappa e aggiunta dal portale',legend:'Legenda dei layer accesi',basemaps:'Mappa di base',bookmarks:'Segnalibri',edit:'Modifica AREAS COLLECTION',print:'Stampa'};
   Array.prototype.forEach.call(document.querySelectorAll('#sideRail button'), function(b){ var t=RAIL_TIPS[b.dataset.tab]; if(t){ b.setAttribute('data-tip',t); b.removeAttribute('title'); } });
   Array.prototype.forEach.call(document.querySelectorAll('#actionIcons button'), function(b){ var t=PANEL_TIPS[b.dataset.panel]; if(t){ b.setAttribute('data-tip',t); b.removeAttribute('title'); } });
   var tip=$('uiTip');

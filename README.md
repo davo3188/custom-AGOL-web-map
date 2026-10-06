@@ -274,6 +274,31 @@ after 20 s with a message, instead of leaving the UI waiting forever.
 - **Colour picker** (since 2026-10-01, `makeColorSwatch`/`colPopOpen`): a button that opens swatches — *Recenti*
   (the last 8, `axpo_colori_recenti`), the model's *Categorie*, *Mappa* (the Okabe–Ito palette, safe for colour
   blindness) and *Tenui* — plus *Altro colore…* for the native picker; Esc closes, `aria-pressed` on the chosen one.
+- **GPS locate button** (since 2026-10-06, user request): the SDK `Locate` widget under the compass
+  (`view.ui`, top-left, index 2), `popupEnabled: false`, zooms to 1:2500; a refused or failed geolocation gives
+  a toast (`locate-error`). Needs https, like the login — fine on Azure and on the local HTTPS server.
+- **Legenda** (since 2026-10-06, user request: "the legend of the layers that are on, in the rail between the
+  layer list and the basemaps"). A rail panel `data-panel="legend"` (`esri-icon-legend`) with two parts. Above,
+  the SDK **Legend widget** (`esri/widgets/Legend`, mounted on the first opening by `legendMount`), with
+  `respectLayerVisibility` (only layers that are on) and `hideLayersNotInCurrentView: false` — a layer that is on
+  but out of scale stays in the legend (the first version hid it and the user read it as a defect: "some layers
+  are missing"); a status line says how many are out of scale. It covers portal and web-map layers, services
+  added by URL, GeoJSON, ArcGIS tile services, and follows a web-map swap because it reads `view.map`. Its own
+  "Nessuna legenda" message is hidden (CSS): next to WMS images it was misleading; `#legendMsg` says instead
+  "Nessun layer acceso" / "Nessun layer acceso ha una legenda da mostrare". It does not cover WMS — for those
+  `legendWmsRender` adds the GetLegendGraphic image of each visible sublayer that declares a `legendUrl` (no
+  constructed URLs, so no broken images; the cadastre WMS is `listMode: 'hide'` and stays out), honouring the
+  groups that contain the layer (`legendAncestorsOn`) and its scale range (`legendScaleOk`), as the widget does
+  for its layers (the first version ignored both: WMS images looked "always on") — and layers that are on but
+  have nothing to show (vector tiles, WMTS, images, graphics, or "hide in legend" set in the web map,
+  `legendEnabled: false`) are named in a line, *Accesi ma senza legenda* (`legendMissingRender`, comparing the
+  operational layers that are on with the widget's `activeLayerInfos`). It does not cover
+  the Raccolta's graphics layers either: below, the **Raccolta block** (`legendLocalRender`) lists what is on with
+  its real colour and a count: Particelle, each Site Features category present among the drawings (polygon,
+  line or point swatch), drawings without category, geoprocess results, imports, owner groups of the owners
+  file, images. The block redraws 150 ms after every list redraw (`legendSoon` from `renderGeoms`) and the whole
+  panel after a layer visibility change (a `reactiveUtils.watch` on `view.map.allLayers` visibilities), only
+  while the panel is open.
 - **Crea area lorda / Crea area netta** (since 2026-10-06, user request: the two steps that always follow the
   choice of parcels, without going through Geoprocessi). Under the *Particelle* list, **Crea area lorda dalle
   particelle** unions the ticked parcels — or all of them when none is ticked; the label says which — into a
@@ -1403,6 +1428,31 @@ distances from cadastral boundaries").** §4 *Rientro dal confine*. Checked in h
 goes from 0.381 to 0.132 ha and the note says it; 500 m → no net drawing and the message "il rientro di 500 m
 consuma tutta l'area lorda"; back to 0 → the previous value; `netSetback` saved and restored with the field.
 Backup: `geoportale_axpo_pre-rientro_2026-10-06.html`.
+
+**Legend panel (2026-10-06, night, user: "add the legend of the layers that are on, in the rail between the
+layer list and the basemaps; use the ArcGIS SDK, or show me something better").** §4 *Legenda*: the SDK Legend
+widget plus a block for the Raccolta, which the widget cannot see. Checked in headless Chrome: the rail order
+(Raccolta, Layer, Legenda, Mappa di base, Segnalibri, Modifica, Stampa), icon and tooltip; the drawer opens and
+the widget mounts; the Raccolta block lists Particelle, a connection line (line swatch), an exclusion, a
+geoprocess result and an import with their colours and counts; an exclusion with the eye off and hidden parcels
+leave the block; closed, the panel is not redrawn, reopened it is current; no WMS rows and no images for the
+cadastre. On screen (built-in browser): the panel with "Nessuna legenda" above and the Raccolta block below; a
+GeoJSON layer with a unique-value renderer added to the map is listed by the widget once the view reaches it,
+and leaves when switched off. Not tested: a real web-map swap with the panel open, WMS services that declare a
+`legendUrl`. Backups: `geoportale_axpo_pre-legenda_2026-10-06.html`, `README_tools_pre-legenda_2026-10-06.md`.
+
+**Legend, second round (same night, user with a screenshot of the logged-in map: "why are some layers always on
+and some missing from the legend?").** Two causes, both fixed (§4 *Legenda*): the WMS images ignored the group
+that contains the layer and its scale range, so switched-off groups still showed their WMS legends; and
+`hideLayersNotInCurrentView` dropped layers that are on but out of scale. Now every layer that is on is listed,
+a status line counts the ones out of scale, the widget's own "Nessuna legenda" is replaced by a line that
+accounts for WMS too, and layers that are on but have no legend are named. Checked in headless Chrome: a tile
+service with "hide in legend" is named in *Accesi ma senza legenda* and leaves when switched off; inside a
+switched-off group it does not count; with a tiny `minScale` the status line says one layer is out of scale.
+
+**GPS locate button (2026-10-06, night, user request).** §4 *GPS locate button*. Checked in headless Chrome: the
+`Locate` widget sits in the top-left UI right after the compass; the guide mentions it; both tours run. Not
+tested: a real geolocation (headless has none). Backup: `geoportale_axpo_pre-gps_2026-10-06.html`.
 
 **Open, known, non-blocking**
 
