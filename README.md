@@ -977,6 +977,12 @@ so it never touches the AMD loader. Worth knowing before editing:
     that `import`s it can, and `GlobalWorkerOptions.workerPort` takes it. Only loaded on the first PDF.
   - The card gets the image's `ow/oh/page/dpi` through `createGeorefImage(..., extra)` **before** `editImage`
     opens it: setting them after the call came too late for the dpi field (the first attempt).
+  - **A file picked from the undocked panel is from another window** (another realm). pdf.js checks the data
+    with `instanceof ArrayBuffer`, which is realm-bound, so `getDocument({data: await file.arrayBuffer()})`
+    throws "Invalid PDF binary data: either TypedArray, string, or array-like object is expected" (the user's
+    report of 2026-10-07: "many PDFs give an error"). Wrapping the foreign buffer in a `Uint8Array` passes the
+    check but the worker never answers. The fix is a copy into this window: `new Uint8Array(buffer).slice()`.
+    `geotiff.js` and `URL.createObjectURL` do not care. Reproduced and verified with a `File` built in an iframe.
 
 ## 6. Security & distribution
 
@@ -1449,6 +1455,11 @@ a status line counts the ones out of scale, the widget's own "Nessuna legenda" i
 accounts for WMS too, and layers that are on but have no legend are named. Checked in headless Chrome: a tile
 service with "hide in legend" is named in *Accesi ma senza legenda* and leaves when switched off; inside a
 switched-off group it does not count; with a tiny `minScale` the status line says one layer is out of scale.
+
+**PDF from the undocked panel (2026-10-07, user: "many PDFs give 'Invalid PDF binary data…', is it easy to
+fix?").** Yes: the PDF bytes are now copied into the main window before pdf.js sees them (§5 *Images v2*, last
+trap). Checked in headless Chrome with a File created in an iframe: the old call reproduces the user's message,
+the new one renders both pages and the whole import goes through; the image suite still passes.
 
 **GPS locate button (2026-10-06, night, user request).** §4 *GPS locate button*. Checked in headless Chrome: the
 `Locate` widget sits in the top-left UI right after the compass; the guide mentions it; both tours run. Not

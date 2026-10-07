@@ -6396,7 +6396,10 @@ async function pdfLib(){ if(window.__pdfjs) return window.__pdfjs;
   catch(e){ m.GlobalWorkerOptions.workerSrc=PDFJS_URL+'pdf.worker.min.mjs'; }
   window.__pdfjs=m; return m; }
 async function loadPDF(file, page){
-  var L=await pdfLib(), doc=await L.getDocument({data:await file.arrayBuffer()}).promise, n=doc.numPages, pg=page||1;
+  // Copia in un Uint8Array di QUESTA finestra (.slice()): pdf.js controlla `instanceof ArrayBuffer`, che fallisce per
+  // un file scelto dal pannello sganciato (altra finestra, altro realm) → «Invalid PDF binary data» (segnalato il
+  // 7/10); e un Uint8Array sopra un buffer straniero passa il controllo ma poi il worker non risponde più.
+  var L=await pdfLib(), doc=await L.getDocument({data:new Uint8Array(await file.arrayBuffer()).slice()}).promise, n=doc.numPages, pg=page||1;
   if(!page&&n>1){ var a=prompt('Il PDF ha '+n+' pagine: quale metto sulla mappa?','1'); if(a==null) throw new Error('annullato'); pg=Math.min(n, Math.max(1, parseInt(a,10)||1)); }
   var p=await doc.getPage(Math.min(n, Math.max(1, pg))), v1=p.getViewport({scale:1});
   var sc=Math.min(MAX_IMG_DIM/Math.max(v1.width,v1.height), 8), vp=p.getViewport({scale:sc});   // il lato lungo a 4096 px (72 dpi × scala)
