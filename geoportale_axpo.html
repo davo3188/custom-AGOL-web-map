@@ -1711,6 +1711,26 @@ const PV_PROC_FIELDS=["plant_name","capacity_mw","status","status_detail","proce
 // nel browser (l'item sul portale non cambia). Questi id servono a riconoscerlo.
 const CATASTO_ITEM_ID="382d9c13039446e4b17a19a4a226313d";   // IT - AdE - Cartografia Catastale (Web Mercator)
 const CATASTO_ITEM_ID_ALT="05ccc51fc6e64c5f84e4032faad754dc";   // IT - Cartografia Catastale (variante)
+// ── Sorgenti del catasto (8/10/2026) ──────────────────────────────────────────────────────────────────────
+// Il WMS dell'Agenzia delle Entrate non si usa dal browser: niente CORS e niente EPSG:3857 (Web Mercator, l'SR delle
+// mappe). Serve un «ponte» che traduca le richieste. In ordine di preferenza:
+//  1) il ponte dell'app: /api/catasto accanto alla pagina (scripts/serve_https_catasto.py in locale; per il sito c'è la
+//     funzione Azure pronta in scripts/ponte_catasto_azure/, non installata per scelta dell'utente del 9/10);
+//  2) il GeoServer della Regione Sardegna, ponte pubblico, ma dipende dai loro certificati Java:
+//     l'8/10/2026 rispondeva «PKIX path building failed» a ogni GetMap e il catasto spariva senza un errore.
+// catastoProbe prova le sorgenti con una GetMap minuscola, usa la prima viva, avvisa se nessuna risponde e riprova
+// ogni 10 minuti. ?catasto=<url di un ponte> lo mette in testa (resta in localStorage); ?catasto=off lo toglie.
+const CATASTO_ADE_SUBS=[{name:"CP.CadastralParcel"},{name:"fabbricati"}];
+const CATASTO_SOURCES=[
+  {id:'ponte', label:'ponte dell\'app (/api/catasto)', url:(function(){ try{ return new URL('api/catasto', location.href).href; }catch(e){ return 'api/catasto'; } })(), sublayers:CATASTO_ADE_SUBS, fixMapUrl:true},
+  {id:'sardegna', label:'GeoServer Regione Sardegna', url:"https://webgis.regione.sardegna.it/geoserver/dbu/wms", sublayers:[{name:"AdE_cadastral_parcel"},{name:"AdE_fabbricati"}]}
+];
+(function(){ try{ const m=location.search.match(/[?&]catasto=([^&#]+)/);
+  if(m){ const v=decodeURIComponent(m[1]); if(v==='off') localStorage.removeItem('axpo_catasto_url'); else localStorage.setItem('axpo_catasto_url', v); }
+  const u=localStorage.getItem('axpo_catasto_url');
+  if(u&&/^https?:\/\//.test(u)) CATASTO_SOURCES.unshift({id:'manuale', label:'ponte indicato ('+u+')', url:u, sublayers:CATASTO_ADE_SUBS, fixMapUrl:true});
+}catch(e){} })();
+let catastoSrc=null, catastoBad=false, catastoTimer=null;
 
 // Lookup Regione (Zornade) → item id "IT - PORTALE CHECK VINCOLI - …"
 // Match normalizzato (spazi/trattini ignorati). Mancano: Liguria, Molise,
@@ -1837,15 +1857,11 @@ require([
 
   esriMods={Graphic,Polygon,projection,FeatureLayer,Layer,WebMap,Editor,Portal,PortalQueryParams,geometryEngine,Point,webMercatorUtils,ElevationLayer,Viewpoint,symbolJsonUtils,reactiveUtils,centroidOperator};
 
-  catasto=new WMSLayer({
-    url:"https://webgis.regione.sardegna.it/geoserver/dbu/wms",
-    sublayers:[{name:"AdE_cadastral_parcel"},{name:"AdE_fabbricati"}],
-    // GeoServer rifiuta il codice Esri 102100 (SR delle basemap tiled) come "InvalidSRS":
-    // forzo la richiesta in EPSG:3857 (equivalente, ma è il codice che GeoServer accetta).
-    spatialReferences:[3857],
-    // trasparenza 50% e popup spento di partenza: il GeoServer non risponde alle richieste di popup dal browser
-    minScale:25000, opacity:.5, popupEnabled:false, title:"Catasto AdE"
-  });
+  esriMods.WMSLayer=WMSLayer;
+  // il catasto parte dalla Sardegna (o dal ponte indicato con ?catasto=); la sorgente definitiva la sceglie
+  // catastoProbe poco dopo l'avvio (vedi CATASTO_SOURCES)
+  catastoSrc=CATASTO_SOURCES.find(s=>s.id==='manuale')||CATASTO_SOURCES.find(s=>s.id==='sardegna');
+  catasto=catastoMake(catastoSrc);
   gl=new GraphicsLayer({title:"Particelle selezionate", listMode:"hide"});
   // etichette particelle: layer separato -> si spengono e spariscono a scala piccola
   labelsGL=new GraphicsLayer({title:"Etichette particelle", listMode:"hide", minScale:150000, maxScale:0});
@@ -1860,6 +1876,7 @@ require([
   const map=new Map({basemap:bmTopo, ground:{layers:[new ElevationLayer({url:WORLD_ELEV})]}, layers:[catasto, gl, labelsGL, toolsGL, ownLblGL]});
   view=new MapView({container:"viewDiv", map, center:[12.5,42.0], zoom:6});
   window.view=view; window.dispatchEvent(new Event('axpo-view'));   // per chi aspetta la vista (pin delle coordinate)
+  setTimeout(()=>{ try{ catastoProbe(false); }catch(e){} }, 1500);   // sorgente del catasto: prova il ponte, poi la Sardegna; avvisa se nessuna risponde
   // bussola sempre visibile sotto lo zoom: la mappa si ruota (tasto destro trascinato, due dita), un clic rimette il nord in alto
   require(['esri/widgets/Compass'], Compass=>{ try{ view.ui.add(new Compass({view}), {position:'top-left', index:1}); }catch(e){ console.warn('Compass:', e&&e.message); } });
   // localizzazione GPS (6/10): sotto la bussola; usa la geolocalizzazione del browser (serve https, come per il login)
@@ -3115,6 +3132,48 @@ async function projOpenFile(file, handle){
   }catch(e){ console.warn('[progetto]',e); msg('Progetto aperto solo in parte: '+((e&&e.message)||e),'err'); }
   finally{ cadBusy=false; projBusy=false; bootVP=null; projUi(); try{ saveStateDebounced(); }catch(e){} } }
 
+// ── catasto: creazione dalla sorgente, controllo di vita, cambio al volo (8/10/2026) ────────────────────────
+function catastoMake(src){
+  const l=new esriMods.WMSLayer({url:src.url, sublayers:src.sublayers.map(s=>({name:s.name})),
+    // GeoServer rifiuta il codice Esri 102100 (SR delle basemap tiled) come "InvalidSRS": forzo la richiesta in
+    // EPSG:3857 (equivalente). Vale anche per il ponte, che traduce il 3857 in lon/lat per l'Agenzia.
+    spatialReferences:[3857],
+    // trasparenza 50% e popup spento di partenza: nessuna delle sorgenti risponde alle richieste di popup dal browser
+    minScale:25000, opacity:.5, popupEnabled:false, title:"Catasto AdE", copyright:"Agenzia delle Entrate"});
+  // le capabilities dell'Agenzia fanno puntare le GetMap al suo server: col ponte devono restare sul ponte
+  if(src.fixMapUrl) l.when(()=>{ try{ if(!l.mapUrl||l.mapUrl.indexOf(src.url)!==0) l.mapUrl=src.url; }catch(e){} }, ()=>{});
+  l._catSrc=src; return l; }
+async function catastoPing(src){   // una GetMap minuscola: immagine = vivo; XML o errore di rete = morto, col perché
+  const names=src.sublayers.map(s=>s.name).join(','), styles=src.sublayers.map(()=>'').join(',');
+  const u=src.url+(src.url.indexOf('?')>=0? '&' : '?')+'SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap&FORMAT=image/png&TRANSPARENT=true'
+    +'&LAYERS='+encodeURIComponent(names)+'&STYLES='+encodeURIComponent(styles)+'&CRS=EPSG:3857&BBOX=1018000,5648000,1018200,5648200&WIDTH=32&HEIGHT=32&_='+Date.now();
+  const ctl=new AbortController(), t=setTimeout(()=>ctl.abort(), 20000);
+  try{ const r=await fetch(u, {signal:ctl.signal, cache:'no-store'}); const ct=(r.headers.get('content-type')||'').toLowerCase();
+    if(r.ok&&ct.indexOf('image/')===0) return {ok:true};
+    let why='HTTP '+r.status;
+    if(/xml/.test(ct)){ try{ const x=await r.text(), m=x.match(/<ServiceException[^>]*>([\s\S]*?)<\/ServiceException>/i);
+      if(m){ let w=m[1].replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim();   // le parole del servizio, tagliate a una parola intera
+        if(w.length>120){ const c=w.lastIndexOf(' ',120); w=w.slice(0, c>60? c : 120)+'…'; } why=w||'eccezione del servizio'; } }catch(e){} }
+    return {ok:false, why};
+  }catch(e){ return {ok:false, why:(e&&e.name==='AbortError')? 'nessuna risposta in 20 s' : 'non raggiungibile (rete o CORS)'}; }
+  finally{ clearTimeout(t); } }
+async function catastoProbe(quiet){
+  if(catastoProbe.busy) return; catastoProbe.busy=true;
+  try{ let pick=null; const fails=[];
+    for(const s of CATASTO_SOURCES){ const r=await catastoPing(s); if(r.ok){ pick=s; break; } fails.push({s, why:r.why}); }
+    if(pick){ if(!catasto||catasto._catSrc!==pick) catastoSwap(pick);
+      if(catastoBad){ catastoBad=false; msg('Catasto AdE di nuovo disponibile ('+pick.label+').','ok'); }
+      catastoMark(false); }
+    else{ const shown=fails.filter(f=>f.why!=='HTTP 404'), txt=(shown.length? shown : fails).map(f=>f.s.label+': '+f.why).join(' · ');
+      const first=!catastoBad; catastoBad=true; catastoMark(true);
+      if(!quiet||first) msg('Catasto AdE non disponibile — '+txt+'. È un guasto dei loro server, non dell\'app: riprovo ogni 10 minuti.','err'); }
+  }catch(e){ console.warn('[catasto] controllo non riuscito:', e); }
+  finally{ catastoProbe.busy=false; clearTimeout(catastoTimer); catastoTimer=setTimeout(()=>catastoProbe(true), 10*60*1000); } }
+function catastoSwap(src){ const old=catasto, nl=catastoMake(src);
+  try{ if(old){ nl.visible=old.visible; nl.opacity=old.opacity; } }catch(e){}
+  try{ const m=view&&view.map; if(m){ const i=old? m.layers.indexOf(old) : -1; if(old&&i>=0) m.remove(old); m.add(nl, i>=0? i : 0); } }catch(e){ console.warn('[catasto] cambio sorgente:', e); }
+  catasto=nl; catastoSrc=src; console.info('[catasto] sorgente: '+src.label); }
+function catastoMark(bad){ try{ const t=bad? 'Catasto AdE ⚠ non disponibile' : 'Catasto AdE'; if(catasto&&catasto.title!==t) catasto.title=t; }catch(e){} }
 // ── catasto della webmap: match per ITEM ID (i titoli "catast*" sono decine: regioni/province) ──
 function findWebmapCatasto(wm){
   let f=null;

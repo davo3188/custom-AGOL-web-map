@@ -442,6 +442,17 @@ right-click menu opens it on the clicked point.
   through the same engine. The file is converted automatically only when Web Mercator is the *only*
   reading that lands on Italian soil; otherwise the import stops, the candidates appear in the
   coordinates module, and the whole file is reprojected with the system the user picks.
+- **Cadastre source and bridge** (since 2026-10-08). The "Catasto AdE" layer on every map is the Agenzia delle
+  Entrate WMS, but that service cannot be used from a browser (no CORS, no Web Mercator), so it needs a bridge.
+  `CATASTO_SOURCES` lists them in order of preference: the app's own bridge at `api/catasto` next to the page
+  (`scripts/serve_https_catasto.py` locally; for the site there is an Azure Function ready in
+  `scripts/ponte_catasto_azure/`, not installed by the owner's choice of 2026-10-09), then the public GeoServer of
+  Regione Sardegna, which cascades the AdE WMS. `catastoProbe` sends each one a 32-px GetMap 1.5 s after start
+  and every 10 minutes: the first answering an image is used (the layer is rebuilt in place by `catastoSwap`,
+  keeping visibility and opacity; the project key `app:catasto` does not change); if none does, a red toast
+  repeats the service's own exception text and the layer is titled "Catasto AdE ⚠ non disponibile" in the Layer
+  panel, with a green toast when it comes back. `?catasto=<url>` puts a bridge of your choice first (kept in
+  `localStorage`; `?catasto=off` removes it).
 - **Web services by URL** (since 2026-09-23): WMS, WFS and ArcGIS REST (MapServer, FeatureServer, a
   single layer, ImageServer…) go straight onto the map, without creating an item on the portal. The type
   is guessed from the URL, the service is read, and you tick the layers you want. The list has a text
@@ -854,7 +865,8 @@ so it never touches the AMD loader. Worth knowing before editing:
   blocked, no way around it from the page). Capabilities and data are read only if the server allows
   cross-origin reads (**CORS**). An `http://` URL is tried as `https://` automatically; if that fails, the
   message says why. Tested on 2026-09-23:
-  - the Sardinia GeoServer (the catasto one) works;
+  - the Sardinia GeoServer (the catasto one) works (CORS `*`) — but see *The cadastre bridge* below: on
+    2026-10-08 it stopped answering GetMap;
   - the **national PCN WMS** (`wms.pcn.minambiente.it`) has **no CORS** and cannot be read.
 
   Serving such services needs a proxy on the server side, e.g. an Azure Function on the future host,
@@ -867,6 +879,28 @@ so it never touches the AMD loader. Worth knowing before editing:
 - **WMS.** The layer is created with only the chosen sublayers. As for the catasto, when the
   capabilities list EPSG:3857 it is forced, because GeoServer rejects 102100. For zooming, the extent is
   that of the chosen sublayers: the service's own extent is often all of Italy.
+- **The cadastre bridge** (`scripts/catasto_proxy.py`; the same in Node in `scripts/ponte_catasto_azure/`, 2026-10-08). The AdE WMS
+  (`wms.cartografia.agenziaentrate.gov.it/inspire/wms/ows01.php`) serves EPSG:6706/4258 and the ETRS89 UTM
+  zones, never 3857, and sends no CORS header (the WFS the same, GML only): useless from a browser. The bridge
+  takes the SDK's GetMap in EPSG:3857 (or 102100/900913), converts the two BBOX corners to lon/lat and asks the
+  AdE in WMS 1.1.1 with `SRS=EPSG:4258`, same WIDTH/HEIGHT, LAYERS, STYLES, FORMAT, TRANSPARENT, and returns the
+  PNG untouched with `Access-Control-Allow-Origin: *` (images cached 10 min). No warping: inside one image the
+  difference between the equirectangular and the Mercator grid is below a pixel at 1:25,000 and 2048 px (the
+  vertical scale factor varies by about Δφ·tan φ, 1e-3 at most). GetCapabilities is forwarded with the GetMap
+  `OnlineResource` rewritten to the bridge and `EPSG:3857`/`102100` added after `EPSG:4258`, so ArcGIS Online
+  and QGIS can use the bridge as a normal WMS; the app also pins `mapUrl` to the bridge after load
+  (`fixMapUrl`), because the SDK takes the GetMap URL from the capabilities. Only the AdE host is reached: it
+  is not an open proxy. WIDTH/HEIGHT above 2048 → 400; other requests (GetLegendGraphic…) pass through. The
+  Sardinia GeoServer (`webgis.regione.sardegna.it/geoserver/dbu/wms`, layers `AdE_*`) is a cascade of the same
+  service; on 2026-10-08 its Java could not validate the AdE TLS chain ("Internal error PKIX path building
+  failed") and every GetMap came back as an HTTP 200 `text/xml` exception, which the SDK swallows (no event, no
+  console line) — hence the probe. **The Azure Function is ready but not installed**: it lives in
+  `scripts/ponte_catasto_azure/` (with its own README) and the owner decided on 2026-10-09 not to touch the
+  organisation's GitHub Actions for now (no control over them, unfamiliar: "a big expense without understanding
+  exactly what I am doing"); do not propose it again unless asked. On the site the probe therefore skips the
+  404 and the toast names only the Sardinia source, until Regione Sardegna repairs its trust store; locally
+  `serve_https_catasto.py` already serves the bridge. The portal item `382d9c13…` ("IT - AdE - Cartografia
+  Catastale (Web Mercator)", in 18 web maps) points at the Sardinia GeoServer too, and is broken the same way.
 - **WFS.** ArcGIS `WFSLayer` wants WFS 2.0 with GeoJSON output, and before loading it also asks for a
   GML sample. Some GeoServers refuse that GML request: GeoBretagne serves GeoJSON fine and fails the
   GML one. When `WFSLayer` fails, the fallback runs a `GetFeature` in GeoJSON/WGS84 (2.0, then 1.1) of
@@ -1465,6 +1499,22 @@ the new one renders both pages and the whole import goes through; the image suit
 `Locate` widget sits in the top-left UI right after the compass; the guide mentions it; both tours run. Not
 tested: a real geolocation (headless has none). Backup: `geoportale_axpo_pre-gps_2026-10-06.html`.
 
+**Cadastre gone from every map (2026-10-08, user: "il catasto che aggiungi ad ogni mappa ora non si vede e non
+segna nessun errore").** Not the app: the Sardinia GeoServer that bridges the AdE WMS answers every GetMap with a
+`ServiceException` ("Internal error PKIX path building failed…": its Java cannot validate the AdE server's TLS
+chain; the AdE certificate is a Let's Encrypt one issued 2026-07-22, nothing new in October), HTTP 200
+`text/xml`, which the SDK swallows. The AdE WMS cannot be used directly from the browser (no CORS, no
+EPSG:3857; the WFS the same, GML only); no other public cascade found (Veneto, Lazio, Basilicata GeoServers
+checked). Done: (1) `CATASTO_SOURCES` + `catastoProbe` (§4 *Cadastre source and bridge*); (2) a bridge of our
+own, `scripts/catasto_proxy.py` (wired into `serve_https_catasto.py` at `/api/catasto`) and the same in Node for
+the Azure site, now in `scripts/ponte_catasto_azure/` (§5 *The cadastre bridge*). Checked:
+the bridge with curl (capabilities rewritten, GetMap 3857 → PNG with parcels, 400 on oversize, pass-through);
+headless Chrome A) without a bridge → `catastoBad`, marked title, error toast; B) `?catasto=<local bridge>` →
+source swapped, `mapUrl` on the bridge, `fetchImage` at Pavia 1:2000 returns 39,851 opaque pixels, no errors.
+Not tested: the Azure Function itself (no Node here). **2026-10-09, user:** no GitHub Actions work on the
+company repo for now (no control, unfamiliar), so the function stays in `scripts/`, out of the published files. Backup:
+`geoportale_axpo_pre-catasto-ponte_2026-10-08.html` (+ README, `serve_https_catasto.py`).
+
 **Open, known, non-blocking**
 
 1. **The public GitHub repository with the Zornade key** (§6) — needs the owner: make it private,
@@ -1496,8 +1546,8 @@ tested: a real geolocation (headless has none). Backup: `geoportale_axpo_pre-gps
 ## 8. Repository contents
 
 ```
-geoportale_axpo.html   the whole application
-README.md              this file
+geoportale_axpo.html       the whole application
+README.md                  this file
 ```
 
 There is no build, no test suite and no CI. Verification is done in the browser against the live
