@@ -2681,7 +2681,7 @@ async function selectByGeometry(geom){
     const rs=await Promise.all(b.map(h=>addByFid(h.fid,(h.municipality&&h.municipality.name)||'',null,h.label,h.centroid)));
     rs.forEach(r=>{ if(r==='ok')added++; else if(r==='dup')dup++; else failDet++; });
   }
-  render(true);
+  render(true, hits.map(h=>h.fid));   // inquadra solo queste, e solo se escono dalla vista
   if(doneLoc&&failLoc===doneLoc){ msg('Zornade non ha risposto a nessuno dei '+doneLoc+' punti: non so se nell\'area ci sono particelle. Riprova tra poco.','err'); return; }
   const fails=[]; if(failLoc) fails.push(failLoc+' punt'+(failLoc===1?'o':'i')+' su '+doneLoc+' senza risposta'); if(failDet) fails.push(failDet+' particell'+(failDet===1?'a':'e')+' trovat'+(failDet===1?'a':'e')+' ma non lett'+(failDet===1?'a':'e'));
   msg((run.stop?'Selezione interrotta: ':'Selezione: ')+`${added} particell${added===1?'a aggiunta':'e aggiunte'}`+(dup?`, ${dup} già nella Raccolta`:'')
@@ -3975,9 +3975,10 @@ async function search(){
   const parts=[...new Set($('par').value.split(/[\s,;]+/).map(s=>s.trim()).filter(Boolean))];
   if(!parts.length)return;
   msg(`Ricerca di ${parts.length} particell${parts.length>1?'e':'a'}…`,'');
-  let added=0, dup=0, notfound=[];
+  let added=0, dup=0, notfound=[]; const fids=[];   // fids: le particelle di questa ricerca, anche se già presenti
   for(const part of parts){
-    if(parcels.some(p=>p.comune===comune&&p.foglio===foglio&&p.particella===part)){dup++;continue;}
+    const already=parcels.find(p=>p.comune===comune&&p.foglio===foglio&&p.particella===part);
+    if(already){ dup++; if(already.fid) fids.push(already.fid); continue; }
     try{
       let d=await z('/parcels/search',{comune,foglio,label:part,limit:5});
       let hit=d.data.find(x=>String(x.label)===part);
@@ -3985,9 +3986,10 @@ async function search(){
       if(!hit){notfound.push(part);continue;}
       const r=await addByFid(hit.fid, comune, foglio, part, hit.centroid);
       if(r==='ok')added++; else if(r==='dup')dup++; else notfound.push(part+'(err)');
+      if(r!=='err') fids.push(hit.fid);
     }catch(e){notfound.push(part+'(err)');}
   }
-  render(true);
+  render(true, fids);   // vola sulle particelle cercate (sono altrove), non su tutta la Raccolta
   let m=`${added} particell${added===1?'a aggiunta':'e aggiunte'}`; if(dup)m+=`, ${dup} già nella Raccolta`;
   if(notfound.length)m+=`, non trovate: ${notfound.join(', ')} (oltre le 100/foglio o altra sezione → verifica su FoMaps)`;
   msg(m, notfound.length?'err':'ok', added? vediElenco('parcels') : null);
@@ -4000,7 +4002,7 @@ async function addByClick(lat,lng){
     const hit=(d.data||[])[0];
     if(!hit){msg('Nessuna particella in questo punto.','err');return;}
     const r=await addByFid(hit.fid,(hit.municipality&&hit.municipality.name)||'',null,hit.label,hit.centroid);
-    render(true);
+    render(true, [hit.fid]);   // è sotto il cursore: in pratica la mappa non si muove
     const last=parcels[parcels.length-1];
     if(r==='ok') msg(`Aggiunta: ${last.comune} · Fg ${last.foglio} · ${last.particella}.`,'ok', vediElenco('parcels'));
     else if(r==='dup') msg('Particella già nella Raccolta.','ok');
@@ -4027,7 +4029,20 @@ function renderLabels(){
 }
 // zoom=true solo quando si AGGIUNGONO particelle (ricerca, clic, selezione su area): prima ogni render
 // riportava la mappa sulle particelle — anche cambiando colore, togliendone una o accendendo l'occhio.
-function render(zoom){
+// Dal 9/10/2026 (richiesta dell'utente) lo zoom va SOLO sulle particelle di quell'azione (fids) e solo se non sono
+// già tutte in vista: un clic o una selezione su area non muovono la mappa, una ricerca per Foglio/Particella vola
+// sulle particelle trovate; la Raccolta intera non si inquadra più (prima ogni aggiunta faceva zoom out su tutto).
+function parcelsInView(gs){   // tutte le geometrie dentro l'inquadratura attuale?
+  try{ const ve=view&&view.extent; if(!ve) return false;
+    const ve4=(ve.spatialReference&&ve.spatialReference.isWGS84)? ve : esriMods.webMercatorUtils.webMercatorToGeographic(ve);
+    if(!ve4) return false;
+    let ext=null;
+    for(const g of gs){ const ge=g.geometry; if(!ge) continue;
+      if(ge.type==='point'){ if(!ve4.contains(ge)) return false; continue; }
+      const e=ge.extent; if(!e) continue; ext=ext? ext.union(e) : e.clone(); }
+    return !ext||ve4.contains(ext);
+  }catch(e){ return false; } }
+function render(zoom, fids){
   $('cnt').textContent=parcels.length;
   const has=parcels.length>0;
   const totHa=parcels.reduce((s,p)=>s+(p.area_m2||0),0)/10000;
@@ -4047,8 +4062,11 @@ function render(zoom){
       gpParcelOf.set(g,p);   // per la scelta sulla mappa nei geoprocessi
       gl.add(g);
     });
-    const vis=gl.graphics.toArray().filter(g=>g.visible!==false);
-    if(zoom===true && vis.length && view && !bootVP){ view.goTo(vis).catch(()=>{}); }   // al boot rispetto la vista salvata
+    if(zoom===true && view && !bootVP){   // al boot rispetto la vista salvata
+      const want=(fids&&fids.length)? new Set(fids) : null;
+      const tg=gl.graphics.toArray().filter(g=>g.visible!==false&&(!want||want.has((gpParcelOf.get(g)||{}).fid)));
+      if(tg.length&&!parcelsInView(tg)) view.goTo(tg).catch(()=>{});
+    }
   }
   renderLabels();
   try{ gpSelInfo(); }catch(e){}   // particelle tolte dall'elenco: via anche dagli slot A/B

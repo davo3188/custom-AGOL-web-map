@@ -442,6 +442,14 @@ right-click menu opens it on the clicked point.
   through the same engine. The file is converted automatically only when Web Mercator is the *only*
   reading that lands on Italian soil; otherwise the import stops, the candidates appear in the
   coordinates module, and the whole file is reprojected with the system the user picks.
+- **Zoom after a selection** (since 2026-10-09, user request: "the zoom goes to all the extracted parcels,
+  I want it only on the parcels of that last selection, or no zoom-out"). One rule: after a search, a click
+  or an area selection the map frames **only the parcels of that action** (`render(true, fids)`, including
+  the ones that were already in the Raccolta), and **only if they are not all inside the current view**
+  (`parcelsInView`). So a click or an area selection never moves the map (the parcels are under the cursor or
+  inside the shape you drew), a search by Foglio/Particella flies to what it found, and nothing ever zooms
+  out to the whole Raccolta any more. The per-row Zoom button is unchanged; the saved viewpoint at start-up
+  still wins (`bootVP`).
 - **Cadastre source and bridge** (since 2026-10-08). The "Catasto AdE" layer on every map is the Agenzia delle
   Entrate WMS, but that service cannot be used from a browser (no CORS, no Web Mercator), so it needs a bridge.
   `CATASTO_SOURCES` lists them in order of preference: the app's own bridge at `api/catasto` next to the page
@@ -1514,6 +1522,16 @@ source swapped, `mapUrl` on the bridge, `fetchImage` at Pavia 1:2000 returns 39,
 Not tested: the Azure Function itself (no Node here). **2026-10-09, user:** no GitHub Actions work on the
 company repo for now (no control, unfamiliar), so the function stays in `scripts/`, out of the published files. Backup:
 `geoportale_axpo_pre-catasto-ponte_2026-10-08.html` (+ README, `serve_https_catasto.py`).
+
+**Zoom only on the last selection (2026-10-09, user request).** §4 *Zoom after a selection*. `render(zoom, fids)`
+frames the graphics of the given fids only when `parcelsInView` says they are not all in the view (extents
+unioned in WGS84, points checked one by one; a point parcel without geometry never moves the map). The three
+callers pass their fids: the area selection its hits, the text search the found fids plus the fids of parcels
+already present, the click its hit. Checked in headless Chrome with invented parcels: out of view → flies to
+those only (same scale when the second one is elsewhere, no zoom-out to both); in view → no movement; `render()`
+without zoom → no movement; a re-selected duplicate out of view → framed; `bootVP` set → no movement;
+`render(true)` without fids keeps the old "all visible" behaviour (no caller uses it). Backup:
+`geoportale_axpo_pre-zoom-selezione_2026-10-09.html` (+ README).
 
 **Open, known, non-blocking**
 
