@@ -465,6 +465,16 @@ right-click menu opens it on the clicked point.
   inside the shape you drew), a search by Foglio/Particella flies to what it found, and nothing ever zooms
   out to the whole Raccolta any more. The per-row Zoom button is unchanged; the saved viewpoint at start-up
   still wins (`bootVP`).
+- **Cadastre as an image over the map** (since 2026-10-11, user: "trovare un modo senza creare strumenti complessi
+  che cambino il metodo attuale"). The first cadastre source is now the Agenzia delle Entrate WMS itself, drawn
+  the way Leaflet-style viewers (forMaps) do it: one `<img>` for the visible extent, requested in EPSG:4258
+  when the view has been still for 250 ms, moved with CSS while the view pans, zooms or rotates, replaced only
+  when the new image has loaded. No CORS and no bridge are needed because the browser only displays the image.
+  The «Catasto AdE» entry of the Layer panel is a `GraphicsLayer` without graphics that acts as the switch: the
+  image follows its visibility and opacity, the entry greys out above 1:6,000 like the image (the Agenzia draws
+  parcels and buildings below 1:5,000 only). The legend names it. Limits: it is not an Esri layer, so it does not
+  print; above 1:6,000 nothing is drawn; three images in a row that do not decode (an XML exception, a server
+  down) hand over to `catastoProbe`, which tries the bridges and otherwise shows the status card.
 - **Cadastre source and bridge** (since 2026-10-08). The "Catasto AdE" layer on every map is the Agenzia delle
   Entrate WMS, but that service cannot be used from a browser (no CORS, no Web Mercator), so it needs a bridge.
   `CATASTO_SOURCES` lists them in order of preference: the app's own bridge at `api/catasto` next to the page
@@ -902,6 +912,17 @@ so it never touches the AMD loader. Worth knowing before editing:
 - **WMS.** The layer is created with only the chosen sublayers. As for the catasto, when the
   capabilities list EPSG:3857 it is forced, because GeoServer rejects 102100. For zooming, the extent is
   that of the chosen sublayers: the service's own extent is often all of Italy.
+- **The cadastre image (`adeOv*`, 2026-10-11).** `CATASTO_SOURCES[0]` is `{kind:'overlay'}`; `catastoMake` returns a
+  `GraphicsLayer` for it and `catastoPing` loads a 32-px image (an `<img>` can only say loaded / not loaded).
+  `adeOvBind` (called when the view is ready and after every `catastoSwap`) creates `#adeOverlay` inside the view
+  container, next to `.esri-ui` (a sibling inserted before it: over the map canvas, under the widgets,
+  `pointer-events:none`), and watches `view.extent`/`view.rotation` (place + debounced refresh) and the layer's
+  `visible`/`opacity`. `adeOvRefresh` asks the Agenzia for the view's bounding extent converted to lon/lat (WMS
+  1.1.1, `SRS=EPSG:4258`, size = extent in px × device pixel ratio up to 2, capped at 2,048 px, the Agenzia's
+  limit); `adeOvPlace` positions the image with `view.toScreen` of three corners of its extent (translate +
+  rotate + width/height), so rotation and zoom between refreshes are exact. Late answers are dropped
+  (`adeOv.pending`). Trap: `.esri-ui` is not a direct child of the view container; insert next to it, not with
+  `container.insertBefore`.
 - **The cadastre bridge** (`scripts/catasto_proxy.py`; the same in Node in `scripts/ponte_catasto_azure/`, 2026-10-08). The AdE WMS
   (`wms.cartografia.agenziaentrate.gov.it/inspire/wms/ows01.php`) serves EPSG:6706/4258 and the ETRS89 UTM
   zones, never 3857, and sends no CORS header (the WFS the same, GML only): useless from a browser. The bridge
@@ -1558,6 +1579,19 @@ and the toast is centred at the top; no console errors. Looked at in the built-i
 Raccolta with invented parcels, Layer with the status card). Headless screenshots at 390 px are cropped (Chrome's
 minimum window is ~500 px): use the pane's Mobile preset for phone visuals. Backup:
 `geoportale_axpo_pre-telefono-messaggi_2026-10-10.html` (+ README).
+
+**Cadastre back without a server (2026-10-11, user: "trovare un modo senza creare strumenti complessi").** §4
+*Cadastre as an image over the map*, §5 *The cadastre image*. Exploration first: Zornade draws parcels as vectors
+from its own database (its `locate?bbox=` returns centroids only, 200 per call, no geometry); the ArcGIS Online
+sharing proxy answers 403; the Agenzia refuses every Web Mercator code; OnData's `dati_catastali` gives one point
+per parcel, no geometries. A throwaway `<img>` overlay in the scratchpad proved the approach, then it was built in.
+Checked in headless Chrome (`scratchpad/dwg/make_ov2_test.py`): the layer is a GraphicsLayer at index 0, the box
+sits before `.esri-ui`, the image loads at the view size, its top-left matches `view.toScreen` of the extent corner
+to 0 px, a 100-px pan moves it by 100 px and triggers a reload, 30° of rotation gives 0.524 rad, above 1:6,000 it
+hides and comes back below, the Layer entry's visibility and opacity drive it, three broken answers call the probe;
+no console errors. Looked at in the built-in browser at Pavia 1:1,500 with two Zornade parcels on the AdE
+outlines and the Layer panel showing «Catasto AdE». Backup: `geoportale_axpo_pre-catasto-immagine_2026-10-11.html`
+(+ README).
 
 **Open, known, non-blocking**
 
