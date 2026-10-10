@@ -465,16 +465,20 @@ right-click menu opens it on the clicked point.
   inside the shape you drew), a search by Foglio/Particella flies to what it found, and nothing ever zooms
   out to the whole Raccolta any more. The per-row Zoom button is unchanged; the saved viewpoint at start-up
   still wins (`bootVP`).
-- **Cadastre as an image over the map** (since 2026-10-11, user: "trovare un modo senza creare strumenti complessi
+- **Cadastre as an image over the map** (since 2026-10-10 evening, user: "trovare un modo senza creare strumenti complessi
   che cambino il metodo attuale"). The first cadastre source is now the Agenzia delle Entrate WMS itself, drawn
   the way Leaflet-style viewers (forMaps) do it: one `<img>` for the visible extent, requested in EPSG:4258
   when the view has been still for 250 ms, moved with CSS while the view pans, zooms or rotates, replaced only
   when the new image has loaded. No CORS and no bridge are needed because the browser only displays the image.
   The «Catasto AdE» entry of the Layer panel is a `GraphicsLayer` without graphics that acts as the switch: the
-  image follows its visibility and opacity, the entry greys out above 1:6,000 like the image (the Agenzia draws
-  parcels and buildings below 1:5,000 only). The legend names it. Limits: it is not an Esri layer, so it does not
-  print; above 1:6,000 nothing is drawn; three images in a row that do not decode (an XML exception, a server
-  down) hand over to `catastoProbe`, which tries the bridges and otherwise shows the status card.
+  image follows its visibility and opacity, the entry greys out above 1:25,000 like the image. The request
+  carries four Agenzia layers, `CP.CadastralZoning` (map sheets with their number, served up to 1:200,000),
+  `CP.CadastralParcel` and `fabbricati` (below 1:5,000) and `codice_plla` (parcel numbers, below 1:2,000, so
+  from zoom level 19 on, since the view snaps to the basemap's zoom levels); the Agenzia leaves out-of-scale
+  layers blank, so one list serves every scale (user, 2026-10-10: "si è perso il numero delle particelle e i
+  fogli"). The legend names it. Limits: it is not an Esri layer, so it does not print; above 1:25,000 nothing is
+  drawn; three images in a row that do not decode (an XML exception, a server down) hand over to
+  `catastoProbe`, which tries the bridges and otherwise shows the status card.
 - **Cadastre source and bridge** (since 2026-10-08). The "Catasto AdE" layer on every map is the Agenzia delle
   Entrate WMS, but that service cannot be used from a browser (no CORS, no Web Mercator), so it needs a bridge.
   `CATASTO_SOURCES` lists them in order of preference: the app's own bridge at `api/catasto` next to the page
@@ -912,7 +916,7 @@ so it never touches the AMD loader. Worth knowing before editing:
 - **WMS.** The layer is created with only the chosen sublayers. As for the catasto, when the
   capabilities list EPSG:3857 it is forced, because GeoServer rejects 102100. For zooming, the extent is
   that of the chosen sublayers: the service's own extent is often all of Italy.
-- **The cadastre image (`adeOv*`, 2026-10-11).** `CATASTO_SOURCES[0]` is `{kind:'overlay'}`; `catastoMake` returns a
+- **The cadastre image (`adeOv*`, 2026-10-10).** `CATASTO_SOURCES[0]` is `{kind:'overlay'}`; `catastoMake` returns a
   `GraphicsLayer` for it and `catastoPing` loads a 32-px image (an `<img>` can only say loaded / not loaded).
   `adeOvBind` (called when the view is ready and after every `catastoSwap`) creates `#adeOverlay` inside the view
   container, next to `.esri-ui` (a sibling inserted before it: over the map canvas, under the widgets,
@@ -1556,7 +1560,12 @@ the bridge with curl (capabilities rewritten, GetMap 3857 → PNG with parcels, 
 headless Chrome A) without a bridge → `catastoBad`, marked title, error toast; B) `?catasto=<local bridge>` →
 source swapped, `mapUrl` on the bridge, `fetchImage` at Pavia 1:2000 returns 39,851 opaque pixels, no errors.
 Not tested: the Azure Function itself (no Node here). **2026-10-09, user:** no GitHub Actions work on the
-company repo for now (no control, unfamiliar), so the function stays in `scripts/`, out of the published files. Backup:
+company repo for now (no control, unfamiliar), so the function stays in `scripts/`, out of the published files.
+**2026-10-10, later:** the published page showed the cadastre once the browser cache was refreshed (Ctrl+F5); the
+user then missed the parcel numbers and the sheets: the image now asks for `CP.CadastralZoning` and
+`codice_plla` too and its limit is back to 1:25,000 (sheets from there, parcels below 1:5,000, numbers below
+1:2,000). Looked at in the built-in browser: sheets with numbers at 1:18,000, parcels at 1:2,257, numbers at
+1:1,128 (zoom 19). Backup: `geoportale_axpo_pre-catasto-fogli-numeri_2026-10-10.html`. Backup:
 `geoportale_axpo_pre-catasto-ponte_2026-10-08.html` (+ README, `serve_https_catasto.py`).
 
 **Zoom only on the last selection (2026-10-09, user request).** §4 *Zoom after a selection*. `render(zoom, fids)`
@@ -1580,7 +1589,7 @@ Raccolta with invented parcels, Layer with the status card). Headless screenshot
 minimum window is ~500 px): use the pane's Mobile preset for phone visuals. Backup:
 `geoportale_axpo_pre-telefono-messaggi_2026-10-10.html` (+ README).
 
-**Cadastre back without a server (2026-10-11, user: "trovare un modo senza creare strumenti complessi").** §4
+**Cadastre back without a server (2026-10-10 evening, user: "trovare un modo senza creare strumenti complessi").** §4
 *Cadastre as an image over the map*, §5 *The cadastre image*. Exploration first: Zornade draws parcels as vectors
 from its own database (its `locate?bbox=` returns centroids only, 200 per call, no geometry); the ArcGIS Online
 sharing proxy answers 403; the Agenzia refuses every Web Mercator code; OnData's `dati_catastali` gives one point
@@ -1591,7 +1600,7 @@ to 0 px, a 100-px pan moves it by 100 px and triggers a reload, 30° of rotation
 hides and comes back below, the Layer entry's visibility and opacity drive it, three broken answers call the probe;
 no console errors. Looked at in the built-in browser at Pavia 1:1,500 with two Zornade parcels on the AdE
 outlines and the Layer panel showing «Catasto AdE». Backup: `geoportale_axpo_pre-catasto-immagine_2026-10-11.html`
-(+ README).
+(+ README; the file name carries the wrong date, as do the branches `update/2026-10-11`).
 
 **Open, known, non-blocking**
 

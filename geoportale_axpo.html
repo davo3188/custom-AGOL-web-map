@@ -1665,7 +1665,7 @@
       <li><b>Importa dati</b> — quattro schede sempre aperte: <b>file di geometrie</b> (GeoJSON, KML, KMZ, Shapefile; il GeoJSON di <b>Estrazione intestatari</b> si colora e si raggruppa per intestatario, e i nominativi restano fuori dal salvataggio automatico e dal portale), <b>disegni CAD</b> (DWG letti nel browser, con il sistema di coordinate proposto, oppure posizionati a mano con 2 punti), <b>immagini</b> (GeoTIFF e world file si posizionano da soli; le altre, PDF compresi, con sposta/scala/ruota, angoli, coppie di punti noti o valori numerici, e si scaricano con il world file) e <b>servizi web</b> (WMS, WFS e ArcGIS REST per indirizzo, senza creare item sul portale; il browser accetta solo servizi <b>https</b> che permettono la lettura da altri siti, CORS).</li>
       <li><b>Rail destro</b> — in cima la <b>Raccolta</b>, con il numero di oggetti: tutto quello che hai raccolto (Particelle · Disegni · Geoprocessi · Importati; sotto le Particelle <b>Crea area lorda</b>, dalle spuntate o da tutte, e sotto i Disegni la spunta <b>Area netta automatica</b>: la lorda meno tutto ciò che taglia — esclusioni, fasce dei buffer, ostacoli, siepi e zone agricole — ricalcolata da sola, come in PV Predesign, con accanto il <b>rientro dal confine</b> in metri); ogni riga si rinomina, si colora, si nasconde e si <b>spunta</b> per usarla nei geoprocessi; da qui esporti e salvi sul portale. Sotto, i pannelli della mappa (Layer, <b>Legenda</b> dei layer accesi — compresa la Raccolta —, Mappa di base, Segnalibri) e le azioni (Modifica AREAS, Stampa).</li>
       <li><b>🗺 Mappa</b> (in alto) — la web map del portale in uso: la General Map o una Check Vincoli regionale, con ricerca per nome. Cambiarla non tocca particelle, disegni e risultati; si perdono solo i layer accesi e i filtri di quella mappa (te lo chiedo prima). Scegliendo una regione nella ricerca ti propongo i suoi vincoli con un clic. Sulla mappa, sotto la bussola, il pulsante di <b>localizzazione GPS</b> porta la vista dove sei (il browser chiede il permesso).</li>
-      <li><b>Layer</b> — cerca un layer per nome; dal pannello di ogni layer (icona a cursori) trasparenza, popup e <b>filtro per attributo</b> (l'icona diventa un imbuto quando è attivo). I layer aggiunti da te (dal portale, servizi web, DWG, immagini) hanno il menu <b>…</b> con Zoom e <b>Rimuovi dalla mappa</b>. Il <b>Catasto AdE</b> è l'immagine ufficiale del WMS dell'Agenzia delle Entrate, visibile da 1:6.000 in giù: la sua voce lo accende, lo spegne e ne regola la trasparenza.</li>
+      <li><b>Layer</b> — cerca un layer per nome; dal pannello di ogni layer (icona a cursori) trasparenza, popup e <b>filtro per attributo</b> (l'icona diventa un imbuto quando è attivo). I layer aggiunti da te (dal portale, servizi web, DWG, immagini) hanno il menu <b>…</b> con Zoom e <b>Rimuovi dalla mappa</b>. Il <b>Catasto AdE</b> è l'immagine ufficiale del WMS dell'Agenzia delle Entrate: fogli da 1:25.000, particelle e fabbricati da 1:5.000, numeri di particella da 1:2.000; la sua voce lo accende, lo spegne e ne regola la trasparenza.</li>
       <li><b>Esporta / Migra / Salva</b> — in fondo alla Raccolta, sempre in vista: <b>Esporta</b> apre la finestra con il formato (GeoJSON/KML/KMZ/SHP/XLSX) e i singoli oggetti (le spunte sono quelle della Raccolta; senza spunte esporta tutto); il file prende il nome da comune, data e numero di particelle, per esempio <i>Milano_2026-10-05_6part.geojson</i>; <b>Migra particelle in AREAS Collection</b> (l'opzione «dissolvi» sta nella sua finestra); <b>Salva disegni in Site Features</b> (categoria, tipo, attributi e sito: la seconda volta aggiorna, non duplica).</li>
       <li><b>Tools</b> (in basso a sinistra sulla mappa) — uno strumento alla volta, in una scheda: <b>Misura</b> (distanza e area); <b>Profilo altimetrico</b> lungo una linea; <b>Pendenze da DTM</b> (scegli l'area lorda e il limite di pendenza, in ogni direzione oppure nord–sud ed est–ovest: il terreno compare sulla mappa con le zone troppo ripide, che diventano un'esclusione nella Raccolta); <b>Analisi di contesto</b> (sottostazioni, linee AT e progetti FV intorno a un punto; serve l'accesso); <b>Coordinate sconosciute</b> (in che sistema sono?); <b>Percorso su strada</b> fino al punto di connessione (serve l'accesso).</li>
       <li><b>Progetto</b> (in alto) — <b>💾 Salva progetto</b> mette tutto in un file .axpo, come un progetto QGIS: vista, basemap, area di lavoro, mappa e layer del portale (accesi, trasparenza, ordine), servizi web, particelle, disegni, geoprocessi, import, sito di lavoro, i file di <b>DWG e immagini</b> con il loro posizionamento e il <b>DTM delle pendenze</b> con il suo limite. <b>📂 Apri progetto</b> lo ripristina (sostituisce il lavoro corrente). <kbd>Ctrl</kbd>+<kbd>S</kbd> risalva sullo stesso file, <kbd>Ctrl</kbd>+<kbd>Maiusc</kbd>+<kbd>S</kbd> salva con nome. Lo stesso file si apre in PV Predesign, che ne legge aree, esclusioni e terreno.</li>
@@ -1772,10 +1772,12 @@ const CATASTO_ITEM_ID_ALT="05ccc51fc6e64c5f84e4032faad754dc";   // IT - Cartogra
 //     l'8/10/2026 rispondeva «PKIX path building failed» a ogni GetMap e il catasto spariva senza un errore.
 // catastoProbe prova le sorgenti con una GetMap minuscola, usa la prima viva, avvisa se nessuna risponde e riprova
 // ogni 10 minuti. ?catasto=<url di un ponte> lo mette in testa (resta in localStorage); ?catasto=off lo toglie.
-// 11/10/2026: the first source is the Agenzia WMS itself, drawn as an image over the view (kind 'overlay', see adeOv*):
+// 10/10/2026: the first source is the Agenzia WMS itself, drawn as an image over the view (kind 'overlay', see adeOv*):
 // no bridge, no CORS needed. The bridges (kind 'wms') remain as fallbacks, chosen only when the Agenzia does not answer.
 const CATASTO_ADE_WMS="https://wms.cartografia.agenziaentrate.gov.it/inspire/wms/ows01.php";
-const CATASTO_ADE_SUBS=[{name:"CP.CadastralParcel"},{name:"fabbricati"}];
+// sheets (CP.CadastralZoning, served up to 1:200,000), parcels and buildings (below 1:5,000), parcel numbers (codice_plla,
+// below 1:2,000): the Agenzia leaves out-of-scale layers blank, so one list serves every scale
+const CATASTO_ADE_SUBS=[{name:"CP.CadastralZoning"},{name:"CP.CadastralParcel"},{name:"fabbricati"},{name:"codice_plla"}];
 const CATASTO_SOURCES=[
   {id:'ade', kind:'overlay', label:'WMS dell\'Agenzia delle Entrate (immagine sulla mappa)', url:CATASTO_ADE_WMS, sublayers:CATASTO_ADE_SUBS},
   {id:'ponte', label:'ponte dell\'app (/api/catasto)', url:(function(){ try{ return new URL('api/catasto', location.href).href; }catch(e){ return 'api/catasto'; } })(), sublayers:CATASTO_ADE_SUBS, fixMapUrl:true},
@@ -3190,14 +3192,14 @@ async function projOpenFile(file, handle){
   finally{ cadBusy=false; projBusy=false; bootVP=null; projUi(); try{ saveStateDebounced(); }catch(e){} } }
 
 // ── catasto: creazione dalla sorgente, controllo di vita, cambio al volo (8/10/2026) ────────────────────────
-// ── The Agenzia WMS as an image over the view (11/10/2026) ──────────────────────────────────────────────────
+// ── The Agenzia WMS as an image over the view (10/10/2026) ──────────────────────────────────────────────────
 // The Agenzia serves EPSG:4258 only and sends no CORS header, so the SDK (WebGL) cannot draw it; a plain <img> can,
 // because the browser only displays it. Leaflet-style: one image for the visible extent, requested when the view has
 // been still for 250 ms, moved with CSS while the view pans, zooms or rotates; the previous image stays until the new
 // one has loaded; late answers are dropped. Within one image the difference between the lon/lat grid and Web
 // Mercator is below a pixel at these scales. The «Catasto AdE» entry of the Layer panel (a GraphicsLayer without
 // graphics) is the switch: the image follows its visibility and opacity. Not an Esri layer: it does not print.
-const ADE_OV_MAX_SCALE=6000;   // the Agenzia draws parcels and buildings below 1:5,000 only (blank above)
+const ADE_OV_MAX_SCALE=25000;   // the app's limit for the cadastre: sheets from here, parcels and buildings below 1:5,000, numbers below 1:2,000
 const adeOv={box:null, img:null, ext:null, pending:null, tmr:null, on:false, src:null, fails:0, handles:[], loads:0};
 function adeOvUrl(src, bbox, w, h){ const names=src.sublayers.map(s=>s.name).join(','), styles=src.sublayers.map(()=>'').join(',');
   return src.url+'?SERVICE=WMS&REQUEST=GetMap&VERSION=1.1.1&LAYERS='+encodeURIComponent(names)+'&STYLES='+encodeURIComponent(styles)
@@ -3243,7 +3245,7 @@ function adeOvRefresh(){ if(!adeOv.on||!view||!view.ready||!adeOv.src) return;
     if(adeOv.fails===3){ console.warn('[catasto] il WMS dell\'Agenzia non risponde con immagini'); try{ catastoProbe(true); }catch(x){} } };
   n.src=adeOvUrl(adeOv.src, [a[0],a[1],b[0],b[1]], w, h); }
 function catastoMake(src){
-  if(src.kind==='overlay'){   // the Layer panel entry only: the image is drawn by adeOv*, out of scale above 1:6,000 like the image
+  if(src.kind==='overlay'){   // the Layer panel entry only: the image is drawn by adeOv*, out of scale above 1:25,000 like the image
     const g=new esriMods.GraphicsLayer({title:"Catasto AdE", opacity:.5, minScale:ADE_OV_MAX_SCALE}); g._catSrc=src; return g; }
   const l=new esriMods.WMSLayer({url:src.url, sublayers:src.sublayers.map(s=>({name:s.name})),
     // GeoServer rifiuta il codice Esri 102100 (SR delle basemap tiled) come "InvalidSRS": forzo la richiesta in
@@ -5147,7 +5149,7 @@ function legendMissingRender(){ const box=$('legendNo'), mb=$('legendMsg'); if(!
   const on=legendOpLayers().filter(l=>l.visible&&l.listMode!=='hide'&&legendAncestorsOn(l)), wmsOn=on.filter(l=>l.type==='wms');
   const catOv=!!(catasto&&catasto._catSrc&&catasto._catSrc.kind==='overlay'&&on.indexOf(catasto)>=0);
   const miss=on.filter(l=>!(catOv&&l===catasto)&&l.type!=='wms'&&!shown.has(l.uid)&&legendScaleOk(l));
-  box.textContent= (catOv? 'Catasto AdE: immagine del WMS dell\'Agenzia delle Entrate (particelle e fabbricati, visibile da 1:6.000 in giù). ' : '')+(miss.length? 'Accesi ma senza legenda: '+miss.map(l=>(l.title||'layer')+(LEGEND_TYPES[l.type]? ' ('+LEGEND_TYPES[l.type]+')' : l.legendEnabled===false? ' (nascosto nella legenda della web map)' : '')).join(', ')+'.' : '');
+  box.textContent= (catOv? 'Catasto AdE: immagine del WMS dell\'Agenzia delle Entrate (fogli da 1:25.000, particelle e fabbricati da 1:5.000, numeri di particella da 1:2.000). ' : '')+(miss.length? 'Accesi ma senza legenda: '+miss.map(l=>(l.title||'layer')+(LEGEND_TYPES[l.type]? ' ('+LEGEND_TYPES[l.type]+')' : l.legendEnabled===false? ' (nascosto nella legenda della web map)' : '')).join(', ')+'.' : '');
   const empty=!shown.size&&!$('legendWms').querySelector('.wmsleg'), outOfScale=on.filter(l=>l.type!=='wms'&&!legendScaleOk(l)).length;
   mb.textContent= empty? (on.length? 'Nessun layer acceso ha una legenda da mostrare.' : 'Nessun layer acceso.') : (outOfScale? outOfScale+(outOfScale===1? ' layer acceso è' : ' layer accesi sono')+' fuori scala: in legenda, ma non sulla mappa a questo zoom.' : ''); }
 function legendLocalRender(){ const box=$('legendLocal'); if(!box) return; const rows=[];
