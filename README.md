@@ -442,6 +442,21 @@ right-click menu opens it on the clicked point.
   through the same engine. The file is converted automatically only when Web Mercator is the *only*
   reading that lands on Italian soil; otherwise the import stops, the candidates appear in the
   coordinates module, and the whole file is reprojected with the system the user picks.
+- **Messages and service status** (since 2026-10-10, UX review point 2). Toasts sit at the top centre of the page
+  (below the top bar, 560 px wide), never over the widgets in the corners; on phones they sit below the panel
+  header and clear of the zoom/compass column. A failing service no longer repeats its exception in the toast: the
+  cadastre toast says only that the bridge does not answer, with «Vedi ›» opening the Layer panel, where a red
+  status card (`#svcStatus`, `catastoStatus`) keeps the full reason and a «Riprova ora» button; the card disappears
+  when the service is back.
+- **Phone and tablet layout** (since 2026-10-10, UX review point 1). Up to 1024 px wide only one panel is open at a
+  time: opening a right drawer collapses the left panel and a module tab closes the drawer (`isNarrow` in
+  `openPanel` and in the tab handler; `ensureMapRoom` steps aside). Up to 768 px the two rails become one bottom
+  bar (`#mbar`): Cerca, Disegna, Geoproc, Importa | Raccolta, Layer, Legenda, Base, Luoghi, built by `mbarBuild`
+  as proxies of the rail buttons (same icon and ARIA label, synced by a `MutationObserver`, badge included), so
+  Stampa and Modifica AREAS stay desktop only. The left panel and the right drawer open full screen between the
+  top bar and the bottom bar, with a × in their header (`#sideToggle` restyled, `#mdclose` for the drawers); the
+  page starts with the map; the top bar hides the title and compacts the map selector and the sign-in button; the
+  coordinates box, the resize handles, the undock button and the tours are hidden. Nothing changes above 1024 px.
 - **Zoom after a selection** (since 2026-10-09, user request: "the zoom goes to all the extracted parcels,
   I want it only on the parcels of that last selection, or no zoom-out"). One rule: after a search, a click
   or an area selection the map frames **only the parcels of that action** (`render(true, fids)`, including
@@ -1532,6 +1547,17 @@ those only (same scale when the second one is elsewhere, no zoom-out to both); i
 without zoom → no movement; a re-selected duplicate out of view → framed; `bootVP` set → no movement;
 `render(true)` without fids keeps the old "all visible" behaviour (no caller uses it). Backup:
 `geoportale_axpo_pre-zoom-selezione_2026-10-09.html` (+ README).
+
+**Messages, service status, phone and tablet (2026-10-10, UX review points 1 and 2, user: "procedi con 1 e 2").**
+§4 *Messages and service status* and *Phone and tablet layout*. Checked in headless Chrome with a test page that
+drives the real handlers (`scratchpad/dwg/make_resp_test.py`): at phone width the bottom bar has nine buttons, the
+page starts with the map, Cerca opens the left panel full screen and closes the drawer, Raccolta opens the drawer
+full screen and collapses the left panel, × closes, Disegna + × and Layer toggle work, the status card shows and
+hides, «Vedi ›» opens the Layer panel; at tablet width the two panels exclude each other; at desktop both stay open
+and the toast is centred at the top; no console errors. Looked at in the built-in browser at 375×812 (map, Cerca,
+Raccolta with invented parcels, Layer with the status card). Headless screenshots at 390 px are cropped (Chrome's
+minimum window is ~500 px): use the pane's Mobile preset for phone visuals. Backup:
+`geoportale_axpo_pre-telefono-messaggi_2026-10-10.html` (+ README).
 
 **Open, known, non-blocking**
 

@@ -274,7 +274,10 @@
   .msg.ok{background:color-mix(in srgb, var(--ok) 13%, transparent);color:var(--ok)}
 
   /* ══ TOAST (brief §8) ══ */
-  #toasts{position:fixed;right:16px;bottom:16px;z-index:1200;display:flex;flex-direction:column;gap:8px;max-width:340px}
+  /* 10/10 (UX review): messages sit at the top centre of the page, never over the widgets in the corners
+     (coordinates box, scale bar, Tools); the container lets clicks through, the toasts do not */
+  #toasts{position:fixed;left:50%;top:56px;transform:translateX(-50%);z-index:1200;display:flex;flex-direction:column;gap:8px;width:min(560px,calc(100% - 32px));pointer-events:none}
+  #toasts .toast{pointer-events:auto}
   .toast .tact{display:inline;margin:0 0 0 6px;padding:0;border:0;background:none;color:var(--accent);font:inherit;font-weight:700;cursor:pointer;text-decoration:underline}
   .toast .tclose{float:right;margin:-4px -6px 0 8px;padding:0 4px;border:0;background:none;color:var(--mut);font-size:16px;line-height:1;cursor:pointer}
   .toast .tclose:hover{color:var(--txt)}
@@ -821,6 +824,52 @@
   .imod .im-info,.gpstep .im-info,.sfrow .im-info{opacity:0;transition:opacity .15s}
   .imod:hover .im-info,.imod:focus-within .im-info,.gpstep:hover .im-info,.gpstep:focus-within .im-info,.sfrow:hover .im-info,.sfrow:focus-within .im-info,.im-info:focus-visible{opacity:1}
   @media (hover:none){ .imod .im-info,.gpstep .im-info,.sfrow .im-info{opacity:1} }
+
+  /* ══ SERVICE STATUS in the Layer panel (10/10, UX review): the toast stays short, the reason and «Riprova» live here ══ */
+  .svcstat{padding:8px 10px;margin-bottom:10px;border:1px solid var(--err);border-left-width:4px;border-radius:8px;font-size:12px;line-height:1.4;background:var(--panel)}
+  .svcstat b{display:block;margin-bottom:2px}
+  .svcstat button{margin:6px 0 0;padding:4px 10px;font-size:11.5px}
+
+  /* ══ PHONE AND TABLET (10/10, UX review) ══
+     <=1024px: one panel at a time (left module or right drawer), widths unchanged (script: openPanel, tab clicks).
+     <=768px: the two rails become one bottom bar (#mbar, filled by the script with proxies of the rail buttons);
+     the left panel and the right drawer open full screen between the top bar and the bottom bar, with a × to close;
+     Stampa and Modifica AREAS stay desktop only; the coordinates box and the tours are hidden. */
+  #mbar{display:none;position:fixed;left:0;right:0;bottom:0;height:56px;z-index:45;background:var(--panel-head);border-top:1px solid var(--line-strong);padding:4px 4px calc(4px + env(safe-area-inset-bottom,0px));box-sizing:content-box;gap:2px;align-items:stretch}
+  #mbar button{flex:1 1 0;min-width:0;margin:0;background:transparent;border:0;border-radius:8px;color:var(--mut);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:2px 0;cursor:pointer;font-family:var(--font-ui)}
+  #mbar .mbico{display:flex;align-items:center;justify-content:center;height:22px;position:relative}
+  #mbar .mbico svg{width:20px;height:20px;display:block} #mbar .mbico [class^=esri-icon]{font-size:19px}
+  #mbar .mbico .badge{position:absolute;top:-6px;right:-10px}
+  #mbar .mblab{font-size:9px;font-weight:600;letter-spacing:-.1px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;line-height:1}
+  #mbar button.active{color:var(--accent);background:var(--hover)}
+  #mbar .mbsep{width:1px;flex:none;background:var(--line-strong);margin:10px 2px}
+  #mdclose{display:none}
+  @media (max-width:768px){
+    #topbar{gap:8px;padding:0 8px}
+    #topbar .brand{gap:6px} #topbar .brand h1{display:none} #projName{display:none}
+    .wmsel{position:static;transform:none;max-width:none;flex:1;min-width:0;display:flex;justify-content:center}
+    #wmBtn{max-width:100%} #wmBtn .tbl{display:none} #wmBtn b{max-width:110px}
+    #wmMenu{left:8px;right:8px;transform:none;width:auto}
+    .topbar-right{flex:1;min-width:0;gap:4px}
+    #signin{padding:6px 8px} #signin .t{display:none}
+    #appBody{padding-bottom:56px}
+    #side{position:fixed;left:0;right:0;top:46px;bottom:56px;width:auto;min-width:0;max-width:none;z-index:40;border-right:0}
+    body.side-collapsed #side{display:none}
+    #sideRail,#sideResizer,#sideUndock{display:none!important}
+    #sideToggle{font-size:0;padding:3px 10px} #sideToggle::after{content:'×';font-size:18px;line-height:1}
+    #toolsPanel{position:fixed;left:0;right:0;top:46px;bottom:56px;z-index:40;border-left:0;display:none;flex-direction:column}
+    #toolsPanel.open{display:flex}
+    #toolsPanel.open #toolsBody{width:auto;flex:1;min-height:0;transition:none}
+    #actionIcons,#toolsResizer{display:none!important}
+    #mdclose{display:flex;position:sticky;top:0;z-index:2;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--panel-head);border-bottom:1px solid var(--line-strong)}
+    #mdclose b{font-size:11px;text-transform:uppercase;letter-spacing:.6px}
+    #mdclose button{margin:0;background:var(--panel);border:1px solid var(--line);border-radius:6px;color:var(--txt);padding:2px 10px;font-size:18px;line-height:1;cursor:pointer}
+    #mbar{display:flex}
+    #brStack{display:none}
+    /* below the top bar and the panel header, clear of the zoom/compass column on the left */
+    #toasts{top:94px;left:62px;right:8px;width:auto;transform:none}
+    #hmStart,#hmAll{display:none}
+  }
   /* giro 3, alleggerimento: attribuzione Esri più bassa e discreta (le fonti complete al passaggio del mouse) */
   .esri-attribution{height:18px;line-height:18px;font-size:10px;padding:0 6px;background:color-mix(in srgb, var(--panel) 55%, transparent);color:var(--mut);opacity:.75}
   .esri-attribution:hover{opacity:1}
@@ -1418,6 +1467,7 @@
   <div id="toolsPanel">
     <div id="toolsResizer" title="Trascina per ridimensionare" role="separator" aria-orientation="vertical" aria-label="Ridimensiona pannello"></div>
     <div id="toolsBody">
+      <div id="mdclose"><b id="mdcloseT"></b><button type="button" id="mdcloseBtn" aria-label="Chiudi il pannello">×</button></div>
       <div class="drawer" data-panel="elenco" id="drawerElenco">
         <div class="tlab" id="rcTitle">Raccolta</div>
         <div class="thint rcsub">Tutto quello che hai raccolto: particelle, disegni, risultati, importati. Da qui esporti e salvi.</div>
@@ -1452,6 +1502,7 @@
         </div>
       </div>
       <div class="drawer" data-panel="layers">
+        <div id="svcStatus" class="svcstat" hidden></div>
         <div class="tlab">Aggiungi layer dal portale</div>
         <div class="row">
           <div style="flex:2"><input id="itemQ" placeholder="cerca per titolo…" disabled></div>
@@ -1600,6 +1651,7 @@
 </div>
 
 <!-- ── MODALE HELP ── -->
+<nav id="mbar" aria-label="Sezioni e mappa" hidden></nav>
 <div id="helpModal">
   <div class="card">
     <button id="helpClose" class="mclose" title="Chiudi" aria-label="Chiudi">×</button>
@@ -3163,16 +3215,28 @@ async function catastoProbe(quiet){
     for(const s of CATASTO_SOURCES){ const r=await catastoPing(s); if(r.ok){ pick=s; break; } fails.push({s, why:r.why}); }
     if(pick){ if(!catasto||catasto._catSrc!==pick) catastoSwap(pick);
       if(catastoBad){ catastoBad=false; msg('Catasto AdE di nuovo disponibile ('+pick.label+').','ok'); }
-      catastoMark(false); }
+      catastoMark(false); catastoStatus(null); }
     else{ const shown=fails.filter(f=>f.why!=='HTTP 404'), txt=(shown.length? shown : fails).map(f=>f.s.label+': '+f.why).join(' · ');
       const first=!catastoBad; catastoBad=true; catastoMark(true);
-      if(!quiet||first) msg('Catasto AdE non disponibile — '+txt+'. È un guasto dei loro server, non dell\'app: riprovo ogni 10 minuti.','err'); }
+      catastoStatus(txt);   // 10/10: the full reason and «Riprova» live in the Layer panel; the toast stays short
+      if(!quiet||first) msg('Catasto AdE non disponibile: il servizio che fa da ponte non risponde. Non dipende dall\'app, riprovo ogni 10 minuti.','err',
+        {action:{label:'Vedi ›', fn:function(){ try{ window.openPanel&&window.openPanel('layers'); }catch(e){} }}}); }
   }catch(e){ console.warn('[catasto] controllo non riuscito:', e); }
   finally{ catastoProbe.busy=false; clearTimeout(catastoTimer); catastoTimer=setTimeout(()=>catastoProbe(true), 10*60*1000); } }
 function catastoSwap(src){ const old=catasto, nl=catastoMake(src);
   try{ if(old){ nl.visible=old.visible; nl.opacity=old.opacity; } }catch(e){}
   try{ const m=view&&view.map; if(m){ const i=old? m.layers.indexOf(old) : -1; if(old&&i>=0) m.remove(old); m.add(nl, i>=0? i : 0); } }catch(e){ console.warn('[catasto] cambio sorgente:', e); }
   catasto=nl; catastoSrc=src; console.info('[catasto] sorgente: '+src.label); }
+function catastoStatus(txt){   // persistent service status in the Layer panel (10/10, UX review)
+  try{ const el=byId('svcStatus'); if(!el) return;
+    if(!txt){ el.hidden=true; el.textContent=''; return; }
+    el.hidden=false; el.textContent='';
+    const b=document.createElement('b'); b.textContent='Catasto AdE non disponibile';
+    const p=document.createElement('div'); p.textContent=txt+'. È un guasto del loro server, non dell\'app: riprovo ogni 10 minuti.';
+    const r=document.createElement('button'); r.type='button'; r.className='sec'; r.textContent='Riprova ora';
+    r.onclick=()=>{ r.disabled=true; Promise.resolve(catastoProbe(false)).finally(()=>{ r.disabled=false; }); };
+    el.appendChild(b); el.appendChild(p); el.appendChild(r);
+  }catch(e){} }
 function catastoMark(bad){ try{ const t=bad? 'Catasto AdE ⚠ non disponibile' : 'Catasto AdE'; if(catasto&&catasto.title!==t) catasto.title=t; }catch(e){} }
 // ── catasto della webmap: match per ITEM ID (i titoli "catast*" sono decine: regioni/province) ──
 function findWebmapCatasto(wm){
@@ -8102,12 +8166,19 @@ function baseGroundSet(){
 
   /* 3 ── ACTION BAR: un drawer alla volta */
   var icons=Array.prototype.slice.call(document.querySelectorAll('#actionIcons button'));
+  // 10/10: narrow screens (tablet <=1024px) show one panel at a time; phones (<=768px) get the bottom bar
+  function isNarrow(){ try{ return window.matchMedia('(max-width:1024px)').matches; }catch(e){ return false; } }
+  function isPhone(){ try{ return window.matchMedia('(max-width:768px)').matches; }catch(e){ return false; } }
   function openPanel(name){
     icons.forEach(function(b){ var on=b.dataset.panel===name; b.classList.toggle('active', on); b.setAttribute('aria-expanded', on? 'true' : 'false'); });
     Array.prototype.forEach.call(document.querySelectorAll('#toolsBody .drawer'),function(d){ d.classList.toggle('open', d.dataset.panel===name); });
     var tp=$g('toolsPanel'); if(tp) tp.classList.toggle('open', !!name);
     if(name&&window.toolMenuClose) window.toolMenuClose(false);   // P4: un cassetto aperto chiude il menu Tools (non la scheda)
+    if(name&&isNarrow()) document.body.classList.add('side-collapsed');   // one panel at a time
+    var ct=$g('mdcloseT'); if(ct){ var ab=null; icons.forEach(function(b){ if(b.dataset.panel===name) ab=b; }); ct.textContent=ab? (ab.getAttribute('title')||ab.getAttribute('aria-label')||'') : ''; }
+    mbarSync();
   }
+  window.openPanel=openPanel;
   icons.forEach(function(b){ b.onclick=function(){ var n=b.classList.contains('active')?null:b.dataset.panel; openPanel(n); if(n) ensureMapRoom('right');
     if(n==='legend'&&window.legendMount) window.legendMount(); }; });
 
@@ -8116,7 +8187,8 @@ function baseGroundSet(){
      sinistro, o finestra ristretta → prima chiudo il cassetto. Un passo alla volta, misurando dopo la transizione. */
   var MAP_MIN=360, roomT=null, roomSteps=0;
   function mapWidth(){ var v=$g('viewDiv'); return v? v.getBoundingClientRect().width : 9999; }
-  function ensureMapRoom(prefer){ clearTimeout(roomT); roomSteps=0; roomT=setTimeout(function(){ roomStep(prefer, []); }, 260); }
+  function ensureMapRoom(prefer){ if(isNarrow()) return;   // 10/10: tablet and phone already show one panel at a time
+    clearTimeout(roomT); roomSteps=0; roomT=setTimeout(function(){ roomStep(prefer, []); }, 260); }
   function roomStep(prefer, did){
     var done=function(){ if(did.length) msg('Poco spazio per la mappa: '+did.join(', ')+'. Con il pannello sganciato (⧉) su un secondo schermo la mappa ha tutto lo spazio.',''); };
     if(MAP_MIN-mapWidth()<=0||roomSteps++>4){ done(); return; }
@@ -8132,6 +8204,45 @@ function baseGroundSet(){
   window.ensureMapRoom=ensureMapRoom;
   window.addEventListener('resize', function(){ ensureMapRoom(); });
   ensureMapRoom();   // all'apertura, su uno schermo stretto
+
+  /* 3b2 ── phone (<=768px, 10/10 UX review): one bottom bar instead of the two rails. Its buttons are proxies of the
+     rail buttons (same icon, same label), so every handler, badge and ARIA label stays in one place. */
+  var mbar=$g('mbar'), mbarRaf=null;
+  // labels of at most 8 characters: nine buttons share 375px
+  var MBAR=[['#sideRail button[data-tab="ricerca"]','Cerca'],['#sideRail button[data-tab="disegno"]','Disegna'],
+    ['#sideRail button[data-tab="geoproc"]','Geoproc'],['#sideRail button[data-tab="import"]','Importa'],null,
+    ['#actionIcons button[data-panel="elenco"]','Raccolta'],['#actionIcons button[data-panel="layers"]','Layer'],
+    ['#actionIcons button[data-panel="legend"]','Legenda'],['#actionIcons button[data-panel="basemaps"]','Base'],
+    ['#actionIcons button[data-panel="bookmarks"]','Luoghi']];
+  function mbarBuild(){ if(!mbar||mbar.children.length) return; mbar.innerHTML='';
+    MBAR.forEach(function(d){ if(!d){ var s=document.createElement('span'); s.className='mbsep'; mbar.appendChild(s); return; }
+      var o=document.querySelector(d[0]); if(!o) return;
+      var b=document.createElement('button'); b.type='button'; b.dataset.src=d[0]; b.setAttribute('aria-label', o.getAttribute('aria-label')||d[1]);
+      var ic=document.createElement('span'); ic.className='mbico'; var lb=document.createElement('span'); lb.className='mblab'; lb.textContent=d[1];
+      b.appendChild(ic); b.appendChild(lb);
+      b.onclick=function(){
+        if(o.dataset.tab){   // left module: open full screen (closing the drawer), or close it when it is the open one
+          var open=!document.body.classList.contains('side-collapsed');
+          if(open&&o.classList.contains('active')) document.body.classList.add('side-collapsed');
+          else { openPanel(null); document.body.classList.remove('side-collapsed'); showTab(o.dataset.tab); } }
+        else o.click();   // right drawer: the rail button's own handler (openPanel closes the left panel on narrow screens)
+        mbarSync(); };
+      mbar.appendChild(b); });
+    mbarSync(); }
+  function mbarSync(){ if(!mbar||mbar.hidden) return;
+    Array.prototype.forEach.call(mbar.querySelectorAll('button'), function(b){ var o=document.querySelector(b.dataset.src); if(!o) return;
+      var on=o.classList.contains('active')&&(o.dataset.tab? !document.body.classList.contains('side-collapsed') : true);
+      b.classList.toggle('active', on);
+      var ic=b.querySelector('.mbico'), h=o.innerHTML.replace(/ id="[^"]*"/g,''); if(ic&&ic.innerHTML!==h) ic.innerHTML=h; }); }
+  function mbarSoon(){ cancelAnimationFrame(mbarRaf); mbarRaf=requestAnimationFrame(mbarSync); }
+  function mbarApply(){ if(!mbar) return;
+    if(isPhone()){ mbarBuild(); mbar.hidden=false; if(!mbarApply.done){ mbarApply.done=true; document.body.classList.add('side-collapsed'); } mbarSync(); }
+    else mbar.hidden=true; }
+  try{ var mbarMq=window.matchMedia('(max-width:768px)'); (mbarMq.addEventListener? mbarMq.addEventListener('change', mbarApply) : mbarMq.addListener(mbarApply)); }catch(e){}
+  try{ var mbarObs=new MutationObserver(mbarSoon); ['sideRail','actionIcons'].forEach(function(id){ var el=$g(id); if(el) mbarObs.observe(el, {attributes:true, childList:true, characterData:true, subtree:true}); });
+    mbarObs.observe(document.body, {attributes:true, attributeFilter:['class']}); }catch(e){}
+  if($g('mdcloseBtn')) $g('mdcloseBtn').onclick=function(){ openPanel(null); };
+  mbarApply();
 
   /* 3c ── finestre (dialoghi): semantica, fuoco dentro la finestra e ritorno al comando che l'ha aperta */
   var DLG=['exportModal','promoteModal','sfModal','cadModal','helpModal','infoModal','helpMenu'];
@@ -8251,7 +8362,7 @@ function baseGroundSet(){
   }
   _tabs.forEach(function(b){ b.onclick=function(){
     if(typeof sideUndocked==='function'&&sideUndocked()){ showTab(b.dataset.tab); return; }   // sganciato: niente pannello da comprimere
-    if(document.body.classList.contains('side-collapsed')){ document.body.classList.remove('side-collapsed'); showTab(b.dataset.tab); ensureMapRoom('left'); }
+    if(document.body.classList.contains('side-collapsed')){ document.body.classList.remove('side-collapsed'); showTab(b.dataset.tab); if(isNarrow()) openPanel(null); else ensureMapRoom('left'); }
     else if(b.classList.contains('active')){ document.body.classList.add('side-collapsed'); }
     else { showTab(b.dataset.tab); }
   }; });
@@ -8837,7 +8948,7 @@ function baseGroundSet(){
   document.addEventListener('focusout', function(e){ if(tipTarget(e)) tip.style.display='none'; });
 
   /* --- avvio automatico alla prima visita --- */
-  try{ if(!localStorage.getItem('axpo_tour_seen')){ localStorage.setItem('axpo_tour_seen','1'); setTimeout(function(){ startTour(TOUR_START); }, 1800); } }catch(e){}
+  try{ if(!localStorage.getItem('axpo_tour_seen')&&!window.matchMedia('(max-width:768px)').matches){ localStorage.setItem('axpo_tour_seen','1'); setTimeout(function(){ startTour(TOUR_START); }, 1800); } }catch(e){}
   window.__startTour=startTour; window.__TOUR_START=TOUR_START; window.__TOUR_ALL=TOUR_ALL;
 })();
 </script>
