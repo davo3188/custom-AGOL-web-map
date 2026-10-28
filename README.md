@@ -82,7 +82,7 @@ py -3 scripts/build.py --check    exit 1 if the built file is not up to date
 py -3 scripts/make_tokens.py      writes src/css/10-tokens.css from design/tokens.json (the family's tokens); --check
 py -3 scripts/make_icons.py       writes src/html/05-icons.html, the sprite of the family icons the sources use; --check, --list
 py -3 scripts/make_kit.py         writes src/css/12-kit.css and 13-geo-kit.css from design/kit.css and geo-kit.css (verbatim); --check
-py -3 tests/run.py                headless checks, Python + Chrome, 24 harnesses, about eight minutes (see tests/README.md)
+py -3 tests/run.py                headless checks, Python + Chrome, 25 harnesses, about eight minutes (see tests/README.md)
 ```
 
 `design/` holds the design system's inputs, copied verbatim from the family (`tokens.json`, `icons/*.svg`, `kit.css`,
@@ -294,7 +294,8 @@ Groups **File · CAD · Immagini · Servizi web · Portale**; the four modules s
   candidates and the whole file is reprojected with the system chosen.
 - **The owners file** of the separate *Estrazione intestatari* tool (recognised by `sister_stato`): parcels named
   `Fg 12 · 101 · <comune>`, coloured by set of co-owners, at the end of Particelle under *Per intestatario* (one group
-  per set, largest area first, *Senza intestatari* last; *Nomi sulla mappa*); a row's «i» or a click on the map shows
+  per set, largest area first, *Senza intestatari* last; *Nomi sulla mappa*; the bin on that line removes the whole
+  file, Annulla brings it back); a row's «i» or a click on the map shows
   owners with tax code and share, status, land use, area, notes. **Personal data**: kept in the page and the `.axpo`,
   left out of the browser autosave, never sent to the portal, never written to the console.
 - **CAD** › *Disegno DWG*: read in the browser (LibreDWG in WebAssembly, ~9.5 MB on the first DWG); the file never
@@ -798,6 +799,9 @@ How the app works inside, by subject, with the traps to know before editing. The
   (`render()`: subgroups, parcels without one, then the owners' parcels in `#listOwn`), the groups (`#grpList`,
   `renderGeoms` → `grpBlock`), the net-area foot `#grpFoot` (`#netAuto`, `#netSetback`), the **Immagini** block
   (`data-sec="images"`). `#rcEmpty` shows when empty; the count `#rcBadge` repeats on the strip and the phone bar.
+- **Trap:** a block shows only when populated (`secShow`), so its count must cover all it holds: Particelle counts the
+  searched parcels and the owners' parcels (`secParcelsN`). Until 2026-10-28 it counted the first only, and an
+  owners' file imported with no parcel searched was in the badge but nowhere in the list.
 - **Groups** (`22a-groups.js`) are containers: the category stays the role, and the portal never sees them. Standard
   groups (`GRP_STD`: `parcels`, `project`, `exclusion`, `analysis`, `other`) show when populated; custom ones (`grpNew`,
   `grpRename`, `grpMove`, `grpAssign`; `grpDelete` sends its objects back to their default) always. An object's group
@@ -1083,7 +1087,8 @@ How the app works inside, by subject, with the traps to know before editing. The
   (`Fg 12 · 101 · Borgo Inventato`), never by person, since geoprocess results take their inputs' names; coloured by
   class (twelve fixed
   colours, then hues at the golden angle; a class on the map keeps its colour, a new one never reuses one; grey without
-  owners); listed at the end of Particelle (`#listOwn`, `ownRenderList`). Names on the map in `ownLblGL` (`ownLblSoon`).
+  owners); listed at the end of Particelle (`#listOwn`, `ownRenderList`); `ownRemoveAll` (the bin of *Per intestatario*)
+  removes them all with one confirm and one Annulla. Names on the map in `ownLblGL` (`ownLblSoon`).
   A click opens a popup, not an edit: the SDK update is cancelled at `start` and `ownShow` opens the popup at the last
   `immediate-click` (a Shift-click on two still edits). Files of version 1.1 lack `nominativi_brevi`/`etichetta`: names
   are cut from `nominativi` (`ownShort`). A plain parcel export imported by mistake gets a hint naming the right file.
@@ -1289,7 +1294,7 @@ How the app works inside, by subject, with the traps to know before editing. The
   (the SDK not served by the CDN: «SDK non ancora caricato»), so that run is repeated too.
 - Every test page is a first visit (a fresh Chrome profile): the hook marks the first-visit tour as seen
   (`axpo_tour_seen`) before the app starts.
-- The twenty-four harnesses:
+- The twenty-five harnesses:
   - `smoke`: the view is ready, the app's layers, the Agenzia cadastre, six tabs and the panels' tabs.
   - `zoom`: the zoom after a selection goes only to the action's parcels, only when they are out of view.
   - `overlay`: the cadastre image placed to the pixel through pan, rotation, scale, switch and opacity (needs the AdE).
@@ -1323,6 +1328,8 @@ How the app works inside, by subject, with the traps to know before editing. The
   - `statusbar`: elevation and slope from a synthetic terrain grid (over the limit, split limit, outside, no model);
     the scale menu; the autosave time and the full browser.
   - `axpo`: a project saved and opened again; the copy to share; an old file; a file of a newer version.
+  - `owners`: the owners' file with no parcel searched shows at the end of Particelle; its bin and Annulla; a plain
+    GeoJSON of 120 features in «Altro».
 - **Debugging**: «nessun risultato nella pagina» means the script never wrote its JSON (an error in the harness, such
   as a duplicate `const`, or in the app). Serve `tests/out/` with any static server and open `<name>.html` to read the
   console; `--keep` also keeps each raw result as `tests/out/<name>_<size>.json`.
@@ -2262,6 +2269,15 @@ starts, keeps the console errors next to the result (a harness that died early b
 is now repeated as network noise) and treats the AGEA orthophotos not loading as noise (the user's decision);
 `undock` waits for the state each step checks. Found and fixed by a separate session (PR 42). The app is unchanged.
 
+**Fix of 2026-10-28: the owners' file invisible in the Raccolta (reported by the user).** An owners' file imported
+with no parcel searched was counted in the badge («99+») while the Raccolta said it was empty: its rows live at the
+end of the Particelle block, which since 22/10 shows only with parcels in it, and counted the searched ones only. The
+block now counts both (`secParcelsN`, in `render` and `renderGeoms`); the line *Per intestatario* has a bin that
+removes the whole file (`ownRemoveAll`, one confirm, one Annulla «Togli intestatari»), and the guide says where the
+file goes. «Nomi sulla mappa» on that line was in capitals: the shell's rule for labels (`label:not(.chk)`) beat
+`.gownbar label`; the label is now a `.chk`. A plain GeoJSON was not affected (it goes to «Altro»). New harness `owners`. Backup:
+`geoportale_axpo_pre-fix-intestatari_2026-10-28.html`.
+
 ## 8. Repository contents
 
 ```
@@ -2451,3 +2467,8 @@ in §7):
   hook, the console errors kept next to the result, the AGEA orthophotos in `NOISE`); `tests/harness/undock.py`
   (`until` instead of fixed waits, the tour check); `tests/README.md` (PR 42); then `docs/architecture.md` and this
   README (§5, §7, §8).
+- **Fix · The owners' file invisible in the Raccolta (2026-10-28).** New: `tests/harness/owners.py`. Changed:
+  `src/js/22-raccolta-ui.js` (`secParcelsN`, the block shown from `renderGeoms`); `src/js/18-parcels.js` (`render`);
+  `src/js/24-import-files.js` (the bin of *Per intestatario*, `ownRemoveAll`, the label a `.chk`); `src/css/60-tour.css`
+  (`.gownbar label.chk`); `src/html/30-modals.html` (the guide);
+  `tests/README.md`; this README (§3, §4, §5, §7, §8).

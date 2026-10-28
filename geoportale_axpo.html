@@ -1295,7 +1295,7 @@ dialog.dialog::backdrop { background: rgba(11, 18, 25, .45); }
   .gownbar{display:flex;flex-wrap:wrap;align-items:center;gap:2px 8px;margin:6px 2px 2px;padding:5px 6px 3px;border-top:1px dashed var(--line);font-size:11px;color:var(--mut)}
   .gownbar b{color:var(--txt);font-weight:600;white-space:nowrap}
   .gownbar span{white-space:nowrap}
-  .gownbar label{flex:none;display:inline-flex;align-items:center;gap:4px;margin:0 0 0 auto;cursor:pointer;white-space:nowrap;text-transform:none;letter-spacing:0;font-weight:400;font-size:11px;color:var(--txt)}
+  .gownbar label.chk{flex:none;display:inline-flex;align-items:center;gap:4px;margin:0 0 0 auto;cursor:pointer;white-space:nowrap;text-transform:none;letter-spacing:0;font-weight:400;font-size:11px;color:var(--txt)}
   .gownbar input{width:13px;height:13px;margin:0;accent-color:var(--accent)}
   .gown{display:flex;flex-wrap:wrap;align-items:center;gap:5px;padding:4px 5px;border-radius:7px;cursor:pointer}
   .gown:hover{background:var(--hover)}
@@ -2621,7 +2621,7 @@ dialog.dialog::backdrop { background: rgba(11, 18, 25, .45); }
       <li><b>Terreno</b> — <b>Estensione</b>: su cosa lavorare (un'area lorda, il sito AREAS, le particelle, oppure un rettangolo o un poligono disegnato qui); <b>Modello del terreno</b>: il limite di pendenza, in ogni direzione oppure nord–sud ed est–ovest, e <b>Analizza le pendenze</b>, con le quote di Esri World Elevation (circa 10 m in Italia); <b>Analisi terreno</b>: classi di pendenza, quote, esposizione, ombreggiatura e curve di livello; <b>Profilo</b> altimetrico lungo una linea; <b>Rimuovi terreno</b>. Le zone troppo ripide diventano un'esclusione nella Raccolta.</li>
       <li><b>Disegna</b> — <b>Cosa disegni</b>: la categoria (la scheda colorata: un clic apre l'elenco, anche con le categorie tue), con tipo, valori e fonte, ed <b>Esclusione da layer</b>; <b>Con quale strumento</b>: punto, linea, area, rettangolo, cerchio, a mano libera; <b>Seleziona e modifica</b>: seleziona, riquadro, rimodella, sposta e ruota, dividi, unisci, copia, elimina, annulla e ripeti; <b>Supporto al disegno</b>: aggancio, misure esatte, griglia; <b>Aree automatiche</b>: l'area netta e il rientro dal confine; <b>Collega a sito AREAS</b>: il sito a cui vanno i disegni sul portale (salvando, ogni oggetto si lega da solo all'area che tocca).</li>
       <li><b>Geoprocessi e analisi</b> — <b>Oggetti di partenza</b>: metti gli oggetti in A, dalla mappa, dalle righe spuntate o per categoria (B serve a Parte comune e Sottrai); <b>Geoprocessi</b>: Buffer, Unisci, Parte comune, Sottrai B da A, Copia, Contorno, Semplifica, Ritaglia, poi <b>Esegui</b> a destra: il risultato va nella Raccolta, gruppo Analisi; <b>Contesto</b>: Analisi di contesto (sottostazioni, linee AT e progetti FV intorno a un punto) e Percorso su strada, con l'accesso; <b>Coordinate</b>: in che sistema sono dei valori sconosciuti.</li>
-      <li><b>Importa</b> — <b>File</b>: GeoJSON, KML, KMZ, Shapefile (.zip) e il file di <b>Estrazione intestatari</b>, colorato e raggruppato per intestatario (i nominativi restano fuori dal salvataggio automatico e dal portale); <b>CAD</b>: un DWG letto nel browser, con il sistema proposto, oppure allineato a mano con due punti; <b>Immagini</b>: GeoTIFF e world file si posizionano da soli, PNG, JPG e PDF con sposta, scala, ruota o punti noti; <b>Servizi web</b>: WMS, WFS e ArcGIS REST dal loro indirizzo; <b>Portale</b>: un layer cercato per titolo.</li>
+      <li><b>Importa</b> — <b>File</b>: GeoJSON, KML, KMZ, Shapefile (.zip) e il file di <b>Estrazione intestatari</b>, colorato e raggruppato per intestatario in fondo al blocco <b>Particelle</b> della Raccolta, dove il cestino della riga «Per intestatario» lo toglie tutto (i nominativi restano fuori dal salvataggio automatico e dal portale); <b>CAD</b>: un DWG letto nel browser, con il sistema proposto, oppure allineato a mano con due punti; <b>Immagini</b>: GeoTIFF e world file si posizionano da soli, PNG, JPG e PDF con sposta, scala, ruota o punti noti; <b>Servizi web</b>: WMS, WFS e ArcGIS REST dal loro indirizzo; <b>Portale</b>: un layer cercato per titolo.</li>
       <li><b>Salva ed esporta</b> — <b>Esporta</b>: GeoJSON, KML, KMZ, Shapefile (.zip) o la tabella XLSX delle particelle, con gli oggetti spuntati nella Raccolta o con tutto (il KML ha una cartella per gruppo, lo shapefile un file per gruppo; il nome del file viene da comune, data e numero di particelle); <b>Portale AGOL</b>: Migra particelle in AREAS (l'opzione «dissolvi» sta nella sua finestra), Salva disegni in Site Features (categoria, tipo, attributi e sito: la seconda volta aggiorna, non duplica), Modifica AREAS COLLECTION; <b>Progetto</b>: Salva, Salva come, Apri; <b>Stampa</b>.</li>
       <li><b>Raccolta</b>, a sinistra — tutto quello che raccogli, in gruppi: Particelle, Aree di progetto, Aree di esclusione, Analisi, Altro, Immagini, e i gruppi tuoi (<b>+ Gruppo</b>). In alto il filtro per nome e <b>Comprimi</b>. Ogni riga ha la spunta (la selezione, che usano anche geoprocessi ed esportazione), il colore, il nome, la cifra a destra, l'occhio e il menu <b data-icon="more"></b>, anche col tasto destro: rinomina, zoom, sposta in un gruppo, Proprietà, elimina. Il menu di un gruppo, di un sottogruppo e di Particelle ha lo <b>Zoom</b> su tutti i loro oggetti. Il bordo destro la allarga, <b data-icon="undock"></b> la sgancia in una finestra per il secondo schermo.</li>
       <li><b>Pannello a destra</b> — tre schede. <b>Proprietà</b>: le impostazioni dello strumento aperto e, in Disegna, la scheda dell'oggetto selezionato (categoria, tipo e attributi). <b>Layer</b>: cerca un layer per nome; dal pannello di ogni layer (icona a cursori) trasparenza, popup e <b>filtro per attributo</b> (l'icona diventa un imbuto quando è attivo); i layer aggiunti da te hanno il menu <b>…</b> con Zoom e Rimuovi dalla mappa. Il <b>Catasto AdE</b> è l'immagine ufficiale del WMS dell'Agenzia delle Entrate: fogli da 1:25.000, particelle e fabbricati da 1:5.000, numeri da 1:2.000. <b>Legenda</b>: i layer accesi. Anche questo pannello si allarga dal bordo e si sgancia.</li>
@@ -5455,7 +5455,7 @@ function parcelsInView(gs){   // tutte le geometrie dentro l'inquadratura attual
   }catch(e){ return false; } }
 function render(zoom, fids){
   $('cnt').textContent=parcels.length;
-  try{ secShow('parcels', parcels.length); }catch(e){}   // 22/10: the section shows only when populated
+  try{ secShow('parcels', secParcelsN()); }catch(e){}   // 22/10: the section shows only when populated (fix 28/10: the owners' file counts)
   const has=parcels.length>0;
   const totHa=parcels.reduce((s,p)=>s+(p.area_m2||0),0)/10000;
   const nNd=parcels.filter(p=>!p.area_m2).length;
@@ -7327,6 +7327,7 @@ function renderGeoms(){
   const gf=$('grpFoot'); if(gf) gf.hidden=!all.some(function(g){ return g.attributes._kind==='drawing'&&g.attributes._sub!=='geoproc'; });
   const ib=$('listImport'); if(ib) ib.innerHTML='<div class="empty">Nessuna immagine.</div>'; const ic=$('cntImport'); if(ic) ic.textContent='0';
   try{ ownRenderList(imports.filter(ownIs), imports.length); }catch(e){ console.warn('[intestatari] elenco non disegnato'); }
+  try{ secShow('parcels', secParcelsN()); }catch(e){}   // fix 28/10: the owners' file alone opens the block
   try{ updateImportImages(); }catch(e){}
   try{ secShow('images', (typeof importedImages!=='undefined'&&importedImages)? importedImages.length : 0); }catch(e){}   // it also recomputes the empty state
   try{ wireSectionTools(); }catch(e){}
@@ -7453,6 +7454,8 @@ function setSectionColor(sec,hex){
 // 22/10: a section of the Raccolta shows only when populated; with nothing at all, one empty message
 function secShow(sec, n){ var s=rcQ('#drawerElenco .gsec[data-sec="'+sec+'"]'); if(s) s.hidden=!n;
   var any=Array.prototype.some.call(rcQA('#drawerElenco .gsec'), function(x){ return !x.hidden; }); var e=$('rcEmpty'); if(e) e.hidden=any; }
+// fix 28/10: the Particelle block holds the searched parcels and, at its end, the owners' file (listOwn): it shows for either
+function secParcelsN(){ return parcels.length+(toolsGL? toolsGL.graphics.toArray().filter(ownIs).length : 0); }
 // 22/10: the row menu (right-click or «…») and the in-place rename it offers; the menu itself is drawn by the UI glue (rowMenu)
 function rowRename(span, value, commit){ if(span.nextSibling&&span.nextSibling.classList&&span.nextSibling.classList.contains('edit')) return;
   var inp=document.createElement('input'); inp.className='gname edit'; inp.value=value; inp.spellcheck=false; inp.setAttribute('aria-label','Nuovo nome');
@@ -8221,6 +8224,13 @@ function ownRow(g){ const at=g.attributes, pezzi=[], a=geomAreaHa(g); if(a!=null
   if(ownCard===g){ const c=ownInfoEl(g); c.className='owncard'; wrap.appendChild(c); }
   return wrap; }
 function ownLblOn(){ try{ return localStorage.getItem('axpo_own_labels')!=='0'; }catch(e){ return true; } }
+// fix 28/10: all the owners' parcels out of the Raccolta (the bar «Per intestatario»); Annulla brings them back
+function ownRemoveAll(){ const gs=toolsGL? toolsGL.graphics.toArray().filter(ownIs) : []; if(!gs.length) return false;
+  const what=gs.length===1? 'la particella' : 'le '+gs.length+' particelle';
+  if(!confirm('Togliere dalla Raccolta '+what+' del file degli intestatari? Si può annullare con Annulla nella scheda Disegna.')) return false;
+  try{ histName('Togli intestatari'); }catch(e){}
+  ownCard=null; if(ownIs(sfEditOpen)) sfEditOpen=null; toolsGL.removeMany(gs); refreshDl();
+  msg((gs.length===1? 'Tolta la particella' : 'Tolte le '+gs.length+' particelle')+' del file degli intestatari.','ok'); return true; }
 function ownRenderList(arr, total){ const box=$('listOwn'), cnt=null; if(!box) return; box.innerHTML='';   // G2-4a (X9): at the end of Particelle
   if(cnt) cnt.textContent=total;
   if(ownCard&&arr.indexOf(ownCard)<0) ownCard=null;
@@ -8234,9 +8244,12 @@ function ownRenderList(arr, total){ const box=$('listOwn'), cnt=null; if(!box) r
   const bt=document.createElement('b'); bt.textContent='Per intestatario'; bar.appendChild(bt);
   // «gruppi», non «intestatari»: un gruppo è l'insieme dei cointestatari di una particella (due persone = un gruppo)
   const bs=document.createElement('span'); bs.textContent=nOwn+(nOwn===1?' gruppo':' gruppi')+' · '+arr.length+' part.'; bar.appendChild(bs);
-  const lb=document.createElement('label'), ck=document.createElement('input'); ck.type='checkbox'; ck.id='ownLbl'; ck.checked=ownLblOn();
+  const lb=document.createElement('label'), ck=document.createElement('input'); lb.className='chk'; ck.type='checkbox'; ck.id='ownLbl'; ck.checked=ownLblOn();   // fix 28/10: .chk, or the shell's rule for labels writes it in capitals
   ck.onchange=()=>{ try{ localStorage.setItem('axpo_own_labels', ck.checked?'1':'0'); }catch(e){} ownLblSync(); };
-  lb.appendChild(ck); lb.appendChild(document.createTextNode('Nomi sulla mappa')); bar.appendChild(lb); box.appendChild(bar);
+  lb.appendChild(ck); lb.appendChild(document.createTextNode('Nomi sulla mappa')); bar.appendChild(lb);
+  const del=document.createElement('button'); del.type='button'; del.className='gact gowndel'; del.innerHTML=TRASH_SVG;   // fix 28/10: the whole file out in one go
+  del.title='Togli dalla Raccolta '+(arr.length===1? 'la particella' : 'le '+arr.length+' particelle')+' del file degli intestatari'; del.setAttribute('aria-label', del.title);
+  del.onclick=e=>{ e.stopPropagation(); ownRemoveAll(); }; bar.appendChild(del); box.appendChild(bar);
   groups.forEach(G=>{ const open=ownOpen.has(G.k)? ownOpen.get(G.k) : (arr.length<=12||G.gs.indexOf(ownCard)>=0), hex=graphicColorHex(G.gs[0])||OWN_GREY;
     const h=document.createElement('div'); h.className='gown'+(G.k?'':' none'); h.setAttribute('aria-expanded', open?'true':'false');
     const body=document.createElement('div'); body.className='gownb'; body.hidden=!open; body.style.setProperty('--c', hex);
