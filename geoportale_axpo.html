@@ -2624,7 +2624,7 @@ dialog.dialog::backdrop { background: rgba(11, 18, 25, .45); }
       <li><b>Importa</b> — <b>File</b>: GeoJSON, KML, KMZ, Shapefile (.zip) e il file di <b>Estrazione intestatari</b>, colorato e raggruppato per intestatario in fondo al blocco <b>Particelle</b> della Raccolta, dove il cestino della riga «Per intestatario» lo toglie tutto (i nominativi restano fuori dal salvataggio automatico e dal portale); <b>CAD</b>: un DWG letto nel browser, con il sistema proposto, oppure allineato a mano con due punti; <b>Immagini</b>: GeoTIFF e world file si posizionano da soli, PNG, JPG e PDF con sposta, scala, ruota o punti noti; <b>Servizi web</b>: WMS, WFS e ArcGIS REST dal loro indirizzo; <b>Portale</b>: un layer cercato per titolo.</li>
       <li><b>Salva ed esporta</b> — <b>Esporta</b>: GeoJSON, KML, KMZ, Shapefile (.zip) o la tabella XLSX delle particelle, con gli oggetti spuntati nella Raccolta o con tutto (il KML ha una cartella per gruppo, lo shapefile un file per gruppo; il nome del file viene da comune, data e numero di particelle); <b>Portale AGOL</b>: Migra particelle in AREAS (l'opzione «dissolvi» sta nella sua finestra), Salva disegni in Site Features (categoria, tipo, attributi e sito: la seconda volta aggiorna, non duplica), Modifica AREAS COLLECTION; <b>Progetto</b>: Salva, Salva come, Apri; <b>Stampa</b>.</li>
       <li><b>Raccolta</b>, a sinistra — tutto quello che raccogli, in gruppi: Particelle, Aree di progetto, Aree di esclusione, Analisi, Altro, Immagini, e i gruppi tuoi (<b>+ Gruppo</b>). In alto il filtro per nome e <b>Comprimi</b>. Ogni riga ha la spunta (la selezione, che usano anche geoprocessi ed esportazione), il colore, il nome, la cifra a destra, l'occhio e il menu <b data-icon="more"></b>, anche col tasto destro: rinomina, zoom, sposta in un gruppo, Proprietà, elimina. Il menu di un gruppo, di un sottogruppo e di Particelle ha lo <b>Zoom</b> su tutti i loro oggetti. Il bordo destro la allarga, <b data-icon="undock"></b> la sgancia in una finestra per il secondo schermo.</li>
-      <li><b>Pannello a destra</b> — tre schede. <b>Proprietà</b>: le impostazioni dello strumento aperto e, in Disegna, la scheda dell'oggetto selezionato (categoria, tipo e attributi). <b>Layer</b>: cerca un layer per nome; dal pannello di ogni layer (icona a cursori) trasparenza, popup e <b>filtro per attributo</b> (l'icona diventa un imbuto quando è attivo); i layer aggiunti da te hanno il menu <b>…</b> con Zoom e Rimuovi dalla mappa. Il <b>Catasto AdE</b> è l'immagine ufficiale del WMS dell'Agenzia delle Entrate: fogli da 1:25.000, particelle e fabbricati da 1:5.000, numeri da 1:2.000. <b>Legenda</b>: i layer accesi. Anche questo pannello si allarga dal bordo e si sgancia.</li>
+      <li><b>Pannello a destra</b> — tre schede. <b>Proprietà</b>: le impostazioni dello strumento aperto e, in Disegna, la scheda dell'oggetto selezionato (categoria, tipo e attributi). <b>Layer</b>: cerca un layer per nome; dal pannello di ogni layer (icona a cursori) trasparenza, popup e <b>filtro per attributo</b> (l'icona diventa un imbuto quando è attivo); i layer aggiunti da te hanno il menu <b>…</b> con Zoom e Rimuovi dalla mappa. Un clic sulla mappa apre il popup anche sui layer a <b>tasselli vettoriali</b> che portano gli attributi (es. i vincoli paesaggistici della Campania nella vista d'insieme): campi e titolo come configurati nell'item, l'elemento non si evidenzia. Il <b>Catasto AdE</b> è l'immagine ufficiale del WMS dell'Agenzia delle Entrate: fogli da 1:25.000, particelle e fabbricati da 1:5.000, numeri da 1:2.000. <b>Legenda</b>: i layer accesi. Anche questo pannello si allarga dal bordo e si sgancia.</li>
       <li><b>Sulla mappa</b> — in alto a destra la lente della <b>ricerca</b> (indirizzi, lat lon, oppure X Y in Gauss-Boaga o UTM, di cui indovina il sistema) e, sotto, <b data-icon="measure"></b> le <b>misure</b>: lineare, area, Pulisci (non si salvano). In alto a sinistra zoom, bussola, posizione GPS, <b>Zoom sulla Raccolta</b> e <b>Luoghi</b>, i segnalibri; in basso a destra la <b>mappa di base</b>, con l'opacità; in basso al centro lo scalimetro. Col tasto destro: aggiungi la particella qui, analisi di contesto qui, buffer qui, copia le coordinate, apri in Google Maps, centra qui.</li>
       <li><b>Barra di stato</b>, in basso — il pin fissa le coordinate del prossimo clic; le coordinate del puntatore nel sistema che scegli; la scala, che scegli anche dal suo menu; con il terreno analizzato, la <b>quota</b> e la <b>pendenza</b> sotto il puntatore (in rosso oltre il limite); lo stato del Catasto AdE; a destra la modalità in corso, l'aggancio e l'ora dell'ultimo salvataggio nel browser (in rosso se il browser è pieno).</li>
       <li><b>Progetto .axpo</b> — <b data-icon="save">Salva progetto</b> mette tutto in un file .axpo, come un progetto QGIS: vista, basemap, area di lavoro, mappa e layer del portale (accesi, trasparenza, ordine), servizi web, particelle, disegni e gruppi della Raccolta, categorie tue, geoprocessi, import, sito AREAS, i file di <b>DWG e immagini</b> con il loro posizionamento e il <b>terreno</b> con il suo limite. <b data-icon="folder">Apri progetto</b> lo ripristina (sostituisce il lavoro corrente). <kbd>Ctrl</kbd>+<kbd>S</kbd> risalva sullo stesso file, <kbd>Ctrl</kbd>+<kbd>Maiusc</kbd>+<kbd>S</kbd> salva con nome, <kbd>Ctrl</kbd>+<kbd>O</kbd> apre. Lo stesso file si apre in PV Predesign, che ne legge aree, esclusioni e terreno. Per passarlo a chi non deve vedere gli intestatari, nel modulo Progetto <b>Salva una copia da condividere…</b>: tutto il lavoro tranne i dati personali.</li>
@@ -3134,6 +3134,7 @@ require([
     if(sketchVM && sketchVM.state==="active") return;      // disegno in corso
     if(e.mapPoint) await addByClick(e.mapPoint.latitude, e.mapPoint.longitude);
   });
+  try{ vtpWire(); }catch(e){ console.warn('[popup tasselli]', e); }   // 30/10: popups on the web maps' vector tiles (16-layers-webmap.js)
 
   // ── Fase 1: OAuth ──
   if(CLIENT_ID){
@@ -4740,6 +4741,51 @@ function elevCreating(){ try{ return !!(elevW&&elevW.viewModel&&elevW.viewModel.
 function elevStop(){ try{ if(!elevStarting&&elevCreating()) elevW.viewModel.stop(); }catch(e){} }
 function elevWatch(){ try{ watchProp(elevW.viewModel,'state', s=>{ if(s!=='creating') return;
   elevStarting=true; try{ cadModesOff(); gpPickEnd(); if(srRefOn()) srRefEnd(); }catch(e){} elevStarting=false; }); }catch(e){ console.warn('[profilo]', e); } }
+// ── 30/10/2026 (decisions V1–V6, asked by the session «Pubblicazione layer campania»): popups on the web maps' vector tiles ──
+// The SDK opens no popup on a VectorTileLayer, but view.hitTest gives back the attributes of the tiles ArcGIS Online builds
+// with «Configura attributi» (the tiles made in Pro have none: nothing opens). On a click with popups on (no tool armed: the
+// modes switch view.popupEnabled off), the vector tile layers of the map — in groups too, never the basemap — shown at
+// this scale are hit-tested; each element gets the popup of the item's resource popup.json ({version, layers:
+// {<source-layer>: {title, fields:[{name, label}]}}}) or, without it, the source layer's name and every field not starting
+// with «_». They join the native popup of the same click, after its features. The tiles carry no shape: no highlight.
+const vtpConf=new Map();   // item id → Promise of its popup.json (null when missing or unreadable)
+let _vtpReq=null;
+function vtpRequest(){ return _vtpReq||(_vtpReq=new Promise((res,rej)=>{ try{ require(['esri/request'], r=>res(r), rej); }catch(e){ rej(e); } })); }
+function vtpConfig(l){ const it=l&&l.portalItem, id=it&&it.id; if(!id) return Promise.resolve(null);
+  if(!vtpConf.has(id)){ const base=(it.portal&&it.portal.restUrl)||(PORTAL+'/sharing/rest');
+    vtpConf.set(id, vtpRequest().then(r=>r(base+'/content/items/'+id+'/resources/popup.json', {query:{f:'json'}, responseType:'json'}))
+      .then(x=>{ const d=x&&x.data; return (d&&d.layers&&typeof d.layers==='object')? d : null; }).catch(()=>null)); }
+  return vtpConf.get(id); }
+function vtpShown(l){ try{ const lv=view.allLayerViews.find(v=>v.layer===l); return !!(lv&&!lv.suspended&&lv.visible!==false); }catch(e){ return false; } }
+function vtpLayers(){ if(!view||!view.map) return []; const bm=view.map.basemap, skip=new Set();
+  try{ if(bm){ bm.baseLayers.forEach(l=>skip.add(l)); bm.referenceLayers.forEach(l=>skip.add(l)); } }catch(e){}
+  return view.map.allLayers.filter(l=>l.type==='vector-tile'&&!skip.has(l)&&vtpShown(l)).toArray(); }
+// the popup's graphics of a click on the vector tiles: [] when nothing with attributes is there
+async function vtpFeatures(e){ const ls=vtpLayers(); if(!ls.length) return [];
+  const r=await view.hitTest(e, {include:ls}), seen=new Set(), out=[];
+  for(const h of (r&&r.results)||[]){ const g=h.graphic, o=(g&&g.origin)||{}, l=o.layer||h.layer, at=(g&&g.attributes)||{};
+    if(!l||typeof l.getStyleLayer!=='function') continue;
+    let src=''; try{ const st=l.getStyleLayer(o.layerId); src=(st&&st['source-layer'])||''; }catch(x){}
+    const keys=Object.keys(at).filter(k=>k.charAt(0)!=='_');
+    if(!src||/\/label$/.test(src)||!keys.length) continue;   // the labels come back without attributes
+    const key=(l.uid||l.id)+'|'+src+'|'+JSON.stringify(keys.map(k=>[k, at[k]])); if(seen.has(key)) continue; seen.add(key);   // the fill and the outline of one element (their _symbol may differ)
+    const conf=await vtpConfig(l), c=conf&&conf.layers[src];
+    const fields=((c&&Array.isArray(c.fields)&&c.fields.length)? c.fields : keys.map(k=>({name:k, label:k}))).filter(f=>f&&f.name);
+    out.push(new esriMods.Graphic({attributes:Object.assign({}, at), popupTemplate:{title:(c&&c.title)||src,
+      content:[{type:'fields', fieldInfos:fields.map(f=>({fieldName:f.name, label:f.label||f.name}))}]}})); }
+  return out; }
+function vtpBusy(){ try{ return view.popupEnabled===false||subActive||!!(measurement&&measurement.activeTool)||!!(sketchVM&&sketchVM.state==='active'); }catch(e){ return true; } }
+async function vtpClick(e){ if(!e||!e.mapPoint||vtpBusy()) return;
+  try{ if(toolsGL){ const t=await view.hitTest(e, {include:[toolsGL]}); if(t&&t.results&&t.results.length) return; }   // a click on an object of the Raccolta is for that object
+    const feats=await vtpFeatures(e); if(!feats.length||vtpBusy()) return;
+    // the native popup of the same click comes first: wait until it has fetched its features
+    const p=view.popup; let nat=[];
+    if(p){ const t0=Date.now(); while(p.viewModel&&p.viewModel.waitingForResult&&Date.now()-t0<5000) await new Promise(r=>setTimeout(r,80));
+      const loc=p.visible&&p.location, s=loc&&view.toScreen(loc);
+      if(s&&Math.hypot(s.x-e.x, s.y-e.y)<4) nat=(p.features||[]).slice(); }
+    view.openPopup({features:nat.concat(feats), location:e.mapPoint}); }
+  catch(x){ console.warn('[popup tasselli]', (x&&x.message)||x); } }
+function vtpWire(){ view.on('click', vtpClick); }
 
 // ══ Cornice metrica locale (fase 4a, 22/10/2026; piano §6h, decisioni F1–F10) ═══════════════════════════════════════
 // Ogni costruzione e operazione geometrica dell'app gira in una Trasversa di Mercatore a scala 1 centrata sulle

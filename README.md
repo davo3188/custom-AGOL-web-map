@@ -82,7 +82,7 @@ py -3 scripts/build.py --check    exit 1 if the built file is not up to date
 py -3 scripts/make_tokens.py      writes src/css/10-tokens.css from design/tokens.json (the family's tokens); --check
 py -3 scripts/make_icons.py       writes src/html/05-icons.html, the sprite of the family icons the sources use; --check, --list
 py -3 scripts/make_kit.py         writes src/css/12-kit.css and 13-geo-kit.css from design/kit.css and geo-kit.css (verbatim); --check
-py -3 tests/run.py                headless checks, Python + Chrome, 25 harnesses, about eight minutes (see tests/README.md)
+py -3 tests/run.py                headless checks, Python + Chrome, 26 harnesses, about eight minutes (see tests/README.md)
 ```
 
 `design/` holds the design system's inputs, copied verbatim from the family (`tokens.json`, `icons/*.svg`, `kit.css`,
@@ -164,7 +164,7 @@ Groups **Catasto · Sulla mappa · Da un disegno · Raccolta**; the cadastral so
   more parcels (comma or space), *Aggiungi alla Raccolta*. A chosen region offers its Check Vincoli map as a one-click
   link (`wmSuggest`); it never swaps the map by itself.
 - **Sulla mappa**: *Puntuale*, *Rettangolo*, *Poligono*, *Linea*; the mode stays on until its button again or Esc.
-  With no mode on, a click on the map opens the layers' popups.
+  With no mode on, a click on the map opens the layers' popups (since 2026-10-30 the web maps' vector tiles' too).
 - **Da un disegno**: a drawing, buffer, result or import chosen in Proprietà, then *Cerca*: the parcels it touches (a
   point finds the parcel under it). The module title counts the usable objects.
 - **Raccolta**: *Crea area lorda*, *Etichette sulla mappa* (parcel numbers, hidden below 1:150,000, `axpo_labels`),
@@ -369,7 +369,8 @@ change or a ribbon tool with a module brings Proprietà back; at its foot, *Impo
 - **Layer**: *Aggiungi layer dal portale* (search by title, `ADDABLE` item types, sign-in); *Layer in mappa*, the Esri
   LayerList with a search by name, drag-and-drop order and, per layer, transparency, popup on/off and an **attribute
   filter** like QGIS *Filter…* (field, condition, suggested value, `+ E` / `+ O`, editable SQL, live count; the icon
-  turns into a funnel while on). Added layers have ⋯ *Zoom al layer* / *Rimuovi dalla mappa*. A red card (`#svcStatus`)
+  turns into a funnel while on). Added layers have ⋯ *Zoom al layer* / *Rimuovi dalla mappa*. The vector tile layers whose tiles carry attributes open a
+  popup too (§5.7). A red card (`#svcStatus`)
   with *Riprova ora* shows while the cadastre does not answer.
 - **Catasto AdE**: the Agenzia delle Entrate WMS drawn as one image over the map (EPSG:4258, `adeOv*`): sheets with
   their numbers from 1:25,000, parcels and buildings below 1:5,000, parcel numbers below 1:2,000; its Layer entry is the
@@ -700,6 +701,19 @@ How the app works inside, by subject, with the traps to know before editing. The
 - **Layer list**: `LayerList` with `layerListItem`, drag-and-drop and a name filter; an item's panel (legend, opacity,
   popup, labels, attribute filter) is built on first opening; the icon becomes a funnel while filtered. Layers the app
   added (`llMine`) get «Zoom al layer» and «Rimuovi dalla mappa».
+- **Vector tile popups** (2026-10-30, `vtp*` at the end of `16-layers-webmap.js`, wired by `vtpWire` in
+  `11-map-model.js`): on a click with `view.popupEnabled` (no mode armed), no measure, no sketch and no object of the
+  Raccolta under the pointer, `vtpFeatures` hit-tests the `vector-tile` layers of `view.map.allLayers` that are not the
+  basemap's and whose layer view is not suspended (scale, visibility). Per result: the source layer
+  (`getStyleLayer(origin.layerId)['source-layer']`), skipped when it ends in `/label` or the attributes have no key
+  without «_»; one element per layer, source layer and visible attributes (fill and outline come back twice). The popup
+  comes from `popup.json` among the item's resources (`vtpConfig`: a promise cached by item id, `esri/request` with the
+  session's token; `{version, layers:{<source-layer>:{title, fields:[{name, label}]}}}`) or falls back to the source
+  layer's name and every field. The native popup of the same click (its `location` within 4 px) is waited for
+  (`waitingForResult`, 5 s at most) and keeps its features first. No highlight: the tiles carry no shape.
+- **Trap:** tiles made in ArcGIS Pro carry no attributes, so they open nothing; `popup.json` is written by whoever
+  publishes the tiles (for Campania `../scripts/campania_vincoli_04_vector_tile.py`). A `VectorTileLayer` has no
+  `popupEnabled`, so the Layer panel offers no switch for it.
 - **Attribute filter** (like QGIS *Filtro…*) for layers with `definitionExpression` and `queryFeatures` (not WMS):
   `llApply` tries the expression with a count first, so a wrong SQL keeps the previous filter. «contiene» and «inizia
   con» use `UPPER(field) LIKE`; a dd/mm/yyyy date covers the day. Filters go into projects (`def`, `sdef`) only.
@@ -1294,7 +1308,7 @@ How the app works inside, by subject, with the traps to know before editing. The
   (the SDK not served by the CDN: «SDK non ancora caricato»), so that run is repeated too.
 - Every test page is a first visit (a fresh Chrome profile): the hook marks the first-visit tour as seen
   (`axpo_tour_seen`) before the app starts.
-- The twenty-five harnesses:
+- The twenty-six harnesses:
   - `smoke`: the view is ready, the app's layers, the Agenzia cadastre, six tabs and the panels' tabs.
   - `zoom`: the zoom after a selection goes only to the action's parcels, only when they are out of view.
   - `overlay`: the cadastre image placed to the pixel through pan, rotation, scale, switch and opacity (needs the AdE).
@@ -1330,6 +1344,11 @@ How the app works inside, by subject, with the traps to know before editing. The
   - `axpo`: a project saved and opened again; the copy to share; an old file; a file of a newer version.
   - `owners`: the owners' file with no parcel searched shows at the end of Particelle; its bin and Annulla; a plain
     GeoJSON of 120 features in «Altro».
+  - `vtpopup`: the vector tile popups on a simulated hit test (popup.json and fallback, labels, fill and outline once,
+    after the native popup, not with a tool armed or on an object of the Raccolta, never the basemap).
+- **Trap:** the history photographs the work 0.5 s after it settles, and every change pushes the photo back: a harness
+  that removes something and then tests Annulla waits for `drwHist.timer` to be 0 first, or the state before the
+  removal was never photographed (`owners` failed once under the full suite on 2026-10-30).
 - **Debugging**: «nessun risultato nella pagina» means the script never wrote its JSON (an error in the harness, such
   as a duplicate `const`, or in the app). Serve `tests/out/` with any static server and open `<name>.html` to read the
   console; `--keep` also keeps each raw result as `tests/out/<name>_<size>.json`.
@@ -2278,6 +2297,19 @@ file goes. «Nomi sulla mappa» on that line was in capitals: the shell's rule f
 `.gownbar label`; the label is now a `.chk`. A plain GeoJSON was not affected (it goes to «Altro»). New harness `owners`. Backup:
 `geoportale_axpo_pre-fix-intestatari_2026-10-28.html`.
 
+**2026-10-30: popups on the web maps' vector tiles (decisions V1–V6, asked by the session «Pubblicazione layer
+campania», approved by the user).** The SDK opens no popup on a `VectorTileLayer`, but tiles built by ArcGIS Online with
+«Configura attributi» carry the fields and `view.hitTest` returns them. On a click with popups on (V1), the map's
+vector tile layers shown at that scale, never the basemap (V2), are hit-tested; their elements join the native popup
+of the same click, after its features (V3), with title and fields from the item's `popup.json` or, without it, the
+source layer's name and its fields (V4); one line in the guide, no new control (V5). No highlight: the tiles carry no
+shape. First use: CV Campania, «Vincoli paesaggistici (PPR) › Vista d'insieme» (item `b71293c2`, 25 source layers
+configured). Tried in the built-in browser with a public Esri vector tile service added as a layer (a real click on a
+road: «Road», 1 of 2); the real map needs the sign-in: item 1.6 of the checklist
+`../reports/collaudo_login_vero_2026-10-27.md` (V6). New harness `vtpopup`; `owners` now waits for the history's photo
+before its bin (it failed once under the full suite: tests only). Backup:
+`geoportale_axpo_pre-popup-tasselli_2026-10-30.html`.
+
 ## 8. Repository contents
 
 ```
@@ -2472,3 +2504,7 @@ in §7):
   `src/js/24-import-files.js` (the bin of *Per intestatario*, `ownRemoveAll`, the label a `.chk`); `src/css/60-tour.css`
   (`.gownbar label.chk`); `src/html/30-modals.html` (the guide);
   `tests/README.md`; this README (§3, §4, §5, §7, §8).
+- **Vector tile popups (2026-10-30).** New: `tests/harness/vtpopup.py`. Changed: `src/js/16-layers-webmap.js` (`vtp*`);
+  `src/js/11-map-model.js` (`vtpWire`); `src/html/30-modals.html` (the guide); `tests/harness/owners.py` (waits for the
+  history's photo before the bin); `tests/README.md`;
+  `docs/architecture.md`; `../reports/collaudo_login_vero_2026-10-27.md` (item 1.6); this README (§3, §4, §5, §7, §8).
