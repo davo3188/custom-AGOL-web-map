@@ -82,7 +82,7 @@ py -3 scripts/build.py --check    exit 1 if the built file is not up to date
 py -3 scripts/make_tokens.py      writes src/css/10-tokens.css from design/tokens.json (the family's tokens); --check
 py -3 scripts/make_icons.py       writes src/html/05-icons.html, the sprite of the family icons the sources use; --check, --list
 py -3 scripts/make_kit.py         writes src/css/12-kit.css and 13-geo-kit.css from design/kit.css and geo-kit.css (verbatim); --check
-py -3 tests/run.py                headless checks, Python + Chrome, 26 harnesses, about eight minutes (see tests/README.md)
+py -3 tests/run.py                headless checks, Python + Chrome, 27 harnesses, about eight minutes (see tests/README.md)
 ```
 
 `design/` holds the design system's inputs, copied verbatim from the family (`tokens.json`, `icons/*.svg`, `kit.css`,
@@ -159,15 +159,17 @@ site and the writes to AREAS COLLECTION and IT - Site Features. This section fol
 
 ### Ricerca particelle
 
-Groups **Catasto · Sulla mappa · Da un disegno · Raccolta**; the cadastral source is the Zornade API (§2).
+Groups **Catasto · Aggiungi dalla mappa · Da un disegno · Raccolta**; the cadastral source is the Zornade API (§2).
 - **Catasto** › *Cerca particelle*: in Proprietà, region → province → municipality, the sheet (*foglio*) and one or
   more parcels (comma or space), *Aggiungi alla Raccolta*. A chosen region offers its Check Vincoli map as a one-click
   link (`wmSuggest`); it never swaps the map by itself.
-- **Sulla mappa**: *Puntuale*, *Rettangolo*, *Poligono*, *Linea*; the mode stays on until its button again or Esc.
+- **Aggiungi dalla mappa** (until 2026-11-02 «Sulla mappa», renamed so that «Seleziona» has one meaning): *Puntuale*,
+  *Rettangolo*, *Poligono*, *Linea* add parcels from the cadastre; the mode stays on until its button again or Esc.
   With no mode on, a click on the map opens the layers' popups (since 2026-10-30 the web maps' vector tiles' too).
 - **Da un disegno**: a drawing, buffer, result or import chosen in Proprietà, then *Cerca*: the parcels it touches (a
   point finds the parcel under it). The module title counts the usable objects.
-- **Raccolta**: *Crea area lorda*, *Etichette sulla mappa* (parcel numbers, hidden below 1:150,000, `axpo_labels`),
+- **Raccolta**: *Crea area lorda*, *Seleziona* and *Riquadro* (since 2026-11-02 the same tools as in Disegna: they pick
+  the parcels already in the Raccolta), *Etichette sulla mappa* (parcel numbers, hidden below 1:150,000, `axpo_labels`),
   *Zoom sulle particelle*.
 - **Area selection is sampled**: Zornade has no spatial query, so a shape becomes points (a 14 × 14 grid over an area,
   at least 12 m apart; every 25 m along a line; at most 180), each sent to `/parcels/locate`, 28 at a time, stopping at
@@ -227,8 +229,9 @@ category with *Cambia…* and *Le mie categorie…*, its attributes and note, th
   areas, the tool stays armed, Esc stops. With no tool on, a click on a drawing takes it in hand (drag, rotate, scale;
   a second click edits vertices; Delete removes it).
 - **Seleziona e modifica**: the selection **is** the Raccolta's checkbox, shared with «Spuntati» of the geoprocesses
-  and the export window; blue outline; one selected object shows its card in Proprietà. *Seleziona* (Shift+click adds),
-  *Riquadro*, *Rimodella*, *Sposta e ruota*, *Dividi* (a drawn line cuts the selected areas into «nome · 1», «nome · 2»…,
+  and the export window; blue outline; one selected object shows its card in Proprietà. *Seleziona* (Shift+click adds
+  or removes; since 2026-11-02 the parcels too, the smallest object under the click first, a second click in the same
+  place the one below), *Riquadro* (parcels too), *Rimodella*, *Sposta e ruota*, *Dividi* (a drawn line cuts the selected areas into «nome · 1», «nome · 2»…,
   new objects for the portal), *Unisci* (attributes of the first), *Copia*, *Elimina* (asks; for saved objects also
   about the portal), *Annulla · Ripeti* (Ctrl+Z / Ctrl+Y): one action is one Annulla, strips and net area included;
   Annulla also gives back parcels, groups, subgroups, own categories, the net-area settings, the terrain extent and the
@@ -358,7 +361,15 @@ The left panel, *Raccolta*, with a count badge (parcels and objects); one scroll
   *Zoom*, *Proprietà: categoria, tipo e attributi* (`sfEditInProps`), *Sposta in: ‹gruppo›*, *Elimina* (asks about the
   portal for saved objects; *Annulla* restores), only the items the kind of object allows (`RULES`, 7b-1): an
   automatic strip has *Zoom* and *Sposta in*, the automatic net area *Zoom*, *Sposta in* and *Elimina*; their colour
-  is the automation's. Past 30 rows: *Mostra altre n* (`RC_LIMIT`).
+  is the automation's. Past 30 rows: *Mostra altre n* (`RC_LIMIT`). A parcel's row reads «Fg 10 · 100 · Comune» (sheet and
+  number first: the narrow panel cuts the end). A click on a row makes its object flash on the map (brought into view
+  when out of it), a double click zooms on it; Shift+click on a tick ticks every row up to the last one ticked.
+- **The selection bar** (since 2026-11-02): while something is ticked, on top of the Raccolta, «4 selezionate · 4,00 ha»
+  with *Zoom*, *Sottogruppo* (or *Gruppo*: the moves of the whole selection, also into a new one), *Togli* (also the
+  Canc key; asks; Annulla restores) and *Deseleziona*. The right-click on a selected row, or on the map on a selected
+  object, offers the same for the whole selection; on a row not selected, that row's own menu (the selection stays);
+  on the map on an object not selected, *Seleziona* it or *Aggiungi alla selezione*. With the filter on, the «Spunta
+  tutti» boxes take only the rows found.
 - At the foot, while a drawing exists, the net-area switch and the setback; *Immagini* lists images and DTMs with eye,
   opacity, reposition and ×.
 
@@ -834,7 +845,14 @@ How the app works inside, by subject, with the traps to know before editing. The
 - Past `RC_LIMIT` (30) rows a block offers «Mostra altre n» (`rcListsPost`; `rcExpanded`, for the session). The filter
   ignores accents (`rcNorm`), hides blocks without a match and opens collapsed ones while it filters.
 - **The selection is the tick**: `_sel` on graphics, `sel` on parcels, shared by «Seleziona e modifica», the rows,
-  «Spuntati» of the geoprocesses, the export window and «Solo gli spuntati» of the portal save.
+  «Spuntati» of the geoprocesses, the export window and «Solo gli spuntati» of the portal save. Since 2026-11-02 (M1)
+  the parcels are part of it everywhere: the blue outline (`selRender`, `selPGeom` converts a parcel's shape once per
+  geometry), the card, the bar (`rcSelBarSync`, `selSummary`), `selSet` (a parcel or its graphic), `selDelete`. A
+  parcel tick changed in place is mirrored by `parcelSelSync` (rows and subgroup boxes, without redrawing the list
+  or the map). `rcPass(o)` says whether the filter shows an object: `setSectionSel`, the subgroup boxes and their
+  «Spunta tutte» use it (M10b), and `sectionSelCount(sec, true)` sets the header box from the rows found.
+- **Trap:** the selection is not in the history (U1): an Annulla gives back a removed parcel with its tick as it was,
+  but a selection cleared by mistake does not come back.
 - **The object editor** lives in «Proprietà»: `sfEditInProps(g)` selects, opens Disegna and shows `#selCard`
   (`selCardRender` + `sfEditor`: category among those that accept the geometry, type, numbers, custom fields, note,
   source, status, site, portal state). The name follows the category label until renamed; the card is not rebuilt
@@ -910,8 +928,9 @@ How the app works inside, by subject, with the traps to know before editing. The
   area). `RULES[kind][action]` is absent (allowed) or the sentence the user reads when it is not; `can(o, action)`
   returns `true` or that sentence, `canOk` a boolean. The actions read today: `rename`, `colour`, `props`, `edit`,
   `split`, `merge`, `move`, `delete`, `zoom`, `sfSave`, `promote`. Read by the row menu and its colour swatch and ×
-  (`geomRow`), `sfEditInProps`, `selEditable` and `selClick` (a click on an object that cannot be selected says why in
-  the Disegno message and keeps the selection), Dividi of the geoprocesses. The export, the save to IT - Site
+  (`geomRow`), `sfEditInProps`, the edit tools of the selection (`selFor`: since 2026-11-02 every object of the Raccolta
+  can be selected, and Rimodella, Sposta, Dividi, Unisci take what the table allows and say what they left out),
+  `selDelete` (a strip stays), Dividi of the geoprocesses. The export, the save to IT - Site
   Features (`sfCandidates`) and the migration to AREAS COLLECTION keep their own filters, which the `rules` harness
   checks against the table. A copy (`drwCopyAdd`) is always an ordinary drawing: it drops the automatic link
   (`sf_auto`, `sf_of`), the portal identity (`sf_uid`, `sf_sig`, `sf_gid`), the owners' data (`own`, `src_attrs`),
@@ -963,14 +982,22 @@ How the app works inside, by subject, with the traps to know before editing. The
   keep category, type, attributes, note, site and style, not `sf_gid`/`sf_saved`; a parcel or a layer feature becomes a
   drawing of the current category. **Parallel copy** (`off1`/`off2`): a parallel line, an inset (click inside) or an
   outset, mitred; «Solo il lato cliccato» moves one side.
-- **Seleziona e modifica** (`23b-select-edit.js`): `selEditable` = drawings, results, imports (not parcels, automatic
-  objects `sf_auto`, owners' parcels). `selSet(list, 'only'|'add'|'toggle')`, `selList`, `selCount`, `selClear`;
+- **Seleziona e modifica** (`23b-select-edit.js`): since 2026-11-02 (M2) `selPickable` = anything with an `objKind`
+  (parcels, owners' parcels, automatic objects included) and `selEditable` = pickable and `canOk(g,'edit')`.
+  `selSet(list, 'only'|'add'|'toggle')` (parcels or their graphics too), `selList` and `selCount` (the objects),
+  `selParcels`, `selTotal`, `selClear`; `selSay` writes the Disegna message and, when that is not in view, a toast;
   `selRender` draws the outline (`selGL`), re-renders the rows unless `{rows:false}`, fills `#selCard`, refreshes the
-  ribbon, and runs from `refreshDl`. Seleziona: a click (`hitTest`); Shift or touch toggles; nothing clears. Riquadro: a
-  rectangle sketch (`selBoxDone`, tested after `geoProject`; `selShift` tracks Shift, which the create event lacks).
+  ribbon, and runs from `refreshDl`. Seleziona: a click (`hitTest` on `toolsGL` and `gl`, ordered by `selOrder`: points,
+  lines, then areas by size, so a parcel comes before the gross area over it; `selCyc` takes the next one on a second
+  plain click within 6 px); Shift or touch toggles; nothing clears; the row comes into view (`rcReveal` →
+  `srchShowRow(obj, true)`, which leaves the filter alone). Riquadro: a rectangle sketch (`selBoxDone`, parcels too,
+  tested after `geoProject`; `selShift` tracks Shift, which the create event lacks). `selMoveActs` / `selMenuActs` are
+  the menus of the whole selection (row right-click, the bar, the map's right-click via `ctxSelFill` in
+  `12-zornade.js`); `selKeyDel` is the Canc key (not in a field, a window or an edit of the SDK, which has its own).
   Rimodella (`reshape`) and Sposta e ruota (`transform`, no scaling) are SDK updates after `selEditPrep` projects to the
   view's system. Dividi arms the cut (`gpPendingSplit`); Unisci replaces the areas with their `geoUnion` and the first
-  one's attributes; Copia starts `cp2` from the centroid; Elimina asks, then asks again for the portal.
+  one's attributes; Copia starts `cp2` from the centroid (a single parcel too: the copy is a drawing); Elimina
+  (`selDelete`) takes the parcels and the objects the rules allow, asks, then asks again for the portal.
 - **Esclusione da layer** (`exlStart`/`exlEnd`): a click reads a complete feature of a visible vector layer
   (`gpLayerFeatureAt`) and `exlAdd` draws it (area → *Esclusione*, line → *Infrastruttura lineare*, point →
   *Ostacolo*; source `official`, `src_attrs`, `_srcKey` so it is added once); its Riquadro queries every visible
@@ -1308,7 +1335,7 @@ How the app works inside, by subject, with the traps to know before editing. The
   (the SDK not served by the CDN: «SDK non ancora caricato»), so that run is repeated too.
 - Every test page is a first visit (a fresh Chrome profile): the hook marks the first-visit tour as seen
   (`axpo_tour_seen`) before the app starts.
-- The twenty-six harnesses:
+- The twenty-seven harnesses:
   - `smoke`: the view is ready, the app's layers, the Agenzia cadastre, six tabs and the panels' tabs.
   - `zoom`: the zoom after a selection goes only to the action's parcels, only when they are out of view.
   - `overlay`: the cadastre image placed to the pixel through pan, rotation, scale, switch and opacity (needs the AdE).
@@ -1346,6 +1373,9 @@ How the app works inside, by subject, with the traps to know before editing. The
     GeoJSON of 120 features in «Altro».
   - `vtpopup`: the vector tile popups on a simulated hit test (popup.json and fallback, labels, fill and outline once,
     after the native popup, not with a tool armed or on an object of the Raccolta, never the basemap).
+  - `parcelsel`: the parcels in the selection (a click under a gross area and the second click, Shift, Riquadro, the
+    filter and «Spunta tutte», the range, the right-click and a subgroup of the selection, Canc and Annulla, the map's
+    right-click, Rimodella and Copia on a parcel).
 - **Trap:** the history photographs the work 0.5 s after it settles, and every change pushes the photo back: a harness
   that removes something and then tests Annulla waits for `drwHist.timer` to be 0 first, or the state before the
   removal was never photographed (`owners` failed once under the full suite on 2026-10-30).
@@ -2310,6 +2340,23 @@ road: «Road», 1 of 2); the real map needs the sign-in: item 1.6 of the checkli
 before its bin (it failed once under the full suite: tests only). Backup:
 `geoportale_axpo_pre-popup-tasselli_2026-10-30.html`.
 
+**2026-11-02: the parcels in the selection (decisions M1–M7 and M10, approved by the user; the drag and drop, M8, is the
+next step).** The user asked to select parcels on the map and see them selected in the panel, a button to take the
+selected ones away, a right-click to make a group of them, and the drag and drop between groups and subgroups; and to
+test the panel. The test found: a click on a parcel of the Raccolta did nothing, «Seleziona» refused parcels with a
+reason written where it could not be seen, ticked parcels had no outline, the right-click on a ticked row acted on that
+row only, nothing took away just the ticked parcels, every row read «Borgo Inventato · F…» (the comune first, cut by
+the narrow panel), «Spunta tutte» ticked the rows hidden by the filter too, and «Sulla mappa» (which adds from the
+cadastre) sat beside a «Seleziona» (which picks what is collected). Done: one selection for parcels and objects (M1);
+Seleziona and Riquadro take parcels, in Disegna and in Ricerca › Raccolta, and selecting is not editing (M2); the row
+comes into view, a click flashes the object on the map, a double click zooms, Shift+click ticks a range (M3); the
+selection bar (M4); Togli and Canc (M5); the right-click menus of the whole selection, on rows and on the map (M6);
+«sottogruppo» for parcels, «gruppo» for objects (M7); one level of subgroups (M9); the fixes M10a–d («Sulla mappa»
+became «Aggiungi dalla mappa» rather than the «Aggiungi dal catasto» proposed: beside the group «Catasto» that read
+twice). Formats unchanged (`.axpo`, Site Features): PV Predesign has nothing to do. New harness `parcelsel`; `rules`
+(a strip and a parcel are selected, Rimodella says why not), `search`, `texts` and `profiles` follow the names. Backup:
+`geoportale_axpo_pre-selezione-particelle_2026-11-02.html`.
+
 ## 8. Repository contents
 
 ```
@@ -2321,7 +2368,7 @@ src/js/22a-groups.js       the groups of the Raccolta (G2-4a): the model, the cu
 src/js/22b-parcel-groups.js  the parcel subgroups (G2-4b): the model, the menus, the nested blocks of Particelle
 src/js/22c-rules.js        what can be done to what (7b-1): the kinds of object, the table of rules, can()
 src/js/19b-custom-cats.js  the custom categories (G2-5b): the model, the values sf_ext, the modal «Le mie categorie»
-src/js/23b-select-edit.js  Seleziona e modifica (G2-3): the selection on the map, the edit tools, the exclusion from the layers
+src/js/23b-select-edit.js  Seleziona e modifica (G2-3; parcels since 2026-11-02): the selection on the map, its menus and Canc, the edit tools, the exclusion from the layers
 src/js/29b-commands.js     the commands (7a): the name each action gives to its Annulla; the registry and the shortcuts; the profiles (7b-2)
 src/js/29c-search.js       the search Ctrl K (7c): the objects of the Raccolta and the commands of the ribbon
 design/                    the family's design system as copied: tokens.json, icons/*.svg (143), kit.css, geo-kit.css
@@ -2508,3 +2555,13 @@ in §7):
   `src/js/11-map-model.js` (`vtpWire`); `src/html/30-modals.html` (the guide); `tests/harness/owners.py` (waits for the
   history's photo before the bin); `tests/README.md`;
   `docs/architecture.md`; `../reports/collaudo_login_vero_2026-10-27.md` (item 1.6); this README (§3, §4, §5, §7, §8).
+- **The parcels in the selection (2026-11-02).** New: `tests/harness/parcelsel.py`. Changed: `src/js/23b-select-edit.js`
+  (`selPickable`, `selParcels`, `selTotal`, `selFor`, `selSay`, `selOrder`, `selMoveActs`, `selMenuActs`, `selKeyDel`);
+  `src/js/18-parcels.js` (`parcelRowName`, `parcelSelSync`, the row's tick, click and right-click);
+  `src/js/22-raccolta-ui.js` (`rcPass`, `rcRowClicks`, `rcFlash`, `rcRangeClick`, `rcReveal`, the bar);
+  `src/js/22a-groups.js`, `src/js/22b-parcel-groups.js` (the filter, «selezionate», the headers' right-click);
+  `src/js/12-zornade.js` (`ctxSelFill`); `src/js/24-import-files.js`; `src/js/29b-commands.js` (the name of Togli);
+  `src/js/29c-search.js` (`srchShowRow(obj, soft)`, the parcel's name); `src/js/30-ui-glue.js` (the ribbon, «Aggiungi
+  dalla mappa», the help); `src/js/32-tour.js`; `src/html/20-app-body.html` (`#rcSelBar`); `src/html/30-modals.html`
+  (`#ctxSel`, the guide); `src/css/50-panels.css`, `src/css/60-tour.css`; `tests/harness/rules.py`, `search.py`,
+  `texts.py`, `profiles.py`; `tests/README.md`; `docs/architecture.md`; this README (§3, §4, §5, §7, §8).
