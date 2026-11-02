@@ -1186,6 +1186,39 @@ dialog.dialog::backdrop { background: rgba(11, 18, 25, .45); }
   .rcmore{display:block;margin:4px 0 2px 24px;font-size:11.5px}
   #grossBtn{display:none} .gsec[data-sec="parcels"] .gfoot:has(#grossBtn){display:none}   /* «Crea area lorda» is in the ribbon, which presses this button */
   #selCard .gedit{margin:8px 0 0;border-left-width:1px;padding:4px 0 0;border:0;background:transparent}
+  /* ── 2/11 (N3): the Raccolta as a tree, as the layers of QGIS: no boxes, every level a row of the height of an object's row,
+     the depth an indent; the count and the hectares on the right; eye, names and ⋯ on hover (the eye stays while it says
+     «hidden»; always on touch) ── */
+  #drawerElenco .gsec{border:0;border-radius:0;margin:0 0 2px;overflow:visible;background:transparent}
+  #drawerElenco .gsecH{min-height:28px;padding:2px 5px;gap:5px;background:transparent;border-radius:7px;justify-content:flex-start}
+  #drawerElenco .gsecH:hover{background:var(--hover)}
+  #drawerElenco .gsecH::before{margin-right:0}
+  #drawerElenco .gsecH b{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:600}
+  #drawerElenco .gsecH .gfig,#drawerElenco .gsecH .gcount{flex:none;font-size:11px;font-weight:400;color:var(--mut);opacity:1;white-space:nowrap;font-variant-numeric:tabular-nums;background:none;padding:0;min-width:0;border-radius:0}
+  #drawerElenco .glist{padding:0 0 4px 14px}
+  #drawerElenco .gsecH .gtools{gap:0}
+  /* the hidden tools take no room, so the names keep the width; the eye of a hidden group stays */
+  #drawerElenco .gsecH .gtools>*,#drawerElenco .psubH .vtoggle,#drawerElenco .psubH .ltoggle,#drawerElenco .psubH .gmore{opacity:0;width:0;height:22px;padding:0;overflow:hidden}
+  #drawerElenco .gsecH:hover .gtools>*,#drawerElenco .gsecH:focus-within .gtools>*,#drawerElenco .psubH:hover>button,#drawerElenco .psubH:focus-within>button{opacity:.75;width:22px}
+  #drawerElenco .gsecH .gtools .vtoggle.off,#drawerElenco .psubH .vtoggle.off{opacity:.6;width:22px}
+  @media (hover:none){ #drawerElenco .gsecH .gtools>*,#drawerElenco .psubH>button{opacity:.6;width:22px} }
+  #drawerElenco .psub{border:0;border-radius:0;margin:0}
+  #drawerElenco .psubH{min-height:28px;padding:2px 5px;gap:5px;background:transparent;border-radius:7px}
+  #drawerElenco .psubH:hover{background:var(--hover)}
+  #drawerElenco .psubH .psubN{flex-direction:row;align-items:center;gap:6px}
+  #drawerElenco .psubH .psubN b{flex:1;font-weight:600}
+  #drawerElenco .psubB{padding:0 0 2px 14px}
+  #drawerElenco .gcat{padding:4px 5px 0}
+  #drawerElenco .gown{flex-wrap:nowrap;min-height:28px;padding:2px 5px}
+  #drawerElenco .gown .gown-s{order:0;flex:none;padding:0;margin:0;opacity:1;color:var(--mut)}
+  #drawerElenco .gownbar{margin:4px 0 0;padding:4px 5px 2px}
+  #drawerElenco .gfoot{padding:4px 5px 2px}
+  /* M8 (2/11): drag and drop in the Raccolta: the row dragged fades, the block that takes it lights, a line says where a
+     subgroup or a group goes; the label that follows the pointer */
+  #drawerElenco .dndsrc{opacity:.45}
+  #drawerElenco .dndover{background:color-mix(in srgb,var(--accent) 16%,transparent)!important;outline:1px dashed var(--accent);outline-offset:-1px;border-radius:7px}
+  #drawerElenco .dndbefore{box-shadow:inset 0 2px 0 var(--accent)} #drawerElenco .dndafter{box-shadow:inset 0 -2px 0 var(--accent)}
+  .dndghost{position:fixed;top:-200px;left:0;padding:3px 10px;border-radius:12px;background:var(--fill);color:var(--on-fill);font:600 12px/18px var(--font-sans,sans-serif);white-space:nowrap;pointer-events:none}
   /* ══ TOUR spotlight + menu aiuto + tooltip icone ══ */
   #tourOverlay{position:fixed;inset:0;z-index:2000;display:none}
   #tourHole{position:fixed;border-radius:8px;border:2px solid var(--accent);box-shadow:0 0 0 9999px rgba(0,0,0,.6);transition:left .2s,top .2s,width .2s,height .2s;pointer-events:none}
@@ -1276,6 +1309,28 @@ dialog.dialog::backdrop { background: rgba(11, 18, 25, .45); }
     color:var(--mut);font:italic 700 12px Georgia,'Times New Roman',serif;line-height:1;cursor:pointer;display:grid;place-items:center}
   .imod .im-info:hover,.imod .im-info:focus-visible{color:var(--link);border-color:var(--accent);outline:none}
   .imod .im-body{padding:2px 10px 11px}
+  /* 2/11 (N2): a module of one card: the panel's header has its title (and its «i», #sideInfo), the card keeps its body only */
+  .imod.solo,.imod.solo[open],[data-theme="dark"] .imod.solo[open]{border:0;background:transparent;margin:0}
+  .imod.solo>summary{display:none}
+  .imod.solo>.im-body{padding:0}
+  #modProj>.tlab:first-child,#modEdit>.tlab:first-child,#modPrint>.tlab:first-child{display:none}   /* «Progetto», «Modifica AREAS COLLECTION», «Stampa»: the header says it */
+  /* 2/11 (J1–J4): the sections of the Ricerca panel: rows that close, chevron on the left, no box, icon or subtitle; a closed
+     section shows its figure on the right; labels inside the fields; the four modes of «Dalla mappa» in one row */
+  .imod.flat,.imod.flat[open],[data-theme="dark"] .imod.flat[open]{border:0;border-top:1px solid var(--line);border-radius:0;background:transparent;margin:0}
+  .imod.flat:first-child{border-top:0}
+  .imod.flat>summary{padding:7px 2px;gap:6px;border-radius:6px}
+  .imod.flat>summary:hover,.imod.flat[open]>summary:hover,[data-theme="dark"] .imod.flat[open]>summary:hover{background:var(--hover)}
+  .imod.flat>summary::after{order:-1;margin:0 3px 2px 2px;transform:rotate(-45deg)} .imod.flat[open]>summary::after{transform:rotate(45deg);margin:0 3px 3px 2px}
+  .imod.flat .im-t b{font-size:12.5px}
+  .imod.flat[open]>summary .im-n{display:none}
+  .imod.flat>.im-body{padding:0 2px 10px}
+  .imod.flat .im-body>select,.imod.flat .rcpair{margin:0 0 6px}
+  .imod.flat #cvNote:empty{display:none}
+  .rcpair{display:grid;grid-template-columns:1fr 1fr;gap:6px} .rcpair.rcfp{grid-template-columns:1fr 2fr} .rcpair.rcdraw{grid-template-columns:minmax(0,1fr) auto}
+  .rcpair>select,.rcpair>input,.rcpair>button{margin:0;min-width:0}
+  .imod.flat select:has(option[value=""]:checked){color:var(--mut)}
+  .segbtns.rcmodes{grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;margin:0}
+  .segbtns.rcmodes button{display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 2px 5px;font-size:11px;min-width:0;overflow:hidden;text-overflow:ellipsis}
   .imod .im-main{width:100%;margin-top:0}
   /* Site Features: categorie a bottoni colorati, attributi, sito di lavoro, categoria e scheda nelle righe della Raccolta */
   .sfchips{display:flex;flex-wrap:wrap;gap:5px;margin-top:2px}
@@ -1382,6 +1437,7 @@ dialog.dialog::backdrop { background: rgba(11, 18, 25, .45); }
   .infobody{font-size:13px;line-height:1.55;color:var(--txt)}
   .infobody h3{font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--mut);margin:14px 0 6px;font-weight:700}
   .infobody h3:first-child{margin-top:4px}
+  .infobody h2{font-size:14px;font-weight:700;margin:18px 0 2px;padding-top:12px;border-top:1px solid var(--line)} .infobody h2:first-child{margin-top:0;padding-top:0;border:0}   /* 2/11 (J2): a window of several sections */
   .infobody ol,.infobody ul{margin:0;padding-left:20px}
   .infobody li{margin-bottom:6px}
   .infobody p{margin:0 0 8px}
@@ -1694,7 +1750,7 @@ dialog.dialog::backdrop { background: rgba(11, 18, 25, .45); }
      di sezione) usano --link (accent-strong nel chiaro, accent nello scuro). Gli esiti ok/errore hanno un punto
      colorato e testo normale: --ok e --warn come testo su bianco si fermano a 2,4:1 e 1,5:1. */
   .btn.active,.segbtns button.active,#subToggle.active,
-  #measureCtl.open #measureBtn,#tourNext,.gsecH .gcount,#cnt,.srnum,.gpnum{background:var(--fill);border-color:var(--fill);color:var(--on-fill)}
+  #measureCtl.open #measureBtn,#tourNext,.srnum,.gpnum{background:var(--fill);border-color:var(--fill);color:var(--on-fill)}
   .item .t b,#modeBanner b,.subrow .subd,.subsec,.llopts .llflt .llfst.on,.imod .im-n{color:var(--link)}
   .thint.ok,.thint.err{color:var(--txt)}
   .thint.ok:not(#gpMsg)::before,.thint.err:not(#gpMsg)::before{content:'';display:inline-block;width:8px;height:8px;border-radius:4px;margin:0 6px 1px 0;vertical-align:middle}
@@ -1885,8 +1941,9 @@ dialog.dialog::backdrop { background: rgba(11, 18, 25, .45); }
         <div id="rcEmpty" class="empty" hidden>La Raccolta è vuota: cerca o clicca le particelle, disegna, calcola o importa.</div>   <!-- 22/10: the sections show only when populated -->
         <!-- intestazione di sezione: spunta tutti · mostra/nascondi · colore (non nei Disegni: lì il colore è la categoria) · elimina tutti -->
         <div class="gsec" data-sec="parcels">
-          <div class="gsecH"><input type="checkbox" class="gselall" data-sec="parcels" title="Spunta tutte" aria-label="Spunta tutte le particelle"><b>Particelle</b><span class="gtools" data-sec="parcels"><button class="vtoggle" data-role="visall" title="Mostra/nascondi tutte" aria-label="Mostra/nascondi tutte le particelle"></button><button type="button" class="ltoggle" data-role="lblall" title="Nomi sulla mappa" aria-label="Nomi sulla mappa" aria-pressed="false"></button><button type="button" class="cswatch" data-role="colall" data-col="#F5A623" title="Colore di tutte le particelle" aria-label="Colore di tutte le particelle"></button><button type="button" class="gdel" data-role="delall" title="Elimina tutte le particelle" aria-label="Elimina tutte le particelle"></button><button type="button" class="gact gmore" data-role="more" title="Sottogruppi" aria-label="Sottogruppi delle particelle" aria-haspopup="menu"></button></span><span id="cnt" class="gcount">0</span></div>
-          <div class="glist"><div id="listTot" class="hint"></div>
+          <div class="gsecH"><input type="checkbox" class="gselall" data-sec="parcels" title="Spunta tutte" aria-label="Spunta tutte le particelle"><b>Particelle</b><span id="cnt" class="gfig" title="Particelle e superficie catastale">0</span><span class="gtools" data-sec="parcels"><button class="vtoggle" data-role="visall" title="Mostra/nascondi tutte" aria-label="Mostra/nascondi tutte le particelle"></button><button type="button" class="ltoggle" data-role="lblall" title="Nomi sulla mappa" aria-label="Nomi sulla mappa" aria-pressed="false"></button><button type="button" class="gact gmore" data-role="more" title="Altre azioni: sottogruppi, colore, togli tutte" aria-label="Altre azioni delle particelle" aria-haspopup="menu"></button></span></div>
+          <!-- 2/11 (N3): the count and the cadastral area are the header's figure; colour and «togli tutte» live in its ⋯ -->
+          <div class="glist">
             <label class="chk" hidden><input type="checkbox" id="lblParcels" checked> Etichette sulla mappa</label>   <!-- 22/10: the state only; the icon in the header drives it -->
             <div id="list"><div class="empty">Nessuna particella. Cercala o cliccala sulla mappa.</div></div><div id="listOwn"></div><div class="gfoot"><button type="button" class="btn" id="grossBtn" disabled title="Prima aggiungi delle particelle">Crea area lorda dalle particelle</button></div></div>
         </div>
@@ -2015,57 +2072,42 @@ dialog.dialog::backdrop { background: rgba(11, 18, 25, .45); }
       <button class="ptab" role="tab" type="button" data-stab="layers" aria-selected="false" tabindex="-1" aria-controls="sideLayers">Layer</button>
       <button class="ptab" role="tab" type="button" data-stab="legend" aria-selected="false" tabindex="-1" aria-controls="sideLegend" title="Legenda dei layer accesi">Legenda</button>
     </div>
-    <header class="panel-h" id="sideHead"><div class="ttl"><b id="sideTitle">Ricerca particelle</b><small id="sideSub">Comune, foglio e particelle</small></div><button id="sideUndock" class="ibtn" type="button" aria-label="Sgancia il pannello in una finestra" title="Sgancia il pannello in una finestra (per il secondo schermo)" data-icon="undock"></button><button id="sideToggle" class="ibtn" type="button" data-collapse="right" aria-label="Chiudi il pannello" title="Chiudi il pannello"><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-collapse-right"></use></svg></button></header>
+    <header class="panel-h" id="sideHead"><div class="ttl"><b id="sideTitle">Ricerca particelle</b><small id="sideSub">Per foglio e particella, dalla mappa, da un disegno</small></div><button id="sideInfo" class="ibtn" type="button" hidden aria-label="Come funziona" title="Come funziona" data-icon="info"></button><button id="sideUndock" class="ibtn" type="button" aria-label="Sgancia il pannello in una finestra" title="Sgancia il pannello in una finestra (per il secondo schermo)" data-icon="undock"></button><button id="sideToggle" class="ibtn" type="button" data-collapse="right" aria-label="Chiudi il pannello" title="Chiudi il pannello"><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-collapse-right"></use></svg></button></header>
     <div id="sideContent" class="panel-b">
     <!-- phase 3 (H2 B): on a phone the tools of the tab sit at the top of the sheet, group by group, rendered by the script -->
     <div id="sheetTools" role="group" aria-label="Strumenti della scheda" hidden></div>
     <div id="authTodo" class="notice warn" style="display:none"></div>
 
     <div class="tabpane active" data-tab="ricerca"><div class="paneBody">
-        <!-- Tre moduli: la ricerca per comune, foglio e particella; la selezione sulla mappa; la selezione da un
-             disegno. Titolo + una riga per modulo; gli esempi stanno nella finestra «i» (RC_INFO nello script). -->
-        <details class="imod" id="rcSecFind" open>
-          <summary><span class="im-ico" aria-hidden="true" data-icon="parcels"></span><span class="im-t"><b>Ricerca particelle</b><small>Comune, foglio e particelle</small></span>
-            <span class="im-n im-txt" id="rcSumArea"></span><button type="button" class="im-info" data-info="rcFind" title="Come funziona" aria-label="Come funziona la ricerca per foglio e particella">i</button></summary>
+        <!-- 2/11 (N1, J1–J4): one module, three sections as rows that close (remembered): by comune, sheet and number; from
+             the map; from a drawing. No hint in view: the hints are the controls' tooltips, the examples the «i» by the panel's
+             title (RC_INFO.rcAll); a closed section shows only its figure (the comune chosen, the drawings available). -->
+        <details class="imod flat" id="rcSecFind" open>
+          <summary><span class="im-t"><b>Per foglio e particella</b></span><span class="im-n im-txt" id="rcSumArea"></span></summary>
           <div class="im-body">
-            <label for="reg">Regione</label>
-            <select id="reg"><option value="">— seleziona —</option></select>
-            <label for="prov">Provincia</label>
-            <select id="prov" disabled><option value="">—</option></select>
-            <label for="com">Comune</label>
-            <select id="com" disabled><option value="">—</option></select>
+            <label for="reg" class="sr-only">Regione</label><select id="reg" title="Regione"><option value="">Regione</option></select>
+            <div class="rcpair"><label for="prov" class="sr-only">Provincia</label><select id="prov" disabled title="Provincia"><option value="">Provincia</option></select><label for="com" class="sr-only">Comune</label><select id="com" disabled title="Comune"><option value="">Comune</option></select></div>
             <div id="cvNote" class="hint"></div>
-            <div class="row">
-              <div><label for="fog">Foglio</label><input id="fog" placeholder="es. 1"></div>
-              <div><label for="par">Particelle</label><input id="par" placeholder="es. 1, 2, 3"></div>
-            </div>
-            <div class="hint">Una o più, separate da virgola o spazio. Serve il comune.</div>
+            <div class="rcpair rcfp"><label for="fog" class="sr-only">Foglio</label><input id="fog" placeholder="Foglio" title="Il foglio catastale"><label for="par" class="sr-only">Particelle</label><input id="par" placeholder="Particelle: 1, 2, 3" title="Una o più particelle, separate da virgola o spazio. Serve il comune."></div>
             <button id="go" class="btn primary wide" disabled>Aggiungi alla Raccolta</button>
           </div>
         </details>
-        <details class="imod" id="rcSecMap">
-          <summary><span class="im-ico" aria-hidden="true" data-icon="sel-click"></span><span class="im-t"><b>Aggiungi dalla mappa</b><small>Clicca o disegna sopra le particelle che vuoi</small></span>
-            <button type="button" class="im-info" data-info="rcMap" title="Come funziona, con un esempio" aria-label="Come funziona la selezione sulla mappa">i</button></summary>
+        <details class="imod flat" id="rcSecMap" open>
+          <summary><span class="im-t"><b>Dalla mappa</b></span></summary>
           <div class="im-body">
-            <div class="segbtns" id="selModeBox">
-              <button data-m="point" data-icon="sel-click">Puntuale</button>
-              <button data-m="rectangle" data-icon="sel-rect">Rettangolo</button>
-              <button data-m="polygon" data-icon="sel-poly">Poligono</button>
-              <button data-m="polyline" data-icon="sel-line">Linea</button>
+            <div class="segbtns rcmodes" id="selModeBox">
+              <button data-m="point" data-icon="sel-click" title="Clicca una particella sulla mappa: la aggiungo alla Raccolta. Di nuovo sul pulsante, o Esc, per smettere.">Punto</button>
+              <button data-m="rectangle" data-icon="sel-rect" title="Trascina un rettangolo: aggiungo le particelle al suo interno. Ricerca indicativa: provo un punto ogni tanti metri, una particella molto piccola può sfuggire. Esc per smettere.">Rettangolo</button>
+              <button data-m="polygon" data-icon="sel-poly" title="Clicca i vertici, doppio clic per chiudere: aggiungo le particelle all’interno. Ricerca indicativa: una particella molto piccola può sfuggire. Esc per smettere.">Poligono</button>
+              <button data-m="polyline" data-icon="sel-line" title="Clicca i punti, doppio clic per finire: aggiungo le particelle attraversate. Ricerca indicativa: una particella molto piccola può sfuggire. Esc per smettere.">Linea</button>
             </div>
-            <div class="hint" id="selHint">Scegli un modo, poi lavora sulla mappa. Di nuovo sul pulsante, o Esc, per smettere.</div>
-            <div class="hint selnote">Rettangolo, poligono e linea danno una ricerca <b>indicativa</b>: il catasto non si interroga per area, provo un punto ogni tanti metri e una particella molto piccola può sfuggire.</div>
+            <div class="hint" id="selHint" hidden></div>   <!-- the mode's hint: the map's banner says it -->
           </div>
         </details>
-        <details class="imod" id="rcSecDraw">
-          <summary><span class="im-ico" aria-hidden="true" data-icon="from-drawing"></span><span class="im-t"><b>Da un disegno</b><small>Le particelle toccate da un disegno, un buffer o un file</small></span>
-            <span class="im-n" id="rcNDraw"></span><button type="button" class="im-info" data-info="rcDraw" title="Come funziona, con un esempio" aria-label="Come funziona la ricerca da un disegno">i</button></summary>
+        <details class="imod flat" id="rcSecDraw" open>
+          <summary><span class="im-t"><b>Da un disegno</b></span><span class="im-n im-txt" id="rcNDraw"></span></summary>
           <div class="im-body">
-            <div class="row" style="align-items:flex-end">
-              <div style="flex:2"><select id="selFromDraw" aria-label="Disegno da usare"><option value="">— nessun disegno —</option></select></div>
-              <div style="flex:0 0 auto"><button class="btn" id="selDrawGo" disabled style="margin-top:0">Cerca</button></div>
-            </div>
-            <div class="hint selnote">Ricerca <b>indicativa</b>, come quella su area: una particella molto piccola può sfuggire (un punto la trova sempre).</div>
+            <div class="rcpair rcdraw"><select id="selFromDraw" aria-label="Disegno da usare"><option value="">Nessun disegno</option></select><button class="btn" id="selDrawGo" disabled title="Le particelle toccate dall’oggetto scelto. Ricerca indicativa, come quella su area: una particella molto piccola può sfuggire (un punto la trova sempre).">Cerca</button></div>
           </div>
         </details>
     </div></div>
@@ -2628,13 +2670,13 @@ dialog.dialog::backdrop { background: rgba(11, 18, 25, .45); }
     <ol style="margin:0;padding-left:18px;font-size:13px;line-height:1.7">
       <li><b>Barra in alto</b> — il nome del <b>progetto</b> .axpo (un clic lo salva con un altro nome); <b data-icon="map">Mappa</b>, la web map del portale in uso: la General Map o una Check Vincoli regionale, con ricerca per nome (cambiandola restano particelle, disegni e risultati; si perdono i layer accesi e i filtri di quella mappa, te lo chiedo prima); <b data-icon="folder"></b> Apri e <b data-icon="save"></b> Salva progetto; <b>Accedi</b> ad AGOL; il tema chiaro o scuro; <b data-icon="help"></b> i tour e questa guida.</li>
       <li><b>Schede e ribbon</b> — sei schede, nell'ordine del lavoro: Ricerca particelle · Terreno · Disegna · Geoprocessi e analisi · Importa · Salva ed esporta. Sotto, il <b>ribbon</b> con gli strumenti della scheda, a gruppi: ogni gruppo ha il suo nome e una <b data-icon="info"></b> che dice cosa si fa lì, con «Di più» per la spiegazione lunga, spesso con un esempio disegnato. Uno strumento apre le sue impostazioni a destra, in <b>Proprietà</b>.</li>
-      <li><b>Ricerca particelle</b> — <b>Catasto</b>: regione, provincia, comune, foglio e numeri di particella (con una regione scelta ti propongo i suoi vincoli con un clic; all'invio la mappa inquadra le particelle appena aggiunte); <b>Aggiungi dalla mappa</b>: Puntuale, Rettangolo, Poligono o Linea; <b>Da un disegno</b>: le particelle toccate da un disegno, un buffer o un file; <b>Raccolta</b>: Crea area lorda dalle particelle, <b>Seleziona</b> e <b>Riquadro</b> per scegliere sulla mappa quelle già nella Raccolta, i numeri sulla mappa, lo zoom.</li>
+      <li><b>Ricerca particelle</b> — <b>Catasto</b> › <b>Cerca particelle</b> apre a destra i tre modi di prendere le particelle dal catasto, ognuno in una sezione che si chiude: <b>Per foglio e particella</b> (regione, provincia, comune, foglio e numeri; con una regione scelta ti propongo i suoi vincoli con un clic; all'invio la mappa inquadra le particelle appena aggiunte), <b>Dalla mappa</b> (Puntuale, Rettangolo, Poligono o Linea) e <b>Da un disegno</b> (le particelle toccate da un disegno, un buffer o un file); <b>Raccolta</b>: Crea area lorda dalle particelle, <b>Seleziona</b> e <b>Riquadro</b> per scegliere sulla mappa quelle già nella Raccolta, i numeri sulla mappa, lo zoom.</li>
       <li><b>Terreno</b> — <b>Estensione</b>: su cosa lavorare (un'area lorda, il sito AREAS, le particelle, oppure un rettangolo o un poligono disegnato qui); <b>Modello del terreno</b>: il limite di pendenza, in ogni direzione oppure nord–sud ed est–ovest, e <b>Analizza le pendenze</b>, con le quote di Esri World Elevation (circa 10 m in Italia); <b>Analisi terreno</b>: classi di pendenza, quote, esposizione, ombreggiatura e curve di livello; <b>Profilo</b> altimetrico lungo una linea; <b>Rimuovi terreno</b>. Le zone troppo ripide diventano un'esclusione nella Raccolta.</li>
       <li><b>Disegna</b> — <b>Cosa disegni</b>: la categoria (la scheda colorata: un clic apre l'elenco, anche con le categorie tue), con tipo, valori e fonte, ed <b>Esclusione da layer</b>; <b>Con quale strumento</b>: punto, linea, area, rettangolo, cerchio, a mano libera; <b>Seleziona e modifica</b>: seleziona, riquadro, rimodella, sposta e ruota, dividi, unisci, copia, elimina, annulla e ripeti; <b>Supporto al disegno</b>: aggancio, misure esatte, griglia; <b>Aree automatiche</b>: l'area netta e il rientro dal confine; <b>Collega a sito AREAS</b>: il sito a cui vanno i disegni sul portale (salvando, ogni oggetto si lega da solo all'area che tocca).</li>
       <li><b>Geoprocessi e analisi</b> — <b>Oggetti di partenza</b>: metti gli oggetti in A, dalla mappa, dalle righe spuntate o per categoria (B serve a Parte comune e Sottrai); <b>Geoprocessi</b>: Buffer, Unisci, Parte comune, Sottrai B da A, Copia, Contorno, Semplifica, Ritaglia, poi <b>Esegui</b> a destra: il risultato va nella Raccolta, gruppo Analisi; <b>Contesto</b>: Analisi di contesto (sottostazioni, linee AT e progetti FV intorno a un punto) e Percorso su strada, con l'accesso; <b>Coordinate</b>: in che sistema sono dei valori sconosciuti.</li>
       <li><b>Importa</b> — <b>File</b>: GeoJSON, KML, KMZ, Shapefile (.zip) e il file di <b>Estrazione intestatari</b>, colorato e raggruppato per intestatario in fondo al blocco <b>Particelle</b> della Raccolta, dove il cestino della riga «Per intestatario» lo toglie tutto (i nominativi restano fuori dal salvataggio automatico e dal portale); <b>CAD</b>: un DWG letto nel browser, con il sistema proposto, oppure allineato a mano con due punti; <b>Immagini</b>: GeoTIFF e world file si posizionano da soli, PNG, JPG e PDF con sposta, scala, ruota o punti noti; <b>Servizi web</b>: WMS, WFS e ArcGIS REST dal loro indirizzo; <b>Portale</b>: un layer cercato per titolo.</li>
       <li><b>Salva ed esporta</b> — <b>Esporta</b>: GeoJSON, KML, KMZ, Shapefile (.zip) o la tabella XLSX delle particelle, con gli oggetti spuntati nella Raccolta o con tutto (il KML ha una cartella per gruppo, lo shapefile un file per gruppo; il nome del file viene da comune, data e numero di particelle); <b>Portale AGOL</b>: Migra particelle in AREAS (l'opzione «dissolvi» sta nella sua finestra), Salva disegni in Site Features (categoria, tipo, attributi e sito: la seconda volta aggiorna, non duplica), Modifica AREAS COLLECTION; <b>Progetto</b>: Salva, Salva come, Apri; <b>Stampa</b>.</li>
-      <li><b>Raccolta</b>, a sinistra — tutto quello che raccogli, in gruppi: Particelle, Aree di progetto, Aree di esclusione, Analisi, Altro, Immagini, e i gruppi tuoi (<b>+ Gruppo</b>). In alto il filtro per nome e <b>Comprimi</b>. Ogni riga ha la spunta (la selezione, che usano anche geoprocessi ed esportazione; <kbd>Maiusc</kbd>+clic spunta un intervallo), il colore, il nome (le particelle per foglio e numero, poi il comune), la cifra a destra, l'occhio e il menu <b data-icon="more"></b>, anche col tasto destro: rinomina, zoom, sposta in un gruppo, Proprietà, elimina. Un clic sulla riga fa lampeggiare l'oggetto sulla mappa, un doppio clic ci fa lo zoom. Con qualcosa selezionato (spuntato qui, o scelto sulla mappa con <b>Seleziona</b> e <b>Riquadro</b>) compare in cima la <b>barra della selezione</b>: Zoom, Sottogruppo o Gruppo (anche nuovo), Togli (o il tasto <kbd>Canc</kbd>; Annulla rimette tutto) e Deseleziona; il tasto destro su una riga selezionata, o sulla mappa su un oggetto selezionato, offre le stesse azioni per tutta la selezione. Il menu di un gruppo, di un sottogruppo e di Particelle ha lo <b>Zoom</b> su tutti i loro oggetti. Il bordo destro la allarga, <b data-icon="undock"></b> la sgancia in una finestra per il secondo schermo.</li>
+      <li><b>Raccolta</b>, a sinistra — tutto quello che raccogli, ad albero come i layer di QGIS: i gruppi (Particelle, Aree di progetto, Aree di esclusione, Analisi, Altro, Immagini, e i tuoi, <b>+ Gruppo</b>), dentro i sottogruppi delle particelle, poi gli oggetti, ogni livello un po' più rientrato; numero ed ettari a destra, occhio, nomi e menu passando sopra la riga. In alto il filtro per nome e <b>Comprimi</b>. Ogni riga ha la spunta (la selezione, che usano anche geoprocessi ed esportazione; <kbd>Maiusc</kbd>+clic spunta un intervallo), il colore, il nome (le particelle per foglio e numero, poi il comune), la cifra a destra, l'occhio e il menu <b data-icon="more"></b>, anche col tasto destro: rinomina, zoom, sposta in un gruppo, Proprietà, elimina. Un clic sulla riga fa lampeggiare l'oggetto sulla mappa, un doppio clic ci fa lo zoom. <b>Trascina</b> una riga su un sottogruppo (le particelle) o su un gruppo (gli altri oggetti) per spostarla: se è spuntata, vanno con lei tutte le selezionate; sulla riga Particelle una particella esce dai sottogruppi; dove non può andare non si accende nulla e, al rilascio, ti dico perché. La riga di un sottogruppo, o di un gruppo tuo, trascinata su un'altra ne cambia l'ordine. Annulla rimette tutto. Con qualcosa selezionato (spuntato qui, o scelto sulla mappa con <b>Seleziona</b> e <b>Riquadro</b>) compare in cima la <b>barra della selezione</b>: Zoom, Sottogruppo o Gruppo (anche nuovo), Togli (o il tasto <kbd>Canc</kbd>; Annulla rimette tutto) e Deseleziona; il tasto destro su una riga selezionata, o sulla mappa su un oggetto selezionato, offre le stesse azioni per tutta la selezione. Il menu di un gruppo, di un sottogruppo e di Particelle ha lo <b>Zoom</b> su tutti i loro oggetti. Il bordo destro la allarga, <b data-icon="undock"></b> la sgancia in una finestra per il secondo schermo.</li>
       <li><b>Pannello a destra</b> — tre schede. <b>Proprietà</b>: le impostazioni dello strumento aperto e, in Disegna, la scheda dell'oggetto selezionato (categoria, tipo e attributi). <b>Layer</b>: cerca un layer per nome; dal pannello di ogni layer (icona a cursori) trasparenza, popup e <b>filtro per attributo</b> (l'icona diventa un imbuto quando è attivo); i layer aggiunti da te hanno il menu <b>…</b> con Zoom e Rimuovi dalla mappa. Un clic sulla mappa apre il popup anche sui layer a <b>tasselli vettoriali</b> che portano gli attributi (es. i vincoli paesaggistici della Campania nella vista d'insieme): campi e titolo come configurati nell'item, l'elemento non si evidenzia. Il <b>Catasto AdE</b> è l'immagine ufficiale del WMS dell'Agenzia delle Entrate: fogli da 1:25.000, particelle e fabbricati da 1:5.000, numeri da 1:2.000. <b>Legenda</b>: i layer accesi. Anche questo pannello si allarga dal bordo e si sgancia.</li>
       <li><b>Sulla mappa</b> — in alto a destra la lente della <b>ricerca</b> (indirizzi, lat lon, oppure X Y in Gauss-Boaga o UTM, di cui indovina il sistema) e, sotto, <b data-icon="measure"></b> le <b>misure</b>: lineare, area, Pulisci (non si salvano). In alto a sinistra zoom, bussola, posizione GPS, <b>Zoom sulla Raccolta</b> e <b>Luoghi</b>, i segnalibri; in basso a destra la <b>mappa di base</b>, con l'opacità; in basso al centro lo scalimetro. Col tasto destro: aggiungi la particella qui, analisi di contesto qui, buffer qui, copia le coordinate, apri in Google Maps, centra qui.</li>
       <li><b>Barra di stato</b>, in basso — il pin fissa le coordinate del prossimo clic; le coordinate del puntatore nel sistema che scegli; la scala, che scegli anche dal suo menu; con il terreno analizzato, la <b>quota</b> e la <b>pendenza</b> sotto il puntatore (in rosso oltre il limite); lo stato del Catasto AdE; a destra la modalità in corso, l'aggancio e l'ora dell'ultimo salvataggio nel browser (in rosso se il browser è pieno).</li>
@@ -3301,7 +3343,7 @@ async function z(path,params){
 async function loadRegions(){
   if(!key()||!$('reg'))return;
   try{const d=await z('/admin/regions');
-    $('reg').innerHTML='<option value="">— seleziona —</option>'+d.data.sort((a,b)=>a.name.localeCompare(b.name)).map(r=>`<option>${esc(r.name)}</option>`).join('');
+    $('reg').innerHTML='<option value="">Regione</option>'+d.data.sort((a,b)=>a.name.localeCompare(b.name)).map(r=>`<option>${esc(r.name)}</option>`).join('');
   }catch(e){msg('Chiave non valida o API irraggiungibile: '+e.message,'err');}
 }
 // ── menu contestuale della mappa (tasto destro): agisce sul punto cliccato ──
@@ -3427,12 +3469,12 @@ async function zoomToAdmin(lv, name){
 async function admLoadProv(region){
   const d=await z('/admin/provinces',{region});
   if($('reg').value!==region) return false;
-  $('prov').innerHTML='<option value="">— seleziona —</option>'+d.data.map(p=>`<option>${esc(fixProvName(region,p.name))}</option>`).join('');$('prov').disabled=false;
+  $('prov').innerHTML='<option value="">Provincia</option>'+d.data.map(p=>`<option>${esc(fixProvName(region,p.name))}</option>`).join('');$('prov').disabled=false;
   return true; }
 async function admLoadCom(prov){
   const d=await z('/admin/municipalities',{province:prov});
   if($('prov').value!==prov) return false;
-  $('com').innerHTML='<option value="">— seleziona —</option>'+d.data.sort((a,b)=>a.name.localeCompare(b.name)).map(c=>`<option>${esc(c.name)}</option>`).join('');$('com').disabled=false;
+  $('com').innerHTML='<option value="">Comune</option>'+d.data.sort((a,b)=>a.name.localeCompare(b.name)).map(c=>`<option>${esc(c.name)}</option>`).join('');$('com').disabled=false;
   return true; }
 function wireUI(){
   // giro 2: ricerca collassabile — una lente in alto a destra apre il box (80 % di opacità); Esc, clic fuori o un risultato lo chiudono
@@ -3464,7 +3506,7 @@ function wireUI(){
     wmRefresh();
   }
   $('reg').addEventListener('change',async()=>{
-    $('prov').disabled=$('com').disabled=true;$('com').innerHTML='<option value="">—</option>';checkReady();
+    $('prov').disabled=$('com').disabled=true;$('com').innerHTML='<option value="">Comune</option>';checkReady();
     const region=$('reg').value;
     provExtent=null;
     const cv=Promise.resolve(wmSuggest(region));   // P3: la regione non cambia più la mappa; propone i suoi vincoli con un clic
@@ -3477,7 +3519,7 @@ function wireUI(){
     zoomToAdmin('reg',region);
   });
   $('prov').addEventListener('change',async()=>{
-    $('com').disabled=true;$('com').innerHTML='<option value="">—</option>';checkReady();provExtent=null;
+    $('com').disabled=true;$('com').innerHTML='<option value="">Comune</option>';checkReady();provExtent=null;
     const prov=$('prov').value; if(!prov)return;
     try{ if(!await admLoadCom(prov)) return; }catch(e){ msg('Comuni non caricati: '+e.message,'err'); return; }
     provExtent=await zoomToAdmin('prov',$('prov').value);   // serve anche a filtrare i comuni omonimi
@@ -4211,7 +4253,7 @@ async function projApplyPortal(st, warn){
 // area di lavoro (regione/provincia/comune) senza cambiare mappa né spostare la vista
 async function projSetAdmin(a){
   a=a||{}; const R=$('reg'), P=$('prov'), C=$('com');
-  P.disabled=C.disabled=true; P.innerHTML=C.innerHTML='<option value="">—</option>'; provExtent=null;
+  P.disabled=C.disabled=true; P.innerHTML='<option value="">Provincia</option>'; C.innerHTML='<option value="">Comune</option>'; provExtent=null;
   const done=()=>{ checkReady(); };
   if(!a.reg||![...R.options].some(o=>o.value===a.reg)){ R.value=''; return done(); }
   R.value=a.reg;
@@ -5534,12 +5576,12 @@ function parcelsInView(gs){   // tutte le geometrie dentro l'inquadratura attual
     return !ext||ve4.contains(ext);
   }catch(e){ return false; } }
 function render(zoom, fids){
-  $('cnt').textContent=parcels.length;
   try{ secShow('parcels', secParcelsN()); }catch(e){}   // 22/10: the section shows only when populated (fix 28/10: the owners' file counts)
   const has=parcels.length>0;
   const totHa=parcels.reduce((s,p)=>s+(p.area_m2||0),0)/10000;
   const nNd=parcels.filter(p=>!p.area_m2).length;
-  $('listTot').textContent = has ? fmtHa2(totHa)+' catastali'+(nNd? ' · '+nNd+' senza area' : '') : '';   // R3-4 (Q9 c, h): the count is the badge, the area the cadastral one
+  const cn=$('cnt'); cn.textContent=parcels.length+(totHa? ' · '+fmtHa2(totHa) : '');   // 2/11 (N3): one figure in the header, as the groups have
+  cn.title=has? parcels.length+(parcels.length===1? ' particella' : ' particelle')+', superficie catastale '+fmtHa2(totHa)+(nNd? ' ('+nNd+' senza area)' : '') : 'Nessuna particella';
   refreshDl();
   $('promote').disabled=!(has&&signedIn);
   saveStateDebounced();   // auto-resume
@@ -5593,13 +5635,13 @@ function render(zoom, fids){
     row.appendChild(rowMore(acts)); row.appendChild(db);
     row.oncontextmenu=function(e){ e.preventDefault(); if(window.rowMenu) window.rowMenu(e, (p.sel&&selTotal()>1)? selMenuActs() : acts()); };   // M6: on a selected row, the whole selection
     rcRowClicks(row, p);   // M3: a click shows it on the map, a double click zooms
+    row.draggable=true;    // M8: into a subgroup (22d-drag.js)
     return row;
   };
-  // G2-4b (23/10, Y1, Y8): the subgroups as nested blocks, then the parcels without one (under a thin line when subgroups exist)
+  // G2-4b (23/10, Y1, Y8): the subgroups as nested blocks, then the parcels without one (2/11, N3: the indent says it, no line)
   const subs=(typeof pgrpSorted==='function')? pgrpSorted() : [], byS={}; parcels.forEach((p,i)=>{ const k=(typeof pgrpOf==='function'&&pgrpOf(p))||''; (byS[k]=byS[k]||[]).push([p,i]); });
   subs.forEach(G=>{ const items=byS[G.id]||[]; _lb.appendChild(pgrpBlock(G, items, rowOf)); });
   const rest=byS['']||[];
-  if(rest.length&&subs.length){ const cl=document.createElement('div'); cl.className='gcat'; cl.textContent='Senza sottogruppo'; _lb.appendChild(cl); }
   rest.forEach(x=>_lb.appendChild(rowOf(x[0], x[1])));
   try{ const mb=rcQ('#drawerElenco .gsec[data-sec="parcels"] [data-role=more]'); if(mb&&!mb.dataset.wired){ mb.dataset.wired='1'; mb.innerHTML=icon('more','sm');
     mb.onclick=function(e){ e.stopPropagation(); if(window.rowMenu) window.rowMenu(mb, pgrpHeadActs()); }; } }catch(e){}
@@ -6963,7 +7005,7 @@ function grpBlock(G, arr, subOf){
   const sec=document.createElement('div'); sec.className='gsec ggrp'+(grpIsOpen(G.id)? '' : ' collapsed'); sec.dataset.sec=G.id;
   const cats={}; arr.forEach(g=>{ cats[g.attributes.sf_cat||'']=1; }); const mixed=Object.keys(cats).length>1;
   let ha=0, nA=0; arr.forEach(g=>{ const a=geomAreaHa(g); if(a!=null){ ha+=a; nA++; } });
-  const h=document.createElement('div'); h.className='gsecH';
+  const h=document.createElement('div'); h.className='gsecH'; h.draggable=!G.std;   // M8: the custom groups are reordered by dragging their row
   h.innerHTML='<input type="checkbox" class="gselall" data-sec="'+esc(G.id)+'" title="Spunta tutti" aria-label="Spunta tutti gli oggetti di '+esc(G.name)+'"><b>'+esc(G.name)+'</b>'
     +'<span class="gfig">'+(arr.length? arr.length+(nA? ' · '+ha.toFixed(2).replace('.',',')+' ha' : '') : 'vuoto')+'</span>'
     +'<span class="gtools" data-sec="'+esc(G.id)+'"><button type="button" class="vtoggle" data-role="visall" title="Mostra/nascondi tutti" aria-label="Mostra/nascondi tutti gli oggetti di '+esc(G.name)+'"></button>'
@@ -7021,6 +7063,9 @@ function pgrpHeadActs(){ const sel=parcels.filter(p=>p.sel), acts=[{t:'Nuovo sot
   if(sel.length&&pgrpList.length){ pgrpSorted().forEach(G=>{ acts.push({t:'Sposta le '+sel.length+' selezionate in: '+G.name, i:'folder', fn:function(){ pgrpAssign(sel, G.id); }}); });
     if(sel.some(p=>pgrpOf(p))) acts.push({t:'Togli le selezionate dai sottogruppi', i:'close', fn:function(){ pgrpAssign(sel, null); }}); }
   if(parcels.length) acts.unshift({t:'Zoom sulle particelle', i:'target', fn:function(){ zoomParcelList(parcels); }});   // 26/10 (user)
+  if(parcels.length){ acts.push({t:'Colore di tutte le particelle…', i:'bucket', fn:function(){ const mb=rcQ('#drawerElenco .gsec[data-sec="parcels"] [data-role=more]');   // 2/11 (N3): from the header's icons
+      setTimeout(function(){ colPopOpen(mb, function(){ return (parcels[0]&&parcels[0].color)||PARCEL_HEX; }, function(hex){ setSectionColor('parcels', hex); render(); }); }, 0); }},   // after the click: a click outside closes the picker
+    {t:'Togli tutte le particelle', i:'trash', fn:function(){ sectionDelete('parcels'); }}); }
   return acts; }
 // il menu ⋯ dell'intestazione di un sottogruppo (M10b: with the filter on, «Spunta tutte» takes only the rows found)
 function pgrpMenuActs(G){ const arr=pgrpParcels(G.id), sel=parcels.filter(p=>p.sel&&pgrpOf(p)!==G.id), L=pgrpSorted(), i=L.findIndex(x=>x.id===G.id);
@@ -7038,7 +7083,7 @@ function pgrpBlock(G, items, rowOf){
   const key='p:'+G.id, sec=document.createElement('div'); sec.className='psub'+(grpIsOpen(key)? '' : ' collapsed'); sec.dataset.sub=G.id;
   const ha=items.reduce((s,x)=>s+((x[0].area_m2||0)/10000), 0), nSel=items.filter(x=>x[0].sel).length, allVis=items.every(x=>!x[0].hidden);
   sec.addEventListener('contextmenu', e=>{ if(e.target.closest('.grow')) return; e.preventDefault(); if(window.rowMenu) window.rowMenu(e, pgrpMenuActs(G)); });   // the header's menu on a right-click too
-  const h=document.createElement('div'); h.className='psubH';
+  const h=document.createElement('div'); h.className='psubH'; h.draggable=true;   // M8: the subgroups are reordered by dragging their row
   h.innerHTML='<input type="checkbox" class="gsel" title="Spunta tutte" aria-label="Spunta tutte le particelle di '+esc(G.name)+'"><span class="psubN"><b>'+esc(G.name)+'</b>'
     +'<span class="gfig">'+(items.length? items.length+' · '+ha.toFixed(2).replace('.',',')+' ha' : 'vuoto')+'</span></span>'
     +'<button type="button" class="vtoggle" data-role="vis" title="Mostra/nascondi" aria-label="Mostra/nascondi le particelle di '+esc(G.name)+'"></button>'
@@ -7389,6 +7434,7 @@ function geomRow(g, subtitle){
   row.appendChild(rowMore(acts)); row.appendChild(db);
   row.oncontextmenu=function(e){ e.preventDefault(); if(window.rowMenu) window.rowMenu(e, (g.attributes._sel&&selTotal()>1)? selMenuActs() : acts()); };   // M6: on a selected row, the whole selection
   rcRowClicks(row, g);   // M3
+  row.draggable=canOk(g,'move');   // M8: into a group (22d-drag.js); the owners' parcels stay where they are
   const wrap=document.createElement('div'); wrap.className='gitem'; wrap.appendChild(row);
   if(sfEditOpen===g) wrap.appendChild(sfEditor(g));
   return wrap;
@@ -7585,7 +7631,8 @@ function secParcelsN(){ return parcels.length+(toolsGL? toolsGL.graphics.toArray
 function rowRename(span, value, commit){ if(span.nextSibling&&span.nextSibling.classList&&span.nextSibling.classList.contains('edit')) return;
   var inp=document.createElement('input'); inp.className='gname edit'; inp.value=value; inp.spellcheck=false; inp.setAttribute('aria-label','Nuovo nome');
   span.hidden=true; span.parentNode.insertBefore(inp, span.nextSibling);
-  var done=false, fin=function(ok){ if(done) return; done=true; var v=inp.value.trim(); inp.remove(); span.hidden=false; if(ok) commit(v); };
+  var row=span.closest('.grow'), drg=!!(row&&row.draggable); if(row) row.draggable=false;   // M8: selecting the text does not drag the row
+  var done=false, fin=function(ok){ if(done) return; done=true; var v=inp.value.trim(); inp.remove(); span.hidden=false; if(row) row.draggable=drg; if(ok) commit(v); };
   inp.onkeydown=function(e){ if(e.key==='Enter'){ e.preventDefault(); fin(true); } else if(e.key==='Escape'){ e.preventDefault(); e.stopPropagation(); fin(false); } };
   inp.onblur=function(){ fin(true); }; inp.onclick=function(e){ e.stopPropagation(); }; inp.focus(); inp.select(); }
 function rowMore(acts){ var b=document.createElement('button'); b.type='button'; b.className='gact gmore'; b.title='Altre azioni'; b.setAttribute('aria-label','Altre azioni'); b.setAttribute('aria-haspopup','menu');
@@ -7657,11 +7704,78 @@ function refreshSelDraw(){
   const sel=$('selFromDraw'); if(!sel) return;
   const geoms=toolsGL?toolsGL.graphics.toArray().filter(g=>g.attributes&&(g.attributes._kind==='drawing'||g.attributes._kind==='buffer'||g.attributes._kind==='import')&&g.geometry):[];
   window.__selDrawList=geoms;
-  sel.innerHTML='<option value="">— nessun disegno —</option>'+geoms.map((g,i)=>`<option value="${i}">${esc(g.attributes.nome||geomDefName(g))}</option>`).join('');
+  sel.innerHTML='<option value="">'+(geoms.length? 'Scegli un oggetto' : 'Nessun disegno')+'</option>'+geoms.map((g,i)=>`<option value="${i}">${esc(g.attributes.nome||geomDefName(g))}</option>`).join('');   // 2/11 (J3): the label in the field
   const btn=$('selDrawGo'); if(btn) btn.disabled=!geoms.length;
-  const n1=$('rcNDraw'); if(n1) n1.textContent=geoms.length||'';          // contatori nei titoli delle sezioni
+  const n1=$('rcNDraw'); if(n1) n1.textContent=geoms.length? geoms.length+' disponibil'+(geoms.length===1? 'e' : 'i') : '';   // the figure of the closed section (J1)
   const n2=$('drwNSum'); if(n2) n2.textContent=countDrawingsPure()||'';
 }
+// ══ Drag and drop in the Raccolta (M8, 2026-11-02; decisions M8 and M9, approved by the user) ════════════════════════════
+// The browser's own drag and drop on the tree of the Raccolta; the listeners sit on #drawerElenco, which moves with the
+// panel into its window when undocked. A parcel's row goes into a subgroup (its row or its rows) or out of the subgroups
+// (the Particelle row, the parcels without one); an object's row goes into a group; a selected row brings the whole
+// selection of its kind. The row of a subgroup, or of a custom group, is dragged onto another to reorder them (one level
+// only, M9). What the rules forbid (22c-rules.js) lights nothing and says why when released. A closed block opens after
+// 0.7 s under the pointer; near the top or the bottom of the panel the list scrolls. Every move is one Annulla (pgrpAssign
+// and grpAssign name it; the order names itself). Touch has no drag of this kind: the menus «Sposta in…» stay.
+let dnd=null;
+const DND_OPEN_MS=700, DND_EDGE=36;
+function dndWhat(items, kind){ const n=items.length; return kind==='parcel'? (n===1? '1 particella' : n+' particelle') : (n===1? '1 oggetto' : n+' oggetti'); }
+function dndStart(e){ const t=e.target, row=t.closest&&t.closest('.grow'), ph=t.closest&&t.closest('.psubH'), gh=t.closest&&t.closest('.ggrp > .gsecH'); let d=null;
+  if(row&&row._obj){ const o=row._obj, isP=objKind(o)==='parcel';
+    if(!isP&&!canOk(o,'move')){ e.preventDefault(); return; }
+    const sel= isP? (o.sel? selParcels() : null) : ((o.attributes&&o.attributes._sel)? selList().filter(g=>objKind(g)!=='parcel'&&canOk(g,'move')) : null);   // a selected row brings the selection of its kind
+    const items=(sel&&sel.length)? sel : [o], kind=isP? 'parcel' : 'obj';
+    d={kind:kind, items:items, label:dndWhat(items, kind), src:row}; }
+  else if(ph){ const G=pgrpById(ph.parentNode.dataset.sub); if(G) d={kind:'pgrp', id:G.id, label:'Sottogruppo «'+G.name+'»', src:ph}; }
+  else if(gh){ const G=grpById(gh.parentNode.dataset.sec); if(G&&!G.std) d={kind:'grp', id:G.id, label:'Gruppo «'+G.name+'»', src:gh}; }
+  if(!d){ e.preventDefault(); return; }
+  d.root=e.currentTarget; dnd=d;
+  try{ e.dataTransfer.effectAllowed='move'; e.dataTransfer.setData('text/plain', d.label); }catch(x){}
+  try{ const doc=d.root.ownerDocument, g=doc.createElement('div'); g.className='dndghost'; g.textContent=d.label; doc.body.appendChild(g); e.dataTransfer.setDragImage(g, 12, 12); setTimeout(()=>g.remove(), 0); }catch(x){}
+  d.src.classList.add('dndsrc'); }
+// where the pointer is: {el (lit when ok), ok, why, sub (a subgroup, or null: out of them), grp, ref and before (reorder)}
+function dndTarget(e){ const d=dnd, t=e.target; if(!d||!t||!t.closest) return null;
+  if(d.kind==='parcel'){ const ps=t.closest('.psub'); if(ps) return {el:ps, ok:true, sub:ps.dataset.sub};
+    const sp=t.closest('.gsec[data-sec="parcels"]'); if(sp) return {el:sp.querySelector(':scope > .gsecH'), ok:true, sub:null};
+    const g=t.closest('.gsec'); return g? {el:g, ok:false, why:String(can(d.items[0], 'move'))} : null; }   // RULES.parcel.move
+  if(d.kind==='obj'){ const g=t.closest('.ggrp'); if(g) return {el:g, ok:true, grp:g.dataset.sec};
+    const s=t.closest('.gsec'); return s? {el:s, ok:false, why:s.dataset.sec==='parcels'? 'Nel blocco Particelle stanno solo le particelle: gli oggetti vanno nei gruppi.' : 'Le immagini hanno un blocco tutto loro.'} : null; }
+  if(d.kind==='pgrp'){ const ps=t.closest('.psub'); if(ps){ if(ps.dataset.sub===d.id) return null; const h=ps.querySelector(':scope > .psubH'), r=h.getBoundingClientRect(); return {el:h, ok:true, ref:ps.dataset.sub, before:e.clientY<r.top+r.height/2}; }
+    const s=t.closest('.gsec'); return s? {el:s, ok:false, why:'Un sottogruppo resta nel blocco Particelle: trascinalo su un altro sottogruppo per cambiarne l’ordine.'} : null; }
+  if(d.kind==='grp'){ const g=t.closest('.ggrp'); if(!g||g.dataset.sec===d.id) return null; const G=grpById(g.dataset.sec);
+    if(G&&!G.std){ const h=g.querySelector(':scope > .gsecH'), r=h.getBoundingClientRect(); return {el:h, ok:true, ref:G.id, before:e.clientY<r.top+r.height/2}; }
+    return {el:g, ok:false, why:'I gruppi standard hanno un posto fisso: trascina il gruppo su un altro dei tuoi.'}; }
+  return null; }
+function dndLight(tg){ const d=dnd; if(!d) return; const el=(tg&&tg.ok)? tg.el : null, cls=!el? '' : tg.ref? (tg.before? 'dndbefore' : 'dndafter') : 'dndover';
+  if(d.lit&&(d.lit!==el||d.litCls!==cls)){ d.lit.classList.remove('dndover','dndbefore','dndafter'); d.lit=null; }
+  if(el&&!d.lit){ el.classList.add(cls); d.lit=el; d.litCls=cls; } }
+// a closed block under the pointer opens after a moment; near the edges the panel scrolls
+function dndOpenSoon(e){ const d=dnd, c=e.target.closest&&e.target.closest('.gsec.collapsed, .psub.collapsed'); if(c===d.openEl) return;
+  clearTimeout(d.openT); d.openEl=c; if(!c) return;
+  d.openT=setTimeout(()=>{ if(!dnd||dnd.openEl!==c) return; c.classList.remove('collapsed');
+    try{ if(c.classList.contains('psub')) grpSetOpen('p:'+c.dataset.sub, true); else if(c.classList.contains('ggrp')) grpSetOpen(c.dataset.sec, true); }catch(x){} }, DND_OPEN_MS); }
+function dndScroll(e){ const box=dnd.root.closest('.panel-b')||dnd.root.parentElement; if(!box) return; const r=box.getBoundingClientRect();
+  if(e.clientY<r.top+DND_EDGE) box.scrollTop-=12; else if(e.clientY>r.bottom-DND_EDGE) box.scrollTop+=12; }
+function dndOver(e){ const d=dnd; if(!d) return; const tg=dndTarget(e); dndLight(tg);
+  if(tg&&tg.ok){ e.preventDefault(); try{ e.dataTransfer.dropEffect='move'; }catch(x){} d.bad=null; }
+  else d.bad=(tg&&!tg.ok)? tg.why : null;   // said on release, when nothing takes the drop
+  dndOpenSoon(e); dndScroll(e); }
+function dndOrder(L, id, ref, before){ const a=L.find(x=>x.id===id); if(!a) return false; const rest=L.filter(x=>x!==a), i=rest.findIndex(x=>x.id===ref); if(i<0) return false;
+  rest.splice(before? i : i+1, 0, a); rest.forEach((x,k)=>{ x.order=k+1; }); return true; }
+function dndDrop(e){ const d=dnd; if(!d) return; const tg=dndTarget(e); if(!tg||!tg.ok) return; e.preventDefault(); d.done=true;
+  if(d.kind==='parcel'){ const todo=d.items.filter(p=>(pgrpOf(p)||null)!==(tg.sub||null)); if(!todo.length) return;
+    pgrpAssign(todo, tg.sub||null); msg(dndWhat(todo, 'parcel')+(tg.sub? ' in «'+pgrpName(tg.sub)+'»' : ' fuori dai sottogruppi')+'. Annulla '+(todo.length===1? 'la' : 'le')+' rimette dov’era'+(todo.length===1? '' : 'no')+'.','ok'); }
+  else if(d.kind==='obj'){ const todo=d.items.filter(g=>grpOf(g)!==tg.grp); if(!todo.length) return;
+    grpAssign(todo, tg.grp); msg(dndWhat(todo, 'obj')+' in «'+grpName(tg.grp)+'». Annulla '+(todo.length===1? 'lo' : 'li')+' rimette dov’era'+(todo.length===1? '' : 'no')+'.','ok'); }
+  else if(d.kind==='pgrp'){ histName('Ordine dei sottogruppi'); if(dndOrder(pgrpSorted(), d.id, tg.ref, tg.before)){ pgrpSave(); pgrpRedraw(); } }
+  else if(d.kind==='grp'){ histName('Ordine dei gruppi'); if(dndOrder(grpSorted(), d.id, tg.ref, tg.before)){ grpSave(); grpRedraw(); } } }
+function dndEnd(){ const d=dnd; if(!d) return; dnd=null; clearTimeout(d.openT);
+  try{ d.src.classList.remove('dndsrc'); }catch(x){} if(d.lit) d.lit.classList.remove('dndover','dndbefore','dndafter');
+  if(!d.done&&d.bad) msg(d.bad, 'err'); }
+function dndWire(){ const root=byId('drawerElenco'); if(!root||root._dnd) return; root._dnd=1;
+  root.addEventListener('dragstart', dndStart); root.addEventListener('dragover', dndOver); root.addEventListener('drop', dndDrop); root.addEventListener('dragend', dndEnd);
+  root.addEventListener('dragleave', e=>{ if(dnd&&!(e.relatedTarget&&root.contains(e.relatedTarget))){ dnd.bad=null; dndLight(null); } }); }   // out of the panel: nothing to say
+window.addEventListener('DOMContentLoaded', dndWire);
 // ══ Disegno stile CAD: aggancio ai layer, direzione, annulla/ripeti, misure esatte, copia (anche parallela), griglia ══
 // Dal 22/10 (fase 4a) le misure non passano più dal Web Mercator, che non è conforme (a 45° un metro vale ~0,17% in più
 // in est-ovest e ~0,16% in meno in nord-sud del semplice 1/cos(lat)): forme, azimut e copia parallela si costruiscono
@@ -10815,17 +10929,10 @@ function srchShowRow(obj, soft){ const root=byId('drawerElenco'); if(!root) retu
       foot:{t: on? 'Analizza di nuovo' : 'Analizza', press:'#slpGo', primary:true}}; }
   var SHELL={
     ricerca:{name:'Ricerca particelle', mods:[
-      {id:'find', t:'Ricerca particelle', s:'Comune, foglio e particelle', i:'parcels', roots:['#rcSecFind']},
-      {id:'map', t:'Aggiungi dalla mappa', s:'Le particelle del catasto che clicchi o che stanno in una forma', i:'sel-click', roots:['#rcSecMap']},   // 2/11 (M10d): was «Sulla mappa»
-      {id:'fromdraw', t:'Da un disegno', s:'Le particelle toccate da un disegno, un buffer o un file', i:'from-drawing', roots:['#rcSecDraw']}],
+      // 2/11 (N1): one module, the three ways to add parcels from the cadastre as its sections (the ribbon keeps the Raccolta)
+      {id:'find', t:'Ricerca particelle', s:'Per foglio e particella, dalla mappa, da un disegno', i:'parcels', roots:['#rcSecFind','#rcSecMap','#rcSecDraw'], info:'rcAll'}],   // J2: one «i» by the title
      groups:[
-      {label:'Catasto', more:'rcFind', tools:[{id:'find', t:'Cerca particelle', i:'parcels', size:'large', primary:true, mod:'find', focus:'#reg'}]},
-      {label:'Aggiungi dalla mappa', more:'rcMap', tools:[   // 2/11 (M10d): these add from the cadastre; «Seleziona» picks what is in the Raccolta
-        {id:'sel-point', t:'Puntuale', i:'sel-click', size:'large', press:'#selModeBox [data-m="point"]', mod:'map'},
-        {id:'sel-rect', t:'Rettangolo', i:'sel-rect', size:'large', press:'#selModeBox [data-m="rectangle"]', mod:'map'},
-        {id:'sel-poly', t:'Poligono', i:'sel-poly', size:'large', press:'#selModeBox [data-m="polygon"]', mod:'map'},
-        {id:'sel-line', t:'Linea', i:'sel-line', size:'large', press:'#selModeBox [data-m="polyline"]', mod:'map'}]},
-      {label:'Da un disegno', more:'rcDraw', tools:[{id:'fromdraw', t:'Particelle toccate da un disegno', i:'from-drawing', size:'large', wide:true, mod:'fromdraw'}]},
+      {label:'Catasto', more:'rcAll', tools:[{id:'find', t:'Cerca particelle', i:'parcels', size:'large', primary:true, mod:'find', focus:'#reg'}]},
       {label:'Raccolta', tools:[{id:'gross', t:'Crea area lorda', i:'area-gross', size:'large', press:'#grossBtn'},
         {id:'r-sel', t:'Seleziona', i:'cursor', size:'small', fn:function(){ selStart(); }, on:function(){ return typeof selOn==='function'&&selOn(); }, s:'Clicca le particelle della Raccolta sulla mappa per selezionarle (Maiusc+clic aggiunge o toglie); compaiono spuntate nella Raccolta'},   // 2/11 (M2)
         {id:'r-sel-box', t:'Riquadro', i:'sel-rect', size:'small', fn:function(){ selBoxStart(); }, on:function(){ return typeof selBoxOn==='function'&&selBoxOn(); }, s:'Un rettangolo seleziona le particelle e gli oggetti della Raccolta che tocca (Maiusc aggiunge)'},
@@ -10950,9 +11057,7 @@ function srchShowRow(obj, soft){ const root=byId('drawerElenco'); if(!root) retu
   /* the ⓘ of every group, written once in 5a (26/10, plan §6q F5): what the group is for, its tools by the names on the
      buttons, where the result goes; «Di più» opens the window of data-more */
   var RIBBON_INFO={
-    'Catasto':"Cerca le particelle per regione, provincia, comune, foglio e numeri: Cerca particelle apre la ricerca a destra, in Proprietà. Le particelle trovate vanno nella Raccolta, gruppo Particelle, e la mappa ci va sopra.",
-    'Aggiungi dalla mappa':"Aggiungi alla Raccolta le particelle del catasto che indichi sulla mappa: Puntuale con un clic, oppure Rettangolo, Poligono o Linea. L'area viene campionata a punti, quindi la ricerca è indicativa (circa 120 particelle per volta); Esc la ferma. Per scegliere quelle già nella Raccolta c'è Seleziona, nel gruppo Raccolta.",
-    'Da un disegno':"Particelle toccate da un disegno: a destra scegli un disegno, un buffer, un risultato o un importato e premi Cerca. Le particelle che tocca vanno nella Raccolta.",
+    'Catasto':"Cerca particelle apre a destra, in Proprietà, i tre modi di prenderle dal catasto: per regione, comune, foglio e numeri; dalla mappa (Puntuale, Rettangolo, Poligono o Linea); da un disegno, un buffer o un file. Le particelle trovate vanno nella Raccolta, gruppo Particelle.",
     'Raccolta':"Dalle particelle della Raccolta: Crea area lorda la mette nel gruppo Aree di progetto (dalle selezionate, o da tutte); Seleziona e Riquadro scelgono sulla mappa quelle già nella Raccolta (si spuntano nell'elenco, e la barra in cima alla Raccolta le sposta in un sottogruppo o le toglie); Etichette sulla mappa accende i numeri; Zoom sulle particelle le inquadra.",
     'Collega a sito AREAS':"Il sito di AREAS COLLECTION a cui vanno i disegni sul portale; è facoltativo, perché salvando ogni oggetto prende da solo l'area che tocca. Dalla mappa lo sceglie con un clic, Carica elementi porta nella Raccolta quelli già salvati, Togli il sito lo toglie. Serve l'accesso.",
     'Cosa disegni':"La categoria dei nuovi disegni: la scheda colorata ne dice nome e descrizione, un clic apre l'elenco, diviso come la Raccolta, con «Non classificato» e le categorie tue. Accanto solo i valori di quella categoria (tipo; buffer, larghezza, altezza o tensione) e la Fonte. Esclusione da layer fa di un elemento di un layer acceso un'esclusione.",
@@ -11096,8 +11201,14 @@ function srchShowRow(obj, soft){ const root=byId('drawerElenco'); if(!root) retu
   function modHidden(tab, id){ var t=SHELL[tab], any=false, vis=false; if(!t||typeof profHides!=='function') return false;
     (t.groups||[]).forEach(function(g){ g.tools.forEach(function(x){ if(x.mod===id){ any=true; if(!profHides(g.label, x.id)) vis=true; } }); }); return any&&!vis; }
   function modFirst(tab){ var ms=SHELL[tab].mods; return ms.filter(function(m){ return !modHidden(tab, m.id); })[0]||ms[0]; }
+  // 2/11 (N1, N2): a module of one card shows it open and without its title row (the panel's header says it; its «i» moves
+  // to the header, #sideInfo); a module of several cards (Ricerca) keeps them as sections, open or closed as left
   function modShow(tab, id){ var t=SHELL[tab]; if(!t||!t.mods||!t.mods.length) return; var m=tabMod(tab, id)||modFirst(tab), was=curMod[tab]; curMod[tab]=m.id;
-    t.mods.forEach(function(x){ x.roots.forEach(function(sel){ var el=qAny(sel); if(!el) return; el.classList.toggle('mod-off', x!==m); if(x===m&&el.tagName==='DETAILS') el.open=true; }); });
+    var one=m.roots.length===1? qAny(m.roots[0]) : null, solo=!!(one&&one.tagName==='DETAILS'&&one.classList.contains('imod'));
+    t.mods.forEach(function(x){ x.roots.forEach(function(sel){ var el=qAny(sel); if(!el) return; el.classList.toggle('mod-off', x!==m); if(x===m&&el.tagName==='DETAILS'&&x.roots.length===1) el.open=true;
+      if(el.classList.contains('imod')) el.classList.toggle('solo', x===m&&solo); }); });
+    if(tab===curTab()){ var si=$g('sideInfo'), ib=solo? one.querySelector(':scope > summary .im-info') : null, inf=ib? ib.dataset.info : (m.info||'');   // J2: or the module's own (m.info)
+      if(si){ si.hidden=!inf; si.dataset.info=inf; } }
     Array.prototype.forEach.call(document.querySelectorAll('#ribbon [data-mod]'), function(b){ b.setAttribute('aria-pressed', b.dataset.mod===m.id? 'true' : 'false'); });
     if(tab===curTab()&&typeof spanel!=='undefined'&&spanel!=='props') spanelSet('props', true);   // R3-3 (Q5): a module brings «Proprietà» back
     if(tab===curTab()){ var st=$g('sideTitle'), ss=$g('sideSub'); if(st) st.textContent=m.t; if(ss) ss.textContent=m.s||'';
@@ -11145,6 +11256,7 @@ function srchShowRow(obj, soft){ const root=byId('drawerElenco'); if(!root) retu
   function spanelSet(name, quiet){ spanel=(name==='layers'||name==='legend')? name : 'props'; var side=$g('side'); if(side) side.dataset.spanel=spanel;
     var tb=$g('sideTabs'); if(tb) Array.prototype.forEach.call(tb.querySelectorAll('[data-stab]'), function(b){ var on=b.dataset.stab===spanel; b.setAttribute('aria-selected', on? 'true' : 'false'); b.tabIndex=on? 0 : -1; b.classList.toggle('active', on); });
     var st=$g('sideTitle'), ss=$g('sideSub');
+    if(spanel!=='props'){ var si=$g('sideInfo'); if(si) si.hidden=true; }   // 2/11 (N2): the module's «i» belongs to Proprietà
     if(spanel==='layers'){ if(st) st.textContent='Layer'; if(ss) ss.textContent='I layer della mappa, anche dal portale'; }
     else if(spanel==='legend'){ if(st) st.textContent='Legenda'; if(ss) ss.textContent='I layer accesi e la Raccolta'; if(window.legendMount) window.legendMount(); }
     else if(!quiet){ try{ modShow(curTab(), curMod[curTab()]); }catch(e){} }
@@ -11366,7 +11478,8 @@ function srchShowRow(obj, soft){ const root=byId('drawerElenco'); if(!root) retu
   try{ var _ribObs=new MutationObserver(ribbonSoon); ['side','leftPanel','signin'].forEach(function(id){ var el=$g(id); if(el) _ribObs.observe(el, {attributes:true, childList:true, subtree:true, attributeFilter:['class','disabled','aria-pressed','aria-checked','title','hidden']}); }); }catch(e){}
   docOn('change', ribbonSoon, true);
   // the panel controls the ribbon now holds are hidden over 768 px (G5); the phone keeps them until the sheet of phase 3
-  Array.prototype.forEach.call(document.querySelectorAll('#selModeBox, #impBtn, #impCadBtn, #impImgBtn, #drwStep2 .gpcards, .drwundo, #sfSitePick, #sfLoad, #sfSiteClear, #gpStep2 .gpcards, #gpPickA, #gpSelA, #grdAlign, #grdStraight'), function(el){ el.classList.add('rib'); });
+  // (2/11, N1: #selModeBox is no longer here: «Dalla mappa» has its buttons in the panel again, the ribbon does not)
+  Array.prototype.forEach.call(document.querySelectorAll('#impBtn, #impCadBtn, #impImgBtn, #drwStep2 .gpcards, .drwundo, #sfSitePick, #sfLoad, #sfSiteClear, #gpStep2 .gpcards, #gpPickA, #gpSelA, #grdAlign, #grdStraight'), function(el){ el.classList.add('rib'); });
   showTab('ricerca');
   if(!isPhone()&&!isNarrow()) openPanel('elenco'); else leftClose();   // wide: the Raccolta open at start, as the family; narrow: one panel at a time
   setTimeout(function(){ modShow(curTab(), curMod[curTab()]); }, 0);   // after the remembered open/closed state of the modules is restored
@@ -11551,17 +11664,17 @@ function srchShowRow(obj, soft){ const root=byId('drawerElenco'); if(!root) retu
       'un buffer', '3 particelle', 'Le particelle toccate dal buffer')
   };
   var RC_INFO={
-    rcFind:{t:'Ricerca particelle', s:'Per foglio e particella, nel comune che scegli.', h:
+    rcFind:{t:'Per foglio e particella', s:'Nel comune che scegli.', h:
       '<h3>Come si usa</h3><ol><li>Scegli la <b>regione</b>, poi la <b>provincia</b> e il <b>comune</b>. Con l\'accesso ad AGOL la mappa si sposta lì.</li>'
       +'<li>Scrivi il <b>foglio</b> e una o più <b>particelle</b>, separate da virgola o spazio.</li>'
       +'<li>Premi <b>Aggiungi alla Raccolta</b>: le particelle vanno nella <b>Raccolta</b>, gruppo <b>Particelle</b>, e la mappa ci va sopra.</li></ol>'
       +'<h3>Da sapere</h3><ul><li>Scelta la regione, sotto compare il link per caricare la sua mappa <b>Check Vincoli</b>, se esiste (serve l\'accesso); la mappa si cambia anche dal selettore <b>Mappa</b> in alto. I vincoli arrivano spenti: li accendi dalla scheda <b>Layer</b> del pannello a destra.</li>'
-      +'<li>Il comune serve solo qui: <b>Aggiungi dalla mappa</b> e <b>Da un disegno</b> funzionano ovunque.</li>'
-      +'<li>A modulo chiuso, il titolo ricorda il comune scelto.</li></ul>'},
-    rcMap:{t:'Aggiungi dalla mappa', s:'Le particelle del catasto che clicchi, o che stanno dentro una forma che disegni.', h:
+      +'<li>Il comune serve solo qui: le sezioni <b>Dalla mappa</b> e <b>Da un disegno</b>, qui sotto, funzionano ovunque.</li>'
+      +'<li>A sezione chiusa, il titolo ricorda il comune scelto. I suggerimenti di ogni campo e pulsante compaiono passandoci sopra.</li></ul>'},
+    rcMap:{t:'Dalla mappa', s:'Le particelle del catasto che clicchi, o che stanno dentro una forma che disegni.', h:
       '<h3>Esempio</h3>'+RDIA.point+RDIA.rect+RDIA.line
       +'<p>Sull\'ortofoto vedi un terreno che ti interessa: con <b>Poligono</b> ne ricalchi il contorno e trovi tutte le sue particelle, senza conoscerne i numeri. Con <b>Linea</b>, lungo una strada o un canale, trovi le particelle che attraversa.</p>'
-      +'<h3>Come si usa</h3><ol><li>Nel ribbon, gruppo <b>Aggiungi dalla mappa</b>, premi un modo: <b>Puntuale</b>, <b>Rettangolo</b>, <b>Poligono</b> o <b>Linea</b>.</li>'
+      +'<h3>Come si usa</h3><ol><li>A destra, in <b>Ricerca particelle</b>, sezione <b>Dalla mappa</b>, premi un modo: <b>Puntuale</b>, <b>Rettangolo</b>, <b>Poligono</b> o <b>Linea</b>.</li>'
       +'<li>Sulla mappa: un clic sulla particella; oppure trascina il rettangolo; oppure clicca i vertici del poligono, o i punti della linea, e finisci con un doppio clic.</li>'
       +'<li>Le particelle trovate vanno nella <b>Raccolta</b>, gruppo <b>Particelle</b>. Il modo resta attivo: di nuovo sul pulsante, o Esc, per smettere.</li></ol>'
       +'<h3>Da sapere</h3><ul><li>Funziona ovunque, anche senza aver scelto il comune.</li>'
@@ -11574,9 +11687,12 @@ function srchShowRow(obj, soft){ const root=byId('drawerElenco'); if(!root) retu
       +'<p>Hai disegnato un <b>elettrodotto</b> e in <b>Geoprocessi</b> ne hai fatto un buffer di 150 m. Qui scegli il buffer e premi <b>Cerca</b>: trovi tutte le particelle nella fascia di rispetto.</p>'
       +'<h3>Come si usa</h3><ol><li>A destra, in Proprietà, scegli dal menu un disegno, un buffer, un risultato dei geoprocessi o un oggetto importato.</li>'
       +'<li>Premi <b>Cerca</b>: la mappa va sull\'oggetto e le particelle che tocca vanno nella <b>Raccolta</b>. Con un punto trovi la particella sotto il punto.</li></ol>'
-      +'<h3>Da sapere</h3><ul><li>Vale quanto detto in <b>Aggiungi dalla mappa</b>: un punto ogni tanti metri, circa 120 particelle per volta, Esc per fermare.</li>'
-      +'<li>Il numero nel titolo dice quanti oggetti puoi usare.</li></ul>'}
+      +'<h3>Da sapere</h3><ul><li>Vale quanto detto in <b>Dalla mappa</b>: un punto ogni tanti metri, circa 120 particelle per volta, Esc per fermare.</li>'
+      +'<li>A sezione chiusa, il titolo dice quanti oggetti puoi usare.</li></ul>'}
   };
+  // 2/11 (J2): the «i» by the title of the panel: the three sections in one window (the sections have no «i» of their own)
+  RC_INFO.rcAll={t:'Ricerca particelle', s:'Tre modi di prendere le particelle dal catasto, le tre sezioni del pannello.',
+    h:'<h2>Per foglio e particella</h2>'+RC_INFO.rcFind.h+'<h2>Dalla mappa</h2>'+RC_INFO.rcMap.h+'<h2>Da un disegno</h2>'+RC_INFO.rcDraw.h};
   // Disegno: i gesti di ogni strumento, e un lato scritto a mano (deflezione + distanza)
   var dS=' fill="'+fD+'" stroke="'+cD+'" stroke-width="2" stroke-linejoin="round"';
   var vdot=function(pts){ return pts.split(' ').map(function(p){ var q=p.split(','); return '<circle cx="'+q[0]+'" cy="'+q[1]+'" r="2.2" fill="'+cD+'"/>'; }).join(''); };
@@ -11736,6 +11852,7 @@ function srchShowRow(obj, soft){ const root=byId('drawerElenco'); if(!root) retu
   // apre la sezione di un modulo quando è il codice a portarci lì (un DWG scelto con «Scegli file», uno shapefile senza .prj…)
   window.impOpen=function(id){ var d=$g(id); if(window.modShowFor) window.modShowFor(d); if(d&&!d.open){ d.open=true; impSave(); } };
   window.impInfo=impInfo;
+  if($g('sideInfo')) $g('sideInfo').onclick=function(){ if(this.dataset.info) impInfo(this.dataset.info); };   // 2/11 (N2): the «i» of a one-card module
 
   /* 6a ── click sul backdrop chiude (riusa i pulsanti esistenti) */
   [['exportModal','exCancel'],['promoteModal','pmCancel'],['sfModal','sfCancel'],['helpModal','helpClose'],['cadModal','cadCancel'],['infoModal','infoClose']].forEach(function(p){
@@ -11932,8 +12049,8 @@ function srchShowRow(obj, soft){ const root=byId('drawerElenco'); if(!root) retu
   /* --- definizione dei due tour --- */
   var TOUR_START=[   // 5a (26/10, plan §6q F2): the main flow on the final interface, eight steps
     {sel:'#signin', title:'1 · Accedi ad AGOL', body:"Accedi col tuo account: servono per le mappe dei vincoli e i layer del portale, l'analisi di contesto e il percorso su strada, la migrazione in AREAS COLLECTION e il salvataggio in Site Features. Ricerca, terreno, disegno, geoprocessi e import funzionano anche senza.", placement:'below'},
-    {sel:'#ribbon .rgroup[aria-label="Catasto"]', title:'2 · Cerca le particelle', body:"Nella scheda <b>Ricerca particelle</b>, il gruppo <b>Catasto</b>: a destra scegli regione, provincia e comune, poi foglio e particelle. Accanto, <b>Sulla mappa</b> le clicchi o le racchiudi in una forma, e <b>Da un disegno</b> prendi quelle toccate da un disegno o da un buffer.", open:function(){ openTab('ricerca'); }, placement:'below'},
-    {sel:'#leftPanel', title:'3 · La Raccolta', body:"A sinistra la <b>Raccolta</b>: tutto quello che trovi, disegni, calcoli o importi, in gruppi (Particelle, Aree di progetto, Aree di esclusione, Analisi, Altro, e i tuoi). La spunta di una riga è la selezione; il menu "+icon('more')+" (o il tasto destro) rinomina, sposta in un gruppo, apre le Proprietà. In alto il filtro per nome.", open:function(){ openDrawer('elenco'); }, placement:'right'},
+    {sel:'#ribbon .rgroup[aria-label="Catasto"]', title:'2 · Cerca le particelle', body:"Nella scheda <b>Ricerca particelle</b>, il gruppo <b>Catasto</b>: <b>Cerca particelle</b> apre a destra la ricerca. Scegli regione, provincia e comune, poi foglio e particelle; più sotto, <b>Dalla mappa</b> le clicchi o le racchiudi in una forma, e <b>Da un disegno</b> prendi quelle toccate da un disegno o da un buffer.", open:function(){ openTab('ricerca'); }, placement:'below'},
+    {sel:'#leftPanel', title:'3 · La Raccolta', body:"A sinistra la <b>Raccolta</b>: tutto quello che trovi, disegni, calcoli o importi, in gruppi (Particelle, Aree di progetto, Aree di esclusione, Analisi, Altro, e i tuoi). La spunta di una riga è la selezione; il menu "+icon('more')+" (o il tasto destro) rinomina, sposta in un gruppo, apre le Proprietà; una riga si può anche trascinare in un gruppo o in un sottogruppo. In alto il filtro per nome.", open:function(){ openDrawer('elenco'); }, placement:'right'},
     {sel:'#ribbon .rgroup[aria-label="Cosa disegni"]', title:'4 · Disegna', body:"Nella scheda <b>Disegna</b>: in <b>Cosa disegni</b> scegli la categoria (area lorda, esclusione, ostacolo…) con tipo e valori; in <b>Con quale strumento</b> punto, linea, area, rettangolo, cerchio o a mano libera, poi clicchi sulla mappa. Con un'area lorda, l'<b>area netta</b> si calcola da sola.", open:function(){ openTab('disegno'); }, placement:'below'},
     {sel:'#side', title:'5 · Proprietà, Layer, Legenda', body:"A destra il pannello con tre schede: <b>Proprietà</b> mostra le impostazioni dello strumento aperto e, in Disegna, la scheda dell'oggetto selezionato (categoria, tipo, attributi); <b>Layer</b> e <b>Legenda</b> sono quelli della mappa. Il bordo interno allarga i pannelli, "+icon('undock')+" li sgancia in una finestra.", open:function(){ openTab('disegno'); if(window.spanelSet) window.spanelSet('props'); }, placement:'left'},
     {sel:'#ribbon', title:'6 · Esporta e porta sul portale', body:"Nella scheda <b>Salva ed esporta</b>: <b>Esporta</b> scarica la Raccolta (GeoJSON, KML, KMZ, Shapefile, la tabella XLSX delle particelle), gli oggetti spuntati o tutto; <b>Portale AGOL</b> migra le particelle in AREAS COLLECTION e salva i disegni in Site Features (la seconda volta aggiorna, non duplica).", open:function(){ openTab('export'); }, placement:'below'},
@@ -11942,7 +12059,7 @@ function srchShowRow(obj, soft){ const root=byId('drawerElenco'); if(!root) retu
   ];
   var TOUR_ALL=[   // 5a (F3): one step per tab, then the panels, the map controls, the status bar, the portal map
     {sel:'#tabs', title:'Le sei schede', body:"Le schede seguono il lavoro: <b>Ricerca particelle</b>, <b>Terreno</b>, <b>Disegna</b>, <b>Geoprocessi e analisi</b>, <b>Importa</b>, <b>Salva ed esporta</b>. Sotto, il ribbon con gli strumenti della scheda, a gruppi; la "+icon('info')+" di ogni gruppo dice cosa si fa lì.", placement:'below'},
-    {sel:'#ribbon', title:'Ricerca particelle', body:"<b>Catasto</b> cerca per comune, foglio e particella; <b>Aggiungi dalla mappa</b> con un clic, un rettangolo, un poligono o una linea; <b>Da un disegno</b> le particelle toccate da un disegno o da un buffer; <b>Raccolta</b> crea l'area lorda dalle particelle, <b>seleziona</b> sulla mappa quelle già raccolte, accende i numeri e fa lo zoom.", open:function(){ openTab('ricerca'); }, placement:'below'},
+    {sel:'#ribbon', title:'Ricerca particelle', body:"<b>Cerca particelle</b> apre a destra i tre modi di prenderle dal catasto: per comune, foglio e numero; dalla mappa, con un clic, un rettangolo, un poligono o una linea; da un disegno o da un buffer. <b>Raccolta</b> crea l'area lorda dalle particelle, <b>seleziona</b> sulla mappa quelle già raccolte, accende i numeri e fa lo zoom.", open:function(){ openTab('ricerca'); }, placement:'below'},
     {sel:'#ribbon', title:'Terreno', body:"<b>Estensione</b>: su cosa (un'area lorda, il sito AREAS, le particelle, o un rettangolo o poligono disegnato qui); <b>Modello del terreno</b>: il limite di pendenza e <b>Analizza le pendenze</b>, con le quote di Esri World Elevation; <b>Analisi terreno</b>: classi di pendenza, quote, esposizione, ombreggiatura, curve di livello; <b>Profilo</b> lungo una linea. Le zone troppo ripide diventano un'esclusione nella Raccolta.", open:function(){ openTab('terreno'); }, placement:'below'},
     {sel:'#ribbon', title:'Disegna', body:"<b>Cosa disegni</b> e <b>Con quale strumento</b> per i disegni nuovi; <b>Seleziona e modifica</b> per quelli che ci sono (rimodella, sposta e ruota, dividi, unisci, copia, elimina, annulla); <b>Supporto al disegno</b>: aggancio, misure esatte, griglia; <b>Aree automatiche</b>: area netta e rientro dal confine; <b>Collega a sito AREAS</b>: il sito a cui vanno i disegni sul portale.", open:function(){ openTab('disegno'); }, placement:'below'},
     {sel:'#ribbon', title:'Geoprocessi e analisi', body:"Metti gli oggetti in <b>A</b> (dalla mappa, gli spuntati o per categoria; B serve a Parte comune e Sottrai), scegli l'operazione in <b>Geoprocessi</b> e premi <b>Esegui</b> a destra: il risultato va nella Raccolta, gruppo Analisi. <b>Contesto</b>: sottostazioni, linee AT e progetti FV intorno a un punto, e il percorso su strada (serve l'accesso). <b>Coordinate</b>: in che sistema sono dei valori sconosciuti.", open:function(){ openTab('geoproc'); }, placement:'below'},
