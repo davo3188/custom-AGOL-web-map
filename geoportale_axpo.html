@@ -1166,6 +1166,13 @@ dialog.dialog::backdrop { background: rgba(11, 18, 25, .45); }
   #list{max-height:none;overflow:visible;min-height:0;border:0;margin-top:2px}
   .rctool{display:flex;align-items:center;gap:6px;margin:0 0 8px} .rctool input{flex:1;min-width:0;height:28px;font-size:12px;padding:0 8px;margin:0}
   .rcfn{font-size:11px;color:var(--mut);white-space:nowrap} .rctool .btn.sm{flex:none;margin:0}
+  /* 2/11 (M4): the selection bar, on top of the Raccolta while something is selected; in a narrow panel the words take the first line */
+  .rcselbar{position:sticky;top:0;z-index:3;display:flex;flex-wrap:wrap;align-items:center;gap:4px;margin:0 0 8px;padding:5px 6px 5px 10px;border:1px solid color-mix(in srgb,var(--accent) 45%,var(--line));border-radius:var(--radius-md);background:color-mix(in srgb,var(--accent) 10%,var(--panel))}
+  .rcselbar[hidden]{display:none}
+  .rcseln{flex:1 1 140px;min-width:0;font-size:12px;font-weight:600}
+  .rcselacts{flex:none;display:flex;align-items:center;gap:4px;margin-left:auto}
+  .rcselbar .btn.sm{flex:none;margin:0;display:inline-flex;align-items:center;gap:4px} .rcselbar .ibtn{flex:none}
+  .grow .gname{cursor:pointer}   /* M3: a click on the row shows its object on the map, a double click zooms */
   .grow{flex-wrap:nowrap;min-height:28px;padding:2px 5px;gap:4px}
   .grow .gsub,.grow .gdelx{display:none}
   .grow .gfig2{flex:none;font-size:11px;color:var(--mut);font-variant-numeric:tabular-nums;white-space:nowrap}
@@ -1391,6 +1398,8 @@ dialog.dialog::backdrop { background: rgba(11, 18, 25, .45); }
   /* menu contestuale della mappa (tasto destro) */
   #ctxMenu{position:fixed;z-index:1500;display:none;min-width:216px}   /* the kit's .menu */
   #ctxHead{font-size:11px;opacity:.6;padding:5px 9px 6px;border-bottom:1px solid var(--line);margin-bottom:4px;font-variant-numeric:tabular-nums}
+  #ctxSel{border-bottom:1px solid var(--line);margin-bottom:4px;padding-bottom:4px} #ctxSel[hidden]{display:none}   /* 2/11 (M6): the selection's actions */
+  #ctxSel [role="menuitem"]:disabled{color:var(--mut);background:none;cursor:default}
 
   /* ══ GEOPROCESSI: slot A e B di oggetti scelti (arancio / viola, come i contorni sulla mappa) ══ */
   .gpslot{border:1px solid var(--line);border-radius:8px;padding:8px 9px;margin-top:8px}
@@ -1871,6 +1880,8 @@ dialog.dialog::backdrop { background: rgba(11, 18, 25, .45); }
       <div class="ptabc" data-panel="elenco" id="drawerElenco">
         <!-- R3-4 (Q9 f): the toolbar of the Raccolta: the filter by name, a new group, collapse or expand all -->
         <div class="rctool" id="rcTool"><input type="search" id="rcFilter" placeholder="Filtra per nome…" aria-label="Filtra la Raccolta per nome" autocomplete="off"><span id="rcFilterN" class="rcfn" aria-live="polite"></span><button type="button" class="btn sm" id="grpNewBtn" title="Un gruppo personale della Raccolta: resta nel lavoro e nel progetto .axpo">+ Gruppo</button><button type="button" class="btn sm" id="rcCollapse" title="Comprimi o espandi tutti i blocchi della Raccolta">Comprimi</button></div>
+        <!-- 2/11 (M4): the selection bar, shown with at least one tick: what is selected and what to do with it (rcSelBarSync) -->
+        <div class="rcselbar" id="rcSelBar" role="toolbar" aria-label="Selezione" hidden><span id="rcSelN" class="rcseln" aria-live="polite"></span><span class="rcselacts"><button type="button" class="ibtn" id="rcSelZoom" title="Zoom sulla selezione" aria-label="Zoom sulla selezione" data-icon="target"></button><button type="button" class="btn sm" id="rcSelGrp" aria-haspopup="menu" title="Sposta la selezione in un sottogruppo o in un gruppo" data-icon="folder"><span id="rcSelGrpT">Sottogruppo</span></button><button type="button" class="ibtn" id="rcSelDel" title="Togli la selezione dalla Raccolta (Canc); Annulla la rimette" aria-label="Togli la selezione dalla Raccolta" data-icon="trash"></button><button type="button" class="ibtn" id="rcSelClr" title="Deseleziona tutto" aria-label="Deseleziona tutto" data-icon="close"></button></span></div>
         <div id="rcEmpty" class="empty" hidden>La Raccolta è vuota: cerca o clicca le particelle, disegna, calcola o importa.</div>   <!-- 22/10: the sections show only when populated -->
         <!-- intestazione di sezione: spunta tutti · mostra/nascondi · colore (non nei Disegni: lì il colore è la categoria) · elimina tutti -->
         <div class="gsec" data-sec="parcels">
@@ -2033,7 +2044,7 @@ dialog.dialog::backdrop { background: rgba(11, 18, 25, .45); }
           </div>
         </details>
         <details class="imod" id="rcSecMap">
-          <summary><span class="im-ico" aria-hidden="true" data-icon="sel-click"></span><span class="im-t"><b>Sulla mappa</b><small>Clicca o disegna sopra le particelle che vuoi</small></span>
+          <summary><span class="im-ico" aria-hidden="true" data-icon="sel-click"></span><span class="im-t"><b>Aggiungi dalla mappa</b><small>Clicca o disegna sopra le particelle che vuoi</small></span>
             <button type="button" class="im-info" data-info="rcMap" title="Come funziona, con un esempio" aria-label="Come funziona la selezione sulla mappa">i</button></summary>
           <div class="im-body">
             <div class="segbtns" id="selModeBox">
@@ -2617,13 +2628,13 @@ dialog.dialog::backdrop { background: rgba(11, 18, 25, .45); }
     <ol style="margin:0;padding-left:18px;font-size:13px;line-height:1.7">
       <li><b>Barra in alto</b> — il nome del <b>progetto</b> .axpo (un clic lo salva con un altro nome); <b data-icon="map">Mappa</b>, la web map del portale in uso: la General Map o una Check Vincoli regionale, con ricerca per nome (cambiandola restano particelle, disegni e risultati; si perdono i layer accesi e i filtri di quella mappa, te lo chiedo prima); <b data-icon="folder"></b> Apri e <b data-icon="save"></b> Salva progetto; <b>Accedi</b> ad AGOL; il tema chiaro o scuro; <b data-icon="help"></b> i tour e questa guida.</li>
       <li><b>Schede e ribbon</b> — sei schede, nell'ordine del lavoro: Ricerca particelle · Terreno · Disegna · Geoprocessi e analisi · Importa · Salva ed esporta. Sotto, il <b>ribbon</b> con gli strumenti della scheda, a gruppi: ogni gruppo ha il suo nome e una <b data-icon="info"></b> che dice cosa si fa lì, con «Di più» per la spiegazione lunga, spesso con un esempio disegnato. Uno strumento apre le sue impostazioni a destra, in <b>Proprietà</b>.</li>
-      <li><b>Ricerca particelle</b> — <b>Catasto</b>: regione, provincia, comune, foglio e numeri di particella (con una regione scelta ti propongo i suoi vincoli con un clic; all'invio la mappa inquadra le particelle appena aggiunte); <b>Sulla mappa</b>: Puntuale, Rettangolo, Poligono o Linea; <b>Da un disegno</b>: le particelle toccate da un disegno, un buffer o un file; <b>Raccolta</b>: Crea area lorda dalle particelle, i numeri sulla mappa, lo zoom.</li>
+      <li><b>Ricerca particelle</b> — <b>Catasto</b>: regione, provincia, comune, foglio e numeri di particella (con una regione scelta ti propongo i suoi vincoli con un clic; all'invio la mappa inquadra le particelle appena aggiunte); <b>Aggiungi dalla mappa</b>: Puntuale, Rettangolo, Poligono o Linea; <b>Da un disegno</b>: le particelle toccate da un disegno, un buffer o un file; <b>Raccolta</b>: Crea area lorda dalle particelle, <b>Seleziona</b> e <b>Riquadro</b> per scegliere sulla mappa quelle già nella Raccolta, i numeri sulla mappa, lo zoom.</li>
       <li><b>Terreno</b> — <b>Estensione</b>: su cosa lavorare (un'area lorda, il sito AREAS, le particelle, oppure un rettangolo o un poligono disegnato qui); <b>Modello del terreno</b>: il limite di pendenza, in ogni direzione oppure nord–sud ed est–ovest, e <b>Analizza le pendenze</b>, con le quote di Esri World Elevation (circa 10 m in Italia); <b>Analisi terreno</b>: classi di pendenza, quote, esposizione, ombreggiatura e curve di livello; <b>Profilo</b> altimetrico lungo una linea; <b>Rimuovi terreno</b>. Le zone troppo ripide diventano un'esclusione nella Raccolta.</li>
       <li><b>Disegna</b> — <b>Cosa disegni</b>: la categoria (la scheda colorata: un clic apre l'elenco, anche con le categorie tue), con tipo, valori e fonte, ed <b>Esclusione da layer</b>; <b>Con quale strumento</b>: punto, linea, area, rettangolo, cerchio, a mano libera; <b>Seleziona e modifica</b>: seleziona, riquadro, rimodella, sposta e ruota, dividi, unisci, copia, elimina, annulla e ripeti; <b>Supporto al disegno</b>: aggancio, misure esatte, griglia; <b>Aree automatiche</b>: l'area netta e il rientro dal confine; <b>Collega a sito AREAS</b>: il sito a cui vanno i disegni sul portale (salvando, ogni oggetto si lega da solo all'area che tocca).</li>
       <li><b>Geoprocessi e analisi</b> — <b>Oggetti di partenza</b>: metti gli oggetti in A, dalla mappa, dalle righe spuntate o per categoria (B serve a Parte comune e Sottrai); <b>Geoprocessi</b>: Buffer, Unisci, Parte comune, Sottrai B da A, Copia, Contorno, Semplifica, Ritaglia, poi <b>Esegui</b> a destra: il risultato va nella Raccolta, gruppo Analisi; <b>Contesto</b>: Analisi di contesto (sottostazioni, linee AT e progetti FV intorno a un punto) e Percorso su strada, con l'accesso; <b>Coordinate</b>: in che sistema sono dei valori sconosciuti.</li>
       <li><b>Importa</b> — <b>File</b>: GeoJSON, KML, KMZ, Shapefile (.zip) e il file di <b>Estrazione intestatari</b>, colorato e raggruppato per intestatario in fondo al blocco <b>Particelle</b> della Raccolta, dove il cestino della riga «Per intestatario» lo toglie tutto (i nominativi restano fuori dal salvataggio automatico e dal portale); <b>CAD</b>: un DWG letto nel browser, con il sistema proposto, oppure allineato a mano con due punti; <b>Immagini</b>: GeoTIFF e world file si posizionano da soli, PNG, JPG e PDF con sposta, scala, ruota o punti noti; <b>Servizi web</b>: WMS, WFS e ArcGIS REST dal loro indirizzo; <b>Portale</b>: un layer cercato per titolo.</li>
       <li><b>Salva ed esporta</b> — <b>Esporta</b>: GeoJSON, KML, KMZ, Shapefile (.zip) o la tabella XLSX delle particelle, con gli oggetti spuntati nella Raccolta o con tutto (il KML ha una cartella per gruppo, lo shapefile un file per gruppo; il nome del file viene da comune, data e numero di particelle); <b>Portale AGOL</b>: Migra particelle in AREAS (l'opzione «dissolvi» sta nella sua finestra), Salva disegni in Site Features (categoria, tipo, attributi e sito: la seconda volta aggiorna, non duplica), Modifica AREAS COLLECTION; <b>Progetto</b>: Salva, Salva come, Apri; <b>Stampa</b>.</li>
-      <li><b>Raccolta</b>, a sinistra — tutto quello che raccogli, in gruppi: Particelle, Aree di progetto, Aree di esclusione, Analisi, Altro, Immagini, e i gruppi tuoi (<b>+ Gruppo</b>). In alto il filtro per nome e <b>Comprimi</b>. Ogni riga ha la spunta (la selezione, che usano anche geoprocessi ed esportazione), il colore, il nome, la cifra a destra, l'occhio e il menu <b data-icon="more"></b>, anche col tasto destro: rinomina, zoom, sposta in un gruppo, Proprietà, elimina. Il menu di un gruppo, di un sottogruppo e di Particelle ha lo <b>Zoom</b> su tutti i loro oggetti. Il bordo destro la allarga, <b data-icon="undock"></b> la sgancia in una finestra per il secondo schermo.</li>
+      <li><b>Raccolta</b>, a sinistra — tutto quello che raccogli, in gruppi: Particelle, Aree di progetto, Aree di esclusione, Analisi, Altro, Immagini, e i gruppi tuoi (<b>+ Gruppo</b>). In alto il filtro per nome e <b>Comprimi</b>. Ogni riga ha la spunta (la selezione, che usano anche geoprocessi ed esportazione; <kbd>Maiusc</kbd>+clic spunta un intervallo), il colore, il nome (le particelle per foglio e numero, poi il comune), la cifra a destra, l'occhio e il menu <b data-icon="more"></b>, anche col tasto destro: rinomina, zoom, sposta in un gruppo, Proprietà, elimina. Un clic sulla riga fa lampeggiare l'oggetto sulla mappa, un doppio clic ci fa lo zoom. Con qualcosa selezionato (spuntato qui, o scelto sulla mappa con <b>Seleziona</b> e <b>Riquadro</b>) compare in cima la <b>barra della selezione</b>: Zoom, Sottogruppo o Gruppo (anche nuovo), Togli (o il tasto <kbd>Canc</kbd>; Annulla rimette tutto) e Deseleziona; il tasto destro su una riga selezionata, o sulla mappa su un oggetto selezionato, offre le stesse azioni per tutta la selezione. Il menu di un gruppo, di un sottogruppo e di Particelle ha lo <b>Zoom</b> su tutti i loro oggetti. Il bordo destro la allarga, <b data-icon="undock"></b> la sgancia in una finestra per il secondo schermo.</li>
       <li><b>Pannello a destra</b> — tre schede. <b>Proprietà</b>: le impostazioni dello strumento aperto e, in Disegna, la scheda dell'oggetto selezionato (categoria, tipo e attributi). <b>Layer</b>: cerca un layer per nome; dal pannello di ogni layer (icona a cursori) trasparenza, popup e <b>filtro per attributo</b> (l'icona diventa un imbuto quando è attivo); i layer aggiunti da te hanno il menu <b>…</b> con Zoom e Rimuovi dalla mappa. Un clic sulla mappa apre il popup anche sui layer a <b>tasselli vettoriali</b> che portano gli attributi (es. i vincoli paesaggistici della Campania nella vista d'insieme): campi e titolo come configurati nell'item, l'elemento non si evidenzia. Il <b>Catasto AdE</b> è l'immagine ufficiale del WMS dell'Agenzia delle Entrate: fogli da 1:25.000, particelle e fabbricati da 1:5.000, numeri da 1:2.000. <b>Legenda</b>: i layer accesi. Anche questo pannello si allarga dal bordo e si sgancia.</li>
       <li><b>Sulla mappa</b> — in alto a destra la lente della <b>ricerca</b> (indirizzi, lat lon, oppure X Y in Gauss-Boaga o UTM, di cui indovina il sistema) e, sotto, <b data-icon="measure"></b> le <b>misure</b>: lineare, area, Pulisci (non si salvano). In alto a sinistra zoom, bussola, posizione GPS, <b>Zoom sulla Raccolta</b> e <b>Luoghi</b>, i segnalibri; in basso a destra la <b>mappa di base</b>, con l'opacità; in basso al centro lo scalimetro. Col tasto destro: aggiungi la particella qui, analisi di contesto qui, buffer qui, copia le coordinate, apri in Google Maps, centra qui.</li>
       <li><b>Barra di stato</b>, in basso — il pin fissa le coordinate del prossimo clic; le coordinate del puntatore nel sistema che scegli; la scala, che scegli anche dal suo menu; con il terreno analizzato, la <b>quota</b> e la <b>pendenza</b> sotto il puntatore (in rosso oltre il limite); lo stato del Catasto AdE; a destra la modalità in corso, l'aggancio e l'ora dell'ultimo salvataggio nel browser (in rosso se il browser è pieno).</li>
@@ -2675,6 +2686,7 @@ dialog.dialog::backdrop { background: rgba(11, 18, 25, .45); }
 </div>
 <div id="ctxMenu" class="menu" role="menu">
   <div id="ctxHead">—</div>
+  <div id="ctxSel" hidden></div>   <!-- 2/11 (M6): the selection's actions when the pointer is on an object of the Raccolta (ctxSelFill) -->
   <button type="button" role="menuitem" id="ctxParcel"><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-parcels"></use></svg>Aggiungi particella qui</button>
   <button type="button" role="menuitem" id="ctxCtx"><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-context"></use></svg>Analisi di contesto qui</button>
   <button type="button" role="menuitem" id="ctxBuf"><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-buffer"></use></svg>Buffer qui</button>
@@ -3293,20 +3305,32 @@ async function loadRegions(){
   }catch(e){msg('Chiave non valida o API irraggiungibile: '+e.message,'err');}
 }
 // ── menu contestuale della mappa (tasto destro): agisce sul punto cliccato ──
+// 2/11 (M6): on a selected object, the whole selection's menu (selMenuActs); on another one, select it, or add it
+function ctxSelFill(obj, close){ const box=$('ctxSel'); if(!box) return; box.innerHTML=''; box.hidden=true; if(!obj) return;
+  const on=objKind(obj)==='parcel'? !!obj.sel : !!(obj.attributes&&obj.attributes._sel);
+  const acts= on? selMenuActs() : [{t:'Seleziona «'+selName(obj)+'»', i:'cursor', fn:()=>{ selSet([obj], 'only'); rcReveal(obj); }}]
+    .concat(selTotal()? [{t:'Aggiungi alla selezione', i:'plus', fn:()=>{ selSet([obj], 'add'); rcReveal(obj); }}] : []);
+  acts.forEach(a=>{ const b=document.createElement('button'); b.type='button'; b.setAttribute('role','menuitem'); b.disabled=!!a.dis; b.innerHTML=(a.i? icon(a.i) : '')+esc(a.t);
+    b.onclick=()=>{ close(); try{ a.fn(); }catch(x){ console.warn('[menu della mappa]', x); } }; box.appendChild(b); });
+  box.hidden=false; }
 function wireContextMenu(){
   const vd=$('viewDiv'), menu=$('ctxMenu');
   if(!vd||!menu) return;
   let pt=null, ll=null;
   const close=()=>{ menu.style.display='none'; };
-  vd.addEventListener('contextmenu', e=>{
+  vd.addEventListener('contextmenu', async e=>{
     e.preventDefault();                      // sostituisco il menu del browser
     if(!view) return;
-    const r=vd.getBoundingClientRect();
-    pt=view.toMap({x:e.clientX-r.left, y:e.clientY-r.top});
+    const r=vd.getBoundingClientRect(), sp={x:e.clientX-r.left, y:e.clientY-r.top};
+    pt=view.toMap(sp);
     if(!pt){ return; }
     const g=to4326(pt);
     ll=g? {lat:(g.latitude!=null?g.latitude:g.y), lng:(g.longitude!=null?g.longitude:g.x)} : null;
     $('ctxHead').textContent= ll ? ll.lat.toFixed(5)+', '+ll.lng.toFixed(5) : '—';
+    // 2/11 (M6): a parcel or an object of the Raccolta under the pointer: the selection's actions on top of the menu
+    let obj=null; try{ const h=await Promise.race([view.hitTest(sp, {include:[toolsGL, gl]}), new Promise(res=>setTimeout(()=>res(null), 400))]);
+      const hs=h? selOrder((h.results||[]).map(x=>x.graphic).filter(selPickable)) : []; obj=hs.length? selObj(hs[0]) : null; }catch(x){}
+    ctxSelFill(obj, close); $('ctxParcel').style.display= objKind(obj)==='parcel'? 'none' : '';   // already in the Raccolta
     menu.style.display='block';
     const mw=menu.offsetWidth, mh=menu.offsetHeight;
     menu.style.left=Math.max(6, Math.min(e.clientX, window.innerWidth-mw-8))+'px';
@@ -5457,6 +5481,16 @@ async function addByClick(lat,lng){
 }
 
 // ── elenco + disegno ──────────────────────────────────────────────────────
+// M10a (2/11/2026): the name of a parcel's row, sheet and number first: in the narrow panel the end is cut, and with the
+// comune first every row of one comune read the same («Borgo Inventato · F…»). A name given with Rinomina wins.
+function parcelRowName(p, plain){ const s='Fg '+(p.foglio!=null? p.foglio : '?')+' · '+(p.particella!=null? p.particella : '?')+(p.comune? ' · '+p.comune : '');
+  return plain? s : (p.nome||s); }
+// M1: the ticks of the parcel rows and of their headers follow the selection, without redrawing the list (or the map)
+function parcelSelSync(){ const root=byId('drawerElenco'); if(!root) return;
+  Array.prototype.forEach.call(root.querySelectorAll('#list .grow'), r=>{ const p=r._obj; if(!p) return; const cb=r.querySelector('.gsel'); if(cb) cb.checked=!!p.sel; r.classList.toggle('sel', !!p.sel); });
+  Array.prototype.forEach.call(root.querySelectorAll('#list .psub'), s=>{ const cb=s.querySelector('.psubH .gsel'); if(!cb) return; const items=parcels.filter(p=>pgrpOf(p)===s.dataset.sub), n=items.filter(p=>p.sel).length;
+    cb.checked=!!items.length&&n===items.length; cb.indeterminate=n>0&&n<items.length; });
+  try{ wireSectionTools(); }catch(e){} }
 // ── etichette delle particelle: TextSymbol sul centroide (layer labelsGL) ──
 function renderLabels(){
   if(!labelsGL||!esriMods) return;
@@ -5535,14 +5569,14 @@ function render(zoom, fids){
     const row=document.createElement('div'); row.className='grow'; row._obj=p;   // 7c: the search finds the row of its parcel
     if(p.hidden) row.classList.add('hidden');
     const psc=document.createElement('input'); psc.type='checkbox'; psc.className='gsel';
-    psc.title='Seleziona per i geoprocessi'; psc.checked=!!p.sel;
+    psc.title='Seleziona (Maiusc+clic: tutte le righe fino all’ultima spuntata)'; psc.checked=!!p.sel;
     row.classList.toggle('sel', !!p.sel);
     psc.onchange=function(e){ e.stopPropagation(); p.sel=psc.checked;
-      row.classList.toggle('sel', psc.checked); gpSelInfo(); try{ wireSectionTools(); }catch(x){} };
+      row.classList.toggle('sel', psc.checked); try{ parcelSelSync(); }catch(x){} try{ selRender({rows:false}); }catch(x){} };   // M1: the outline on the map, the bar
     row.appendChild(psc);
     const vis=(makeVisToggle(()=>!p.hidden, on=>{ p.hidden=!on; row.classList.toggle('hidden',!on); const gg=gl.graphics.getItemAt(i); if(gg) gg.visible=on; renderLabels(); saveStateDebounced&&saveStateDebounced(); try{ wireSectionTools(); }catch(x){} }));
     row.appendChild(makeColorSwatch(()=>p.color||PARCEL_HEX, hex=>{ p.color=hex; const gg=gl.graphics.getItemAt(i); if(gg&&gg.geometry) gg.symbol=symbolForColor(gg.geometry.type,hex); saveStateDebounced&&saveStateDebounced(); }));
-    const defName=function(){ return p.comune+' · Fg '+p.foglio+' · '+p.particella; };
+    const defName=function(){ return parcelRowName(p, true); };
     const nm=document.createElement('span'); nm.className='gname'; nm.textContent=p.nome||defName(); nm.title=nm.textContent;   // 22/10: text; Rinomina is in the row menu
     row.appendChild(nm);
     const st=(p.area_m2? 'superficie catastale '+fmtHa2(p.area_m2/10000) : (p.area_nd?'area non disponibile (manca il contorno)':''))+(p.land_use?' · '+p.land_use:'');
@@ -5557,7 +5591,8 @@ function render(zoom, fids){
       .concat(typeof pgrpMoveActs==='function'? pgrpMoveActs([p]) : [])   // G2-4b: «Sposta in …» (the subgroups)
       .concat([{t:'Rimuovi', i:'trash', fn:function(){ db.click(); }}]); };
     row.appendChild(rowMore(acts)); row.appendChild(db);
-    row.oncontextmenu=function(e){ e.preventDefault(); if(window.rowMenu) window.rowMenu(e, acts()); };
+    row.oncontextmenu=function(e){ e.preventDefault(); if(window.rowMenu) window.rowMenu(e, (p.sel&&selTotal()>1)? selMenuActs() : acts()); };   // M6: on a selected row, the whole selection
+    rcRowClicks(row, p);   // M3: a click shows it on the map, a double click zooms
     return row;
   };
   // G2-4b (23/10, Y1, Y8): the subgroups as nested blocks, then the parcels without one (under a thin line when subgroups exist)
@@ -6911,8 +6946,8 @@ function grpMoveActs(list){ const cur=(list&&list.length===1)? grpOf(list[0]) : 
   return acts; }
 // il menu ⋯ dell'intestazione di un gruppo
 function grpMenuActs(G, arr){
-  const acts=[{t:'Spunta tutti', i:'check', fn:function(){ setSectionSel(G.id, true); grpRedraw(); try{ gpSelInfo(); }catch(e){} }},
-    {t:'Togli le spunte', i:'close', fn:function(){ setSectionSel(G.id, false); grpRedraw(); try{ gpSelInfo(); }catch(e){} }}];
+  const acts=[{t:'Spunta tutti', i:'check', fn:function(){ setSectionSel(G.id, true); selRender(); }},   // 2/11: selRender redraws the rows and the outline
+    {t:'Togli le spunte', i:'close', fn:function(){ setSectionSel(G.id, false); selRender(); }}];
   const sel=(typeof selList==='function')? selList().filter(g=>grpOf(g)!==G.id) : [];
   if(sel.length) acts.push({t:'Sposta qui i '+sel.length+' selezionati', i:'folder', fn:function(){ grpAssign(sel, G.id); msg(sel.length+' oggetti in «'+G.name+'».','ok'); }});
   if(!G.std){ acts.push({t:'Rinomina il gruppo', i:'pen', fn:function(){ const n=grpPrompt(G.name); if(n) grpRename(G.id, n); }});
@@ -6936,6 +6971,7 @@ function grpBlock(G, arr, subOf){
     +'<button type="button" class="gact gmore" data-role="more" title="Altre azioni" aria-label="Altre azioni del gruppo" aria-haspopup="menu">'+icon('more','sm')+'</button></span>';
   h.onclick=function(e){ if(e.target.closest('input,button')) return; sec.classList.toggle('collapsed'); grpSetOpen(G.id, !sec.classList.contains('collapsed')); };
   const more=h.querySelector('[data-role=more]'); more.onclick=function(e){ e.stopPropagation(); if(window.rowMenu) window.rowMenu(more, grpMenuActs(G, arr)); };
+  h.oncontextmenu=function(e){ e.preventDefault(); if(window.rowMenu) window.rowMenu(e, grpMenuActs(G, arr)); };   // 2/11: the header's menu on a right-click too
   sec.appendChild(h);
   const list=document.createElement('div'); list.className='glist';
   if(!arr.length) list.innerHTML='<div class="empty">Gruppo vuoto: «Sposta in…» dal menu di un oggetto lo riempie.</div>';
@@ -6980,17 +7016,17 @@ function pgrpMoveActs(list){ const cur=(list&&list.length===1)? pgrpOf(list[0]) 
   if(list.some(p=>pgrpOf(p))) acts.push({t:'Togli dal sottogruppo', i:'close', fn:function(){ pgrpAssign(list, null); }});
   acts.push({t:'Nuovo sottogruppo…', i:'file-plus', fn:function(){ const id=pgrpNewAsk(list); if(id) msg('Sottogruppo «'+pgrpName(id)+'» creato con '+list.length+' particell'+(list.length>1?'e':'a')+'.','ok'); }});
   return acts; }
-// il menu ⋯ dell'intestazione «Particelle»
-function pgrpHeadActs(){ const sel=parcels.filter(p=>p.sel), acts=[{t:'Nuovo sottogruppo…', i:'file-plus', fn:function(){ const id=pgrpNewAsk(sel); if(id) msg('Sottogruppo «'+pgrpName(id)+'» creato'+(sel.length? ' con le '+sel.length+' spuntate' : '')+'.','ok'); }}];
-  if(sel.length&&pgrpList.length){ pgrpSorted().forEach(G=>{ acts.push({t:'Sposta le '+sel.length+' spuntate in: '+G.name, i:'folder', fn:function(){ pgrpAssign(sel, G.id); }}); });
-    if(sel.some(p=>pgrpOf(p))) acts.push({t:'Togli le spuntate dai sottogruppi', i:'close', fn:function(){ pgrpAssign(sel, null); }}); }
+// il menu ⋯ dell'intestazione «Particelle» (2/11, M1: the tick is the selection, so «selezionate»)
+function pgrpHeadActs(){ const sel=parcels.filter(p=>p.sel), acts=[{t:'Nuovo sottogruppo…', i:'file-plus', fn:function(){ const id=pgrpNewAsk(sel); if(id) msg('Sottogruppo «'+pgrpName(id)+'» creato'+(sel.length? ' con le '+sel.length+' selezionate' : '')+'.','ok'); }}];
+  if(sel.length&&pgrpList.length){ pgrpSorted().forEach(G=>{ acts.push({t:'Sposta le '+sel.length+' selezionate in: '+G.name, i:'folder', fn:function(){ pgrpAssign(sel, G.id); }}); });
+    if(sel.some(p=>pgrpOf(p))) acts.push({t:'Togli le selezionate dai sottogruppi', i:'close', fn:function(){ pgrpAssign(sel, null); }}); }
   if(parcels.length) acts.unshift({t:'Zoom sulle particelle', i:'target', fn:function(){ zoomParcelList(parcels); }});   // 26/10 (user)
   return acts; }
-// il menu ⋯ dell'intestazione di un sottogruppo
+// il menu ⋯ dell'intestazione di un sottogruppo (M10b: with the filter on, «Spunta tutte» takes only the rows found)
 function pgrpMenuActs(G){ const arr=pgrpParcels(G.id), sel=parcels.filter(p=>p.sel&&pgrpOf(p)!==G.id), L=pgrpSorted(), i=L.findIndex(x=>x.id===G.id);
-  const acts=[{t:'Spunta tutte', i:'check', fn:function(){ arr.forEach(p=>{ p.sel=true; }); pgrpRedraw(); try{ gpSelInfo(); }catch(e){} }},
-    {t:'Togli le spunte', i:'close', fn:function(){ arr.forEach(p=>{ p.sel=false; }); pgrpRedraw(); try{ gpSelInfo(); }catch(e){} }}];
-  if(sel.length) acts.push({t:'Sposta qui le '+sel.length+' spuntate', i:'folder', fn:function(){ pgrpAssign(sel, G.id); }});
+  const acts=[{t:'Spunta tutte', i:'check', fn:function(){ arr.forEach(p=>{ if(rcPass(p)) p.sel=true; }); pgrpRedraw(); try{ gpSelInfo(); }catch(e){} }},
+    {t:'Togli le spunte', i:'close', fn:function(){ arr.forEach(p=>{ if(rcPass(p)) p.sel=false; }); pgrpRedraw(); try{ gpSelInfo(); }catch(e){} }}];
+  if(sel.length) acts.push({t:'Sposta qui le '+sel.length+' selezionate', i:'folder', fn:function(){ pgrpAssign(sel, G.id); }});
   acts.push({t:'Rinomina il sottogruppo', i:'pen', fn:function(){ const n=pgrpPrompt(G.name); if(n) pgrpRename(G.id, n); }});
   acts.push({t:'Sposta su', dis:i<=0, fn:function(){ pgrpMove(G.id, -1); }}); acts.push({t:'Sposta giù', dis:i>=L.length-1, fn:function(){ pgrpMove(G.id, 1); }});
   acts.push({t:'Elimina il sottogruppo (le particelle restano)', i:'trash', fn:function(){ if(confirm('Eliminare il sottogruppo «'+G.name+'»? Le sue particelle restano nella Raccolta.')) pgrpDelete(G.id); }});
@@ -7001,6 +7037,7 @@ function pgrpMenuActs(G){ const arr=pgrpParcels(G.id), sel=parcels.filter(p=>p.s
 function pgrpBlock(G, items, rowOf){
   const key='p:'+G.id, sec=document.createElement('div'); sec.className='psub'+(grpIsOpen(key)? '' : ' collapsed'); sec.dataset.sub=G.id;
   const ha=items.reduce((s,x)=>s+((x[0].area_m2||0)/10000), 0), nSel=items.filter(x=>x[0].sel).length, allVis=items.every(x=>!x[0].hidden);
+  sec.addEventListener('contextmenu', e=>{ if(e.target.closest('.grow')) return; e.preventDefault(); if(window.rowMenu) window.rowMenu(e, pgrpMenuActs(G)); });   // the header's menu on a right-click too
   const h=document.createElement('div'); h.className='psubH';
   h.innerHTML='<input type="checkbox" class="gsel" title="Spunta tutte" aria-label="Spunta tutte le particelle di '+esc(G.name)+'"><span class="psubN"><b>'+esc(G.name)+'</b>'
     +'<span class="gfig">'+(items.length? items.length+' · '+ha.toFixed(2).replace('.',',')+' ha' : 'vuoto')+'</span></span>'
@@ -7008,7 +7045,7 @@ function pgrpBlock(G, items, rowOf){
     +'<button type="button" class="ltoggle" data-role="lbl" title="Nomi sulla mappa" aria-label="Nomi sulla mappa" aria-pressed="'+(G.labels!==false? 'true' : 'false')+'"></button>'
     +'<button type="button" class="gact gmore" data-role="more" title="Altre azioni" aria-label="Altre azioni del sottogruppo" aria-haspopup="menu">'+icon('more','sm')+'</button>';
   const cb=h.querySelector('.gsel'); cb.checked=!!items.length&&nSel===items.length; cb.indeterminate=nSel>0&&nSel<items.length;
-  cb.onclick=function(e){ e.stopPropagation(); }; cb.onchange=function(e){ e.stopPropagation(); items.forEach(x=>{ x[0].sel=cb.checked; }); pgrpRedraw(); try{ gpSelInfo(); }catch(err){} };
+  cb.onclick=function(e){ e.stopPropagation(); }; cb.onchange=function(e){ e.stopPropagation(); items.forEach(x=>{ if(rcPass(x[0])) x[0].sel=cb.checked; }); pgrpRedraw(); try{ gpSelInfo(); }catch(err){} };   // M10b: the rows found by the filter
   const vb=h.querySelector('[data-role=vis]'); vb.innerHTML=allVis? EYE_ON : EYE_OFF; vb.classList.toggle('off', !allVis);
   vb.onclick=function(e){ e.stopPropagation(); items.forEach(x=>{ x[0].hidden=allVis; }); pgrpSave(); pgrpRedraw(); };
   const lb=h.querySelector('[data-role=lbl]'); lb.innerHTML=LABEL_SVG; lb.classList.toggle('off', G.labels===false);
@@ -7312,7 +7349,7 @@ function geomRow(g, subtitle){
   const row=document.createElement('div'); row.className='grow'; row._obj=g;   // 7c: the search finds the row of its object
   if(g.attributes&&g.attributes.hidden) row.classList.add('hidden');
   const sc=document.createElement('input'); sc.type='checkbox'; sc.className='gsel';
-  sc.title='Seleziona per i geoprocessi'; sc.checked=!!(g.attributes&&g.attributes._sel);
+  sc.title='Seleziona (Maiusc+clic: tutte le righe fino all’ultima spuntata)'; sc.checked=!!(g.attributes&&g.attributes._sel);
   row.classList.toggle('sel', sc.checked);
   sc.onchange=function(e){ e.stopPropagation(); g.attributes._sel=sc.checked;
     row.classList.toggle('sel', sc.checked); gpSelInfo(); try{ wireSectionTools(); }catch(x){} try{ selRender({rows:false}); }catch(x){} };   // G2-3: the outline on the map
@@ -7350,7 +7387,8 @@ function geomRow(g, subtitle){
     .concat((canOk(g,'move')&&typeof grpMoveActs==='function')? grpMoveActs([g]) : [])   // G2-4a: «Sposta in …»
     .concat(canOk(g,'delete')? [{t:'Elimina', i:'trash', fn:function(){ db.click(); }}] : []); };
   row.appendChild(rowMore(acts)); row.appendChild(db);
-  row.oncontextmenu=function(e){ e.preventDefault(); if(window.rowMenu) window.rowMenu(e, acts()); };
+  row.oncontextmenu=function(e){ e.preventDefault(); if(window.rowMenu) window.rowMenu(e, (g.attributes._sel&&selTotal()>1)? selMenuActs() : acts()); };   // M6: on a selected row, the whole selection
+  rcRowClicks(row, g);   // M3
   const wrap=document.createElement('div'); wrap.className='gitem'; wrap.appendChild(row);
   if(sfEditOpen===g) wrap.appendChild(sfEditor(g));
   return wrap;
@@ -7406,9 +7444,49 @@ function rcCollapseAll(){ const root=byId('drawerElenco'); if(!root) return; con
   blocks.forEach(s=>{ s.classList.toggle('collapsed', anyOpen);
     try{ if(s.classList.contains('ggrp')) grpSetOpen(s.dataset.sec, !anyOpen); else if(s.classList.contains('psub')) grpSetOpen('p:'+s.dataset.sub, !anyOpen); }catch(e){} });
   const b=byId('rcCollapse'); if(b) b.textContent=anyOpen? 'Espandi' : 'Comprimi'; }
-window.addEventListener('DOMContentLoaded', function(){ const f=$('rcFilter');
-  if(f){ f.addEventListener('input', rcListsPost); f.addEventListener('keydown', e=>{ if(e.key==='Escape'&&f.value){ e.stopPropagation(); f.value=''; rcListsPost(); } }); }
-  const c=$('rcCollapse'); if(c) c.onclick=rcCollapseAll; });
+window.addEventListener('DOMContentLoaded', function(){ const f=$('rcFilter'), fl=()=>{ rcListsPost(); try{ wireSectionTools(); }catch(e){} };   // M10b: the «Spunta tutti» boxes follow the filter
+  if(f){ f.addEventListener('input', fl); f.addEventListener('keydown', e=>{ if(e.key==='Escape'&&f.value){ e.stopPropagation(); f.value=''; fl(); } }); }
+  const c=$('rcCollapse'); if(c) c.onclick=rcCollapseAll;
+  rcSelBarWire(); const root=$('drawerElenco'); if(root) root.addEventListener('click', rcRangeClick); });
+// M10b: the filter of the Raccolta, for «Spunta tutti»: an object passes when its row's name holds the words typed
+function rcFilterQ(){ const f=byId('rcFilter'); return rcNorm(f? f.value.trim() : ''); }
+function rcPass(o){ const q=rcFilterQ(); if(!q) return true; let n='';
+  try{ n= objKind(o)==='parcel'? parcelRowName(o) : ((o.attributes&&o.attributes.nome)||''); }catch(e){} return rcNorm(n).indexOf(q)>=0; }
+// ── 2/11/2026 (M3, M4): the Raccolta and the map together; the selection bar ──
+// a click on a row (not on its controls) makes its object flash on the map, brought into view when out of it; a double
+// click zooms on it (a parcel or an object of the Raccolta)
+function rcRowClicks(row, obj){ let tm=0;
+  row.addEventListener('click', e=>{ if(e.target.closest('input,button,.edit')) return; clearTimeout(tm); tm=setTimeout(()=>rcFlash(obj), 220); });
+  row.addEventListener('dblclick', e=>{ if(e.target.closest('input,button,.edit')) return; clearTimeout(tm);
+    if(objKind(obj)==='parcel') zoomParcelList([obj]); else zoomGraphics([obj]); }); }
+let rcFlashT=0;
+function rcFlash(obj){ try{ if(!view||!esriMods) return; const ge= objKind(obj)==='parcel'? selPGeom(obj) : obj.geometry; if(!ge) return;
+  const sym= ge.type==='polygon'? {type:'simple-fill', color:[255,214,0,0.25], outline:{color:[255,214,0], width:4}} : ge.type==='polyline'? {type:'simple-line', color:[255,214,0], width:6}
+    : {type:'simple-marker', style:'circle', size:22, color:[0,0,0,0], outline:{color:[255,214,0], width:3}};
+  const fg=new esriMods.Graphic({geometry:ge, symbol:sym}); view.graphics.add(fg); clearTimeout(rcFlashT);
+  rcFlashT=setTimeout(()=>{ try{ view.graphics.remove(fg); }catch(e){} }, 1400);
+  let g2=ge; try{ if(ge.spatialReference&&ge.spatialReference.isWGS84&&view.spatialReference.isWebMercator) g2=esriMods.webMercatorUtils.geographicToWebMercator(ge); }catch(e){}
+  const inView=!!(view.extent&&view.extent.contains(g2.type==='point'? g2 : g2.extent));
+  if(!inView) view.goTo({target:g2.type==='point'? g2 : g2.extent.center, zoom:Math.max(view.zoom||0, 15)}).catch(()=>{}); }catch(e){} }
+// Maiusc+click on a tick: every row between it and the last one ticked takes its state (rows hidden by the filter, «Mostra
+// altre» or a closed block are skipped)
+let rcAnchor=null;
+function rcRangeClick(e){ const cb=e.target.closest('.grow > input.gsel'); if(!cb) return; const row=cb.parentElement, root=byId('drawerElenco');
+  const rows=Array.prototype.filter.call(root.querySelectorAll('.grow'), r=>r._obj&&r.offsetParent&&r.querySelector(':scope > input.gsel'));
+  const a=rcAnchor? rows.findIndex(r=>r._obj===rcAnchor) : -1, b=rows.indexOf(row); rcAnchor=row._obj;
+  if(!e.shiftKey||a<0||b<0||a===b) return; const on=cb.checked;
+  setTimeout(()=>{ rows.slice(Math.min(a,b), Math.max(a,b)+1).forEach(r=>{ const o=r._obj; if(objKind(o)==='parcel') o.sel=on; else if(o.attributes) o.attributes._sel=on; });
+    try{ parcelSelSync(); }catch(x){} try{ selRender(); }catch(x){} }, 0); }
+// the row of an object in view after a selection on the map, when the Raccolta is open (the filter is left as it is)
+function rcReveal(obj){ const root=byId('drawerElenco'); if(!root||!root.offsetParent) return; try{ srchShowRow(obj, true); }catch(e){} }
+// M4: the bar on top of the Raccolta while something is selected
+function rcSelBarSync(){ const bar=byId('rcSelBar'); if(!bar) return; const s=selSummary(); bar.hidden=!s.n; if(!s.n) return;
+  byId('rcSelN').textContent= s.nP&&s.nL? s.n+' selezionati: '+selWhat(s.nP, s.nL)
+    : s.n+' selezionat'+(s.n===1? (s.nP? 'a' : 'o') : (s.nP? 'e' : 'i'))+((s.nP? s.haP : s.haL)? ' · '+fmtHa2(s.nP? s.haP : s.haL) : '');
+  const t=byId('rcSelGrpT'); if(t) t.textContent= s.nP&&s.nL? 'Sposta' : s.nP? 'Sottogruppo' : 'Gruppo'; }
+function rcSelBarWire(){ const z=$('rcSelZoom'), g=$('rcSelGrp'), d=$('rcSelDel'), c=$('rcSelClr'); if(!z) return;
+  z.onclick=()=>selZoom(); d.onclick=()=>selDelete(); c.onclick=()=>selClear();
+  g.onclick=e=>{ e.stopPropagation(); const acts=selMoveActs(); if(!acts.length){ msg('Questi oggetti non si spostano in un gruppo.','err'); return; } if(window.rowMenu) window.rowMenu(g, acts); }; }
 // ── P1 (prototipo UX): contatore della Raccolta sul rail destro e riquadro «Ultimo disegno» nella scheda Disegna ──
 let drwLastG=null;   // l'ultimo disegno fatto (sketch, forma esatta, copia, percorso); sparisce se viene tolto
 function rcBadge(){ const b=$('rcBadge'); if(!b) return;
@@ -7459,13 +7537,14 @@ function setSectionVisible(sec,on){
   try{ saveStateDebounced(); }catch(e){}
 }
 // spunta di sezione: [quanti, quanti spuntati] e spunta/togli a tutti
-function sectionSelCount(sec){
-  if(sec==='parcels') return [parcels.length, parcels.filter(function(p){ return p.sel; }).length];
-  var gs=sectionGraphics(sec); return [gs.length, gs.filter(function(g){ return g.attributes&&g.attributes._sel; }).length];
+function sectionSelCount(sec, filtered){   // filtered: only the rows the filter shows (M10b)
+  var ok=function(o){ return !filtered||rcPass(o); };
+  if(sec==='parcels'){ var P=parcels.filter(ok); return [P.length, P.filter(function(p){ return p.sel; }).length]; }
+  var gs=sectionGraphics(sec).filter(ok); return [gs.length, gs.filter(function(g){ return g.attributes&&g.attributes._sel; }).length];
 }
-function setSectionSel(sec,on){
-  if(sec==='parcels') parcels.forEach(function(p){ p.sel=!!on; });
-  else sectionGraphics(sec).forEach(function(g){ if(g.attributes) g.attributes._sel=!!on; });
+function setSectionSel(sec,on){   // M10b (2/11): with the filter on, only the rows found
+  if(sec==='parcels') parcels.forEach(function(p){ if(rcPass(p)) p.sel=!!on; });
+  else sectionGraphics(sec).forEach(function(g){ if(g.attributes&&rcPass(g)) g.attributes._sel=!!on; });
 }
 // elimina tutta la sezione, con conferma; quelli salvati sul portale: chiede se toglierli anche da lì (come la riga)
 const SEC_WHAT={parcels:['la particella','tutte le %n particelle'], draw:['il disegno','tutti i %n disegni'],
@@ -7560,12 +7639,12 @@ function wireSectionTools(){
     }
     if(sa && !sa.dataset.wired){ sa.dataset.wired='1';
       sa.onclick=function(e){ e.stopPropagation(); };
-      sa.onchange=function(e){ e.stopPropagation(); setSectionSel(sec, sa.checked); redraw(); try{ gpSelInfo(); }catch(x){} };
+      sa.onchange=function(e){ e.stopPropagation(); setSectionSel(sec, sa.checked); redraw(); try{ selRender({rows:false}); }catch(x){} };   // M1: the outline and the bar
     }
     // sincronizza occhio, spunta e cestino col contenuto attuale
     if(vb){ var on=sectionAllVisible(sec); vb.innerHTML=on?EYE_ON:EYE_OFF; vb.classList.toggle('off',!on); }
-    var sc=sectionSelCount(sec), nImg=sectionImages(sec).length;
-    if(sa){ sa.disabled=!sc[0]; sa.checked=!!sc[0]&&sc[1]===sc[0]; sa.indeterminate=sc[1]>0&&sc[1]<sc[0]; }
+    var sc=sectionSelCount(sec), scF=sectionSelCount(sec, true), nImg=sectionImages(sec).length;   // M10b: the box says what the filter shows
+    if(sa){ sa.disabled=!scF[0]; sa.checked=!!scF[0]&&scF[1]===scF[0]; sa.indeterminate=scF[1]>0&&scF[1]<scF[0]; }
     if(db) db.disabled=!(sc[0]+nImg);
   });
   try{ renderGeomLabels(); }catch(e){}   // 22/10: the names follow visibility, renames and edits (this runs after each of them)
@@ -7982,22 +8061,39 @@ async function grdAlign(){ if(!(grdVM&&grdVM.displayEnabled)) await grdSet(true)
 // Rimodella e Sposta/ruota con l'update dello SketchViewModel (il gestore di 11-map-model.js registra storia e sf_dirty),
 // Dividi (la linea dei geoprocessi), Unisci (geoUnion nella cornice metrica), Copia (il modo cp2 del CAD), Elimina.
 // Le particelle restano fuori: non si modificano. Le fasce e l'area netta automatiche nemmeno: rinascono da sole.
+// Since 2026-11-02 (M1–M7, approved by the user) the parcels join the selection: their tick is `sel` (the objects' is
+// `_sel`), and selecting is not editing (M2): «Seleziona» and «Riquadro» take whatever is in the Raccolta, parcels and
+// automatic objects included; each edit tool works on what the table of rules (22c-rules.js) allows it and says what
+// it left out. The selection bar of the Raccolta, the right-click menus and the Canc key act on the whole selection.
 let selMd=null, exlMd=null, selGL=null, selShift=false;
 const SEL_HL=[57,69,207];
 document.addEventListener('keydown', e=>{ if(e.key==='Shift') selShift=true; }, true);
 document.addEventListener('keyup', e=>{ if(e.key==='Shift') selShift=false; }, true);
-function selEditable(g){ const a=g&&g.attributes; return !!(a&&HIST_KINDS[a._kind]&&g.geometry&&g.visible!==false&&canOk(g,'edit')); }   // 7b-1: the table of rules (no automatic objects, no owners' parcels)
+function selPickable(g){ return !!(g&&g.geometry&&g.visible!==false&&objKind(g)); }   // M2: anything of the Raccolta on the map
+function selEditable(g){ return selPickable(g)&&canOk(g,'edit'); }   // 7b-1: the table of rules (no automatic objects, no parcels)
 function selList(){ return toolsGL? toolsGL.graphics.toArray().filter(g=>g.attributes&&g.attributes._sel&&HIST_KINDS[g.attributes._kind]) : []; }
 function selCount(){ return selList().length; }
+function selParcels(){ return (typeof parcels!=='undefined'&&Array.isArray(parcels))? parcels.filter(p=>p.sel) : []; }   // M1
+function selTotal(){ return selCount()+selParcels().length; }
+function selObj(x){ try{ return (x&&gpParcelOf.get(x))||x; }catch(e){ return x; } }   // a parcel's graphic on the map → the parcel
+function selName(o){ if(objKind(o)==='parcel') return parcelRowName(o); const a=(o&&o.attributes)||{}; return a.nome||geomDefName(o); }
 function selAreas(){ return selList().filter(g=>g.geometry&&g.geometry.type==='polygon').length; }
+// M2: what an edit tool may take from the selection, and how many it leaves out (with the reason of the first one)
+function selFor(action, keep){ const L=selList().filter(g=>!keep||keep(g)), ok=L.filter(g=>canOk(g, action)), out=L.filter(g=>!canOk(g, action)), P=selParcels();
+  return {ok:ok, out:out.length+P.length, why:out.length? can(out[0], action) : P.length? can(P[0], action) : null}; }
+function selLeft(s){ return s.out? ' ('+s.out+' lasciat'+(s.out===1?'o':'i')+' fuori: '+String(s.why||'').split(/[.:]/)[0].toLowerCase()+')' : ''; }
+// M10c: the messages of the selection also reach the toasts when the Disegna module is not in view
+function selSay(t, cls){ toolMsg('drwMsg', t, cls); const el=$('drwMsg'); if(!el||!el.offsetParent) msg(t, cls==='err'? 'err' : cls==='ok'? 'ok' : ''); }
 function selOn(){ return !!selMd; }
 function exlOn(){ return !!exlMd; }
 function selBoxOn(){ try{ return sketchPurpose==='select-box'&&sketchVM.state==='active'; }catch(e){ return false; } }
 function exlBoxOn(){ try{ return sketchPurpose==='excl-box'&&sketchVM.state==='active'; }catch(e){ return false; } }
-// mode: 'only' (default) | 'add' | 'toggle'
-function selSet(list, mode){ if(!toolsGL) return; const want=new Set(list||[]);
+// mode: 'only' (default) | 'add' | 'toggle'; the list may hold parcels or their graphics on the map (M1)
+function selSet(list, mode){ if(!toolsGL) return; const want=new Set((list||[]).map(selObj));
   toolsGL.graphics.forEach(g=>{ const a=g.attributes; if(!a||!HIST_KINDS[a._kind]) return;
     if(mode==='add'){ if(want.has(g)) a._sel=true; } else if(mode==='toggle'){ if(want.has(g)) a._sel=!a._sel; } else a._sel=want.has(g); });
+  if(typeof parcels!=='undefined') parcels.forEach(p=>{ if(mode==='add'){ if(want.has(p)) p.sel=true; } else if(mode==='toggle'){ if(want.has(p)) p.sel=!p.sel; } else p.sel=want.has(p); });
+  try{ parcelSelSync(); }catch(e){}
   selRender(); }
 function selClear(){ selSet([], 'only'); }
 const selN=(v,d)=>(+v).toLocaleString('it-IT', {minimumFractionDigits:d, maximumFractionDigits:d});
@@ -8007,15 +8103,34 @@ function selSize(g){ try{ if(!geoFrameReady()) return ''; const m=geoMeasure(g.g
 // il contorno sulla mappa, le righe (se chiesto), la scheda «Selezione», il ribbon
 function selRender(opts){ const o=opts||{};
   try{ if(!selGL&&toolsGL){ selGL=new toolsGL.constructor({title:'Selezione', listMode:'hide'}); } if(selGL&&view&&view.map&&view.map.layers.indexOf(selGL)<0) view.map.add(selGL); }catch(e){}
-  if(selGL){ selGL.removeAll(); const out=[]; selList().forEach(g=>{ const ge=g.geometry;
+  if(selGL){ selGL.removeAll(); const out=[], add=ge=>{ if(!ge) return;
       const sym= ge.type==='polygon'? {type:'simple-fill', color:[SEL_HL[0],SEL_HL[1],SEL_HL[2],0.10], outline:{color:SEL_HL, width:3}}
         : ge.type==='polyline'? {type:'simple-line', color:[SEL_HL[0],SEL_HL[1],SEL_HL[2],0.85], width:5}
         : {type:'simple-marker', style:'circle', size:18, color:[0,0,0,0], outline:{color:SEL_HL, width:2.5}};
-      out.push(new esriMods.Graphic({geometry:ge, symbol:sym})); }); selGL.addMany(out); }
+      out.push(new esriMods.Graphic({geometry:ge, symbol:sym})); };
+    selList().forEach(g=>{ if(g.visible!==false) add(g.geometry); });   // a hidden object keeps its tick, not the outline
+    selParcels().forEach(p=>{ if(!p.hidden) add(selPGeom(p)); });   // M1: the parcels too
+    selGL.addMany(out); }
   if(o.rows!==false){ try{ renderGeoms(); }catch(e){} }
   try{ gpSelInfo(); }catch(e){}
-  selCardRender(); try{ if(window.ribbonSoon) window.ribbonSoon(); }catch(e){} }
-function selCardRender(){ const c=$('selCard'); if(!c) return; const L=selList(); c.hidden=!L.length; if(!L.length){ c.innerHTML=''; c._for=null; return; }
+  selCardRender(); try{ rcSelBarSync(); }catch(e){} try{ if(window.ribbonSoon) window.ribbonSoon(); }catch(e){} }
+// a parcel's shape for the outline, converted once per geometry
+const selPG=new WeakMap();
+function selPGeom(p){ const k=p&&p.geometry; if(k&&typeof k==='object'&&selPG.has(k)) return selPG.get(k); let ge=null;
+  try{ ge=geojsonToEsri(p.geometry)||geojsonToEsri({type:'Point', coordinates:[p.lng, p.lat]}); }catch(e){}
+  if(ge&&k&&typeof k==='object') selPG.set(k, ge); return ge; }
+// M4: the words of a selection («3 particelle · 3,15 ha + 2 oggetti · 1,20 ha»), for the card and the bar
+function selSummary(){ const L=selList(), P=selParcels(), bits=[], haP=P.reduce((s,p)=>s+(p.area_m2||0), 0)/1e4; let haL=0;
+  L.forEach(g=>{ if(g.geometry&&g.geometry.type==='polygon'){ const a=geomAreaHa(g); if(a!=null) haL+=a; } });
+  if(P.length) bits.push(P.length+(P.length===1? ' particella' : ' particelle')+(haP? ' · '+fmtHa2(haP) : ''));
+  if(L.length) bits.push(L.length+(L.length===1? ' oggetto' : ' oggetti')+(haL? ' · '+fmtHa2(haL) : ''));
+  return {n:L.length+P.length, nP:P.length, nL:L.length, haP:haP, haL:haL, text:bits.join(' + ')}; }
+function selCardRender(){ const c=$('selCard'); if(!c) return; const L=selList(), P=selParcels(); c.hidden=!(L.length+P.length); if(!(L.length+P.length)){ c.innerHTML=''; c._for=null; return; }
+  if(P.length){ c._for=null; const s=selSummary(), p=P[0];   // M1: parcels in the selection
+    c.innerHTML= s.n===1? '<div class="cardhd"><b>Particella</b><span class="pill">selezionata</span></div><div class="selc-n">'+esc(parcelRowName(p))+'</div>'
+        +'<div class="thint">'+esc((p.area_m2? 'superficie catastale '+fmtHa2(p.area_m2/1e4) : 'area non disponibile')+(pgrpOf(p)? ' · sottogruppo «'+pgrpName(pgrpOf(p))+'»' : ''))+'</div>'
+      : '<div class="cardhd"><b>Selezione</b><span class="pill">'+s.n+' elementi</span></div><div class="thint">'+esc(s.text)+'</div>';
+    return; }
   if(L.length===1){ const g=L[0], a=g.attributes||{}, size=selSize(g);
     const ae=c.ownerDocument.activeElement; if(c._for===g&&ae&&c.contains(ae)) return;   // R3-4: typing in the properties, the card is not rebuilt under the cursor
     c._for=g;
@@ -8026,45 +8141,59 @@ function selCardRender(){ const c=$('selCard'); if(!c) return; const L=selList()
   else{ c._for=null; let ha=0, nA=0; L.forEach(g=>{ if(g.geometry.type==='polygon'){ nA++; try{ if(geoFrameReady()) ha+=geoMeasure(g.geometry).area/1e4; }catch(e){} } });
     c.innerHTML='<div class="cardhd"><b>Selezione</b><span class="pill">'+L.length+' oggetti</span></div><div class="thint">'+(nA? nA+' are'+(nA>1?'e':'a')+(ha? ', '+selN(ha, 2)+' ha in tutto' : '') : '')+(L.length>nA? (nA? ' · ' : '')+(L.length-nA)+' fra linee e punti' : '')+'</div>'; } }
 // ── il modo «Seleziona» ──────────────────────────────────────────────────────────────────────────────────────────
-function selStart(){ if(selMd){ selEnd(); toolMsg('drwMsg','Selezione sulla mappa: finito ('+selCount()+' selezionat'+(selCount()===1?'o':'i')+').'); return; }
+function selStart(){ if(selMd){ selEnd(); const n=selTotal(); selSay('Selezione sulla mappa: finito ('+n+' selezionat'+(n===1?'o':'i')+').'); return; }
   try{ cadModesOff(); gpPickEnd(); }catch(e){} try{ if(exlMd) exlEnd(); }catch(e){}
-  selMd={popup:view.popupEnabled, cursor:view.container.style.cursor, sk:sketchClickPause(), h:view.on('click', selClick)};
+  try{ if(selMode) setSelMode(null); }catch(e){}   // M2: the modes that add parcels from the cadastre stop
+  selMd={popup:view.popupEnabled, cursor:view.container.style.cursor, sk:sketchClickPause(), h:view.on('click', selClick)}; selCyc=null;
   view.popupEnabled=false; view.container.style.cursor='pointer'; try{ if(window.ribbonSoon) window.ribbonSoon(); }catch(e){}
-  toolMsg('drwMsg','Clicca un disegno, un risultato o un importato per selezionarlo; Maiusc+clic aggiunge; clic nel vuoto svuota. Esc per finire.'); }
+  selSay('Clicca una particella o un oggetto della Raccolta per selezionarlo; Maiusc+clic aggiunge o toglie; un secondo clic nello stesso punto prende quello sotto; clic nel vuoto svuota. Esc per finire.'); }
 function selEnd(){ if(!selMd) return; const m=selMd; selMd=null; try{ m.h.remove(); }catch(e){} sketchClickResume(m.sk);
   try{ view.popupEnabled=m.popup; view.container.style.cursor=m.cursor||''; }catch(e){} try{ if(window.ribbonSoon) window.ribbonSoon(); }catch(e){} }
+// M2: the objects under a click, the small ones first (points, lines, then areas by size: a parcel before the gross area
+// that covers it); a second plain click in the same place takes the next one (selCyc)
+let selCyc=null;
+function selOrder(gs){ const sz=g=>{ const t=g.geometry.type; if(t==='point'||t==='multipoint') return -2; if(t==='polyline') return -1;
+    try{ let x=g.geometry.extent; if(!x) return 0; if(x.spatialReference&&x.spatialReference.isWGS84) x=esriMods.webMercatorUtils.geographicToWebMercator(x); return Math.abs(x.width*x.height); }catch(e){ return 0; } };
+  const k=new Map(gs.map(g=>[g, sz(g)])); return gs.slice().sort((a,b)=>k.get(a)-k.get(b)); }
 async function selClick(e){ if(!selMd) return; e.stopPropagation(); try{ if(sketchVM&&sketchVM.state==='active') return; }catch(x){}
   let r; try{ r=await view.hitTest(e, {include:[toolsGL, gl]}); }catch(err){ return; } if(!selMd) return;
-  const raw=(r.results||[]).map(x=>x.graphic).filter(g=>g&&g.visible!==false), hits=raw.filter(selEditable), nat=e.native||{}, shift=!!nat.shiftKey, touch=nat.pointerType==='touch';
-  if(!hits.length){ const r0=raw.find(g=>objKind(g)); if(r0){ const why=can(r0,'edit'); toolMsg('drwMsg', why===true? 'Questo oggetto non si seleziona.' : why, 'err'); return; }   // 7b-1: say why
-    if(!shift){ selClear(); toolMsg('drwMsg','Selezione svuotata. Clicca un oggetto, Esc per finire.'); } return; }
-  selSet([hits[0]], (shift||touch)? 'toggle' : 'only');
-  const n=selCount(); toolMsg('drwMsg', n+' selezionat'+(n===1?'o':'i')+(n? ': «'+esc(selList()[0].attributes.nome||geomDefName(selList()[0]))+'»'+(n>1? ' e altri' : '') : '')+'. Maiusc+clic aggiunge; Esc per finire.','ok'); }
+  const nat=e.native||{}, shift=!!nat.shiftKey, touch=nat.pointerType==='touch';
+  const hits=selOrder((r.results||[]).map(x=>x.graphic).filter(selPickable).filter((g,i,a)=>a.indexOf(g)===i));
+  if(!hits.length){ selCyc=null; if(!shift){ selClear(); selSay('Selezione svuotata. Clicca una particella o un oggetto, Esc per finire.'); } return; }
+  const key=hits.map(g=>g.uid).join(','), again=!shift&&!touch&&selCyc&&selCyc.key===key&&Math.abs(selCyc.x-e.x)<6&&Math.abs(selCyc.y-e.y)<6;
+  const i=again? (selCyc.i+1)%hits.length : 0; selCyc={key:key, x:e.x, y:e.y, i:i};
+  const o=selObj(hits[i]); selSet([o], (shift||touch)? 'toggle' : 'only');
+  const n=selTotal(), isP=objKind(o)==='parcel', on=isP? !!o.sel : !!(o.attributes&&o.attributes._sel), gn=isP? 'a' : 'o';
+  selSay('«'+selName(o)+'» '+(on? 'selezionat'+gn : 'tolt'+gn+' dalla selezione')+(n>1||(!on&&n)? ' ('+n+' in tutto)' : '')
+    +(hits.length>1&&!shift? ' · '+(i+1)+' di '+hits.length+' qui: clicca di nuovo nello stesso punto per quello sotto' : '')+'. Maiusc+clic aggiunge; Esc per finire.', 'ok');
+  if(on) try{ rcReveal(o); }catch(x){} }   // M3: the row in view, when the Raccolta is open
 // ── «Riquadro»: un rettangolo dello sketch; mentre il modo è acceso si riarma ──
 function selBoxStart(){ if(selBoxOn()){ try{ sketchVM.cancel(); }catch(e){} sketchPurpose=null; toolMsg('drwMsg','Riquadro annullato.'); return; }
   if(!selMd) selStart();
   sketchPurpose='select-box'; try{ sketchVM.cancel(); }catch(e){} sketchVM.create('rectangle');
-  toolMsg('drwMsg','Clicca e trascina il riquadro: seleziona ogni oggetto che tocca (con Maiusc aggiunge). Esc per finire.'); }
+  selSay('Clicca e trascina il riquadro: seleziona ogni particella e oggetto che tocca (con Maiusc aggiunge). Esc per finire.'); }
 function selTouches(rect, g){ try{ const GE=esriMods.geometryEngine, ge=geoProject(g.geometry, rect.spatialReference); return !!(ge&&GE.intersects(rect, ge)); }catch(e){ return false; } }
-function selBoxDone(rect){ sketchPurpose=null; const hit=toolsGL.graphics.toArray().filter(g=>selEditable(g)&&selTouches(rect, g));
-  selSet(hit, selShift? 'add' : 'only'); const n=selCount();
-  toolMsg('drwMsg', hit.length? hit.length+' oggett'+(hit.length>1?'i':'o')+' nel riquadro, '+n+' selezionat'+(n===1?'o':'i')+' in tutto.' : 'Nessun oggetto nel riquadro.', hit.length? 'ok' : '');
+function selBoxDone(rect){ sketchPurpose=null;
+  const hit=toolsGL.graphics.toArray().concat(gl? gl.graphics.toArray() : []).filter(g=>selPickable(g)&&selTouches(rect, g));   // M2: the parcels too
+  selSet(hit, selShift? 'add' : 'only'); const n=selTotal();
+  selSay(hit.length? hit.length+' element'+(hit.length>1?'i':'o')+' nel riquadro, '+n+' selezionat'+(n===1?'o':'i')+' in tutto.' : 'Niente nel riquadro.', hit.length? 'ok' : '');
   if(selMd){ sketchPurpose='select-box'; try{ sketchVM.create('rectangle'); }catch(e){} } }
 // ── gli strumenti di modifica sulla selezione ────────────────────────────────────────────────────────────────────
+// M2: each takes from the selection what the rules allow it (selFor) and says what it left out (selLeft)
 function selEditPrep(g){ try{ const sr=g.geometry&&g.geometry.spatialReference; if(sr&&!geoSameSR(sr, view.spatialReference)) g.geometry=geoProject(g.geometry, view.spatialReference); }catch(e){} }
-function selReshape(){ const L=selList(); if(L.length!==1){ toolMsg('drwMsg','Rimodella lavora su un oggetto alla volta: selezionane uno.','err'); return; }
-  const g=L[0]; selEnd(); selEditPrep(g); try{ if(sketchVM.state==='active') sketchVM.cancel(); }catch(e){}   // a previous edit or sketch still open
-  try{ sketchVM.update(g, {tool: g.geometry.type==='point'? 'move' : 'reshape'}); toolMsg('drwMsg','Sposta i vertici di «'+esc(g.attributes.nome||geomDefName(g))+'»; clic fuori per finire, Esc per lasciare com\'era.'); }
-  catch(e){ toolMsg('drwMsg','Non riesco a rimodellare: '+((e&&e.message)||e),'err'); } }
-function selMove(){ const L=selList(); if(!L.length){ toolMsg('drwMsg','Seleziona prima gli oggetti da spostare.','err'); return; }
+function selReshape(){ const s=selFor('edit'); if(s.ok.length!==1){ selSay(s.ok.length? 'Rimodella lavora su un oggetto alla volta: selezionane uno.' : (s.why||'Seleziona l’oggetto da rimodellare.'),'err'); return; }
+  const g=s.ok[0]; selEnd(); selEditPrep(g); try{ if(sketchVM.state==='active') sketchVM.cancel(); }catch(e){}   // a previous edit or sketch still open
+  try{ sketchVM.update(g, {tool: g.geometry.type==='point'? 'move' : 'reshape'}); selSay('Sposta i vertici di «'+(g.attributes.nome||geomDefName(g))+'»; clic fuori per finire, Esc per lasciare com’era'+selLeft(s)+'.'); }
+  catch(e){ selSay('Non riesco a rimodellare: '+((e&&e.message)||e),'err'); } }
+function selMove(){ const s=selFor('edit'), L=s.ok; if(!L.length){ selSay(s.why||'Seleziona prima gli oggetti da spostare.','err'); return; }
   selEnd(); L.forEach(selEditPrep); const pts=L.some(g=>g.geometry.type==='point'); try{ if(sketchVM.state==='active') sketchVM.cancel(); }catch(e){}
   try{ sketchVM.update(L, pts? {tool:'move'} : {tool:'transform', enableRotation:true, enableScaling:false});
-    toolMsg('drwMsg','Trascina per spostare'+(pts? '' : ', la maniglia per ruotare')+'; clic fuori per finire, Esc per lasciare com\'era.'); }
-  catch(e){ toolMsg('drwMsg','Non riesco a spostare: '+((e&&e.message)||e),'err'); } }
-function selSplit(){ const L=selList().filter(g=>g.geometry.type==='polygon'); if(!L.length){ toolMsg('drwMsg','Dividi lavora sulle aree: selezionane almeno una.','err'); return; }
+    selSay('Trascina per spostare'+(pts? '' : ', la maniglia per ruotare')+'; clic fuori per finire, Esc per lasciare com’era'+selLeft(s)+'.'); }
+  catch(e){ selSay('Non riesco a spostare: '+((e&&e.message)||e),'err'); } }
+function selSplit(){ const s=selFor('split', g=>g.geometry.type==='polygon'), L=s.ok; if(!L.length){ selSay(s.why||'Dividi lavora sulle aree: selezionane almeno una.','err'); return; }
   try{ cadModesOff(); }catch(e){} selEnd(); gpPendingSplit=L; sketchPurpose='geoproc-split'; try{ sketchVM.cancel(); }catch(e){} sketchVM.create('polyline');
-  toolMsg('drwMsg','Disegna la linea di taglio (doppio clic per finire): deve entrare e uscire dall\'area.'); }
-function selMerge(){ const L=selList().filter(g=>g.geometry.type==='polygon'); if(L.length<2){ toolMsg('drwMsg','Unisci vuole almeno due aree selezionate.','err'); return; }
+  selSay('Disegna la linea di taglio (doppio clic per finire): deve entrare e uscire dall’area'+selLeft(s)+'.'); }
+function selMerge(){ const s=selFor('merge', g=>g.geometry.type==='polygon'), L=s.ok; if(L.length<2){ selSay(L.length||!s.why? 'Unisci vuole almeno due aree selezionate.' : s.why,'err'); return; }
   if(!geoFrameReady()){ toolMsg('drwMsg','Carico il motore di proiezione: riprova tra un istante.','err'); geoFrameLoad().catch(()=>{}); return; }
   let u=null; try{ u=geoUnion(L.map(g=>g.geometry)); }catch(e){ console.warn('[unisci]', e); } if(!u){ toolMsg('drwMsg','Unione non riuscita.','err'); return; }
   const first=L[0], H=(typeof drwHist!=='undefined')? drwHist : null; if(H) H.busy=true; let ng=null;   // una sola foto nello storico: un Annulla rimette le aree
@@ -8074,24 +8203,54 @@ function selMerge(){ const L=selList().filter(g=>g.geometry.type==='polygon'); i
     ng=new esriMods.Graphic({geometry:u, symbol:first.symbol? first.symbol.clone() : symbolForColor('polygon', at.color), attributes:at});
     L.forEach(g=>{ if(typeof sfEditOpen!=='undefined'&&sfEditOpen===g) sfEditOpen=null; if(typeof drwLastG!=='undefined'&&drwLastG===g) drwLastG=null; toolsGL.remove(g); }); toolsGL.add(ng); }
   finally{ if(H) H.busy=false; }
-  refreshDl(); selRender(); toolMsg('drwMsg', L.length+' aree unite in «'+esc(ng.attributes.nome)+'»'+(L.some(g=>g.attributes&&g.attributes.sf_saved)? ' (le originali sul portale restano lì finché non le elimini)' : '')+'. Annulla le rimette.','ok'); }
-function selCopy(){ const L=selList(); if(L.length!==1){ toolMsg('drwMsg','Copia lavora su un oggetto alla volta: selezionane uno.','err'); return; }
-  const g=L[0]; selEnd(); drwModeStart('cp1'); const m=drwMode; if(!m||m.kind!=='cp1') return;
+  refreshDl(); selRender(); selSay(L.length+' aree unite in «'+ng.attributes.nome+'»'+(L.some(g=>g.attributes&&g.attributes.sf_saved)? ' (le originali sul portale restano lì finché non le elimini)' : '')+selLeft(s)+'. Annulla le rimette.','ok'); }
+function selCopy(){ if(selTotal()!==1){ selSay('Copia lavora su un oggetto alla volta: selezionane uno.','err'); return; }
+  const p=selParcels()[0], g=p? gl.graphics.find(x=>gpParcelOf.get(x)===p) : selList()[0]; if(!g||!g.geometry){ selSay('Questa particella non ha un contorno da copiare.','err'); return; }   // M2: a parcel is copied as a drawing
+  selEnd(); drwModeStart('cp1'); const m=drwMode; if(!m||m.kind!=='cp1') return;
   const geom=toWM(g.geometry), c=centroidOf(geom)||(geom.extent? geom.extent.center : geom);
-  m.src={geom:geom, g:g, name:(g.attributes&&g.attributes.nome)||geomDefName(g)}; m.P0=[c.x, c.y]; m.kind='cp2'; drwModeUi(); drwTmpShow(geom);
+  m.src={geom:geom, g:g, name:p? parcelRowName(p) : (g.attributes&&g.attributes.nome)||geomDefName(g)}; m.P0=[c.x, c.y]; m.kind='cp2'; drwModeUi(); drwTmpShow(geom);
   let raf=0; m.hm=view.on('pointer-move', ev=>{ if(raf) return; raf=requestAnimationFrame(()=>{ raf=0; if(drwMode!==m||m.kind!=='cp2') return;
     const q=view.toMap({x:ev.x, y:ev.y}); if(q) drwTmpShow(geomShift(m.src.geom, q.x-m.P0[0], q.y-m.P0[1])); }); });
-  toolMsg('drwMsg','Copia di «'+esc(m.src.name)+'»: clicca dove metterla (il suo centro va lì). Esc per finire.'); }
-async function selDelete(){ const L=selList().filter(g=>!(g.attributes&&g.attributes.sf_auto==='buffer')); if(!L.length){ toolMsg('drwMsg','Seleziona prima gli oggetti da togliere.','err'); return; }
+  selSay('Copia di «'+m.src.name+'»: clicca dove metterla (il suo centro va lì). Esc per finire.'); }
+// «3 particelle e 2 oggetti»
+function selWhat(nP, nL){ const a=[]; if(nP) a.push(nP===1? '1 particella' : nP+' particelle'); if(nL) a.push(nL===1? '1 oggetto' : nL+' oggetti'); return a.join(' e '); }
+// M5: the whole selection out of the Raccolta (the parcels too); what the rules keep (the automatic strips) stays
+async function selDelete(){ const all=selList(), L=all.filter(g=>canOk(g,'delete')), P=selParcels(), kept=all.filter(g=>!canOk(g,'delete'));
+  if(!L.length&&!P.length){ selSay(kept.length? String(can(kept[0],'delete')) : 'Seleziona prima gli oggetti da togliere.','err'); return false; }
+  const what=selWhat(P.length, L.length), many=P.length+L.length>1, fem=!!P.length&&!L.length, pr=many? (fem? 'le' : 'li') : (fem? 'la' : 'lo');
   const onPortal=L.filter(g=>g.attributes.sf_saved&&g.attributes.sf_gid), signed=(typeof signedIn!=='undefined'&&signedIn);
-  if(!confirm('Togliere '+L.length+' oggett'+(L.length>1?'i':'o')+' dalla Raccolta?'+(onPortal.length? '\n\n'+onPortal.length+(onPortal.length>1? ' sono' : ' è')+' sul portale: '+(signed? 'ti chiedo poi se eliminarl'+(onPortal.length>1?'i':'o')+' anche da lì.' : 'senza accesso rest'+(onPortal.length>1?'ano':'a')+' sul portale.') : ''))) return;
+  if(!confirm('Togliere '+what+' dalla Raccolta? Annulla '+pr+' rimette.'+(kept.length? ' '+(kept.length===1? 'La fascia automatica selezionata resta' : 'Le '+kept.length+' fasce automatiche selezionate restano')+': segu'+(kept.length===1?'e':'ono')+' il loro oggetto.' : '')
+    +(onPortal.length? '\n\n'+onPortal.length+(onPortal.length>1? ' sono' : ' è')+' sul portale: '+(signed? 'ti chiedo poi se eliminarl'+(onPortal.length>1?'i':'o')+' anche da lì.' : 'senza accesso rest'+(onPortal.length>1?'ano':'a')+' sul portale.') : ''))) return false;
   const remote=!!(onPortal.length&&signed&&confirm('Eliminare anche dal portale (IT - Site Features) '+(onPortal.length>1? 'i '+onPortal.length+' oggetti salvati' : 'l\'oggetto salvato')+'?\n\nOK = anche dal portale\nAnnulla = solo da qui'));
   selEnd(); const H=(typeof drwHist!=='undefined')? drwHist : null; if(H) H.busy=true; let fail=0;
-  try{ for(const g of L){ const at=g.attributes||{}; if(at.sf_auto==='net') netAutoSet(false);
+  try{ if(P.length){ const gone=new Set(P); for(let i=parcels.length-1;i>=0;i--) if(gone.has(parcels[i])) parcels.splice(i,1); }
+    for(const g of L){ const at=g.attributes||{}; if(at.sf_auto==='net') netAutoSet(false);
       if(remote&&at.sf_saved&&at.sf_gid){ try{ await sfDeleteRemote(g); }catch(e){ fail++; console.warn('[elimina] portale', e); } }
       if(typeof sfEditOpen!=='undefined'&&sfEditOpen===g) sfEditOpen=null; if(typeof drwLastG!=='undefined'&&drwLastG===g) drwLastG=null; toolsGL.remove(g); } }
   finally{ if(H) H.busy=false; }
-  refreshDl(); selRender(); msg('Tolt'+(L.length>1?'i':'o')+' '+L.length+' oggett'+(L.length>1?'i':'o')+(remote? (fail? ', '+fail+' non eliminat'+(fail>1?'i':'o')+' dal portale' : ', anche dal portale') : '')+'. Annulla l'+(L.length>1?'i':'o')+' rimette qui.', fail? 'err' : 'ok'); }
+  if(P.length) render(); refreshDl(); selRender();
+  msg('Tolt'+(many? (fem? 'e' : 'i') : (fem? 'a' : 'o'))+' '+what+(remote? (fail? ', '+fail+' non eliminat'+(fail>1?'i':'o')+' dal portale' : ', anche dal portale') : '')+'. Annulla '+pr+' rimette qui.', fail? 'err' : 'ok'); return true; }
+// M6, M7: the moves of the whole selection: the parcels into subgroups, the objects into groups (the rules decide which)
+function selMoveActs(){ const P=selParcels(), L=selList().filter(g=>canOk(g,'move')), acts=[];
+  if(P.length){ const w=P.length===1? 'la particella' : 'le '+P.length+' particelle';
+    acts.push({t:'Nuovo sottogruppo con '+w+'…', i:'file-plus', fn:function(){ const id=pgrpNewAsk(P); if(id) msg('Sottogruppo «'+pgrpName(id)+'» creato con '+w+'.','ok'); }});
+    pgrpSorted().forEach(G=>{ acts.push({t:'Sposta '+w+' in: '+G.name, i:'folder', dis:P.every(p=>pgrpOf(p)===G.id), fn:function(){ pgrpAssign(P, G.id); msg((P.length===1? 'La particella è' : 'Le '+P.length+' particelle sono')+' in «'+G.name+'».','ok'); }}); });
+    if(P.some(p=>pgrpOf(p))) acts.push({t:'Togli '+w+' dal sottogruppo', i:'close', fn:function(){ pgrpAssign(P, null); }}); }
+  if(L.length){ const w=L.length===1? 'l’oggetto' : 'i '+L.length+' oggetti';
+    acts.push({t:'Nuovo gruppo con '+w+'…', i:'file-plus', fn:function(){ const id=grpNewAsk(L); if(id) msg('Gruppo «'+grpName(id)+'» creato con '+w+'.','ok'); }});
+    grpAll().forEach(G=>{ acts.push({t:'Sposta '+w+' in: '+G.name, i:'folder', dis:L.every(g=>grpOf(g)===G.id), fn:function(){ grpAssign(L, G.id); msg((L.length===1? 'L’oggetto è' : 'Gli '+L.length+' oggetti sono')+' in «'+G.name+'».','ok'); }}); }); }
+  return acts; }
+function selZoom(){ const P=new Set(selParcels()); zoomGraphics(selList().filter(g=>g.visible!==false).concat(gl? gl.graphics.toArray().filter(g=>g.visible!==false&&P.has(gpParcelOf.get(g))) : [])); }
+function selMenuActs(){ const n=selTotal();
+  return selMoveActs().concat([{t:'Zoom sulla selezione', i:'target', fn:selZoom}, {t:'Deseleziona tutto', i:'close', fn:function(){ selClear(); }},
+    {t:'Togli dalla Raccolta ('+n+')', i:'trash', fn:function(){ selDelete(); }}]); }
+// M5: Canc takes the selection out of the Raccolta (with the confirm), outside text fields, windows and an edit under way
+function selKeyDel(e){ if(e.key!=='Delete'||e.ctrlKey||e.altKey||e.metaKey) return; const t=e.target, tag=(t&&t.tagName)||'';
+  if(tag==='INPUT'||tag==='TEXTAREA'||tag==='SELECT'||(t&&t.isContentEditable)) return;
+  try{ if(sketchVM&&sketchVM.state==='active') return; }catch(x){}   // the SDK's own Canc (a vertex, the shape under edit)
+  if(Array.prototype.some.call(document.querySelectorAll('[id$="Modal"]'), m=>m.style.display==='flex')) return;
+  if(!selTotal()) return; e.preventDefault(); selDelete(); }
+try{ docOn('keydown', selKeyDel); }catch(e){ document.addEventListener('keydown', selKeyDel); }
 // ── «Esclusione da layer» (W7): un elemento di un layer vettoriale acceso diventa un disegno ──────────────────────
 function exlCatFor(gt){ return gt==='polygon'? 'exclusion' : gt==='polyline'? 'linear' : 'obstacle'; }   // area → esclusione; linea → infrastruttura lineare; punto → ostacolo
 function exlAdd(got){ const geom=got.geometry; if(!geom) return null; const key=got.key||null;
@@ -8305,7 +8464,7 @@ function ownRenderList(arr, total){ const box=$('listOwn'), cnt=null; if(!box) r
     const sa=document.createElement('input'); sa.type='checkbox'; sa.className='gsel'; sa.title='Spunta tutte le particelle di questo intestatario'; sa.setAttribute('aria-label', sa.title);
     const syncSel=()=>{ const n=G.gs.filter(g=>g.attributes._sel).length; sa.checked=n===G.gs.length; sa.indeterminate=n>0&&n<G.gs.length; }; syncSel();
     sa.onclick=e=>e.stopPropagation();
-    sa.onchange=e=>{ e.stopPropagation(); G.gs.forEach(g=>{ g.attributes._sel=sa.checked; }); renderGeoms(); };
+    sa.onchange=e=>{ e.stopPropagation(); G.gs.forEach(g=>{ g.attributes._sel=sa.checked; }); selRender(); };   // 2/11: the rows, the outline and the bar
     h.appendChild(sa);
     h.appendChild(makeVisToggle(()=>G.gs.some(g=>g.visible!==false), on=>{ G.gs.forEach(g=>{ g.visible=!!on; g.attributes.hidden=on?undefined:true; }); renderGeoms(); }));
     h.appendChild(makeColorSwatch(()=>graphicColorHex(G.gs[0])||hex, c=>{ G.gs.forEach(g=>applyGraphicColor(g,c));
@@ -10314,7 +10473,7 @@ function baseGroundSet(){
   N('selSplit', 'Dividi');
   N('selMerge', function(){ return 'Unisci '+((typeof selAreas==='function')? selAreas()+' aree' : 'aree'); });
   N('selCopy', 'Copia');
-  N('selDelete', function(){ const n=(typeof selCount==='function')? selCount() : 0; return 'Elimina '+(n===1? '1 oggetto' : n+' oggetti'); });
+  N('selDelete', function(){ const n=(typeof selCount==='function')? selCount() : 0, nP=(typeof selParcels==='function')? selParcels().length : 0; return 'Togli '+selWhat(nP, n); });   // 2/11 (M5): the parcels too
   N('exlAdd', 'Esclusione da layer');
   N('rowRename', 'Rinomina');
   N('sectionDelete', function(id){ return 'Elimina gli oggetti di '+q((typeof grpName==='function')? grpName(id) : id); });
@@ -10425,7 +10584,7 @@ const srchEsc=s=>String(s==null? '' : s).replace(/[&<>"]/g, c=>({'&':'&amp;', '<
 
 // what the box can find: {kind:'object'|'command', ok (the kind of object), ref, name, sub, hay, colour, icon, fig, hidden}
 function srchItems(){ const out=[];
-  (typeof parcels!=='undefined'&&parcels||[]).forEach(p=>{ const name=p.nome||(p.comune+' · Fg '+p.foglio+' · '+p.particella);
+  (typeof parcels!=='undefined'&&parcels||[]).forEach(p=>{ const name=parcelRowName(p);   // 2/11 (M10a): as in its row
     let sg=''; try{ const id=(typeof pgrpOf==='function')? pgrpOf(p) : null; if(id) sg=pgrpName(id); }catch(e){}
     out.push({kind:'object', ok:'parcel', ref:p, name:name, sub:['Particella', sg].filter(Boolean).join(' · '),
       hay:[name, 'particella', p.comune, 'fg '+p.foglio, p.foglio, p.particella, sg].join(' '), colour:p.color||PARCEL_HEX,
@@ -10497,10 +10656,11 @@ function srchGoTo(it){ try{ if(window.openPanel) window.openPanel('elenco'); }ca
 function srchRunCmd(c){ if(cmdRun(c.id)) return; const b=document.querySelector('#ribbon [data-tool="'+c.tool+'"]');
   msg((b&&b.title)||'Questo comando ora non è disponibile.', 'err'); }
 // the row of an object in the Raccolta, made visible: the filter, «Mostra altre», a closed block; then a short flash
-function srchShowRow(obj){ const root=byId('drawerElenco'); if(!root) return null;
+// soft (2/11, M3: a selection on the map): a row hidden by the filter stays hidden, the list scrolls only as needed
+function srchShowRow(obj, soft){ const root=byId('drawerElenco'); if(!root) return null;
   const row=Array.prototype.find.call(root.querySelectorAll('.grow'), r=>r._obj===obj); if(!row) return null;
   const unit=(row.parentElement&&row.parentElement.classList.contains('gitem'))? row.parentElement : row;
-  if(unit.classList.contains('fout')){ const f=byId('rcFilter'); if(f&&f.value){ f.value=''; rcListsPost(); } }
+  if(unit.classList.contains('fout')){ if(soft) return null; const f=byId('rcFilter'); if(f&&f.value){ f.value=''; rcListsPost(); } }
   if(unit.classList.contains('morehid')){ const box=unit.parentElement, sub=box.closest('[data-sub]'), sec=box.closest('.gsec');
     rcExpanded.add(box.id==='list'? 'list' : sub? 'p:'+sub.dataset.sub : (sec? sec.dataset.sec : '')); rcListsPost(); }
   for(let el=row.parentElement; el&&el!==root; el=el.parentElement){
@@ -10508,7 +10668,7 @@ function srchShowRow(obj){ const root=byId('drawerElenco'); if(!root) return nul
       try{ if(el.classList.contains('ggrp')) grpSetOpen(el.dataset.sec, true); else if(el.classList.contains('psub')) grpSetOpen('p:'+el.dataset.sub, true); }catch(e){} }
     if(el.tagName==='DETAILS'&&!el.open) el.open=true;
     if(el.classList.contains('gownb')&&el.hidden){ const h=el.previousElementSibling; if(h&&h.classList.contains('gown')) h.click(); else el.hidden=false; } }
-  try{ row.scrollIntoView({block:'center'}); }catch(e){}
+  try{ row.scrollIntoView({block:soft? 'nearest' : 'center'}); }catch(e){}
   row.classList.remove('sflash'); void row.offsetWidth; row.classList.add('sflash'); setTimeout(()=>row.classList.remove('sflash'), 1700);
   return row; }
 
@@ -10607,7 +10767,7 @@ function srchShowRow(obj){ const root=byId('drawerElenco'); if(!root) return nul
   function slpOn(){ return !!(typeof slpCur!=='undefined'&&slpCur); }
   function slpNoGrid(){ return slpOn()? null : 'Prima analizza le pendenze'; }
   function slpRuleIs(v){ var s=$g('slpRule'); return !!s&&s.value===v; }
-  function selNone(){ return (typeof selCount==='function'&&selCount())? null : 'Seleziona prima un oggetto'; }   // G2-3
+  function selNone(){ return (typeof selTotal==='function'&&selTotal())? null : 'Seleziona prima un oggetto'; }   // G2-3; 2/11: the parcels count too
   /* G2-2 (22/10, V1): the form under «Analizza le pendenze»: the limit, the thresholds the rule shows, the exclusion switch and
      the button that runs the analysis; every field mirrors a hidden control of the slope pane (data-mirror), so slpWire does the work */
   /* R3-1 (Q3): «Supporto al disegno» in one tool: its name says what is on, its popover holds the fields of the old dock */
@@ -10656,17 +10816,19 @@ function srchShowRow(obj){ const root=byId('drawerElenco'); if(!root) return nul
   var SHELL={
     ricerca:{name:'Ricerca particelle', mods:[
       {id:'find', t:'Ricerca particelle', s:'Comune, foglio e particelle', i:'parcels', roots:['#rcSecFind']},
-      {id:'map', t:'Sulla mappa', s:'Selezione manuale delle particelle', i:'sel-click', roots:['#rcSecMap']},
+      {id:'map', t:'Aggiungi dalla mappa', s:'Le particelle del catasto che clicchi o che stanno in una forma', i:'sel-click', roots:['#rcSecMap']},   // 2/11 (M10d): was «Sulla mappa»
       {id:'fromdraw', t:'Da un disegno', s:'Le particelle toccate da un disegno, un buffer o un file', i:'from-drawing', roots:['#rcSecDraw']}],
      groups:[
       {label:'Catasto', more:'rcFind', tools:[{id:'find', t:'Cerca particelle', i:'parcels', size:'large', primary:true, mod:'find', focus:'#reg'}]},
-      {label:'Sulla mappa', more:'rcMap', tools:[
+      {label:'Aggiungi dalla mappa', more:'rcMap', tools:[   // 2/11 (M10d): these add from the cadastre; «Seleziona» picks what is in the Raccolta
         {id:'sel-point', t:'Puntuale', i:'sel-click', size:'large', press:'#selModeBox [data-m="point"]', mod:'map'},
         {id:'sel-rect', t:'Rettangolo', i:'sel-rect', size:'large', press:'#selModeBox [data-m="rectangle"]', mod:'map'},
         {id:'sel-poly', t:'Poligono', i:'sel-poly', size:'large', press:'#selModeBox [data-m="polygon"]', mod:'map'},
         {id:'sel-line', t:'Linea', i:'sel-line', size:'large', press:'#selModeBox [data-m="polyline"]', mod:'map'}]},
       {label:'Da un disegno', more:'rcDraw', tools:[{id:'fromdraw', t:'Particelle toccate da un disegno', i:'from-drawing', size:'large', wide:true, mod:'fromdraw'}]},
       {label:'Raccolta', tools:[{id:'gross', t:'Crea area lorda', i:'area-gross', size:'large', press:'#grossBtn'},
+        {id:'r-sel', t:'Seleziona', i:'cursor', size:'small', fn:function(){ selStart(); }, on:function(){ return typeof selOn==='function'&&selOn(); }, s:'Clicca le particelle della Raccolta sulla mappa per selezionarle (Maiusc+clic aggiunge o toglie); compaiono spuntate nella Raccolta'},   // 2/11 (M2)
+        {id:'r-sel-box', t:'Riquadro', i:'sel-rect', size:'small', fn:function(){ selBoxStart(); }, on:function(){ return typeof selBoxOn==='function'&&selBoxOn(); }, s:'Un rettangolo seleziona le particelle e gli oggetti della Raccolta che tocca (Maiusc aggiunge)'},
         {id:'labels', t:'Etichette sulla mappa', i:'label', size:'small', toggle:'#lblParcels'},
         {id:'zoomsel', t:'Zoom sulle particelle', i:'target', size:'small', fn:zoomParcels, off:function(){ return (window.parcels&&parcels.length)? null : 'Nessuna particella nella Raccolta'; }}]}]},
     disegno:{name:'Disegna', mods:[
@@ -10691,14 +10853,14 @@ function srchShowRow(obj){ const root=byId('drawerElenco'); if(!root) return nul
         {id:'d-circle', t:'Cerchio', i:'circle', size:'medium', stack:'c2', mod:'draw', press:'#drwCircle'},
         {id:'d-free', t:'A mano libera', i:'freehand', size:'medium', stack:'c3', mod:'draw', press:'#drwFree'}]},
       {label:'Seleziona e modifica', more:'drwSel', tools:[   // G2-3 (23/10, W1–W6): the selection is the Raccolta's checkbox; the logic in 23b-select-edit.js
-        {id:'sel', t:'Seleziona', i:'cursor', size:'large', mod:'draw', fn:function(){ selStart(); }, on:function(){ return typeof selOn==='function'&&selOn(); }, s:'Clicca un disegno, un risultato o un importato per selezionarlo; Maiusc+clic aggiunge; clic nel vuoto svuota'},
-        {id:'sel-box', t:'Riquadro', i:'sel-rect', size:'large', mod:'draw', fn:function(){ if(typeof exlOn==='function'&&exlOn()) exlBoxStart(); else selBoxStart(); }, on:function(){ return typeof selBoxOn==='function'&&(selBoxOn()||exlBoxOn()); }, s:'Un rettangolo seleziona ogni oggetto che tocca (Maiusc aggiunge); con «Esclusione da layer» acceso prende gli elementi dei feature layer'},
+        {id:'sel', t:'Seleziona', i:'cursor', size:'large', mod:'draw', fn:function(){ selStart(); }, on:function(){ return typeof selOn==='function'&&selOn(); }, s:'Clicca una particella o un oggetto della Raccolta per selezionarlo; Maiusc+clic aggiunge o toglie; di nuovo nello stesso punto prende quello sotto; clic nel vuoto svuota'},
+        {id:'sel-box', t:'Riquadro', i:'sel-rect', size:'large', mod:'draw', fn:function(){ if(typeof exlOn==='function'&&exlOn()) exlBoxStart(); else selBoxStart(); }, on:function(){ return typeof selBoxOn==='function'&&(selBoxOn()||exlBoxOn()); }, s:'Un rettangolo seleziona ogni particella e oggetto che tocca (Maiusc aggiunge); con «Esclusione da layer» acceso prende gli elementi dei feature layer'},
         {id:'sel-reshape', t:'Rimodella', i:'reshape', size:'small', stack:'ed1', mod:'draw', fn:function(){ selReshape(); }, off:function(){ return selCount()===1? null : 'Seleziona un oggetto solo'; }, s:'Sposta i vertici dell\'oggetto selezionato (un punto si sposta)'},
         {id:'sel-move', t:'Sposta e ruota', i:'move', size:'small', stack:'ed1', mod:'draw', fn:function(){ selMove(); }, off:selNone, s:'Trascina gli oggetti selezionati; la maniglia li ruota'},
         {id:'sel-split', t:'Dividi', i:'split', size:'small', stack:'ed1', mod:'draw', fn:function(){ selSplit(); }, off:function(){ return selAreas()? null : 'Seleziona un\'area'; }, s:'Una linea che disegni taglia le aree selezionate in parti'},
         {id:'sel-merge', t:'Unisci', i:'merge', size:'small', stack:'ed2', mod:'draw', fn:function(){ selMerge(); }, off:function(){ return selAreas()>=2? null : 'Seleziona almeno due aree'; }, s:'Le aree selezionate diventano una sola, con gli attributi della prima'},
         {id:'sel-copy', t:'Copia', i:'copy', size:'small', stack:'ed2', mod:'draw', fn:function(){ selCopy(); }, off:function(){ return selCount()===1? null : 'Seleziona un oggetto solo'; }, s:'Una copia dell\'oggetto selezionato dove clicchi'},
-        {id:'sel-del', t:'Elimina', i:'trash', size:'small', stack:'ed2', mod:'draw', fn:function(){ selDelete(); }, off:selNone, s:'Toglie gli oggetti selezionati dalla Raccolta (chiede conferma; Annulla li rimette)'},   // R3-1: Annulla and Ripeti join the group (the Storico group is gone, to give «Cosa disegni» its room)
+        {id:'sel-del', t:'Elimina', i:'trash', size:'small', stack:'ed2', mod:'draw', fn:function(){ selDelete(); }, off:selNone, s:'Toglie dalla Raccolta le particelle e gli oggetti selezionati (anche col tasto Canc; chiede conferma; Annulla li rimette)'},   // R3-1: Annulla and Ripeti join the group (the Storico group is gone, to give «Cosa disegni» its room)
         {id:'undo', t:'Annulla', i:'undo', size:'small', stack:'ed3', press:'#drwUndo', off:function(){ var b=$g('drwUndo'); return (b&&b.disabled)? 'Niente da annullare' : null; }},
         {id:'redo', t:'Ripeti', i:'redo', size:'small', stack:'ed3', press:'#drwRedo', off:function(){ var b=$g('drwRedo'); return (b&&b.disabled)? 'Niente da ripetere' : null; }}]},
       {label:'Supporto al disegno', more:'drwAid', tools:[   // R3-1 (Q3): one tool, the settings in a popover as «Modello del terreno»
@@ -10789,12 +10951,12 @@ function srchShowRow(obj){ const root=byId('drawerElenco'); if(!root) return nul
      buttons, where the result goes; «Di più» opens the window of data-more */
   var RIBBON_INFO={
     'Catasto':"Cerca le particelle per regione, provincia, comune, foglio e numeri: Cerca particelle apre la ricerca a destra, in Proprietà. Le particelle trovate vanno nella Raccolta, gruppo Particelle, e la mappa ci va sopra.",
-    'Sulla mappa':"Scegli le particelle sulla mappa: Puntuale con un clic, oppure Rettangolo, Poligono o Linea. L'area viene campionata a punti, quindi la selezione è indicativa (circa 120 particelle per volta); Esc la ferma. Le particelle vanno nella Raccolta.",
+    'Aggiungi dalla mappa':"Aggiungi alla Raccolta le particelle del catasto che indichi sulla mappa: Puntuale con un clic, oppure Rettangolo, Poligono o Linea. L'area viene campionata a punti, quindi la ricerca è indicativa (circa 120 particelle per volta); Esc la ferma. Per scegliere quelle già nella Raccolta c'è Seleziona, nel gruppo Raccolta.",
     'Da un disegno':"Particelle toccate da un disegno: a destra scegli un disegno, un buffer, un risultato o un importato e premi Cerca. Le particelle che tocca vanno nella Raccolta.",
-    'Raccolta':"Dalle particelle della Raccolta: Crea area lorda la mette nel gruppo Aree di progetto (dalle spuntate, o da tutte); Etichette sulla mappa accende i numeri; Zoom sulle particelle le inquadra.",
+    'Raccolta':"Dalle particelle della Raccolta: Crea area lorda la mette nel gruppo Aree di progetto (dalle selezionate, o da tutte); Seleziona e Riquadro scelgono sulla mappa quelle già nella Raccolta (si spuntano nell'elenco, e la barra in cima alla Raccolta le sposta in un sottogruppo o le toglie); Etichette sulla mappa accende i numeri; Zoom sulle particelle le inquadra.",
     'Collega a sito AREAS':"Il sito di AREAS COLLECTION a cui vanno i disegni sul portale; è facoltativo, perché salvando ogni oggetto prende da solo l'area che tocca. Dalla mappa lo sceglie con un clic, Carica elementi porta nella Raccolta quelli già salvati, Togli il sito lo toglie. Serve l'accesso.",
     'Cosa disegni':"La categoria dei nuovi disegni: la scheda colorata ne dice nome e descrizione, un clic apre l'elenco, diviso come la Raccolta, con «Non classificato» e le categorie tue. Accanto solo i valori di quella categoria (tipo; buffer, larghezza, altezza o tensione) e la Fonte. Esclusione da layer fa di un elemento di un layer acceso un'esclusione.",
-    'Seleziona e modifica':"Seleziona (clic sulla mappa, Maiusc aggiunge) o Riquadro sceglie gli oggetti: la selezione è la spunta della Raccolta, e le Proprietà a destra la mostrano. Poi Rimodella, Sposta e ruota, Dividi, Unisci, Copia o Elimina; Annulla e Ripeti valgono per ogni modifica (Ctrl+Z, Ctrl+Y).",
+    'Seleziona e modifica':"Seleziona (clic sulla mappa, Maiusc aggiunge) o Riquadro sceglie le particelle e gli oggetti: la selezione è la spunta della Raccolta, e le Proprietà a destra la mostrano. Poi Rimodella, Sposta e ruota, Dividi, Unisci o Copia (su ciò che si può modificare: le particelle no) ed Elimina (anche col tasto Canc); Annulla e Ripeti valgono per ogni modifica (Ctrl+Z, Ctrl+Y).",
     'Con quale strumento':"Punto, Linea, Area, Rettangolo, Cerchio o A mano libera: scegli e disegna sulla mappa (linee e aree finiscono con un doppio clic). Il disegno prende la categoria di Cosa disegni e va nella Raccolta; Esc smette.",
     'Supporto al disegno':"Un pulsante apre le impostazioni: aggancio ai vertici e ai bordi, misure e angoli mentre disegni, misure esatte di rettangolo e cerchio (anche parallele a un lato), griglia (passo, allinea a un lato, raddrizza). Il nome del pulsante dice cosa è acceso.",
     'Aree automatiche':"Un pulsante apre le impostazioni dell'area netta: automatica (l'area lorda meno esclusioni, fasce, ostacoli, siepi e zone agricole, ricalcolata da sola) oppure congelata, e il rientro dal confine in metri. Il nome del pulsante dice com'è; l'area netta va nel gruppo Aree di progetto.",
@@ -11394,24 +11556,25 @@ function srchShowRow(obj){ const root=byId('drawerElenco'); if(!root) return nul
       +'<li>Scrivi il <b>foglio</b> e una o più <b>particelle</b>, separate da virgola o spazio.</li>'
       +'<li>Premi <b>Aggiungi alla Raccolta</b>: le particelle vanno nella <b>Raccolta</b>, gruppo <b>Particelle</b>, e la mappa ci va sopra.</li></ol>'
       +'<h3>Da sapere</h3><ul><li>Scelta la regione, sotto compare il link per caricare la sua mappa <b>Check Vincoli</b>, se esiste (serve l\'accesso); la mappa si cambia anche dal selettore <b>Mappa</b> in alto. I vincoli arrivano spenti: li accendi dalla scheda <b>Layer</b> del pannello a destra.</li>'
-      +'<li>Il comune serve solo qui: <b>Sulla mappa</b> e <b>Da un disegno</b> funzionano ovunque.</li>'
+      +'<li>Il comune serve solo qui: <b>Aggiungi dalla mappa</b> e <b>Da un disegno</b> funzionano ovunque.</li>'
       +'<li>A modulo chiuso, il titolo ricorda il comune scelto.</li></ul>'},
-    rcMap:{t:'Sulla mappa', s:'Le particelle che clicchi, o che stanno dentro una forma che disegni.', h:
+    rcMap:{t:'Aggiungi dalla mappa', s:'Le particelle del catasto che clicchi, o che stanno dentro una forma che disegni.', h:
       '<h3>Esempio</h3>'+RDIA.point+RDIA.rect+RDIA.line
       +'<p>Sull\'ortofoto vedi un terreno che ti interessa: con <b>Poligono</b> ne ricalchi il contorno e trovi tutte le sue particelle, senza conoscerne i numeri. Con <b>Linea</b>, lungo una strada o un canale, trovi le particelle che attraversa.</p>'
-      +'<h3>Come si usa</h3><ol><li>Nel ribbon, gruppo <b>Sulla mappa</b>, premi un modo: <b>Puntuale</b>, <b>Rettangolo</b>, <b>Poligono</b> o <b>Linea</b>.</li>'
+      +'<h3>Come si usa</h3><ol><li>Nel ribbon, gruppo <b>Aggiungi dalla mappa</b>, premi un modo: <b>Puntuale</b>, <b>Rettangolo</b>, <b>Poligono</b> o <b>Linea</b>.</li>'
       +'<li>Sulla mappa: un clic sulla particella; oppure trascina il rettangolo; oppure clicca i vertici del poligono, o i punti della linea, e finisci con un doppio clic.</li>'
       +'<li>Le particelle trovate vanno nella <b>Raccolta</b>, gruppo <b>Particelle</b>. Il modo resta attivo: di nuovo sul pulsante, o Esc, per smettere.</li></ol>'
       +'<h3>Da sapere</h3><ul><li>Funziona ovunque, anche senza aver scelto il comune.</li>'
       +'<li>Il catasto non permette di cercare per area: provo un punto ogni tanti metri dentro la forma, o lungo la linea. Su aree grandi ci vuole tempo, e una particella molto piccola può sfuggire: aggiungila con un clic.</li>'
       +'<li>Mi fermo a circa 120 particelle per volta. <b>Esc</b> ferma la ricerca: il primo tiene le particelle già trovate, il secondo ferma tutto.</li>'
-      +'<li>Senza un modo attivo, un clic sulla mappa apre le informazioni dei layer.</li></ul>'},
+      +'<li>Senza un modo attivo, un clic sulla mappa apre le informazioni dei layer.</li>'
+      +'<li>Questi modi <b>aggiungono</b> particelle dal catasto. Per <b>scegliere</b> quelle già nella Raccolta (e poi spostarle in un sottogruppo o toglierle) usa <b>'+icon('cursor')+' Seleziona</b> o <b>'+icon('sel-rect')+' Riquadro</b> nel gruppo <b>Raccolta</b>.</li></ul>'},
     rcDraw:{t:'Da un disegno', s:'Le particelle toccate da qualcosa che hai già: un disegno, un buffer, un file.', h:
       '<h3>Esempio</h3>'+RDIA.buf
       +'<p>Hai disegnato un <b>elettrodotto</b> e in <b>Geoprocessi</b> ne hai fatto un buffer di 150 m. Qui scegli il buffer e premi <b>Cerca</b>: trovi tutte le particelle nella fascia di rispetto.</p>'
       +'<h3>Come si usa</h3><ol><li>A destra, in Proprietà, scegli dal menu un disegno, un buffer, un risultato dei geoprocessi o un oggetto importato.</li>'
       +'<li>Premi <b>Cerca</b>: la mappa va sull\'oggetto e le particelle che tocca vanno nella <b>Raccolta</b>. Con un punto trovi la particella sotto il punto.</li></ol>'
-      +'<h3>Da sapere</h3><ul><li>Vale quanto detto in <b>Sulla mappa</b>: un punto ogni tanti metri, circa 120 particelle per volta, Esc per fermare.</li>'
+      +'<h3>Da sapere</h3><ul><li>Vale quanto detto in <b>Aggiungi dalla mappa</b>: un punto ogni tanti metri, circa 120 particelle per volta, Esc per fermare.</li>'
       +'<li>Il numero nel titolo dice quanti oggetti puoi usare.</li></ul>'}
   };
   // Disegno: i gesti di ogni strumento, e un lato scritto a mano (deflezione + distanza)
@@ -11523,22 +11686,24 @@ function srchShowRow(obj){ const root=byId('drawerElenco'); if(!root) return nul
       +'<li>Ogni copia va nella Raccolta e si toglie con <b>'+icon('undo')+' Annulla</b>.</li></ul>'},
     drwSel:{t:'Seleziona e modifica', s:'La selezione è la spunta della Raccolta: gli strumenti di modifica lavorano su quella.', h:
       '<h3>Come si seleziona</h3><ul>'
-      +'<li><b>'+icon('cursor')+' Seleziona</b>: clicca un disegno, un risultato o un importato sulla mappa; <kbd>Maiusc</kbd>+clic aggiunge, un clic nel vuoto svuota.</li>'
-      +'<li><b>'+icon('sel-rect')+' Riquadro</b>: un rettangolo seleziona ogni oggetto che tocca (<kbd>Maiusc</kbd> aggiunge).</li>'
-      +'<li>Nella <b>Raccolta</b>: la spunta di una riga, o «Spunta tutti» nell\'intestazione del gruppo.</li></ul>'
-      +'<p>Gli oggetti selezionati hanno un contorno blu. Con uno solo, a destra in <b>Proprietà</b> vedi la sua scheda: categoria, tipo e attributi.</p>'
+      +'<li><b>'+icon('cursor')+' Seleziona</b>: clicca sulla mappa una particella o un oggetto della Raccolta; <kbd>Maiusc</kbd>+clic aggiunge o toglie, un clic nel vuoto svuota. Dove più oggetti si sovrappongono prendo il più piccolo (una particella prima dell\'area lorda che la copre): un secondo clic nello stesso punto prende quello sotto.</li>'
+      +'<li><b>'+icon('sel-rect')+' Riquadro</b>: un rettangolo seleziona ogni particella e oggetto che tocca (<kbd>Maiusc</kbd> aggiunge).</li>'
+      +'<li>Nella <b>Raccolta</b>: la spunta di una riga (<kbd>Maiusc</kbd>+clic spunta tutte le righe fino all\'ultima spuntata), o «Spunta tutti» nell\'intestazione del gruppo (con il filtro, solo le righe trovate).</li>'
+      +'<li>Sulla mappa, il <b>tasto destro</b> su una particella o un oggetto la seleziona, o la aggiunge alla selezione.</li></ul>'
+      +'<p>Particelle e oggetti selezionati hanno un contorno blu, e in cima alla Raccolta compare la <b>barra della selezione</b>: quanti sono, Zoom, Sottogruppo (o Gruppo), Togli e Deseleziona. Il <b>tasto destro</b> su una riga selezionata, o sulla mappa su un oggetto selezionato, offre le stesse azioni per tutta la selezione. Con un oggetto solo, a destra in <b>Proprietà</b> vedi la sua scheda: categoria, tipo e attributi.</p>'
       +'<h3>Cosa puoi fare</h3><ul>'
       +'<li><b>Rimodella</b>: sposti i vertici dell\'oggetto selezionato (un punto si sposta). Clic fuori per finire.</li>'
       +'<li><b>Sposta e ruota</b>: trascini gli oggetti selezionati; la maniglia li ruota.</li>'
       +'<li><b>Dividi</b>: una linea che disegni taglia le aree selezionate in parti.</li>'
       +'<li><b>Unisci</b>: due o più aree selezionate diventano una sola, con gli attributi della prima.</li>'
       +'<li><b>Copia</b>: una copia dell\'oggetto selezionato dove clicchi.</li>'
-      +'<li><b>Elimina</b>: toglie gli oggetti selezionati dalla Raccolta. Chiede conferma e, per quelli salvati sul portale, se toglierli anche da lì.</li>'
+      +'<li><b>Elimina</b> (o il tasto <kbd>Canc</kbd>): toglie dalla Raccolta le particelle e gli oggetti selezionati. Chiede conferma e, per quelli salvati sul portale, se toglierli anche da lì.</li>'
       +'<li><b>'+icon('undo')+' Annulla</b> e <b>'+icon('redo')+' Ripeti</b> (<kbd>Ctrl</kbd>+<kbd>Z</kbd>, <kbd>Ctrl</kbd>+<kbd>Y</kbd>) valgono per ogni modifica dei disegni, anche per Elimina.</li></ul>'
       +'<h3>Esclusione da layer</h3><p>In <b>Cosa disegni</b>, <b>Esclusione da layer</b>: clicca un elemento di un layer vettoriale acceso (un vincolo, un servizio aggiunto) e diventa un disegno di esclusione nella Raccolta; con <b>Riquadro</b> prendi tutti quelli che tocca.</p>'
       +'<h3>Da sapere</h3><ul><li>Le particelle non si modificano: per cambiarle, fanne una copia o un\'area lorda.</li>'
       +'<li>Le fasce dei buffer e l\'area netta automatica non si toccano: rinascono da sole quando cambi gli oggetti da cui vengono.</li>'
-      +'<li>La stessa selezione vale per «Spuntati» dei geoprocessi e per la finestra Esporta.</li>'
+      +'<li>Selezionare non è modificare: ogni strumento lavora su ciò che può cambiare e dice quanti elementi ha lasciato fuori. Copia vale anche per una particella sola: la copia è un disegno.</li>'
+      +'<li>La stessa selezione vale per «Spuntati» dei geoprocessi e per la finestra Esporta. Non entra in Annulla: deselezionare per sbaglio non si annulla.</li>'
       +'<li>Con nessuno strumento attivo, un clic su un disegno lo prende in mano: lo trascini, lo ruoti o lo ridimensioni con le maniglie; un altro clic ne sposta i vertici.</li></ul>'},
     ctx:{t:'Analisi di contesto', s:'Cosa c\'è intorno a un punto, e la strada fino alla connessione (scheda Geoprocessi e analisi, gruppo Contesto).', h:
       '<h3>Analisi di contesto</h3><ol>'
@@ -11629,7 +11794,7 @@ function srchShowRow(obj){ const root=byId('drawerElenco'); if(!root) return nul
         return 'Modalità <b>'+dn+'</b> attiva — disegna sulla mappa'+ex+'. <kbd>Esc</kbd> per uscire.';
       }
       if(typeof selMode!=='undefined'&&selMode){
-        var sn={point:'Selezione puntuale',rectangle:'Selezione rettangolo',polygon:'Selezione poligono',polyline:'Selezione linea'}[selMode];
+        var sn={point:'Aggiungi: puntuale',rectangle:'Aggiungi: rettangolo',polygon:'Aggiungi: poligono',polyline:'Aggiungi: linea'}[selMode];   // 2/11 (M10d)
         var ex=(selMode==='point')?'un click aggiunge la particella':'disegna la forma, doppio click per chiudere';
         return 'Modalità <b>'+sn+'</b> attiva — '+ex+'. <kbd>Esc</kbd> per uscire.';
       }
@@ -11777,7 +11942,7 @@ function srchShowRow(obj){ const root=byId('drawerElenco'); if(!root) return nul
   ];
   var TOUR_ALL=[   // 5a (F3): one step per tab, then the panels, the map controls, the status bar, the portal map
     {sel:'#tabs', title:'Le sei schede', body:"Le schede seguono il lavoro: <b>Ricerca particelle</b>, <b>Terreno</b>, <b>Disegna</b>, <b>Geoprocessi e analisi</b>, <b>Importa</b>, <b>Salva ed esporta</b>. Sotto, il ribbon con gli strumenti della scheda, a gruppi; la "+icon('info')+" di ogni gruppo dice cosa si fa lì.", placement:'below'},
-    {sel:'#ribbon', title:'Ricerca particelle', body:"<b>Catasto</b> cerca per comune, foglio e particella; <b>Sulla mappa</b> con un clic, un rettangolo, un poligono o una linea; <b>Da un disegno</b> le particelle toccate da un disegno o da un buffer; <b>Raccolta</b> crea l'area lorda dalle particelle, accende i numeri e fa lo zoom.", open:function(){ openTab('ricerca'); }, placement:'below'},
+    {sel:'#ribbon', title:'Ricerca particelle', body:"<b>Catasto</b> cerca per comune, foglio e particella; <b>Aggiungi dalla mappa</b> con un clic, un rettangolo, un poligono o una linea; <b>Da un disegno</b> le particelle toccate da un disegno o da un buffer; <b>Raccolta</b> crea l'area lorda dalle particelle, <b>seleziona</b> sulla mappa quelle già raccolte, accende i numeri e fa lo zoom.", open:function(){ openTab('ricerca'); }, placement:'below'},
     {sel:'#ribbon', title:'Terreno', body:"<b>Estensione</b>: su cosa (un'area lorda, il sito AREAS, le particelle, o un rettangolo o poligono disegnato qui); <b>Modello del terreno</b>: il limite di pendenza e <b>Analizza le pendenze</b>, con le quote di Esri World Elevation; <b>Analisi terreno</b>: classi di pendenza, quote, esposizione, ombreggiatura, curve di livello; <b>Profilo</b> lungo una linea. Le zone troppo ripide diventano un'esclusione nella Raccolta.", open:function(){ openTab('terreno'); }, placement:'below'},
     {sel:'#ribbon', title:'Disegna', body:"<b>Cosa disegni</b> e <b>Con quale strumento</b> per i disegni nuovi; <b>Seleziona e modifica</b> per quelli che ci sono (rimodella, sposta e ruota, dividi, unisci, copia, elimina, annulla); <b>Supporto al disegno</b>: aggancio, misure esatte, griglia; <b>Aree automatiche</b>: area netta e rientro dal confine; <b>Collega a sito AREAS</b>: il sito a cui vanno i disegni sul portale.", open:function(){ openTab('disegno'); }, placement:'below'},
     {sel:'#ribbon', title:'Geoprocessi e analisi', body:"Metti gli oggetti in <b>A</b> (dalla mappa, gli spuntati o per categoria; B serve a Parte comune e Sottrai), scegli l'operazione in <b>Geoprocessi</b> e premi <b>Esegui</b> a destra: il risultato va nella Raccolta, gruppo Analisi. <b>Contesto</b>: sottostazioni, linee AT e progetti FV intorno a un punto, e il percorso su strada (serve l'accesso). <b>Coordinate</b>: in che sistema sono dei valori sconosciuti.", open:function(){ openTab('geoproc'); }, placement:'below'},
