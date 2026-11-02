@@ -82,7 +82,7 @@ py -3 scripts/build.py --check    exit 1 if the built file is not up to date
 py -3 scripts/make_tokens.py      writes src/css/10-tokens.css from design/tokens.json (the family's tokens); --check
 py -3 scripts/make_icons.py       writes src/html/05-icons.html, the sprite of the family icons the sources use; --check, --list
 py -3 scripts/make_kit.py         writes src/css/12-kit.css and 13-geo-kit.css from design/kit.css and geo-kit.css (verbatim); --check
-py -3 tests/run.py                headless checks, Python + Chrome, 28 harnesses, about eight minutes (see tests/README.md)
+py -3 tests/run.py                headless checks, Python + Chrome, 29 harnesses, about eight minutes (see tests/README.md)
 ```
 
 `design/` holds the design system's inputs, copied verbatim from the family (`tokens.json`, `icons/*.svg`, `kit.css`,
@@ -140,18 +140,28 @@ site and the writes to AREAS COLLECTION and IT - Site Features. This section fol
   services and added portal layers (`loadWebMap` moves them) and asks first only when layers switched on or attribute
   filters would be lost (`wmHasStateToLose`).
 - On the right: **Apri progetto** (Ctrl+O), **Salva progetto** (Ctrl+S; Shift+click or Ctrl+Shift+S saves as),
-  **Accedi / Esci** (one button, grey or green dot, the user's name in the tooltip; OAuth with the organisation
-  account), the light or dark theme (`axpo_theme`), **?** for help.
+  **Annulla** and **Ripeti** (Ctrl+Z, Ctrl+Y; since 2026-11-02, J5h: they serve every change of the work, so they sit
+  by the project instead of Disegna › Seleziona e modifica; the tooltip names the command), **Accedi / Esci** (one
+  button, grey or green dot, the user's name in the tooltip; OAuth with the organisation account), the light or dark
+  theme (`axpo_theme`), **⚙ Impostazioni** (J5g: the window `#setModal` with the Zornade key, what the browser keeps,
+  *Svuota il lavoro*, *Ripristina tutto*; on a phone an entry of «Altro»), **?** for help.
 
 ### Tabs and ribbon
 
-- Six tabs by name only, in the order of the work (arrow keys move between them). The ribbon shows the active tab's
-  groups: 28 in all, each closed by its name and an ⓘ (see *Help*).
+- Seven tabs by name only, in the order of the work (arrow keys move between them): *Ricerca particelle · Analizza ·
+  Disegna · Modifica · Geoprocessi · Importa · Salva ed esporta* (since 2026-11-02, K1–K7: before, six, with *Terreno*
+  and *Geoprocessi e analisi* and the selection inside Disegna). The ribbon shows the active tab's groups: 25 in all,
+  each closed by its name and an ⓘ (see *Help*). A tab the profile leaves without tools hides (Geoprocessi in *Base*).
 - A tool presses a panel control, flips a checkbox, shows a module in Proprietà, opens a menu (category, type, source,
   «Per categoria») or a popover of settings that mirrors hidden panel fields (*Supporto al disegno*, *Aree automatiche*,
   *Analizza le pendenze*); some carry an inline number or select (Buffer, Tolleranza, Estensione, Passo). A tool with a
   value shows it in its name («Buffer · 25 m», «Fonte · sopralluogo», «Sito C0000»); a disabled one says why in its
-  tooltip. The panel controls the ribbon presses are hidden in the panel (class `rib`).
+  tooltip. The panel controls the ribbon presses are hidden in the panel (class `rib`), except the three buttons of
+  Importa (J5b, the panel's main control again).
+- **The panels are compact** (since 2026-11-02, J1–J4 for Ricerca, J5 for the others, the user's request): rows that
+  close or a name with its value, fields with their label inside, no cards or numbered steps, nothing explained in view;
+  every module has one «i» by the panel's title (`info` in `SHELL`, or the card's own), the hints are the controls'
+  tooltips; in view only results, errors and states («Serve l'accesso ad AGOL.»).
 - At the right end the context figure (`ribbonCtx`): parcels and hectares, hectares over the slope limit, the automatic
   net area or the drawings, the last result, the imports, the project name — one per tab.
 - Under 1,500 px the groups narrow; under 1,280 px small tools become icons and the context figure goes; when the groups
@@ -175,9 +185,9 @@ row, *Punto · Rettangolo · Poligono · Linea* (J4). About 390 px instead of 65
     With no mode on, a click on the map opens the layers' popups (since 2026-10-30 the web maps' vector tiles' too).
   - **Da un disegno** (until 2026-11-02 a ribbon group): a drawing, buffer, result or import, then *Cerca*: the
     parcels it touches (a point finds the parcel under it). The section title counts the usable objects.
-- **Raccolta**: *Crea area lorda*, *Seleziona* and *Riquadro* (since 2026-11-02 the same tools as in Disegna: they pick
-  the parcels already in the Raccolta), *Etichette sulla mappa* (parcel numbers, hidden below 1:150,000, `axpo_labels`),
-  *Zoom sulle particelle*.
+- **Raccolta**: *Crea area lorda*, *Etichette sulla mappa* (parcel numbers, hidden below 1:150,000, `axpo_labels`),
+  *Zoom sulle particelle*. The parcels already in the Raccolta are picked on the map with *Modifica* › *Seleziona* or
+  *Riquadro*, or a right click (K2, 2026-11-02: one place for the selection; they were here too since M2).
 - **Area selection is sampled**: Zornade has no spatial query, so a shape becomes points (a 14 × 14 grid over an area,
   at least 12 m apart; every 25 m along a line; at most 180), each sent to `/parcels/locate`, 28 at a time, stopping at
   120 parcels (`SEL_*`, `13-tools-select.js`). Slow on large areas; a parcel smaller than the step can be missed. Esc
@@ -192,10 +202,12 @@ row, *Punto · Rettangolo · Poligono · Linea* (J4). About 390 px instead of 65
   GlobalID, so the next save updates it) or to add another. With nothing ticked and parcel subgroups present: one gross
   area per subgroup plus one for the parcels without, each replacing its own earlier one (`sf_pg`).
 
-### Terreno
+### Analizza
 
-Groups **Estensione · Modello del terreno · Analisi terreno · Profilo · Terreno**; modules *Pendenze da DTM*
-(`17-slope.js`) and *Profilo altimetrico*. The terrain method is PV Predesign's, so both give the same numbers.
+What reads the land without changing the Raccolta (since 2026-11-02, K5: the old tab *Terreno* with *Contesto* and
+*Coordinate* of the old *Geoprocessi e analisi*). Groups **Estensione · Modello del terreno · Analisi terreno · Contesto ·
+Coordinate**; modules *Pendenze da DTM* (`17-slope.js`), *Profilo altimetrico*, *Analisi di contesto*, *Percorso su
+strada*, *Coordinate sconosciute*. The terrain method is PV Predesign's, so both give the same numbers.
 - **Estensione**: the extent drawn here (*Rettangolo*, *Poligono*; kept in the work and the project as
   `terrainExtent`), a drawing *Area lorda*, the AREAS site, or the Raccolta's parcels merged. *Salva come area lorda*
   makes it a drawing «Area lorda · estensione»; *Togli l'estensione* removes it.
@@ -211,14 +223,32 @@ Groups **Estensione · Modello del terreno · Analisi terreno · Profilo · Terr
 - With the switch on, one drawing *Esclusione · Pendenza elevata* (`exclusion` / `steep-slope`) named «Pendenza > 10 %»
   follows the limit, clipped to the extent, with `sf_slope` for PV Predesign. The limits are the user's own: the
   design standards stay in PV Predesign, out of this public repository.
-- The DTM image sits in the Immagini block (tag *DTM*); **Terreno** › *Rimuovi terreno* removes it after a confirm,
-  the exclusion stays. **Profilo** › *Profilo altimetrico*: the Esri ElevationProfile widget along a drawn line.
+- The DTM image sits in the Immagini block (tag *DTM*); **Modello del terreno** › *Rimuovi terreno* removes it after a
+  confirm, the exclusion stays. **Analisi terreno** › *Profilo altimetrico*: the Esri ElevationProfile widget along a
+  drawn line (until K5 the groups *Terreno* and *Profilo*).
+- **The panel** (J5d): *Modello del terreno* with the model loaded (its cell and date in the tooltip), the status line,
+  *Avanzate* (closed, «5 m · 250 m²»: the cell and the minimum patch, side by side); after the analysis *Limite di
+  pendenza* with its value, then *Analisi terreno* with the legend and the figures. The explanations are in the «i».
+- **Contesto** (needs sign-in): *Analisi di contesto* — click a point (or right-click › *Analisi di contesto qui*): the
+  nearest substations within 80 km (380, 220, 150, 132 kV and new primary substations), the nearest HV line within
+  60 km, PV projects within 15 km with capacity and status, from the portal's *elemens* layers; no credits.
+  *Percorso su strada*: start, Shift+click via points, end; the organisation's route service (fallback Esri
+  `Route_World`), a simple route of **0.005 credits**; *Strade e sentieri* (Walking Distance) or *Solo strade carrabili*
+  (Rural Driving Distance, `axpo_rte_mode`); the result is a drawing *Percorso di connessione · Stimato*, «Su strada
+  3,4 km».
+- **Coordinate** › *Coordinate sconosciute*: paste X Y pairs (decimal comma, separators, DMS, a leading label);
+  *Trova il sistema* keeps the readings among `SRS_IT` (23 systems, eight company ones) that land in Italy, X/Y swapped
+  included; *Dove dovrebbe stare* plus a click ranks them by error in metres (ED50 vs WGS 84 in one zone: ~200 m). The
+  chosen reading goes to the Raccolta as points or one area. Cassini-Soldner coordinates cannot be resolved.
 
 ### Disegna
 
-Groups **Cosa disegni · Con quale strumento · Seleziona e modifica · Supporto al disegno · Aree automatiche · Collega a
-sito AREAS**. Proprietà shows the card of the selected object (titled «Proprietà»), the AREAS site row, the current
-category with *Cambia…* and *Le mie categorie…*, its attributes and note, the exact-shape box and *Ultimo disegno*.
+Groups **Cosa disegni · Con quale strumento · Supporto al disegno · Aree automatiche · Collega a sito AREAS** (since
+2026-11-02, K2: the selection and its tools are the tab *Modifica*). Proprietà shows the row *Sito AREAS* (the site
+or «nessuno», *Scegli ›*), then *Cosa disegni* as a row that closes (closed, it says the category): the category with
+*Cambia…* (its description is the tooltip of its name; *Le mie categorie…* is in the menu of *Cambia…*), *Tipo* and the
+attributes two by two with their label inside, *Fonte*, the note; the exact-shape box when it applies, the status line,
+and *Ultimo disegno* (J5c, 2026-11-02: the tools are the ribbon's, so the step «Con quale strumento» left the panel).
 - **Cosa disegni**: the category as a coloured card with its description; a click opens the gallery, grouped as the
   Raccolta. Beside it only what the category uses (*Tipo*, *Buffer*, *Larghezza*, *Altezza*, *Tensione*), then *Fonte*
   (a tavolino · sopralluogo · ufficiale) and *Esclusione da layer*. The values apply to the next drawings, the category
@@ -235,16 +265,6 @@ category with *Cambia…* and *Le mie categorie…*, its attributes and note, th
 - **Con quale strumento**: *Punto · Linea · Area · Rettangolo · Cerchio · A mano libera*; double click ends lines and
   areas, the tool stays armed, Esc stops. With no tool on, a click on a drawing takes it in hand (drag, rotate, scale;
   a second click edits vertices; Delete removes it).
-- **Seleziona e modifica**: the selection **is** the Raccolta's checkbox, shared with «Spuntati» of the geoprocesses
-  and the export window; blue outline; one selected object shows its card in Proprietà. *Seleziona* (Shift+click adds
-  or removes; since 2026-11-02 the parcels too, the smallest object under the click first, a second click in the same
-  place the one below), *Riquadro* (parcels too), *Rimodella*, *Sposta e ruota*, *Dividi* (a drawn line cuts the selected areas into «nome · 1», «nome · 2»…,
-  new objects for the portal), *Unisci* (attributes of the first), *Copia*, *Elimina* (asks; for saved objects also
-  about the portal), *Annulla · Ripeti* (Ctrl+Z / Ctrl+Y): one action is one Annulla, strips and net area included;
-  Annulla also gives back parcels, groups, subgroups, own categories, the net-area settings, the terrain extent and the
-  site; its tooltip and message say what («Annulla: Unisci 2 aree»); what is on the portal stays known (an object
-  brought back becomes «da aggiornare», one taken away is said to stay on the portal); 40 commands, restarting when a
-  project opens or the work is emptied. Editable: drawings, results, imports — not parcels, automatic strips and net area, or owners' parcels.
 - **Esclusione da layer**: a click on a feature of a visible vector layer makes a drawing of it (area → *Esclusione*,
   line → *Infrastruttura lineare*, point → *Ostacolo*; source *ufficiale*; never twice); with *Riquadro*, every feature
   the rectangle touches in the visible feature layers (at most 200, a confirm above 20).
@@ -263,42 +283,57 @@ category with *Cambia…* and *Le mie categorie…*, its attributes and note, th
     dal confine** (metres), minus every cutting polygon (hidden ones too); its note says what was subtracted. Off =
     frozen; deleting its row switches it off. Strips and net area carry an «auto» chip and follow their sources.
 - **Collega a sito AREAS** (optional, needs sign-in): on save each object without a site takes the AREAS COLLECTION
-  area it overlaps most; outside every area, the chosen site if any. A chosen site is forced on new drawings. *Dalla
-  mappa* (a click inside the area) or a code such as C0000; *Carica elementi* brings the site's saved features into the
+  area it overlaps most; outside every area, the chosen site if any. A chosen site is forced on new drawings. *Sito
+  dalla mappa* (a click inside the area; *Dalla mappa* until K4) or a code such as C0000; *Carica elementi* brings the site's saved features into the
   Raccolta; *Togli il sito*. The tool reads «Collega a sito AREAS» or «Sito C0000»; the site is saved (`site`).
 
-### Geoprocessi e analisi
+### Modifica
 
-Groups **Oggetti di partenza · Geoprocessi · Contesto · Coordinate**; Proprietà shows the three steps (A, operation,
-parameters and *Esegui*) or the module of a tool. Distances and tolerances are true metres (local metric frame, §5).
-- **Oggetti di partenza** fills slot **A**: *Dalla mappa* (click again on a spot to step through overlapping objects),
+The selection and the tools that change it (since 2026-11-02, K2–K4), as the *Modifica* tab of ArcGIS Pro.
+Groups **Selezione · Modifica**; the module *Selezione e modifica* says what is selected, shows the card of one
+object and the copy's status line; in the profile *Base* only *Seleziona*, *Riquadro*, *Deseleziona*, *Elimina*.
+- **Selezione**: the selection **is** the Raccolta's checkbox, shared with «Spuntati» of the geoprocesses and the export
+  window; blue outline; Proprietà says what is selected («2 particelle · 3,10 ha») and shows the card of one object
+  (also from a row's menu › *Proprietà*). *Seleziona* (Shift+click adds
+  or removes; since 2026-11-02 the parcels too, the smallest object under the click first, a second click in the same
+  place the one below), *Riquadro* (parcels too), *Deseleziona*.
+- **Modifica**, on the selection: *Rimodella*, *Sposta e ruota*, *Dividi* (a drawn line cuts the selected areas into «nome · 1», «nome · 2»…,
+  new objects for the portal), *Unisci* (attributes of the first; the originals are replaced, unlike *Geoprocessi* › *Unione*), *Copia* (below),
+  *Elimina* (asks; for saved objects also
+  about the portal). *Annulla · Ripeti* (Ctrl+Z / Ctrl+Y; in the top bar since 2026-11-02, J5h): one action is one
+  Annulla, strips and net area included;
+  Annulla also gives back parcels, groups, subgroups, own categories, the net-area settings, the terrain extent and the
+  site; its tooltip and message say what («Annulla: Unisci 2 aree»); what is on the portal stays known (an object
+  brought back becomes «da aggiornare», one taken away is said to stay on the portal); 40 commands, restarting when a
+  project opens or the work is emptied. Editable: drawings, results, imports — not parcels, automatic strips and net area, or owners' parcels.
+- **Copia** (K3, one tool since 2026-11-02: it was in Disegna and in Geoprocessi): its popover chooses; with one object
+  selected, *Copia l'oggetto selezionato* places it where you click; otherwise pick an object (drawing, result, import,
+  parcel or layer feature), click to place; each click another copy, Esc ends. The steps are said in the panel. *Parallela* copies at a distance (a line → a parallel line; an area → inset if you click inside, outset
+  outside; mitred corners); *Solo il lato cliccato* copies one side. A copy keeps category, type, attributes, note and
+  site but is a new object for the portal; a parcel or layer feature becomes a drawing of the current category.
+
+### Geoprocessi
+
+Groups **Oggetti di partenza · Geoprocessi** (*Geoprocessi e analisi* until 2026-11-02: its analyses went to *Analizza*,
+its *Copia* to *Modifica*; in the profile *Base* the tab hides); Proprietà shows A (a row with its count and ×,
+the chips, *+ Categoria…*) and, once an operation is chosen in the ribbon, a row named after it with its parameters
+(B for Parte comune and Sottrai), *Esegui* and the status line (J5e, 2026-11-02: no numbered cards; the examples of
+every operation are in the «i», `GP_INFO.gpAll`). Distances and tolerances are true metres
+(local metric frame, §5).
+- **Oggetti di partenza** fills slot **A**: *A dalla mappa* (K4; click again on a spot to step through overlapping objects),
   *Spuntati*, *Per categoria*. A click on a feature of a map vector layer (feature, REST, WFS, GeoJSON, map-service
   sublayers; not WMS) copies it once into the Raccolta with its full geometry and attributes (at most 80). Slot **B**,
   in Proprietà, serves *Parte comune* and *Sottrai B da A*.
-- **Geoprocessi**: *Buffer* (metres, up to 100 km; one per object or one merged), *Unisci*, *Parte comune*, *Sottrai B
-  da A*, *Copia*, *Contorno*, *Semplifica* (*Tolleranza*, 2 m by default, at least 0.5), *Ritaglia* (draw the area to
+- **Geoprocessi**: *Buffer* (metres, up to 100 km; one per object or one merged), *Unione* (K4: a new result, the
+  areas of A stay), *Parte comune*, *Sottrai B da A*, *Contorno*, *Semplifica* (*Tolleranza*, 2 m by default, at least 0.5), *Ritaglia* (draw the area to
   keep after *Esegui*). A card states its condition and stays disabled, with the reason, until A fits. The status line
   ends with the measure and *Vedi nella Raccolta ›*, or the error in plain words. Results go to the group *Analisi*.
   Above 5,000 vertices the buffer simplifies first (said in the message and the name); the others warn above 20,000.
-- **Copia**: pick an object (drawing, result, import, parcel or layer feature), click to place; each click another copy,
-  Esc ends. *Parallela* copies at a distance (a line → a parallel line; an area → inset if you click inside, outset
-  outside; mitred corners); *Solo il lato cliccato* copies one side. A copy keeps category, type, attributes, note and
-  site but is a new object for the portal; a parcel or layer feature becomes a drawing of the current category.
-- **Contesto** (needs sign-in): *Analisi di contesto* — click a point (or right-click › *Analisi di contesto qui*): the
-  nearest substations within 80 km (380, 220, 150, 132 kV and new primary substations), the nearest HV line within
-  60 km, PV projects within 15 km with capacity and status, from the portal's *elemens* layers; no credits.
-  *Percorso su strada*: start, Shift+click via points, end; the organisation's route service (fallback Esri
-  `Route_World`), a simple route of **0.005 credits**; *Strade e sentieri* (Walking Distance) or *Solo strade carrabili*
-  (Rural Driving Distance, `axpo_rte_mode`); the result is a drawing *Percorso di connessione · Stimato*, «Su strada
-  3,4 km».
-- **Coordinate** › *Coordinate sconosciute*: paste X Y pairs (decimal comma, separators, DMS, a leading label);
-  *Trova il sistema* keeps the readings among `SRS_IT` (23 systems, eight company ones) that land in Italy, X/Y swapped
-  included; *Dove dovrebbe stare* plus a click ranks them by error in metres (ED50 vs WGS 84 in one zone: ~200 m). The
-  chosen reading goes to the Raccolta as points or one area. Cassini-Soldner coordinates cannot be resolved.
-
 ### Importa
 
-Groups **File · CAD · Immagini · Servizi web · Portale**; the four modules stay open in Proprietà, each with its «i».
+Groups **File · CAD · Immagini · Servizi web · Portale**; one module at a time in Proprietà: its button (*Scegli uno o
+più file…*, *Scegli un disegno DWG…*, *Scegli un'immagine…*, J5b) or the service's address, then what it has loaded and
+the last message; how it works is the «i» by the panel's title.
 - **File**: GeoJSON, KML, KMZ, Shapefile (.zip), into the group *Altro*. A file without a CRS is converted by itself
   only when Web Mercator is its only reading on Italian soil; otherwise *Coordinate sconosciute* opens with the
   candidates and the whole file is reprojected with the system chosen.
@@ -328,8 +363,9 @@ Groups **File · CAD · Immagini · Servizi web · Portale**; the four modules s
 
 ### Salva ed esporta
 
-Groups **Esporta · Portale AGOL · Progetto · Stampa**; the default module is *Progetto* (name, last save or opening,
-what the work holds, *Salva progetto*, *Salva come…*, *Apri progetto…*).
+Groups **Esporta · Portale AGOL · Progetto · Stampa**; the default module is *Progetto* (J5f: the name with its state,
+«non salvato» or «salvato alle 15:42»; what the work holds; *Salva*, *Salva come…*, *Apri…*; *Copia da condividere…*,
+whose tooltip and the «i» say what the copy leaves out).
 - **Esporta** opens the export window, also on a format (*GeoJSON · KML · KMZ*, *Shapefile (.zip)*, *Tabella XLSX*). It
   lists Particelle with its subgroups, the owners' parcels, then the Raccolta's groups; its ticks are the Raccolta's;
   nothing ticked = everything; XLSX is the parcel table. Features carry `gruppo` and `sottogruppo`; the KML has a folder
@@ -395,7 +431,8 @@ The left panel, *Raccolta*, with a count badge (parcels and objects); one scroll
 
 Tabs **Proprietà · Layer · Legenda** (`spanelSet`); the head carries the module's title, its «i» when the module is one
 card (since 2026-11-02, N2: the card then shows no title of its own), *Sgancia* and close. A tab
-change or a ribbon tool with a module brings Proprietà back; at its foot, *Impostazioni avanzate* (see *Project*).
+change or a ribbon tool with a module brings Proprietà back. The settings (until 2026-11-02 *Impostazioni avanzate* at the
+foot of every panel) are the ⚙ of the top bar.
 - **Layer**: *Aggiungi layer dal portale* (search by title, `ADDABLE` item types, sign-in); *Layer in mappa*, the Esri
   LayerList with a search by name, drag-and-drop order and, per layer, transparency, popup on/off and an **attribute
   filter** like QGIS *Filter…* (field, condition, suggested value, `+ E` / `+ O`, editable SQL, live count; the icon
@@ -468,8 +505,8 @@ bar.
   personal data: the owners' parcels stay, without names or the owners' file record, and the user's name is left out;
   the open project does not change.
 - **The browser autosave** (`localStorage` `cat_state`) keeps the work across reloads except DWGs, images, DTMs and the
-  owners' personal data; at about 5 MB the browser is full and a message says so. *Impostazioni avanzate*: a personal
-  Zornade key, what is saved, *Svuota il lavoro* (preferences kept), *Ripristina tutto* (every key, then reload).
+  owners' personal data; at about 5 MB the browser is full and a message says so. **⚙ Impostazioni** (top bar): a
+  personal Zornade key, what is saved, *Svuota il lavoro* (preferences kept), *Ripristina tutto* (every key, then reload).
 
 ### Help
 
@@ -503,9 +540,9 @@ bar.
 
 ### The phone
 
-- Up to 768 px the tabs, ribbon, strips and status bar hide; a bar at the foot has *Cerca · Terreno · Disegna ·
-  Raccolta* (with the count) *· Altro* (Geoprocessi e analisi, Importa, Salva ed esporta, Layer, Legenda, Mappa di base,
-  Luoghi, Guida rapida). Stampa, Modifica AREAS COLLECTION and the tours stay on the computer; **?** opens the guide,
+- Up to 768 px the tabs, ribbon, strips and status bar hide; a bar at the foot has *Cerca · Analizza · Disegna ·
+  Raccolta* (with the count) *· Altro* (Modifica, Geoprocessi, Importa, Salva ed esporta, Layer, Legenda, Mappa di base,
+  Luoghi, Impostazioni, Guida rapida). The top bar keeps Apri, Salva, Annulla and Ripeti. Stampa, Modifica AREAS COLLECTION and the tours stay on the computer; **?** opens the guide,
   with the profile at its foot.
 - The panels are sheets over the map, one at a time: 31 % of the screen at rest, 84 % with the handle, × to close. A
   tab's sheet shows its ribbon tools first, group by group, then the module. A map mode drops the sheet to rest and
@@ -604,7 +641,28 @@ How the app works inside, by subject, with the traps to know before editing. The
 - **Trap:** the panel controls that a ribbon tool presses are hidden over 768 px with `.rib` (the list in
   `30-ui-glue.js`, «the panel controls the ribbon now holds»). A control whose tool leaves the ribbon must leave the
   list, or the panel shows its section empty: on 2026-11-02 the buttons of «Dalla mappa» (`#selModeBox`) were hidden
-  until the user saw it; `parcelsel` now checks them.
+  until the user saw it; `parcelsel` now checks them. J5b took the three buttons of Importa off the list too.
+- **The compact panels** (2026-11-02, J5a–J5h, `60-tour.css` «J5»): `.j5row` is a row with a name (`.j5k`) and a value
+  (`.j5v`, cut with an ellipsis, the rest in its tooltip); `.kv` is a field with its label inside (`label · input ·
+  unit`; `label.kv:not(.chk):not(.opt)` to beat the base rule of the labels, which is uppercase); `.gpflat` takes the
+  card off A and the parameters. The modules' «i»: `info` in `SHELL` (`drwAll`, `gpAll`: the panel's parts in one
+  window, as `rcAll`; `file`, `proj`, `elev` new; `slope`, `ctx`, `sr` existing). The status lines are empty when there
+  is nothing to say (`#drwMsg:empty`… hidden). Geoprocessi's step 2 is `.rib` as a whole (its cards are pressed by
+  the ribbon); Disegna's former step 2 (`#drwStep2.drwtools`) keeps the hidden tool cards, the exact shapes and the
+  status line. The wide panel (over 640 px) no longer has grid areas for those steps.
+- **The seven tabs** (2026-11-02, K1–K7): the ids are `ricerca`, `analizza` (until then `terreno`), `disegno`,
+  `modifica`, `geoproc`, `import`, `export`. The tool modules (`TOOLS`: slope, elev, ctx, rte, sr) are `.toolpane`s of
+  Analizza (`toolOpen` shows that tab; Esc in the context, the route or the coordinates goes back to the slopes);
+  Modifica's module `msel` is `#modSel` (the row `#modSelSum`, kept by `selRender`, the card `#selCard`, the copy's
+  hidden controls `#cpBox` and its line `#offMsg`). The one Copia is a popover (`copyForm`, mirroring `#offOn`,
+  `#offDist`, `#offEdge`): its button calls `selCopy` with one object selected and not parallel, otherwise presses
+  `#offPick`. `tabsProfSync` hides a tab whose groups the profile empties, on the computer and in «Altro», and the
+  arrow keys skip it. The selection's messages go through `selSay`, which also toasts when `#drwMsg` is not in view.
+- **Trap:** a `//` comment inserted by a scripted replacement in the middle of a line silences the rest of it: on
+  2026-11-02 it hid «Contorno» of `GP_OPS` (and a check of the `layout` harness). Put such comments at the end of the
+  line; `compact` now checks that every geoprocess card has its definition.
+- **Annulla and Ripeti** (J5h) are `#drwUndo` and `#drwRedo` in the top bar, same ids, so `histUi` and the shortcuts
+  did not change; the registry adds them as commands of the top bar (`CMD_BAR`, tab `bar`), so Ctrl K finds them.
 - A tool is `{id, t, i, size: large|medium|small}` plus an action — `press` (clicks a control and mirrors its `.active`,
   `aria-pressed`, `aria-checked`, `disabled`, `title`), `toggle`, `mod`, `fn`, `focus` (a setting, not a module
   switcher), `menu()` + `pick(v)`, `pop()` (a form), `num` (an inline number: `unit`, `min`, `step`), `sel` (a mirrored
@@ -1324,7 +1382,8 @@ How the app works inside, by subject, with the traps to know before editing. The
   (`svcRestoreAll`; `svcGen` discards a restore overtaken by a clear or a project) and keeps the portal items for after
   sign-in; the history restarts. Not saved: DWGs, images, DTMs, layer visibility, opacity, order and filters, the web
   map, owners. Over the quota (about 5 MB per site) the state is saved without geometries, with one message. Other keys:
-  `axpo_*`, `cad_*`, `cat_bookmarks`, `zrn_tok`. *Impostazioni avanzate* (`#tokBox`, at the foot of «Proprietà»):
+  `axpo_*`, `cad_*`, `cat_bookmarks`, `zrn_tok`. **Impostazioni** (`#setModal`, the ⚙ of the top bar, since 2026-11-02;
+  before, `#tokBox` at the foot of «Proprietà»):
   `storeInfo`, «Svuota il lavoro» (`clearWork`; theme, bookmarks, DWG placements stay), «Ripristina tutto» (every
   `APP_KEYS` key, then a reload).
 - **`.axpo`** (`projBuild`): a zip with `progetto.json`, `file/dwg-<n>-<name>`, `file/img-<n>-<name>` and
@@ -1382,7 +1441,7 @@ How the app works inside, by subject, with the traps to know before editing. The
   (the SDK not served by the CDN: «SDK non ancora caricato»), so that run is repeated too.
 - Every test page is a first visit (a fresh Chrome profile): the hook marks the first-visit tour as seen
   (`axpo_tour_seen`) before the app starts.
-- The twenty-eight harnesses:
+- The twenty-nine harnesses:
   - `smoke`: the view is ready, the app's layers, the Agenzia cadastre, six tabs and the panels' tabs.
   - `zoom`: the zoom after a selection goes only to the action's parcels, only when they are out of view.
   - `overlay`: the cadastre image placed to the pixel through pan, rotation, scale, switch and opacity (needs the AdE).
@@ -1426,6 +1485,9 @@ How the app works inside, by subject, with the traps to know before editing. The
   - `dragdrop`: the drag and drop of the Raccolta with dispatched drag events (into and out of subgroups, two selected,
     refused with the reason, an object into a custom group, the order of subgroups and groups, a closed block that opens,
     Annulla).
+  - `compact`: the compact panels (J5): every module's «i» and its window (Modifica's too), no paragraph in view, nothing
+    wider than the panel; every geoprocess card has its definition, no Copia in Geoprocessi; Importa's button; *Avanzate* and *Cosa disegni* closed show their value; Annulla and Ripeti in the top bar
+    (and they work); the ⚙ window opens and Esc closes it; on a phone the ⚙ is in «Altro».
 - **Trap:** the history photographs the work 0.5 s after it settles, and every change pushes the photo back: a harness
   that removes something and then tests Annulla waits for `drwHist.timer` to be 0 first, or the state before the
   removal was never photographed (`owners` failed once under the full suite on 2026-10-30).
@@ -2426,6 +2488,28 @@ on the tree of N3; the rules of 7b-1 decide (a parcel stays in Particelle, the o
 on release. One level of subgroups (M9). Tried with a real mouse drag in the built-in browser. New harness `dragdrop`
 (28). Formats unchanged. Backup: `geoportale_axpo_pre-trascinamento_2026-11-02.html`.
 
+**2026-11-02 (fourth step): the compact panels and the top bar (decisions J5a–J5h, approved by the user).** The pattern
+of the Ricerca panel (J1–J4) on the other panels, after a side-by-side comparison: Terreno, Disegna, Geoprocessi,
+Importa and Salva › Progetto as rows and fields with their labels inside, no cards or numbered steps, every explanation
+in the «i» by the panel's title (new windows `file`, `proj`, `elev`, and `drwAll`, `gpAll` that join the parts of a
+panel) or in the tooltips; Importa's buttons back in the panel; the steps whose tools are only the ribbon's left the
+panel (Disegna «Con quale strumento», Geoprocessi «Cosa fare»). The user asked too to move **Annulla and Ripeti** by
+Apri and Salva in the top bar (they serve every change), and the settings left the foot of every panel for a **⚙**
+window of the top bar (in «Altro» on a phone). Panel heights at 1366 × 768: Disegna 505 → 173 px, Terreno 249 → 69,
+Geoprocessi 221 → 58, File 119 → 32, Progetto 312 → 158. New harness `compact` (29); `commands`, `layout`, `responsive`, `texts`,
+`undo` updated. Formats unchanged. Backup: `geoportale_axpo_pre-pannelli-compatti_2026-11-02.html`.
+
+**2026-11-02 (fifth step): the ribbon in seven tabs (decisions K1–K7, approved by the user).** After a map of the menus
+(today, the user's proposal, a variant), the user chose the variant with *Crea area lorda* left in Ricerca: *Ricerca
+particelle · Analizza · Disegna · Modifica · Geoprocessi · Importa · Salva ed esporta*. Analizza is the old Terreno with
+the context, the route and the coordinates (five groups, to fit at 1366 px); Modifica holds the selection (one place:
+Seleziona and Riquadro left Ricerca), Deseleziona (new) and the editing tools, with one Copia whose popover has the
+parallel copy of the old Geoprocessi; the names that said different things became distinct (*Unione* in Geoprocessi,
+*A dalla mappa*, *Sito dalla mappa*). On a phone *Analizza* replaces *Terreno* in the bar and *Modifica* opens «Altro»;
+in the profile Base the empty Geoprocessi hides. Guide, tours and «i» rewritten; `commands`, `compact`, `layout`,
+`panelswap`, `profiles`, `raccolta`, `responsive`, `select`, `smoke`, `texts`, `tour` updated. Formats unchanged. Backup:
+`geoportale_axpo_pre-sette-schede_2026-11-02.html`.
+
 ## 8. Repository contents
 
 ```
@@ -2647,3 +2731,19 @@ in §7):
   `src/js/18-parcels.js`, `src/js/22-raccolta-ui.js` (rows `draggable`, `rowRename`), `src/js/22a-groups.js`,
   `src/js/22b-parcel-groups.js` (the headers `draggable`); `src/css/50-panels.css` (`.dnd*`); `src/html/30-modals.html`
   (the guide); `src/js/32-tour.js`; `tests/README.md`; `docs/architecture.md`; this README (§3, §4, §5, §7, §8).
+- **Seven tabs (2026-11-02, K).** Changed: `src/html/20-app-body.html` (the tabs, the pane of Analizza with the tool
+  modules, the pane of Modifica); `src/html/30-modals.html` (the guide); `src/js/30-ui-glue.js` (`SHELL`, the popover of
+  Copia, the ⓘ and «i» texts, `tabsProfSync`, the phone's bar and «Altro», Esc); `src/js/11-map-model.js`,
+  `src/js/16-layers-webmap.js`, `src/js/19-undock-sitefeatures.js`, `src/js/20-export-geoproc.js`,
+  `src/js/22-raccolta-ui.js`, `src/js/23b-select-edit.js`, `src/js/24-import-files.js`, `src/js/27-align-sr.js`,
+  `src/js/32-tour.js`; `tests/harness/commands.py`, `compact.py`, `layout.py`, `panelswap.py`, `profiles.py`,
+  `raccolta.py`, `responsive.py`, `select.py`, `smoke.py`, `texts.py`, `tour.py`; `tests/README.md`; this README (§4, §5, §7, §8).
+- **Compact panels and top bar (2026-11-02, J5).** New: `tests/harness/compact.py`. Changed: `src/html/10-topbar.html`
+  (Annulla, Ripeti, ⚙); `src/html/20-app-body.html` (the panels of Terreno, Disegna, Geoprocessi, Importa, Progetto; the
+  settings out); `src/html/30-modals.html` (`#setModal`, the guide); `src/js/30-ui-glue.js` (`info` of the modules, the
+  «i» texts, Annulla and Ripeti out of the ribbon, the `.rib` list, «Altro» on a phone, Esc); `src/js/29b-commands.js`
+  (`CMD_BAR`); `src/js/13-tools-select.js` (the ⚙); `src/js/14-state-project.js`, `src/js/16-layers-webmap.js`,
+  `src/js/17-slope.js`, `src/js/19-undock-sitefeatures.js`, `src/js/22-raccolta-ui.js`, `src/js/23-draw-cad.js` (the
+  panels' texts); `src/js/32-tour.js`; `src/css/20-shell.css`, `src/css/40-map-chrome.css`, `src/css/60-tour.css`,
+  `src/css/85-status-phone.css`; `tests/harness/commands.py`, `layout.py`, `responsive.py`, `texts.py`, `undo.py`; `tests/README.md`; `docs/architecture.md`;
+  this README (§3, §4, §5, §7, §8).
