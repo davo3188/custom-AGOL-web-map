@@ -82,7 +82,7 @@ py -3 scripts/build.py --check    exit 1 if the built file is not up to date
 py -3 scripts/make_tokens.py      writes src/css/10-tokens.css from design/tokens.json (the family's tokens); --check
 py -3 scripts/make_icons.py       writes src/html/05-icons.html, the sprite of the family icons the sources use; --check, --list
 py -3 scripts/make_kit.py         writes src/css/12-kit.css and 13-geo-kit.css from design/kit.css and geo-kit.css (verbatim); --check
-py -3 tests/run.py                headless checks, Python + Chrome, 27 harnesses, about eight minutes (see tests/README.md)
+py -3 tests/run.py                headless checks, Python + Chrome, 28 harnesses, about eight minutes (see tests/README.md)
 ```
 
 `design/` holds the design system's inputs, copied verbatim from the family (`tokens.json`, `icons/*.svg`, `kit.css`,
@@ -159,15 +159,22 @@ site and the writes to AREAS COLLECTION and IT - Site Features. This section fol
 
 ### Ricerca particelle
 
-Groups **Catasto · Aggiungi dalla mappa · Da un disegno · Raccolta**; the cadastral source is the Zornade API (§2).
-- **Catasto** › *Cerca particelle*: in Proprietà, region → province → municipality, the sheet (*foglio*) and one or
-  more parcels (comma or space), *Aggiungi alla Raccolta*. A chosen region offers its Check Vincoli map as a one-click
-  link (`wmSuggest`); it never swaps the map by itself.
-- **Aggiungi dalla mappa** (until 2026-11-02 «Sulla mappa», renamed so that «Seleziona» has one meaning): *Puntuale*,
-  *Rettangolo*, *Poligono*, *Linea* add parcels from the cadastre; the mode stays on until its button again or Esc.
-  With no mode on, a click on the map opens the layers' popups (since 2026-10-30 the web maps' vector tiles' too).
-- **Da un disegno**: a drawing, buffer, result or import chosen in Proprietà, then *Cerca*: the parcels it touches (a
-  point finds the parcel under it). The module title counts the usable objects.
+Groups **Catasto · Raccolta**; the cadastral source is the Zornade API (§2). Since 2026-11-02 (N1) the three ways to
+take parcels from the cadastre are the sections of one panel, *Ricerca particelle*, each closable (remembered); the
+ribbon keeps what acts on the parcels already collected. The sections are rows that close (J1, the chevron on the left,
+no box, icon or subtitle; a closed one shows its figure: the comune chosen, «2 disponibili»); their hints are the
+controls' tooltips and the examples one «i» by the panel's title (J2, `RC_INFO.rcAll`, the three windows in one); the
+labels sit inside the fields, Provincia and Comune side by side, Foglio and Particelle too (J3); the four modes on one
+row, *Punto · Rettangolo · Poligono · Linea* (J4). About 390 px instead of 650.
+- **Catasto** › *Cerca particelle* opens the panel:
+  - **Per foglio e particella**: region → province → municipality, the sheet (*foglio*) and one or more parcels
+    (comma or space), *Aggiungi alla Raccolta*. A chosen region offers its Check Vincoli map as a one-click link
+    (`wmSuggest`); it never swaps the map by itself.
+  - **Dalla mappa** (until 2026-11-02 the ribbon groups «Sulla mappa», then «Aggiungi dalla mappa»): *Puntuale*,
+    *Rettangolo*, *Poligono*, *Linea* add parcels from the cadastre; the mode stays on until its button again or Esc.
+    With no mode on, a click on the map opens the layers' popups (since 2026-10-30 the web maps' vector tiles' too).
+  - **Da un disegno** (until 2026-11-02 a ribbon group): a drawing, buffer, result or import, then *Cerca*: the
+    parcels it touches (a point finds the parcel under it). The section title counts the usable objects.
 - **Raccolta**: *Crea area lorda*, *Seleziona* and *Riquadro* (since 2026-11-02 the same tools as in Disegna: they pick
   the parcels already in the Raccolta), *Etichette sulla mappa* (parcel numbers, hidden below 1:150,000, `axpo_labels`),
   *Zoom sulle particelle*.
@@ -349,10 +356,21 @@ The left panel, *Raccolta*, with a count badge (parcels and objects); one scroll
   obstacle, linear, mitigation, agri → Aree di esclusione; buffers and results → Analisi; the rest → Altro; a custom
   category → its group. Standard groups show when populated, personal ones always. Groups are containers only: the
   category stays the role, and the portal never sees them.
+- **A tree** (since 2026-11-02, N3, as the layers of QGIS): no boxes; a group, a subgroup and an object are rows of the
+  same height, each level indented; the count and the hectares on the right of a group's row; its eye, names and ⋯
+  show on hover (the eye stays while the group is hidden; always on touch).
+- **Drag and drop** (since 2026-11-02, M8): a parcel's row onto a subgroup goes in, onto the Particelle row out of the
+  subgroups; an object's row onto a group goes in; a selected row brings the whole selection of its kind, with a label
+  «3 particelle» under the pointer. Where it cannot go nothing lights and the release says why (the rules of 7b-1). The
+  row of a subgroup, or of a custom group, dragged onto another goes before or after it (a line shows where; *Sposta su
+  / giù* stay in the menus, for the keyboard and touch). A closed block opens after 0.7 s under the pointer; near the
+  edges the panel scrolls. One Annulla per move. Not on touch screens (the menus *Sposta in…* stay).
 - **Group header**: tick all, name, count, total area, eye, names on the map, ⋯ (*Zoom sul gruppo*, *Spunta tutti*, *Togli le spunte*,
   *Sposta qui i selezionati*, *Elimina tutti gli oggetti*; personal groups also *Rinomina*, *Sposta su / giù*, *Elimina
   il gruppo*). Open or collapsed is remembered (`axpo_grp_open`).
-- **Particelle**: ⋯ with *Zoom sulle particelle* and *Nuovo sottogruppo*; «x,xx ha catastali»; the **subgroups** (one level, same
+- **Particelle**: «12 · 15,30 ha» in its row (the cadastral area; the tooltip says how many have none); ⋯ with *Zoom sulle
+  particelle*, *Nuovo sottogruppo*, *Colore di tutte le particelle…* and *Togli tutte le particelle* (until 2026-11-02 two
+  icons of the header); the **subgroups** (one level, same
   tools, *Zoom sul sottogruppo* first in their ⋯); the
   parcels without one; the owners' parcels last.
 - **Rows** of one line: checkbox (the selection), colour (picker: *Recenti*, `axpo_colori_recenti`; *Categorie*;
@@ -375,7 +393,8 @@ The left panel, *Raccolta*, with a count badge (parcels and objects); one scroll
 
 ### The right panel
 
-Tabs **Proprietà · Layer · Legenda** (`spanelSet`); the head carries the module's title, *Sgancia* and close. A tab
+Tabs **Proprietà · Layer · Legenda** (`spanelSet`); the head carries the module's title, its «i» when the module is one
+card (since 2026-11-02, N2: the card then shows no title of its own), *Sgancia* and close. A tab
 change or a ribbon tool with a module brings Proprietà back; at its foot, *Impostazioni avanzate* (see *Project*).
 - **Layer**: *Aggiungi layer dal portale* (search by title, `ADDABLE` item types, sign-in); *Layer in mappa*, the Esri
   LayerList with a search by name, drag-and-drop order and, per layer, transparency, popup on/off and an **attribute
@@ -575,7 +594,17 @@ How the app works inside, by subject, with the traps to know before editing. The
 - `SHELL` (`30-ui-glue.js`) describes each tab: `mods` (id, title, line, icon, and `roots`, the selectors of the pane
   elements that belong to the module) and `groups` (`label`; `more`, the key of its «Di più» window; `tools`; optional
   `when()`, `end`, `cls`). `modShow(tab, id)` shows one module (the others get `.mod-off`), opens a `details`, titles
-  the panel head and brings «Proprietà» back; `modShowFor(el)` opens the module that holds an element.
+  the panel head and brings «Proprietà» back; `modShowFor(el)` opens the module that holds an element. Since
+  2026-11-02 (N1, N2) a module may have several roots: Ricerca's three `details` are its sections, left open or closed
+  as the user left them (`axpo_sezioni_aperte`); a module of one `details.imod` is opened and marked `.solo` (no
+  summary, no border) and its «i» goes to the head (`#sideInfo`, hidden in Layer and Legenda). The labels of
+  *Progetto*, *Modifica AREAS COLLECTION* and *Stampa* (`.tlab`) are hidden for the same reason. A module of several
+  cards can name its own «i» (`info` in `SHELL`, Ricerca's `rcAll`); its cards are `details.imod.flat`, rows that close
+  (`60-tour.css`, J1–J4: `.rcpair` places two fields side by side, `.segbtns.rcmodes` four buttons on a row).
+- **Trap:** the panel controls that a ribbon tool presses are hidden over 768 px with `.rib` (the list in
+  `30-ui-glue.js`, «the panel controls the ribbon now holds»). A control whose tool leaves the ribbon must leave the
+  list, or the panel shows its section empty: on 2026-11-02 the buttons of «Dalla mappa» (`#selModeBox`) were hidden
+  until the user saw it; `parcelsel` now checks them.
 - A tool is `{id, t, i, size: large|medium|small}` plus an action — `press` (clicks a control and mirrors its `.active`,
   `aria-pressed`, `aria-checked`, `disabled`, `title`), `toggle`, `mod`, `fn`, `focus` (a setting, not a module
   switcher), `menu()` + `pick(v)`, `pop()` (a form), `num` (an inline number: `unit`, `min`, `step`), `sel` (a mirrored
@@ -860,6 +889,24 @@ How the app works inside, by subject, with the traps to know before editing. The
 - Delete: a strip refuses; deleting the net area turns its automation off; a saved object asks, when signed in, whether
   to delete it on the portal too (`sfDeleteRemote`; a whole group `sfDeleteRemoteMany`, one `applyEdits` per layer).
   Annulla restores the list, not the portal.
+- **Drag and drop** (M8, `22d-drag.js`): the browser's own drag and drop, listeners on `#drawerElenco` (they move with
+  the undocked window). Rows are `draggable` where `canOk(o,'move')` (not the owners' parcels), the subgroups' rows and
+  the custom groups' rows too. `dndStart` takes the row's object or, when it is selected, the selection of its kind
+  (`selParcels`, the movable `selList`); `dndTarget` reads the block under the pointer (`.psub`, the Particelle
+  `.gsec`, `.ggrp`) and says ok or why not; `dndOver` lights the block (`.dndover`) or the line of an order
+  (`.dndbefore`, `.dndafter`, by the half of the row), opens a closed block after `DND_OPEN_MS` and scrolls near the
+  edges; `dndDrop` moves with `pgrpAssign` / `grpAssign` (each one Annulla) or reorders (`dndOrder`, `histName`);
+  `dndEnd` says the last «why not» when nothing took the drop. The drag image is a `.dndghost` set with
+  `setDragImage` and removed at once. `rowRename` turns the row's `draggable` off while the name is edited.
+- **Trap:** a test dispatches the drag events itself (`DragEvent` with a `DataTransfer`): a `dragover` that is not
+  `defaultPrevented` means refused, and no `drop` follows (as in the browser).
+- **The tree** (N3, the last block of `50-panels.css`, scoped to `#drawerElenco`): `.gsec`, `.psub` lose border and
+  padding, `.glist` and `.psubB` indent 14 px, `.gsecH` / `.psubH` are 28 px rows; `.psubN` puts the name and the figure
+  on one line; the owners' rows (`.gown`) too.
+- **Trap:** the hidden tools of a header row are 0 px wide, not only transparent: transparent they kept 66 px and cut
+  the subgroups' names. They widen on hover or focus, so the name shortens while the pointer is on the row.
+- **Trap:** a menu item that opens the colour picker opens it after the click (`setTimeout`): the document's click
+  that closes the picker would close it at once.
 - **Trap:** `.grp` is the kit's toolbar, so a group block is `.ggrp`; `.gsub` is the row subtitle, so a subgroup block
   is `.psub` (narrow: `.psubN` stacks the name above the figures).
 - **Trap:** the automatic net area makes «Aree di progetto» a mixed group: switch it off before testing category lines.
@@ -1335,7 +1382,7 @@ How the app works inside, by subject, with the traps to know before editing. The
   (the SDK not served by the CDN: «SDK non ancora caricato»), so that run is repeated too.
 - Every test page is a first visit (a fresh Chrome profile): the hook marks the first-visit tour as seen
   (`axpo_tour_seen`) before the app starts.
-- The twenty-seven harnesses:
+- The twenty-eight harnesses:
   - `smoke`: the view is ready, the app's layers, the Agenzia cadastre, six tabs and the panels' tabs.
   - `zoom`: the zoom after a selection goes only to the action's parcels, only when they are out of view.
   - `overlay`: the cadastre image placed to the pixel through pan, rotation, scale, switch and opacity (needs the AdE).
@@ -1376,6 +1423,9 @@ How the app works inside, by subject, with the traps to know before editing. The
   - `parcelsel`: the parcels in the selection (a click under a gross area and the second click, Shift, Riquadro, the
     filter and «Spunta tutte», the range, the right-click and a subgroup of the selection, Canc and Annulla, the map's
     right-click, Rimodella and Copia on a parcel).
+  - `dragdrop`: the drag and drop of the Raccolta with dispatched drag events (into and out of subgroups, two selected,
+    refused with the reason, an object into a custom group, the order of subgroups and groups, a closed block that opens,
+    Annulla).
 - **Trap:** the history photographs the work 0.5 s after it settles, and every change pushes the photo back: a harness
   that removes something and then tests Annulla waits for `drwHist.timer` to be 0 first, or the state before the
   removal was never photographed (`owners` failed once under the full suite on 2026-10-30).
@@ -2357,6 +2407,25 @@ twice). Formats unchanged (`.axpo`, Site Features): PV Predesign has nothing to 
 (a strip and a parcel are selected, Rimodella says why not), `search`, `texts` and `profiles` follow the names. Backup:
 `geoportale_axpo_pre-selezione-particelle_2026-11-02.html`.
 
+**2026-11-02 (second step): the Ricerca panel, no repeated titles, the Raccolta as a tree (decisions N1–N4, approved by
+the user).** After PR 46 the user asked to bring the tools that take parcels from the cadastre back under the search by
+sheet and number (keeping *Seleziona* in the ribbon), to stop «Ricerca particelle» appearing twice in the right panel,
+and a Raccolta of rows instead of boxes. Done: one module *Ricerca particelle* with three sections, *Per foglio e
+particella*, *Dalla mappa*, *Da un disegno* (also moved, asked by the user), and a ribbon of two groups, Catasto and
+Raccolta (N1); a module of one card shows no title of its own and its «i» goes to the panel head, in Importa too, and
+the labels of Progetto, Modifica AREAS COLLECTION and Stampa go (N2); the Raccolta as a tree, the Particelle count and
+area in its row, colour and «togli tutte» in its ⋯, no «Senza sottogruppo» line (N3). The drag and drop (M8) is next,
+on the tree; the company repo and davo3188 are aligned at the end of the round (N4). Then, seen by the user, the Ricerca
+panel without its texts in view (J1–J4, approved): the sections as rows that close, one «i» by the title, the hints as
+tooltips, the labels inside the fields, the four modes on a row; the same for the other panels after M8 (J5). `texts` (26 groups), `profiles` and
+`raccolta` follow. Backup: `geoportale_axpo_pre-raccolta-albero_2026-11-02.html`.
+
+**2026-11-02 (third step): drag and drop in the Raccolta (decision M8, approved by the user).** The fourth request of the
+day: rows dragged into the subgroups and the groups, and the subgroups and the custom groups reordered by dragging,
+on the tree of N3; the rules of 7b-1 decide (a parcel stays in Particelle, the owners' parcels do not move) and say why
+on release. One level of subgroups (M9). Tried with a real mouse drag in the built-in browser. New harness `dragdrop`
+(28). Formats unchanged. Backup: `geoportale_axpo_pre-trascinamento_2026-11-02.html`.
+
 ## 8. Repository contents
 
 ```
@@ -2367,6 +2436,7 @@ src/js/16b-geo-frame.js    the local metric frame (phase 4a): every geometric op
 src/js/22a-groups.js       the groups of the Raccolta (G2-4a): the model, the custom groups, the blocks of the drawer
 src/js/22b-parcel-groups.js  the parcel subgroups (G2-4b): the model, the menus, the nested blocks of Particelle
 src/js/22c-rules.js        what can be done to what (7b-1): the kinds of object, the table of rules, can()
+src/js/22d-drag.js         the drag and drop of the Raccolta (M8, 2026-11-02): rows into groups and subgroups, the order
 src/js/19b-custom-cats.js  the custom categories (G2-5b): the model, the values sf_ext, the modal «Le mie categorie»
 src/js/23b-select-edit.js  Seleziona e modifica (G2-3; parcels since 2026-11-02): the selection on the map, its menus and Canc, the edit tools, the exclusion from the layers
 src/js/29b-commands.js     the commands (7a): the name each action gives to its Annulla; the registry and the shortcuts; the profiles (7b-2)
@@ -2565,3 +2635,15 @@ in §7):
   dalla mappa», the help); `src/js/32-tour.js`; `src/html/20-app-body.html` (`#rcSelBar`); `src/html/30-modals.html`
   (`#ctxSel`, the guide); `src/css/50-panels.css`, `src/css/60-tour.css`; `tests/harness/rules.py`, `search.py`,
   `texts.py`, `profiles.py`; `tests/README.md`; `docs/architecture.md`; this README (§3, §4, §5, §7, §8).
+- **The Ricerca panel and the Raccolta tree (2026-11-02).** Changed: `src/html/20-app-body.html` (the three sections,
+  `#sideInfo`, the Particelle header); `src/js/30-ui-glue.js` (the Ricerca module and groups, `modShow` and `.solo`,
+  the texts); `src/js/18-parcels.js` (the figure `#cnt`, no `#listTot`, no «Senza sottogruppo»);
+  `src/js/22b-parcel-groups.js` (colour and «togli tutte» in ⋯); `src/js/12-zornade.js`, `src/js/14-state-project.js` (the
+  labels inside the menus); `src/js/22-raccolta-ui.js` («2 disponibili»); `src/js/32-tour.js`; `src/html/30-modals.html` (the
+  guide); `src/css/50-panels.css` (the tree), `src/css/60-tour.css` (`.imod.solo`), `src/css/90-tools-a11y.css`;
+  `tests/harness/texts.py`, `profiles.py`, `raccolta.py`, `groups.py` (no line), `parcelsel.py` (the buttons of «Dalla
+  mappa» shown); `tests/README.md`; this README (§4, §5, §7, §8).
+- **Drag and drop (2026-11-02).** New: `src/js/22d-drag.js`, `tests/harness/dragdrop.py`. Changed: `src/manifest.txt`;
+  `src/js/18-parcels.js`, `src/js/22-raccolta-ui.js` (rows `draggable`, `rowRename`), `src/js/22a-groups.js`,
+  `src/js/22b-parcel-groups.js` (the headers `draggable`); `src/css/50-panels.css` (`.dnd*`); `src/html/30-modals.html`
+  (the guide); `src/js/32-tour.js`; `tests/README.md`; `docs/architecture.md`; this README (§3, §4, §5, §7, §8).
