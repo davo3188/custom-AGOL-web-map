@@ -82,7 +82,7 @@ py -3 scripts/build.py --check    exit 1 if the built file is not up to date
 py -3 scripts/make_tokens.py      writes src/css/10-tokens.css from design/tokens.json (the family's tokens); --check
 py -3 scripts/make_icons.py       writes src/html/05-icons.html, the sprite of the family icons the sources use; --check, --list
 py -3 scripts/make_kit.py         writes src/css/12-kit.css and 13-geo-kit.css from design/kit.css and geo-kit.css (verbatim); --check
-py -3 tests/run.py                headless checks, Python + Chrome, 32 harnesses, about eight minutes (see tests/README.md)
+py -3 tests/run.py                headless checks, Python + Chrome, 33 harnesses, about eight minutes (see tests/README.md)
 ```
 
 `design/` holds the design system's inputs, copied verbatim from the family (`tokens.json`, `icons/*.svg`, `kit.css`,
@@ -453,6 +453,11 @@ foot of every panel) are the ⚙ of the top bar.
   turns into a funnel while on). Added layers have ⋯ *Zoom al layer* / *Rimuovi dalla mappa*. The vector tile layers whose tiles carry attributes open a
   popup too (§5.7). A red card (`#svcStatus`)
   with *Riprova ora* shows while the cadastre does not answer.
+  At every map change the app checks which layers of the map load here (since 2026-11-03): the row *«n layer non
+  disponibili qui»* above the list opens the window **Layer non disponibili** — the layers by reason (blocked by the
+  browser: a server without CORS or not answering; http; access needed; server error; no answer in 30 s), the layers
+  turned on in the map before that the new one lacks, *Apri nel Map Viewer* (where they show, through the ArcGIS
+  Online proxy) and *Copia elenco* (with the services' addresses). A message after the change says how many.
 - **Catasto AdE**: the Agenzia delle Entrate WMS drawn as one image over the map (EPSG:4258, `adeOv*`): sheets with
   their numbers from 1:25,000, parcels and buildings below 1:5,000, parcel numbers below 1:2,000; its Layer entry is the
   switch and the opacity (50 % at start). The web maps' own national cadastre (`382d9c13…`, `05ccc51f…`) is removed in
@@ -844,6 +849,25 @@ How the app works inside, by subject, with the traps to know before editing. The
 - **Layer list**: `LayerList` with `layerListItem`, drag-and-drop and a name filter; an item's panel (legend, opacity,
   popup, labels, attribute filter) is built on first opening; the icon becomes a funnel while filtered. Layers the app
   added (`llMine`) get «Zoom al layer» and «Rimuovi dalla mappa».
+- **Which layers load** (`16c-layer-check.js`, since 2026-11-03, C1–C5): after `loadWebMap` sets the map, `lcAfter`
+  runs `lcCheck` on the layers of the web map (`lcLayers`: through the groups, not the app's own, not the ones the user
+  added): their description only (`layer.load()`, no images), `LC_CONC` = 4 at a time, `LC_WAIT` = 30 s each (a slow
+  one is listed and leaves the list when it answers). `lcReason` sorts a failure from the SDK's nested error
+  (`svcMsgs`): `cors` (http 0, «Failed to fetch»), `http` (an http address from an https page), `auth` (401, 403, 498,
+  499, token), `server`. A `layerview-create-error` adds a layer that fails when drawn (`lcWatch`). One message with
+  «Vedi elenco ›» (`lcOpen`), the row `#lcRow` of the Layer panel, the window `#lcModal` (`lcRender`, `lcText` for
+  *Copia elenco*, `lcMapViewer`). `lcMark` keeps the visibility each layer starts with (`_lcVis0`, through the groups),
+  `lcPrevOn` lists, at the next change, what the user turned on and the new map lacks (C5). Requests are numbered
+  (`lcState.run`): a check overtaken by a newer map says nothing.
+- **Trap:** the Esri `LayerList` loads every layer of the list, hidden ones too, and drops the row of a layer whose
+  load failed: without the check a layer of a server without CORS vanished from the list with no message (tried on
+  2026-11-03 with GNA and Regione Lazio). The Map Viewer shows those layers through the ArcGIS Online proxy, which
+  an app of ours cannot use; the cure is a proxy of our own or another source, not the check.
+- **Trap:** loading a secured ArcGIS service the session cannot read sends the page to the sign-in (the
+  IdentityManager's OAuth redirect; seen on 2026-11-03 with AREAS COLLECTION signed out). `lcGuard` first asks a
+  `/rest/services/` address, or the item of a layer with no url, through `esri/request` with `authMode:'no-prompt'`
+  («Token Required [http 499]», no redirect) and does not load what needs an access. The `LayerList` has no such
+  guard: such a layer in a web map, with the Layer panel open, would do the same.
 - **Vector tile popups** (2026-10-30, `vtp*` at the end of `16-layers-webmap.js`, wired by `vtpWire` in
   `11-map-model.js`): on a click with `view.popupEnabled` (no mode armed), no measure, no sketch and no object of the
   Raccolta under the pointer, `vtpFeatures` hit-tests the `vector-tile` layers of `view.map.allLayers` that are not the
@@ -1499,7 +1523,7 @@ How the app works inside, by subject, with the traps to know before editing. The
   (the SDK not served by the CDN: «SDK non ancora caricato»), so that run is repeated too.
 - Every test page is a first visit (a fresh Chrome profile): the hook marks the first-visit tour as seen
   (`axpo_tour_seen`) before the app starts.
-- The thirty-two harnesses:
+- The thirty-three harnesses:
   - `smoke`: the view is ready, the app's layers, the Agenzia cadastre, six tabs and the panels' tabs.
   - `zoom`: the zoom after a selection goes only to the action's parcels, only when they are out of view.
   - `overlay`: the cadastre image placed to the pixel through pan, rotation, scale, switch and opacity (needs the AdE).
@@ -1554,6 +1578,9 @@ How the app works inside, by subject, with the traps to know before editing. The
   - `print`: the module Stampa (groups with the owners' off, basemaps, the dashed sheet and its removal), the sheet at
     1:2.000, the PDF without and with a basemap (texts, numbers, data, legend, no owner's name, A3 portrait), the app's
     basemaps whole afterwards; the last PDF goes to `tests/out/print_<size>.pdf`.
+  - `lcheck`: which layers load: the reasons; a map of invented layers (one loads, one without CORS in a group, a
+    404, a slow one that answers later, a secured one never loaded, a real WMS with no server); the row, the window,
+    *Copia elenco*, *Apri nel Map Viewer*, Esc; the message after a change; the layers of the map before.
 - **Trap:** the history photographs the work 0.5 s after it settles, and every change pushes the photo back: a harness
   that removes something and then tests Annulla waits for `drwHist.timer` to be 0 first, or the state before the
   removal was never photographed (`owners` failed once under the full suite on 2026-10-30).
@@ -2594,6 +2621,19 @@ of the app (and of the layers switched on, when asked), data, legend, scale, nor
 map shows the sheet; on the phone too. New harness `print` (32). Backup: `geoportale_axpo_pre-stampa_2026-11-03.html`
 (from UBS-IT `48b4171`).
 
+**2026-11-03 (fourth step): which layers load in the app (C1–C5, approved by the user).** The user asked how to see
+which layers of the Check Vincoli disappear: those of servers without CORS fail in the browser, and the Esri
+LayerList drops their rows without a word. `scripts/check_webmap_layers.py` (run the same day: 90 layers without
+CORS in the 17 CVs — Friuli 59, Lazio 12, Basilicata 3, Veneto 3, the others 1, GNA) says it for every map in
+advance; the app now says it for the map in use. C1: at every map change the description of each layer is loaded
+(no images, four at a time, 30 s each) and the failures sorted by reason; C2: a message with «Vedi elenco ›»; C3: the
+window «Layer non disponibili» with *Apri nel Map Viewer* and *Copia elenco*; C4: a row in the Layer panel, and a
+layer that fails when drawn joins the list; C5: the layers turned on in the map before that the new one lacks. Found
+while testing: a secured service the session cannot read sent the page to the sign-in, so it is asked first without
+prompting (`lcGuard`). It shows the problem and does not cure it: that takes a proxy (Azure, waiting for the Actions)
+or other sources. New harness `lcheck` (33). Backup: `geoportale_axpo_pre-controllo-layer_2026-11-03.html` (from
+UBS-IT `a4c0dd8`).
+
 ## 8. Repository contents
 
 ```
@@ -2845,3 +2885,9 @@ in §7):
   panels' texts); `src/js/32-tour.js`; `src/css/20-shell.css`, `src/css/40-map-chrome.css`, `src/css/60-tour.css`,
   `src/css/85-status-phone.css`; `tests/harness/commands.py`, `layout.py`, `responsive.py`, `texts.py`, `undo.py`; `tests/README.md`; `docs/architecture.md`;
   this README (§3, §4, §5, §7, §8).
+- **Which layers load (2026-11-03, C1–C5).** New: `src/js/16c-layer-check.js` (in `src/manifest.txt` after
+  `16b-geo-frame.js`), `tests/harness/lcheck.py`. Changed: `src/js/16-layers-webmap.js` (`lcMark`, `lcPrevOn`, `lcAfter`
+  in `loadWebMap`); `src/js/30-ui-glue.js` (`lcModal` in the dialogs, the backdrop and Esc); `src/html/20-app-body.html`
+  (`#lcRow`); `src/html/30-modals.html` (`#lcModal`, the guide); `src/css/40-map-chrome.css`, `src/css/85-status-phone.css`;
+  `tests/README.md`; `docs/architecture.md`; `../reports/collaudo_login_vero_2026-10-27.md` (1.7); this README (§3, §4,
+  §5, §7, §8).
