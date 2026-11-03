@@ -82,7 +82,7 @@ py -3 scripts/build.py --check    exit 1 if the built file is not up to date
 py -3 scripts/make_tokens.py      writes src/css/10-tokens.css from design/tokens.json (the family's tokens); --check
 py -3 scripts/make_icons.py       writes src/html/05-icons.html, the sprite of the family icons the sources use; --check, --list
 py -3 scripts/make_kit.py         writes src/css/12-kit.css and 13-geo-kit.css from design/kit.css and geo-kit.css (verbatim); --check
-py -3 tests/run.py                headless checks, Python + Chrome, 29 harnesses, about eight minutes (see tests/README.md)
+py -3 tests/run.py                headless checks, Python + Chrome, 32 harnesses, about eight minutes (see tests/README.md)
 ```
 
 `design/` holds the design system's inputs, copied verbatim from the family (`tokens.json`, `icons/*.svg`, `kit.css`,
@@ -334,7 +334,10 @@ every operation are in the «i», `GP_INFO.gpAll`). Distances and tolerances are
 Groups **File · CAD · Immagini · Servizi web · Portale**; one module at a time in Proprietà: its button (*Scegli uno o
 più file…*, *Scegli un disegno DWG…*, *Scegli un'immagine…*, J5b) or the service's address, then what it has loaded and
 the last message; how it works is the «i» by the panel's title.
-- **File**: GeoJSON, KML, KMZ, Shapefile (.zip), into the group *Altro*. A file without a CRS is converted by itself
+- **File**: GeoJSON, KML, KMZ, Shapefile (.zip), into the group *Altro*; a file exported from here comes back to its
+  place (since 2026-11-03, B2): the parcels to Particelle in their subgroup (those already there skipped), the drawings
+  to their category and their own group; the automatic strips and net area are left out (they come back from their
+  sources). A file without a CRS is converted by itself
   only when Web Mercator is its only reading on Italian soil; otherwise *Coordinate sconosciute* opens with the
   candidates and the whole file is reprojected with the system chosen.
 - **The owners file** of the separate *Estrazione intestatari* tool (recognised by `sister_stato`): parcels named
@@ -373,15 +376,26 @@ whose tooltip and the «i» say what the copy leaves out).
   `_aree`). **File name** (`exBaseName`): municipality, date, parcels — `Borgo_Inventato_YYYY-MM-DD_6part.geojson`;
   several municipalities add `_e_altri_n`; no parcels gives `export_YYYY-MM-DD`.
 - **Portale AGOL** (needs sign-in; each write confirmed in a window):
-  - *Migra particelle in AREAS*: the Raccolta's parcels become features of **AREAS COLLECTION** (layer 426), one each or
-    one dissolved area (*Dissolvi*), with area class, area type, source, *Estrazione massiva*, project type. REGIONE and
+  - *Migra particelle in AREAS*: the parcels ticked in the Raccolta, or all when none is (since 2026-11-03, B1; the
+    window lists them with the same ticks, as Esporta), become features of **AREAS COLLECTION** (layer 426): one each,
+    one dissolved area, or one dissolved area per subgroup (*Come*), with area class, area type, source, *Estrazione massiva*, project type. REGIONE and
     PROVINCIA are the parcel's own, COMUNE and PRO_COM_T from ISTAT, the area geodesic, `ID_univoco` automatic.
   - *Salva disegni in Site Features*: drawings, results and imports go to **IT - Site Features** with category, type,
     attributes, name, note, source, status and site (`AREA_GUID`, `PROJECT_CODE`); the first save adds, the next update
     (`sf_gid`, no duplicates). *Solo gli spuntati*; objects of an app-only category stay out unless the window gives
     their geometry a model category; owners' parcels are skipped. A cloud icon marks saved rows (orange: changed since).
   - *Modifica AREAS COLLECTION*: the Esri Editor in Proprietà, on the General Map only (computer only).
-- **Stampa**: the Esri Print widget in Proprietà; the cadastre image does not print; computer only.
+- **Stampa** (since 2026-11-03, S1–S6): a PDF like the report of PV Predesign, on the computer and on a phone. A4 or
+  A3, landscape or portrait; the blue bar, the title (the project's name or the comuni when empty), the date, the comuni
+  and the coordinates of the centre; the map in a frame at an exact scale (*Adatta alla Raccolta*: the ticked groups at the
+  nearest round scale; *Come la mappa*; or 1:1.000, 2.000, 5.000, 10.000, 25.000 from the map's centre); a column with
+  *Dati* (parcels and hectares, gross and net area, the exclusions summed, the comuni), *Legenda* (what is drawn, with the
+  scale bar and the north) and *Note*; the footer «scouting, non per costruzione» with the scale and the basemap. *Nella
+  mappa* ticks the groups of the Raccolta (the parcels with their numbers or not; the owners' parcels off, printed without
+  names) and *Layer accesi della mappa*; *Sfondo* is *Nessuno*, a basemap of the gallery or the one in use. The Raccolta
+  is drawn as vectors, the basemap and the layers as images. While the module is in sight a dashed rectangle on the map
+  shows the sheet; *Inquadra* brings the map to it. The cadastre of the Agenzia does not print (its server gives no CORS):
+  the parcels of the Raccolta carry their numbers instead.
 
 ### The Raccolta
 
@@ -458,7 +472,11 @@ foot of every panel) are the ⚙ of the top bar.
 - **Top right**: the search lens, the Esri Search widget (Esc, a click outside or a result closes it): addresses, or
   `lat, lon` (decimal comma, DMS) or a projected `X Y` whose system it guesses; a coordinate pair wins over the geocoder.
   Under it the **measures**: *Misura lineare*, *Misura area*, *Pulisci*, the Esri Measurement widget in a small card
-  (`#msCard`); Esc and other map modes close it; measures are not saved.
+  (`#msCard`); Esc and other map modes close it; measures are not saved. Under the measures the **selection** (since
+  2026-11-03, T1), in every tab: a button whose menu has *Seleziona*, *Riquadro* and *Deseleziona* (pressed while a mode
+  is on); the editing tools are in the right-click menu of the selection, only those that apply to it (*Rimodella* and
+  *Copia* for one object, *Sposta e ruota*, *Dividi* for areas, *Unisci* for two or more), then the groups, the zoom and
+  *Togli*. The tab Modifica keeps all of them, with the card of the selected object.
 - **Top left**: zoom, compass (the map rotates; a click puts north up), GPS (Esri Locate at 1:2,500; needs https),
   **Zoom sulla Raccolta**, **Luoghi** (Esri Bookmarks that also restore layer visibility, `cat_bookmarks`).
 - **Bottom right** the basemap chip: *Topografica*, *Satellite*, *Ortofoto AGEA* 2024, 2023 and 2022, *Stradale*, with
@@ -542,7 +560,7 @@ bar.
 
 - Up to 768 px the tabs, ribbon, strips and status bar hide; a bar at the foot has *Cerca · Analizza · Disegna ·
   Raccolta* (with the count) *· Altro* (Modifica, Geoprocessi, Importa, Salva ed esporta, Layer, Legenda, Mappa di base,
-  Luoghi, Impostazioni, Guida rapida). The top bar keeps Apri, Salva, Annulla and Ripeti. Stampa, Modifica AREAS COLLECTION and the tours stay on the computer; **?** opens the guide,
+  Luoghi, Impostazioni, Guida rapida). The top bar keeps Apri, Salva, Annulla and Ripeti. Modifica AREAS COLLECTION and the tours stay on the computer (Stampa goes on the phone since 2026-11-03); **?** opens the guide,
   with the profile at its foot.
 - The panels are sheets over the map, one at a time: 31 % of the screen at rest, 84 % with the handle, × to close. A
   tab's sheet shows its ribbon tools first, group by group, then the module. A map mode drops the sheet to rest and
@@ -561,8 +579,8 @@ How the app works inside, by subject, with the traps to know before editing. The
   under `src/` is copied, `= text` emits that line, `=` an empty line; blank lines and `#` comments are ignored. The
   output is reproducible byte for byte, with LF endings, and goes through a `.tmp` file that then replaces the target.
 - Order: `html/00-head.html`; all CSS in one `<style>` (tokens, base, kit, geo-kit, icon placement, then the app's
-  rules by area); the body (`05-icons.html`, top bar, app body, modals); four classic `<script>` blocks: `09-icons.js`
-  to `29-logo.js` in one, then `30-ui-glue.js`, `31-measure-coords.js` and `32-tour.js` in one each.
+  rules by area); the body (`05-icons.html`, top bar, app body, modals); five classic `<script>` blocks: `09-icons.js`
+  to `29-logo.js` in one, then `30-ui-glue.js`, `31-measure-coords.js`, `32-tour.js` and `33-print.js` in one each.
 - `design/` holds the family's inputs verbatim (`tokens.json`, `icons/*.svg`, `kit.css`, `geo-kit.css`); change them
   there, then run the generators. `make_tokens.py` → `src/css/10-tokens.css` (light values on `:root`, dark values that
   differ on `[data-theme="dark"]`, `{ref}` → `var(--ref)`, old names kept as aliases: `--acc`, `--on-accent`,
@@ -603,7 +621,7 @@ How the app works inside, by subject, with the traps to know before editing. The
   fails silently in a browser. The page signs in by itself unless the URL has `?noauto`; signed out, `onSignedOut`
   prints the exact redirect URI to register (console; sign-in tooltip on localhost).
 - Still deprecated, left for 5.x because it means rewriting: the widgets (BasemapGallery, LayerList, Legend,
-  Bookmarks, Search, Print, ScaleBar, Measurement, Editor, ElevationProfile) and the `projection` and `geometryEngine`
+  Bookmarks, Search, ScaleBar, Measurement, Editor, ElevationProfile; Print went on 2026-11-03) and the `projection` and `geometryEngine`
   modules. New code uses `watchProp` (`reactiveUtils.watch`) and `centroidOf` (`centroidOperator`).
 - **Trap:** `credential-create` fires once per authenticated service (about twenty for the General Map): `onSignedIn`
   is guarded (`signInBusy`, `signInFailed`) and says «connected» only once the portal has loaded.
@@ -650,6 +668,33 @@ How the app works inside, by subject, with the traps to know before editing. The
   is nothing to say (`#drwMsg:empty`… hidden). Geoprocessi's step 2 is `.rib` as a whole (its cards are pressed by
   the ribbon); Disegna's former step 2 (`#drwStep2.drwtools`) keeps the hidden tool cards, the exact shapes and the
   status line. The wide panel (over 640 px) no longer has grid areas for those steps.
+- **The selection on the map** (2026-11-03, T1): `#selStack` under `#msStack` (same button and menu styles, `#selMapMenu`),
+  wired in `13-tools-select.js` as the measures (a click outside and Esc close the menu, arrows move in it); `selMapSync`
+  (`23b-select-edit.js`) keeps it pressed while `selOn()` or `selBoxOn()`, called by `selRender`, by `ribbonSync` and by
+  the 350 ms loop of the mode banner. Riquadro arms Seleziona too: a first Esc ends the rectangle, a second the selection.
+  `selEditActs` puts the editing tools that apply first in `selMenuActs`, the menu of the selection on the map and on the
+  rows.
+- **The print** (2026-11-03, S1–S6; `33-print.js`). jsPDF 2.5.1 is fetched from cdnjs at the first print and run with
+  no AMD `define` in sight (`prLib`). `prFrame(o)` puts the sheet on the ground in the local metric frame (16b): the map
+  frame of `prLayout` (mm) times the scale N gives a true rectangle in metres, drawn dashed on `view.graphics` (`__pr`)
+  while the module is in sight (`prSync` from `modShow`, `prWant` from `ribbonSync` and the 350 ms loop: a tab change or
+  the panel closed take it away). `prBuild(o, {dpi})` returns `{doc, name, info}` (the test reads it; `prGo` saves): the
+  background, then the Raccolta as jsPDF paths in the frame's metres, clipped to the frame, then the scale bar and north,
+  the header, the column, the footer. Standard PDF fonts are Latin-1: `prTxt` turns ’ – → … into ASCII.
+- **Trap (print background):** the images come from MapViews out of sight (`prShot`, a div at −20000 px) over the
+  frame's extent, then `takeScreenshot`. `Basemap.clone()` keeps the same layer instances, and most layers have no
+  `clone()` in 4.34 (TileLayer, WMSLayer): destroying a view destroys its map, so a copy would destroy the app's
+  basemap. The view shows the app's own basemap in a new Map and, before `destroy()`, sets `map=null`; the layers switched
+  on are a second view on the app's map itself with the basemap and the graphics layers hidden per view
+  (`layerView.visible=false` at `layerview-create`), a PNG over the JPEG. At d dpi the view stands at 1:N·96/d for the SDK
+  (1:1.000 on paper is 1:640 at 150 dpi): past a layer's `maxScale` it does not draw (AGEA stops at 1:2.257), so
+  `prDpiFor` lowers that image's dpi to the layer's own detail. Places without data are painted white (a JPEG makes them
+  black; an AGEA year covers part of Italy); an image of one colour is left out and the message says why. The view waits
+  for `updating` half a second at a time (a minute at most, then what it has, flagged slow).
+- **Trap (print, tests):** headless Chrome does not draw a second MapView (blank screenshots, `updating` never ends, with
+  and without virtual time), so the harness `print` checks the path, the note and that the app's basemaps are whole, not
+  the image; its content was checked in the browser pane (Satellite, AGEA 2023, Topografica; AGEA 2024 and 2022 out of
+  coverage at the test place) and with a windowed Chrome off screen.
 - **The seven tabs** (2026-11-02, K1–K7): the ids are `ricerca`, `analizza` (until then `terreno`), `disegno`,
   `modifica`, `geoproc`, `import`, `export`. The tool modules (`TOOLS`: slope, elev, ctx, rte, sr) are `.toolpane`s of
   Analizza (`toolOpen` shows that tab; Esc in the context, the route or the coordinates goes back to the slopes);
@@ -771,8 +816,8 @@ How the app works inside, by subject, with the traps to know before editing. The
 
 ### 6. Phone and tablets
 
-- Up to 768 px (`isPhone`): the bar `#mbar` (`MBAR`) and the menu «Altro» (`#moreMenu`, `MORE`; Stampa and Modifica
-  AREAS COLLECTION stay on the computer and say so). `mbarApply` gives `#side` and `#leftPanel` the class `sheet` (31 %
+- Up to 768 px (`isPhone`): the bar `#mbar` (`MBAR`) and the menu «Altro» (`#moreMenu`, `MORE`; Modifica AREAS
+  COLLECTION stays on the computer and says so; Stampa goes on the phone since 2026-11-03). `mbarApply` gives `#side` and `#leftPanel` the class `sheet` (31 %
   of the screen, 84 % with `full`, from the `.handle`): no node moves, so the Esri widgets stay. A tab's sheet starts
   with `#sheetTools` (its groups through `sheetToolsRender` and the ribbon's `toolBtn`, `toolClick`, `ribbonSync`).
 - A map mode drops the open sheet to rest (an observer on the banner); «Fine» (`#modeDoneBtn`) dispatches an Escape
@@ -1219,6 +1264,14 @@ How the app works inside, by subject, with the traps to know before editing. The
 
 ### 13. Import
 
+- **A file of this app comes back to its place** (2026-11-03, B2, `impBack` before the imports): a feature with
+  `foglio` and `particella`, a polygon and no `tipo` is a parcel (`impBackParcel`: the parcel record rebuilt, geodesic
+  area and centroid recomputed, the subgroup from `sottogruppo` — `sottogrupp` in a shapefile — made with `pgrpNew` when
+  missing; skipped when the Raccolta has it, by `fid` or sheet, number and Belfiore code or comune). A feature with
+  `tipo:'disegno'` and a `category` known here is a drawing (`impBackDrawing`: type, the values of `SF_ATTR`, note; the
+  group from `gruppo` when it is one of yours, made with `grpNew` when missing); with `auto` (exported since 3/11) or a
+  name «Fascia …» / «Area netta» it is skipped: the automations rebuild it. Until 3/11 all of it became imports in Altro
+  (a choice of 5/10, when an export had been reimported instead of the owners' file: that hint stays).
 - **Vector files** (GeoJSON, KML through `togeojson`, KMZ, zipped Shapefile through `shpjs`): `impAdd` makes imports
   (`_kind:'import'`, one colour per file), skipping and counting features with non-numeric coordinates (`gjFinite`). A
   file without a declared CRS goes through `srEstimate` on its median point and is converted alone only when Web
@@ -1315,7 +1368,12 @@ How the app works inside, by subject, with the traps to know before editing. The
 ### 14. Export and the portal
 
 - **Export** (`28-export-window.js`; «Esporta» presses `#dl`): a section per group in the Raccolta's order
-  (`exSections`), the ticks shared both ways with the Raccolta (none ticked = everything; XLSX = parcels only).
+  (`exSections`), the ticks shared both ways with the Raccolta (none ticked = everything; XLSX = parcels only). The list
+  is `exListRender` (since 3/11 also the parcels' list of Migra particelle, `pmRender`). The strips and the net area made
+  by the automations carry `auto` («fascia», «area netta»), so a reimport leaves them out.
+- **Migra particelle** (`18-parcels.js`, 3/11, B1): `pmPicked` (the ticked parcels, or all), `pmMode` (`each`, `one`,
+  `sub`), `pmBuild` (the GeoJSON to write: `buildFC` on the picked set, once per subgroup for `sub`, the subgroup's name
+  in `sottogruppo`); until then every parcel, and «Dissolvi» a switch.
   `buildFC` (parcels) and `graphicsFeatures` (the rest) give each feature `gruppo`, `sottogruppo`, the model in clear
   (`category`, `type`, numbers, `project_code`), the custom fields (`catExtProps`) and the original attributes of layer
   and owners' imports. KML: a `<Folder>` per group, sub-folders per parcel subgroup, the document named after the file
@@ -1366,7 +1424,7 @@ How the app works inside, by subject, with the traps to know before editing. The
   a request without a token would start a sign-in redirect.
 - **Analisi di contesto** (module `ctx`, signed in): `querySubstations` reads portal layers around the click —
   substations within 80 km (six nearest), the nearest HV line within 60 km, PV projects within 15 km (non-sensitive
-  fields only, `PV_PROC_FIELDS`). **Stampa** (computer only) is the SDK `Print` widget.
+  fields only, `PV_PROC_FIELDS`). **Stampa** is the PDF of `33-print.js` (2026-11-03, see §4 and the print in §5).
 
 ### 15. The `.axpo` project and the browser storage
 
@@ -1441,7 +1499,7 @@ How the app works inside, by subject, with the traps to know before editing. The
   (the SDK not served by the CDN: «SDK non ancora caricato»), so that run is repeated too.
 - Every test page is a first visit (a fresh Chrome profile): the hook marks the first-visit tour as seen
   (`axpo_tour_seen`) before the app starts.
-- The twenty-nine harnesses:
+- The thirty-two harnesses:
   - `smoke`: the view is ready, the app's layers, the Agenzia cadastre, six tabs and the panels' tabs.
   - `zoom`: the zoom after a selection goes only to the action's parcels, only when they are out of view.
   - `overlay`: the cadastre image placed to the pixel through pan, rotation, scale, switch and opacity (needs the AdE).
@@ -1488,6 +1546,14 @@ How the app works inside, by subject, with the traps to know before editing. The
   - `compact`: the compact panels (J5): every module's «i» and its window (Modifica's too), no paragraph in view, nothing
     wider than the panel; every geoprocess card has its definition, no Copia in Geoprocessi; Importa's button; *Avanzate* and *Cosa disegni* closed show their value; Annulla and Ripeti in the top bar
     (and they work); the ⚙ window opens and Esc closes it; on a phone the ⚙ is in «Altro».
+  - `roundtrip`: Migra particelle with two ticked parcels and with none, in its three ways, its list and summary; an
+    export reimported on the same Raccolta (all skipped) and on an empty one (parcels back in their subgroup, the drawing
+    with its buffer, the strip rebuilt not reimported, the drawing back in a group of yours).
+  - `selmap`: the selection's button on the map (under the measures in every tab, its menu, pressed with Seleziona and
+    Riquadro, released by Esc, Deseleziona) and the editing tools of the right-click menu for two areas, one, a parcel.
+  - `print`: the module Stampa (groups with the owners' off, basemaps, the dashed sheet and its removal), the sheet at
+    1:2.000, the PDF without and with a basemap (texts, numbers, data, legend, no owner's name, A3 portrait), the app's
+    basemaps whole afterwards; the last PDF goes to `tests/out/print_<size>.pdf`.
 - **Trap:** the history photographs the work 0.5 s after it settles, and every change pushes the photo back: a harness
   that removes something and then tests Annulla waits for `drwHist.timer` to be 0 first, or the state before the
   removal was never photographed (`owners` failed once under the full suite on 2026-10-30).
@@ -2510,6 +2576,24 @@ in the profile Base the empty Geoprocessi hides. Guide, tours and «i» rewritte
 `panelswap`, `profiles`, `raccolta`, `responsive`, `select`, `smoke`, `texts`, `tour` updated. Formats unchanged. Backup:
 `geoportale_axpo_pre-sette-schede_2026-11-02.html`.
 
+**2026-11-03 (first step): two bugs the user found (B1, B2, approved).** *Migra particelle in AREAS* took every parcel:
+now the ticked ones, or all when none is, chosen in its window too, as one feature each, one dissolved area or one area per
+subgroup (new). An export of the parcels reimported went to «Altro»: now the parcels go back to Particelle in their
+subgroup and the drawings to their category and group, the automatic strips and net area left out. New harness
+`roundtrip` (30). The format of the exports gains `auto`. Backup: `geoportale_axpo_pre-migra-reimport_2026-11-03.html`
+(from UBS-IT `022eea7`).
+
+**2026-11-03 (second step): the selection on the map (T1, approved by the user).** Selection is transversal, so it is at
+hand in every tab: a button under the measures with Seleziona, Riquadro and Deseleziona, and the editing tools in the
+right-click menu of the selection (those that apply). The tab Modifica stays. New harness `selmap` (31). Backup:
+`geoportale_axpo_pre-selezione-mappa_2026-11-03.html` (from UBS-IT `3ad84df`).
+
+**2026-11-03 (third step): the print as a PDF (S1–S6, approved by the user).** The Esri Print widget is replaced by a
+PDF like PV Predesign's: A4/A3, landscape/portrait, the Raccolta as vectors at an exact scale over an image of a basemap
+of the app (and of the layers switched on, when asked), data, legend, scale, north and notes; a dashed rectangle on the
+map shows the sheet; on the phone too. New harness `print` (32). Backup: `geoportale_axpo_pre-stampa_2026-11-03.html`
+(from UBS-IT `48b4171`).
+
 ## 8. Repository contents
 
 ```
@@ -2731,6 +2815,20 @@ in §7):
   `src/js/18-parcels.js`, `src/js/22-raccolta-ui.js` (rows `draggable`, `rowRename`), `src/js/22a-groups.js`,
   `src/js/22b-parcel-groups.js` (the headers `draggable`); `src/css/50-panels.css` (`.dnd*`); `src/html/30-modals.html`
   (the guide); `src/js/32-tour.js`; `tests/README.md`; `docs/architecture.md`; this README (§3, §4, §5, §7, §8).
+- **Print as a PDF (2026-11-03, S1–S6).** New: `src/js/33-print.js` (in `src/manifest.txt`), `tests/harness/print.py`.
+  Changed: `src/js/11-map-model.js` (no Print widget; `esriMods.Map`, `MapView`, `Basemap`; `window.APP_BASEMAPS`),
+  `src/html/20-app-body.html` (`#modPrint`), `src/html/30-modals.html` (the guide), `src/js/30-ui-glue.js` (the module's
+  texts and «i», on the phone too, `prWantSync`), `src/js/32-tour.js`, `src/css/85-status-phone.css` (`#modPrint` shown);
+  `tests/README.md`; `docs/architecture.md`; this README (§3, §4, §5, §7, §8).
+- **Selection on the map (2026-11-03, T1).** New: `tests/harness/selmap.py`. Changed: `src/html/20-app-body.html`
+  (`#selStack`), `src/html/30-modals.html` (the guide); `src/css/40-map-chrome.css`; `src/js/13-tools-select.js`,
+  `src/js/23b-select-edit.js` (`selMapSync`, `selEditActs`), `src/js/30-ui-glue.js` (the ⓘ and «i» texts, the sync),
+  `src/js/32-tour.js`; `tests/harness/parcelsel.py` (Copia first on a selected parcel); `tests/README.md`; this README
+  (§3, §4, §5, §7, §8).
+- **Migra and reimport (2026-11-03, B1, B2).** New: `tests/harness/roundtrip.py`. Changed: `src/html/30-modals.html`
+  (the window of Migra, the guide); `src/js/18-parcels.js` (`pm*`), `src/js/20-export-geoproc.js` (`auto`),
+  `src/js/24-import-files.js` (`impBack*`), `src/js/28-export-window.js` (`exListRender`), `src/js/30-ui-glue.js` (the
+  ⓘ and «i» texts); `src/css/80-proto-ux.css`; `tests/README.md`; this README (§3, §4, §5, §7, §8).
 - **Seven tabs (2026-11-02, K).** Changed: `src/html/20-app-body.html` (the tabs, the pane of Analizza with the tool
   modules, the pane of Modifica); `src/html/30-modals.html` (the guide); `src/js/30-ui-glue.js` (`SHELL`, the popover of
   Copia, the ⓘ and «i» texts, `tabsProfSync`, the phone's bar and «Altro», Esc); `src/js/11-map-model.js`,

@@ -999,13 +999,14 @@ dialog.dialog::backdrop { background: rgba(11, 18, 25, .45); }
   #trStack.open #searchToggle{background:var(--fill);color:var(--on-fill)}
   /* R3-2 (Q4): the measures under the lens: two round buttons and, while one is on, a card with the widget */
   #msStack{position:absolute;top:52px;right:12px;z-index:23;display:flex;flex-direction:column;gap:6px}
-  #msStack .msbtn{width:32px;height:32px;border:1px solid var(--line);border-radius:50%;background:var(--panel);box-shadow:var(--shadow-md);cursor:pointer}
-  #msStack .msbtn.active{background:var(--fill);color:var(--on-fill);border-color:var(--fill)}
-  #msMenu{position:absolute;top:0;right:40px;min-width:180px;display:block;padding:4px}   /* R3-2: the menu of the measure button */
-  #msMenu[hidden]{display:none}
-  #msMenu button{display:flex;align-items:center;gap:8px;width:100%;padding:6px 10px;border:0;border-radius:var(--radius-sm);background:none;color:var(--txt);font-size:12.5px;text-align:left;cursor:pointer}
-  #msMenu button .icon{width:16px;height:16px;flex:none} #msMenu button:hover,#msMenu button:focus{background:var(--hover);outline:none}
-  #msMenu button[aria-checked="true"]{background:color-mix(in srgb, var(--accent) 10%, transparent);font-weight:600} #msMenu button:disabled{opacity:.45;cursor:default}
+  #selStack{position:absolute;top:90px;right:12px;z-index:23;display:flex;flex-direction:column}   /* 3/11 (T1): under the measures */
+  #msStack .msbtn,#selStack .msbtn{width:32px;height:32px;border:1px solid var(--line);border-radius:50%;background:var(--panel);box-shadow:var(--shadow-md);cursor:pointer}
+  #msStack .msbtn.active,#selStack .msbtn.active{background:var(--fill);color:var(--on-fill);border-color:var(--fill)}
+  #msMenu,#selMapMenu{position:absolute;top:0;right:40px;min-width:180px;display:block;padding:4px}   /* R3-2: the menu of the measure button */
+  #msMenu[hidden],#selMapMenu[hidden]{display:none}
+  #msMenu button,#selMapMenu button{display:flex;align-items:center;gap:8px;width:100%;padding:6px 10px;border:0;border-radius:var(--radius-sm);background:none;color:var(--txt);font-size:12.5px;text-align:left;cursor:pointer}
+  #msMenu button .icon,#selMapMenu button .icon{width:16px;height:16px;flex:none} #msMenu button:hover,#msMenu button:focus,#selMapMenu button:hover,#selMapMenu button:focus{background:var(--hover);outline:none}
+  #msMenu button[aria-checked="true"],#selMapMenu button[aria-checked="true"]{background:color-mix(in srgb, var(--accent) 10%, transparent);font-weight:600} #msMenu button:disabled{opacity:.45;cursor:default}
   #msCard{position:absolute;top:52px;right:52px;z-index:23;width:260px;max-height:calc(100% - 120px);overflow:auto;padding:8px 10px 10px;border:1px solid var(--line);border-radius:var(--radius-lg);background:var(--panel);box-shadow:var(--shadow-md)}
   #msCard[hidden]{display:none}
   #msCard .mscard-h{display:flex;align-items:center;gap:8px;margin-bottom:4px} #msCard .mscard-h b{flex:1;font-size:12.5px}
@@ -1627,12 +1628,13 @@ dialog.dialog::backdrop { background: rgba(11, 18, 25, .45); }
   .btn.sm{padding:3px 9px;font-size:12px}
   .sfext{margin-top:4px;padding-top:4px;border-top:1px dashed var(--line)} .sfext .chk{display:flex;align-items:center;gap:6px;margin:7px 0 3px;text-transform:none;letter-spacing:0;font-weight:400;font-size:12px;color:var(--txt)} .sfext .chk input{width:14px;height:14px;margin:0}
   .exlist{max-height:min(52vh,420px);overflow-y:auto;margin-top:8px;border:1px solid var(--line);border-radius:8px;padding:4px 6px}
+  .exlist.pmlist{max-height:min(30vh,220px);margin:4px 0 2px}   /* 3/11 (B1): the parcels of Migra particelle */
   .exsec{padding:4px 0 6px;border-bottom:1px solid var(--line)} .exsec:last-child{border-bottom:none}
   .exsec.off{opacity:.45}
-  #exList .exsec-h{display:flex;align-items:center;gap:7px;padding:4px 4px;font-size:12.5px;cursor:pointer;text-transform:none;letter-spacing:0;font-weight:400;color:var(--txt);margin:0}   /* #exList: the generic label rule would make it a block in capitals */
-  #exList .exsec-h b{flex:1;min-width:0;font-weight:600} #exList .exsec-h small{font-size:11px;color:var(--mut);white-space:nowrap}
-  #exList .exsec-h input,#exList .exrow input{width:14px;height:14px;flex:none;accent-color:var(--accent);margin:0;cursor:pointer}
-  #exList .exrow{display:flex;align-items:center;gap:7px;padding:3px 4px 3px 24px;font-size:12px;cursor:pointer;text-transform:none;letter-spacing:0;font-weight:400;color:var(--txt);margin:0;border-radius:5px}
+  #exList .exsec-h,#pmList .exsec-h{display:flex;align-items:center;gap:7px;padding:4px 4px;font-size:12.5px;cursor:pointer;text-transform:none;letter-spacing:0;font-weight:400;color:var(--txt);margin:0}   /* #exList: the generic label rule would make it a block in capitals */
+  #exList .exsec-h b,#pmList .exsec-h b{flex:1;min-width:0;font-weight:600} #exList .exsec-h small,#pmList .exsec-h small{font-size:11px;color:var(--mut);white-space:nowrap}
+  #exList .exsec-h input,#exList .exrow input,#pmList .exsec-h input,#pmList .exrow input{width:14px;height:14px;flex:none;accent-color:var(--accent);margin:0;cursor:pointer}
+  #exList .exrow,#pmList .exrow{display:flex;align-items:center;gap:7px;padding:3px 4px 3px 24px;font-size:12px;cursor:pointer;text-transform:none;letter-spacing:0;font-weight:400;color:var(--txt);margin:0;border-radius:5px}
   .exrow:hover{background:var(--hover)}
   .exrow span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   /* giro 2: selettore colori con campioni */
@@ -1691,7 +1693,7 @@ dialog.dialog::backdrop { background: rgba(11, 18, 25, .45); }
   /* ══ PHONE (phase 3, 2026-10-21; plan §6e H1–H8): the family's bottom bar (kit .mbar, five entries) and the two panels
      as sheets over the map (kit .sheet: 31 % of the screen at rest, 84 % with the handle; the class is set by the script
      on a phone), one at a time; no tabs, ribbon, strips, status bar or scale bar; the map keeps the zoom column, the
-     search and the basemap chip. Stampa and Modifica AREAS stay on the computer; the tours are hidden. ══ */
+     search and the basemap chip. Modifica AREAS stays on the computer (Stampa goes on the phone since 3/11); the tours are hidden. ══ */
   #mbar{display:none}
   .panel>.handle{display:none}
   #modeDoneBtn{display:none}
@@ -1721,7 +1723,7 @@ dialog.dialog::backdrop { background: rgba(11, 18, 25, .45); }
     #mdclose{display:flex;align-items:center;justify-content:space-between;padding:2px 8px 8px 14px;border-bottom:1px solid var(--line)}
     #mdclose b{font-size:15px}
     #mdclose button{margin:0;background:transparent;border:0;color:var(--txt);padding:2px 8px;font-size:18px;line-height:1;cursor:pointer}
-    #modEdit,#modPrint{display:none}
+    #modEdit{display:none}   /* 3/11 (S6): the print goes on the phone too */
     #bmBtn{top:56px;right:10px;bottom:auto;padding-right:4px} #bmBtn #bmName,#bmBtn .icon{display:none}
     #bmPop{top:98px;right:10px;bottom:auto;left:10px;width:auto}
     #bkPop{left:10px!important;right:10px;width:auto}
@@ -2078,6 +2080,16 @@ dialog.dialog::backdrop { background: rgba(11, 18, 25, .45); }
         <button type="button" role="menuitemradio" aria-checked="false" id="msDist" title="Clic sui punti, doppio clic per finire"><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-measure"></use></svg><span>Misura lineare</span></button>
         <button type="button" role="menuitemradio" aria-checked="false" id="msArea" title="Clic sui vertici, doppio clic per chiudere"><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-measure-area"></use></svg><span>Misura area</span></button>
         <button type="button" role="menuitem" id="msClear" title="Toglie la misura dalla mappa"><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-trash"></use></svg><span>Pulisci</span></button>
+      </div>
+    </div>
+    <!-- 3/11 (T1): the selection on the map, at hand whatever the tab: its modes in a menu, as the measures; the editing
+         tools are in the right-click menu of the selection (and in the tab Modifica) -->
+    <div id="selStack" class="msstack" role="group" aria-label="Selezione sulla mappa">
+      <button type="button" id="selMapBtn" class="geobtn msbtn" aria-haspopup="menu" aria-expanded="false" aria-pressed="false" aria-controls="selMapMenu" aria-label="Selezione: seleziona, riquadro, deseleziona" title="Selezione sulla mappa: le modifiche sono nel tasto destro sulla selezione" data-icon="cursor"></button>
+      <div id="selMapMenu" class="menu msmenu" role="menu" aria-label="Selezione" hidden>
+        <button type="button" role="menuitemradio" aria-checked="false" id="selMapClick" title="Clicca una particella o un oggetto della Raccolta; Maiusc+clic aggiunge o toglie; Esc per finire"><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-cursor"></use></svg><span>Seleziona</span></button>
+        <button type="button" role="menuitemradio" aria-checked="false" id="selMapBox" title="Un rettangolo seleziona ogni particella e oggetto che tocca (Maiusc aggiunge)"><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-sel-rect"></use></svg><span>Riquadro</span></button>
+        <button type="button" role="menuitem" id="selMapNone" title="Svuota la selezione"><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-close"></use></svg><span>Deseleziona</span></button>
       </div>
     </div>
     <div id="msCard" class="mscard" role="region" aria-label="Misura" hidden>
@@ -2500,9 +2512,33 @@ dialog.dialog::backdrop { background: rgba(11, 18, 25, .45); }
         <div class="tlab">Modifica AREAS COLLECTION</div>
         <div id="editorBox" class="wbox"><div class="thint">Accedi e resta sulla General Map: qui compare l'editor.</div></div>
         </div>
+        <!-- 2026-11-03 (S1–S6): the print as a PDF like PV Predesign's (33-print.js) in place of the Esri widget; the dashed
+             rectangle on the map shows the sheet while this module is open; the explanations are in the «i» (IMP_INFO.print) -->
         <div class="modbox" id="modPrint">
         <div class="tlab">Stampa</div>
-        <div id="printBox" class="wbox"></div>
+        <div class="kv" title="Il titolo in alto sul foglio; vuoto, il nome del progetto o dei comuni"><label for="prTitle">Titolo</label><input id="prTitle" spellcheck="false" autocomplete="off"></div>
+        <div class="rcpair">
+          <div class="kv" title="Il formato del foglio"><label for="prPaper">Foglio</label><select id="prPaper"><option value="a4">A4</option><option value="a3">A3</option></select></div>
+          <div class="kv" title="L’orientamento del foglio"><label for="prOrient">Verso</label><select id="prOrient"><option value="l">Orizzontale</option><option value="p">Verticale</option></select></div>
+        </div>
+        <div class="kv" title="«Adatta» inquadra le parti della Raccolta scelte qui sotto alla scala tonda più vicina; «come la mappa» prende il centro e la scala della mappa; le scale fisse partono dal centro della mappa"><label for="prScale">Scala</label><select id="prScale">
+          <option value="fit">Adatta alla Raccolta</option><option value="view">Come la mappa</option><option value="1000">1:1.000</option><option value="2000">1:2.000</option><option value="5000">1:5.000</option><option value="10000">1:10.000</option><option value="25000">1:25.000</option></select></div>
+        <div class="kv" title="L’immagine sotto i disegni. Il catasto dell’Agenzia non si può stampare (il suo server non lo permette): le particelle della Raccolta si disegnano con i numeri"><label for="prBase">Sfondo</label><select id="prBase"><option value="none">Nessuno (solo vettori)</option></select></div>
+        <div class="j5row" id="prInfo" aria-live="polite"></div>
+        <details class="imod flat" id="prWhat" open>
+          <summary><span class="im-t"><b>Nella mappa</b></span><span class="im-n im-txt" id="prWhatSum"></span></summary>
+          <div class="im-body" id="prGroups"></div>
+        </details>
+        <details class="imod flat" id="prSheet">
+          <summary><span class="im-t"><b>Sul foglio</b></span><span class="im-n im-txt">dati, legenda, note</span></summary>
+          <div class="im-body">
+            <label class="chk" style="margin-top:0" title="Particelle, ettari, aree lorda e netta, esclusioni, comuni"><input type="checkbox" id="prData" checked> Dati</label>
+            <label class="chk" title="I colori di ciò che è disegnato, la barra di scala e il nord"><input type="checkbox" id="prLegend" checked> Legenda, scala e nord</label>
+            <label for="prNotes" class="sr-only">Note</label><textarea id="prNotes" rows="3" placeholder="Note sul foglio (facoltative)"></textarea>
+          </div>
+        </details>
+        <div class="btns"><button type="button" class="btn" id="prFrame" data-icon="target" title="Porta la mappa sul rettangolo del foglio">Inquadra</button><button type="button" class="btn primary" id="prGo" data-icon="print" title="Prepara il foglio e salva il PDF">Salva PDF</button></div>
+        <div id="prMsg" class="thint" role="status" aria-live="polite"></div>
         </div>
     </div></div>
   </div>
@@ -2609,8 +2645,11 @@ dialog.dialog::backdrop { background: rgba(11, 18, 25, .45); }
     <button id="pmClose" class="mclose" title="Chiudi" aria-label="Chiudi">×</button>
     <h2>Migra particelle in AREAS Collection</h2>
     <div class="sub" id="pmSub">—</div>
-    <!-- giro 2: la scelta «dissolvi» sta qui, dove ha senso (una feature per particella, oppure un'unica area) -->
-    <label class="chk" style="margin:0 0 4px"><input type="checkbox" id="diss"> Dissolvi le particelle in un'unica area</label>
+    <!-- 3/11 (B1): which parcels (the Raccolta's ticks, as in Esporta: none ticked = all) and how: one feature each, one
+         dissolved area, or one area per subgroup (until then always every parcel, «Dissolvi» a switch) -->
+    <div id="pmList" class="exlist pmlist"></div>
+    <label for="pmDiss">Come</label>
+    <select id="pmDiss"><option value="each">Una feature per particella</option><option value="one">Un'unica area dissolta</option><option value="sub">Un'area dissolta per sottogruppo</option></select>
     <label>Classe dell'area <span class="lbl-opt">· Area class</span></label>
     <select id="pmClass"></select>
     <label>Tipo di area <span class="lbl-opt">· Area type</span></label>
@@ -2689,13 +2728,13 @@ dialog.dialog::backdrop { background: rgba(11, 18, 25, .45); }
       <li><b>Modifica</b> — quello che c'è già. <b>Selezione</b>: Seleziona (clic sulla mappa, <kbd>Maiusc</kbd> aggiunge o toglie), Riquadro, Deseleziona; la selezione è la spunta della Raccolta. <b>Modifica</b>, sulla selezione: Rimodella, Sposta e ruota, Dividi, Unisci (le aree selezionate diventano una), Copia (dove clicchi, anche parallela a distanza fissa: le opzioni nella sua finestra) ed Elimina. A destra, in Proprietà, quanti sono e la scheda dell'oggetto selezionato (categoria, tipo e attributi). Le particelle si selezionano ma non si modificano.</li>
       <li><b>Geoprocessi</b> — <b>Oggetti di partenza</b>: metti gli oggetti in A con A dalla mappa, dalle righe spuntate o per categoria (B serve a Parte comune e Sottrai); <b>Geoprocessi</b>: Buffer, Unione, Parte comune, Sottrai B da A, Contorno, Semplifica, Ritaglia, poi <b>Esegui</b> a destra: il risultato è un oggetto nuovo nella Raccolta, gruppo Analisi, e quelli di partenza restano.</li>
       <li><b>Importa</b> — <b>File</b>: GeoJSON, KML, KMZ, Shapefile (.zip) e il file di <b>Estrazione intestatari</b>, colorato e raggruppato per intestatario in fondo al blocco <b>Particelle</b> della Raccolta, dove il cestino della riga «Per intestatario» lo toglie tutto (i nominativi restano fuori dal salvataggio automatico e dal portale); <b>CAD</b>: un DWG letto nel browser, con il sistema proposto, oppure allineato a mano con due punti; <b>Immagini</b>: GeoTIFF e world file si posizionano da soli, PNG, JPG e PDF con sposta, scala, ruota o punti noti; <b>Servizi web</b>: WMS, WFS e ArcGIS REST dal loro indirizzo; <b>Portale</b>: un layer cercato per titolo.</li>
-      <li><b>Salva ed esporta</b> — <b>Esporta</b>: GeoJSON, KML, KMZ, Shapefile (.zip) o la tabella XLSX delle particelle, con gli oggetti spuntati nella Raccolta o con tutto (il KML ha una cartella per gruppo, lo shapefile un file per gruppo; il nome del file viene da comune, data e numero di particelle); <b>Portale AGOL</b>: Migra particelle in AREAS (l'opzione «dissolvi» sta nella sua finestra), Salva disegni in Site Features (categoria, tipo, attributi e sito: la seconda volta aggiorna, non duplica), Modifica AREAS COLLECTION; <b>Progetto</b>: Salva, Salva come, Apri; <b>Stampa</b>.</li>
+      <li><b>Salva ed esporta</b> — <b>Esporta</b>: GeoJSON, KML, KMZ, Shapefile (.zip) o la tabella XLSX delle particelle, con gli oggetti spuntati nella Raccolta o con tutto (il KML ha una cartella per gruppo, lo shapefile un file per gruppo; il nome del file viene da comune, data e numero di particelle); <b>Portale AGOL</b>: Migra particelle in AREAS (le spuntate o tutte, scelte anche nella sua finestra: una per particella, un'unica area dissolta o un'area per sottogruppo), Salva disegni in Site Features (categoria, tipo, attributi e sito: la seconda volta aggiorna, non duplica), Modifica AREAS COLLECTION; <b>Progetto</b>: Salva, Salva come, Apri; <b>Stampa</b>: un foglio PDF A4 o A3 con la Raccolta in scala, sfondo a scelta, dati, legenda e note (il rettangolo tratteggiato sulla mappa mostra il foglio).</li>
       <li><b>Raccolta</b>, a sinistra — tutto quello che raccogli, ad albero come i layer di QGIS: i gruppi (Particelle, Aree di progetto, Aree di esclusione, Analisi, Altro, Immagini, e i tuoi, <b>+ Gruppo</b>), dentro i sottogruppi delle particelle, poi gli oggetti, ogni livello un po' più rientrato; numero ed ettari a destra, occhio, nomi e menu passando sopra la riga. In alto il filtro per nome e <b>Comprimi</b>. Ogni riga ha la spunta (la selezione, che usano anche geoprocessi ed esportazione; <kbd>Maiusc</kbd>+clic spunta un intervallo), il colore, il nome (le particelle per foglio e numero, poi il comune), la cifra a destra, l'occhio e il menu <b data-icon="more"></b>, anche col tasto destro: rinomina, zoom, sposta in un gruppo, Proprietà, elimina. Un clic sulla riga fa lampeggiare l'oggetto sulla mappa, un doppio clic ci fa lo zoom. <b>Trascina</b> una riga su un sottogruppo (le particelle) o su un gruppo (gli altri oggetti) per spostarla: se è spuntata, vanno con lei tutte le selezionate; sulla riga Particelle una particella esce dai sottogruppi; dove non può andare non si accende nulla e, al rilascio, ti dico perché. La riga di un sottogruppo, o di un gruppo tuo, trascinata su un'altra ne cambia l'ordine. Annulla rimette tutto. Con qualcosa selezionato (spuntato qui, o scelto sulla mappa con <b>Modifica</b> › Seleziona e Riquadro) compare in cima la <b>barra della selezione</b>: Zoom, Sottogruppo o Gruppo (anche nuovo), Togli (o il tasto <kbd>Canc</kbd>; Annulla rimette tutto) e Deseleziona; il tasto destro su una riga selezionata, o sulla mappa su un oggetto selezionato, offre le stesse azioni per tutta la selezione. Il menu di un gruppo, di un sottogruppo e di Particelle ha lo <b>Zoom</b> su tutti i loro oggetti. Il bordo destro la allarga, <b data-icon="undock"></b> la sgancia in una finestra per il secondo schermo.</li>
       <li><b>Pannello a destra</b> — tre schede. <b>Proprietà</b>: le impostazioni dello strumento aperto e, in Modifica, la scheda dell'oggetto selezionato (categoria, tipo e attributi). <b>Layer</b>: cerca un layer per nome; dal pannello di ogni layer (icona a cursori) trasparenza, popup e <b>filtro per attributo</b> (l'icona diventa un imbuto quando è attivo); i layer aggiunti da te hanno il menu <b>…</b> con Zoom e Rimuovi dalla mappa. Un clic sulla mappa apre il popup anche sui layer a <b>tasselli vettoriali</b> che portano gli attributi (es. i vincoli paesaggistici della Campania nella vista d'insieme): campi e titolo come configurati nell'item, l'elemento non si evidenzia. Il <b>Catasto AdE</b> è l'immagine ufficiale del WMS dell'Agenzia delle Entrate: fogli da 1:25.000, particelle e fabbricati da 1:5.000, numeri da 1:2.000. <b>Legenda</b>: i layer accesi. Anche questo pannello si allarga dal bordo e si sgancia.</li>
-      <li><b>Sulla mappa</b> — in alto a destra la lente della <b>ricerca</b> (indirizzi, lat lon, oppure X Y in Gauss-Boaga o UTM, di cui indovina il sistema) e, sotto, <b data-icon="measure"></b> le <b>misure</b>: lineare, area, Pulisci (non si salvano). In alto a sinistra zoom, bussola, posizione GPS, <b>Zoom sulla Raccolta</b> e <b>Luoghi</b>, i segnalibri; in basso a destra la <b>mappa di base</b>, con l'opacità; in basso al centro lo scalimetro. Col tasto destro: aggiungi la particella qui, analisi di contesto qui, buffer qui, copia le coordinate, apri in Google Maps, centra qui.</li>
+      <li><b>Sulla mappa</b> — in alto a destra la lente della <b>ricerca</b> (indirizzi, lat lon, oppure X Y in Gauss-Boaga o UTM, di cui indovina il sistema) e, sotto, <b data-icon="measure"></b> le <b>misure</b>: lineare, area, Pulisci (non si salvano); più sotto <b data-icon="cursor"></b> la <b>selezione</b>: Seleziona, Riquadro, Deseleziona, da qualsiasi scheda (le modifiche stanno nel tasto destro sulla selezione). In alto a sinistra zoom, bussola, posizione GPS, <b>Zoom sulla Raccolta</b> e <b>Luoghi</b>, i segnalibri; in basso a destra la <b>mappa di base</b>, con l'opacità; in basso al centro lo scalimetro. Col tasto destro: aggiungi la particella qui, analisi di contesto qui, buffer qui, copia le coordinate, apri in Google Maps, centra qui.</li>
       <li><b>Barra di stato</b>, in basso — il pin fissa le coordinate del prossimo clic; le coordinate del puntatore nel sistema che scegli; la scala, che scegli anche dal suo menu; con il terreno analizzato, la <b>quota</b> e la <b>pendenza</b> sotto il puntatore (in rosso oltre il limite); lo stato del Catasto AdE; a destra la modalità in corso, l'aggancio e l'ora dell'ultimo salvataggio nel browser (in rosso se il browser è pieno).</li>
       <li><b>Progetto .axpo</b> — <b data-icon="save">Salva progetto</b> mette tutto in un file .axpo, come un progetto QGIS: vista, basemap, area di lavoro, mappa e layer del portale (accesi, trasparenza, ordine), servizi web, particelle, disegni e gruppi della Raccolta, categorie tue, geoprocessi, import, sito AREAS, i file di <b>DWG e immagini</b> con il loro posizionamento e il <b>terreno</b> con il suo limite. <b data-icon="folder">Apri progetto</b> lo ripristina (sostituisce il lavoro corrente). <kbd>Ctrl</kbd>+<kbd>S</kbd> risalva sullo stesso file, <kbd>Ctrl</kbd>+<kbd>Maiusc</kbd>+<kbd>S</kbd> salva con nome, <kbd>Ctrl</kbd>+<kbd>O</kbd> apre. Lo stesso file si apre in PV Predesign, che ne legge aree, esclusioni e terreno. Per passarlo a chi non deve vedere gli intestatari, nel modulo Progetto <b>Copia da condividere…</b>: tutto il lavoro tranne i dati personali.</li>
-      <li><b>Sul telefono</b> — in basso cinque voci: Cerca · Analizza · Disegna · Raccolta · Altro (Modifica, Geoprocessi, Importa, Salva ed esporta, Layer, Legenda, Mappa di base, Luoghi, Impostazioni, Guida rapida). I pannelli diventano schede sopra la mappa: la maniglia le allarga, × le chiude; <b>Fine</b>, accanto al messaggio della modalità, fa da <kbd>Esc</kbd>. Stampa, Modifica AREAS COLLECTION e i tour restano sul computer.</li>
+      <li><b>Sul telefono</b> — in basso cinque voci: Cerca · Analizza · Disegna · Raccolta · Altro (Modifica, Geoprocessi, Importa, Salva ed esporta, Layer, Legenda, Mappa di base, Luoghi, Impostazioni, Guida rapida). I pannelli diventano schede sopra la mappa: la maniglia le allarga, × le chiude; <b>Fine</b>, accanto al messaggio della modalità, fa da <kbd>Esc</kbd>. Modifica AREAS COLLECTION e i tour restano sul computer.</li>
     </ol>
     <div class="hint" style="margin-top:10px"><kbd>Esc</kbd> esce da qualsiasi modalità e interrompe la selezione su area. I tour si riaprono dal <b data-icon="help"></b> in alto a destra; ogni gruppo del ribbon ha la sua <b data-icon="info"></b>. <kbd>Ctrl</kbd>+<kbd>K</kbd> (o «Cerca oggetti e comandi» nel <b data-icon="help"></b>) trova mentre scrivi un oggetto della Raccolta o un comando del ribbon.</div>
     <div class="hprof" role="group" aria-label="Profilo"><span>Profilo</span><div class="segbtns"><button type="button" data-prof="base">Base</button><button type="button" data-prof="avanzato">Avanzato</button></div></div>
@@ -2983,19 +3022,20 @@ require([
   "esri/Graphic","esri/geometry/Polygon","esri/geometry/projection",
   "esri/widgets/BasemapGallery","esri/widgets/LayerList",
   "esri/widgets/Search","esri/widgets/Measurement","esri/widgets/Sketch/SketchViewModel","esri/widgets/Editor",
-  "esri/widgets/ElevationProfile","esri/widgets/Print","esri/widgets/Bookmarks","esri/webmap/Bookmark","esri/widgets/ScaleBar",
+  "esri/widgets/ElevationProfile","esri/widgets/Bookmarks","esri/webmap/Bookmark","esri/widgets/ScaleBar",
   "esri/geometry/geometryEngine","esri/geometry/Point","esri/geometry/support/webMercatorUtils",
   "esri/identity/OAuthInfo","esri/identity/IdentityManager","esri/portal/Portal","esri/portal/PortalQueryParams",
   "esri/Viewpoint","esri/symbols/support/jsonUtils","esri/widgets/Search/SearchSource",
   "esri/core/reactiveUtils","esri/geometry/operators/centroidOperator","esri/layers/ImageryTileLayer",
   "esri/geometry/SpatialReference","esri/geometry/operators/projectOperator"
 ],(Map,MapView,WebMap,Basemap,GraphicsLayer,WMSLayer,FeatureLayer,Layer,TileLayer,ElevationLayer,Graphic,Polygon,projection,
-   BasemapGallery,LayerList,Search,Measurement,SketchViewModel,Editor,ElevationProfile,Print,Bookmarks,Bookmark,ScaleBar,geometryEngine,Point,webMercatorUtils,
+   BasemapGallery,LayerList,Search,Measurement,SketchViewModel,Editor,ElevationProfile,Bookmarks,Bookmark,ScaleBar,geometryEngine,Point,webMercatorUtils,
    OAuthInfo,IdentityManager,Portal,PortalQueryParams,Viewpoint,symbolJsonUtils,SearchSource,reactiveUtils,centroidOperator,ImageryTileLayer,SpatialReference,projectOperator)=>{
 
   esriMods={Graphic,Polygon,projection,FeatureLayer,Layer,WebMap,Editor,Portal,PortalQueryParams,geometryEngine,Point,webMercatorUtils,ElevationLayer,Viewpoint,symbolJsonUtils,reactiveUtils,centroidOperator};
 
   esriMods.WMSLayer=WMSLayer;
+  esriMods.Map=Map; esriMods.MapView=MapView; esriMods.Basemap=Basemap;   // 2026-11-03: the print draws its background in a MapView out of sight (33-print.js)
   esriMods.SpatialReference=SpatialReference; esriMods.projectOperator=projectOperator;   // 4a: la cornice metrica locale (16b-geo-frame.js)
   // il catasto parte dalla Sardegna (o dal ponte indicato con ?catasto=); la sorgente definitiva la sceglie
   // catastoProbe poco dopo l'avvio (vedi CATASTO_SOURCES)
@@ -3033,7 +3073,8 @@ require([
   view.popup.dockEnabled=true;
   view.popup.dockOptions={buttonEnabled:true, breakpoint:false, position:"top-left"};
 
-  new BasemapGallery({view, source:[bmTopo,bmImg,bmAgea24,bmAgea23,bmAgea22,bmStreets], container:document.getElementById("bmGalleryBox")});   // drawer "basemaps" (elemento, non stringa: con l'id la gallery non renderizza)
+  window.APP_BASEMAPS=[bmTopo,bmImg,bmAgea24,bmAgea23,bmAgea22,bmStreets];   // 2026-11-03: the gallery's list, offered by the print too
+  new BasemapGallery({view, source:window.APP_BASEMAPS, container:document.getElementById("bmGalleryBox")});   // drawer "basemaps" (elemento, non stringa: con l'id la gallery non renderizza)
   // drawer "layers": pannello simbologia/trasparenza/popup/filtro, riordino drag&drop, ricerca per nome
   // (le Check Vincoli hanno decine di layer), zoom e rimozione dei layer aggiunti da noi
   const layerListW=new LayerList({view, container:"layerListBox", listItemCreatedFunction:layerListItem, dragEnabled:true,
@@ -3041,8 +3082,7 @@ require([
   layerListW.on("trigger-action", llAction);
   window.__llW=layerListW;   // hook debug (come window.view)
 
-  // ── Stampa (drawer), scalimetro (basso-dx), profilo di elevazione (basso-sx) ──
-  try{ new Print({view, container:"printBox"}); }catch(e){ console.warn('Print:',e&&e.message); }   // drawer "print"
+  // ── scalimetro (basso-dx), profilo di elevazione (basso-sx); la stampa è in 33-print.js (2026-11-03) ──
   new ScaleBar({view, container:"scaleBarBox", unit:"metric"});   // scalimetro basso-dx
   try{ elevW=new ElevationProfile({view, container:"elevProfile", profiles:[{type:"ground"}]}); elevWatch(); }catch(e){ console.warn('ElevProfile:',e&&e.message); }   // 2B-2: a module of tab 3
 
@@ -3603,6 +3643,16 @@ function wireTools(){
   $('msDist').onclick=()=>{ msMenuSet(false); measureStart(measureOn()&&measurement.activeTool==='distance'? null : 'distance'); measureUi(); };
   $('msArea').onclick=()=>{ msMenuSet(false); measureStart(measureOn()&&measurement.activeTool==='area'? null : 'area'); measureUi(); };
   $('msClear').onclick=()=>{ msMenuSet(false); measureStop(true); measureUi(); };   // R3-2: Pulisci in the menu: the measure goes, the card closes
+  // 3/11 (T1): the selection's button on the map: Seleziona, Riquadro, Deseleziona in a menu, wired as the measures
+  if($('selMapBtn')){ const sm=$('selMapMenu'), sb=$('selMapBtn'), set=on=>{ sm.hidden=!on; sb.setAttribute('aria-expanded', on? 'true' : 'false'); if(on) selMapSync(); };
+    sb.onclick=e=>{ e.stopPropagation(); set(sm.hidden); };
+    document.addEventListener('click', e=>{ if(!sm.hidden&&!e.target.closest('#selStack')) set(false); });
+    document.addEventListener('keydown', e=>{ if(e.key==='Escape'&&!sm.hidden){ e.stopPropagation(); set(false); try{ sb.focus(); }catch(x){} } });
+    sm.addEventListener('keydown', e=>{ const it=[...sm.querySelectorAll('button:not(:disabled)')], i=it.indexOf(document.activeElement);
+      if(e.key==='ArrowDown'||e.key==='ArrowUp'){ e.preventDefault(); const j=i<0? 0 : (i+(e.key==='ArrowDown'? 1 : it.length-1))%it.length; if(it[j]) it[j].focus(); } });
+    $('selMapClick').onclick=()=>{ set(false); selStart(); selMapSync(); };
+    $('selMapBox').onclick=()=>{ set(false); selBoxStart(); selMapSync(); };
+    $('selMapNone').onclick=()=>{ set(false); selClear(); selMapSync(); }; }
   if($('msBtn')){ $('msBtn').onclick=e=>{ e.stopPropagation(); msMenuSet(!msMenuOpen()); };
     document.addEventListener('click', e=>{ if(msMenuOpen()&&!e.target.closest('#msStack')) msMenuSet(false); });
     document.addEventListener('keydown', e=>{ if(e.key==='Escape'&&msMenuOpen()){ e.stopPropagation(); msMenuSet(false); try{ $('msBtn').focus(); }catch(x){} } }, true);
@@ -5694,26 +5744,40 @@ function render(zoom, fids){
 }
 
 // ── Fase 4: promote → AREAS COLLECTION ────────────────────────────────────
-function pmSubUpdate(){ const diss=!!($('diss')&&$('diss').checked), n=diss?1:parcels.length;
-  $('pmSub').textContent = `${parcels.length} particell${parcels.length>1?'e':'a'} → ${n} feature ${diss?'(un\'unica area dissolta)':'(una per particella)'} nel layer 426.`; }
+// 3/11 (B1): the parcels ticked in the Raccolta (or in this window's list: the same ticks), all when none is; and how they
+// go: one feature each, one dissolved area, or one dissolved area per subgroup (the parcels without one make their own)
+function pmPicked(){ const s=parcels.filter(p=>p.sel); return s.length? s : parcels.slice(); }
+function pmMode(){ const d=$('pmDiss'); return (d&&d.value)||'each'; }
+function pmGroups(P){ const by=new Map(); P.forEach(p=>{ const k=pgrpOf(p)||''; if(!by.has(k)) by.set(k, []); by.get(k).push(p); });
+  return [...by.entries()].map(([k, list])=>({id:k, name:k? pgrpName(k) : '', list:list})); }
+// the features to write, as GeoJSON (pure: the window and the test use it)
+function pmBuild(P, mode){
+  if(mode==='sub') return {type:'FeatureCollection', features:pmGroups(P).reduce((a, G)=>a.concat(buildFC(true, null, new Set(G.list)).features.map(f=>{ f.properties.sottogruppo=G.name; return f; })), [])};
+  return buildFC(mode==='one', null, new Set(P)); }
+function pmSubUpdate(){ const P=pmPicked(), m=pmMode(), all=!parcels.some(p=>p.sel), np=P.length, n= m==='one'? 1 : m==='sub'? pmGroups(P).length : np;
+  const what= all? (np===1? 'L’unica particella' : 'Tutte le '+np+' particelle') : np+(np===1? ' particella spuntata' : ' particelle spuntate');
+  $('pmSub').textContent=what+' → '+n+' feature'+(m==='one'? ' (un’unica area dissolta)' : m==='sub'? ' (un’area per sottogruppo)' : ' (una per particella)')+' nel layer 426.'; }
+function pmRender(){ const list=$('pmList'); if(list){ const tot=exListRender(list, exSections().filter(s=>s.parcels), ()=>false, pmRender);
+    if(tot&&!parcels.some(p=>p.sel)) list.insertAdjacentHTML('beforeend', '<div class="notice">Nessuna spunta: migro tutte le particelle.</div>'); }
+  pmSubUpdate(); }
 function openPromote(){
   if(!signedIn){ msg('Accedi ad AGOL per migrare le particelle in AREAS Collection.','err'); return; }
   if(!parcels.length) return;
-  pmSubUpdate(); if($('diss')) $('diss').onchange=pmSubUpdate;   // giro 2: «dissolvi» vive in questa finestra
+  pmRender(); if($('pmDiss')) $('pmDiss').onchange=pmSubUpdate;   // B1: which parcels and how, in this window
   $('pmMsg').innerHTML=''; promoteOverlapAck=false;
   $('promoteModal').style.display='flex';
 }
-function closePromote(){ $('promoteModal').style.display='none'; promoteOverlapAck=false;
+function closePromote(){ $('promoteModal').style.display='none'; promoteOverlapAck=false; try{ render(); }catch(e){}   // B1: the ticks go back to the Raccolta
   const b=$('pmConfirm'); b.disabled=false; b.textContent='Conferma inserimento'; }
 async function confirmPromote(){
   const btn=$('pmConfirm'); if(btn.disabled) return;         // già in corso → niente doppio invio
   btn.disabled=true; btn.textContent='Inserimento…';
-  const diss=$('diss').checked;
+  const P=pmPicked(), mode=pmMode(), diss=mode!=='each';   // B1
   const stop=t=>{ pmMsg(esc(t),'err'); btn.disabled=false; btn.textContent='Conferma inserimento'; };
   // AREAS COLLECTION è un layer di aree: una particella senza contorno (solo il punto) non ci può andare
-  const noGeom=parcels.filter(p=>!(p.geometry&&/Polygon/.test(p.geometry.type||'')));
+  const noGeom=P.filter(p=>!(p.geometry&&/Polygon/.test(p.geometry.type||'')));
   if(noGeom.length){ stop('Senza contorno, non promuovibili: '+noGeom.slice(0,4).map(parcelLabel).join('; ')+(noGeom.length>4? '…' : '')+'. Toglile dalla Raccolta e riprova.'); return; }
-  let fc; try{ fc=buildFC(diss); }catch(e){ stop((e&&e.message)||String(e)); return; }
+  let fc; try{ fc=pmBuild(P, mode); }catch(e){ stop((e&&e.message)||String(e)); return; }
   const cls=$('pmClass').value, atype=$('pmType').value, src=$('pmSources').value;
   const estr=parseInt($('pmEstr').value,10)||0, ptype=$('pmProjType').value.trim();
   const region=$('reg').value, prov=$('prov').value;
@@ -6505,6 +6569,7 @@ function graphicsFeatures(kind, pick){
     if(s.cat){ props.category=s.cat; if(s.type) props.type=s.type;
       sfAttrKeys(s.cat, s.type, sfGk(g.geometry.type)).forEach(k=>{ const v=at[SF_ATTR[k][0]]; if(v!=null) props[k]=v; }); }
     if(at.sf_site&&at.sf_site.code) props.project_code=at.sf_site.code;
+    if(at.sf_auto) props.auto=at.sf_auto==='net'? 'area netta' : 'fascia';   // 3/11 (B2): made by the automations, a reimport skips it
     try{ Object.assign(props, catExtProps(g)); }catch(e){}   // G2-5b: one property per field of a custom category
     try{ props.gruppo=(typeof ownIs==='function'&&ownIs(g))? 'Particelle degli intestatari' : grpName(grpOf(g)); props.sottogruppo=''; }catch(e){}   // G2-4b (Y6)
     out.push({type:'Feature',geometry:gj,properties:props});
@@ -8270,7 +8335,7 @@ function selRender(opts){ const o=opts||{};
     selGL.addMany(out); }
   if(o.rows!==false){ try{ renderGeoms(); }catch(e){} }
   try{ gpSelInfo(); }catch(e){}
-  selCardRender(); try{ rcSelBarSync(); }catch(e){} try{ if(window.ribbonSoon) window.ribbonSoon(); }catch(e){}
+  selCardRender(); try{ rcSelBarSync(); }catch(e){} try{ selMapSync(); }catch(e){} try{ if(window.ribbonSoon) window.ribbonSoon(); }catch(e){}
   const ms=$('modSelSum'); if(ms){ const n=selTotal(); ms.textContent=n? selSummary().text : 'nessuna'; } }   // 2/11 (K2): the row of Modifica's panel
 // a parcel's shape for the outline, converted once per geometry
 const selPG=new WeakMap();
@@ -8399,8 +8464,21 @@ function selMoveActs(){ const P=selParcels(), L=selList().filter(g=>canOk(g,'mov
     grpAll().forEach(G=>{ acts.push({t:'Sposta '+w+' in: '+G.name, i:'folder', dis:L.every(g=>grpOf(g)===G.id), fn:function(){ grpAssign(L, G.id); msg((L.length===1? 'L’oggetto è' : 'Gli '+L.length+' oggetti sono')+' in «'+G.name+'».','ok'); }}); }); }
   return acts; }
 function selZoom(){ const P=new Set(selParcels()); zoomGraphics(selList().filter(g=>g.visible!==false).concat(gl? gl.graphics.toArray().filter(g=>g.visible!==false&&P.has(gpParcelOf.get(g))) : [])); }
+// 3/11 (T1): the state of the map's selection button (pressed while a mode is on; Deseleziona off with nothing selected)
+function selMapSync(){ const b=$('selMapBtn'); if(!b) return; const md=selOn(), bx=selBoxOn(), n=selTotal();
+  b.classList.toggle('active', md||bx); b.setAttribute('aria-pressed', (md||bx)? 'true' : 'false');
+  const c=$('selMapClick'), r=$('selMapBox'), z=$('selMapNone'); if(c) c.setAttribute('aria-checked', md? 'true' : 'false'); if(r) r.setAttribute('aria-checked', bx? 'true' : 'false');
+  if(z) z.disabled=!n; b.title=n? 'Selezione sulla mappa: '+selSummary().text+' · le modifiche sono nel tasto destro sulla selezione' : 'Selezione sulla mappa: le modifiche sono nel tasto destro sulla selezione'; }
+// 3/11 (T1): the editing tools in the right-click menu of the selection (map and rows), only those that apply to it
+function selEditActs(){ const n=selCount(), a=selAreas(), acts=[];
+  if(n===1) acts.push({t:'Rimodella', i:'reshape', fn:function(){ selReshape(); }});
+  if(n) acts.push({t:'Sposta e ruota', i:'move', fn:function(){ selMove(); }});
+  if(a) acts.push({t:'Dividi', i:'split', fn:function(){ selSplit(); }});
+  if(a>=2) acts.push({t:'Unisci', i:'merge', fn:function(){ selMerge(); }});
+  if(selTotal()===1) acts.push({t:'Copia', i:'copy', fn:function(){ selCopy(); }});
+  return acts; }
 function selMenuActs(){ const n=selTotal();
-  return selMoveActs().concat([{t:'Zoom sulla selezione', i:'target', fn:selZoom}, {t:'Deseleziona tutto', i:'close', fn:function(){ selClear(); }},
+  return selEditActs().concat(selMoveActs()).concat([{t:'Zoom sulla selezione', i:'target', fn:selZoom}, {t:'Deseleziona tutto', i:'close', fn:function(){ selClear(); }},
     {t:'Togli dalla Raccolta ('+n+')', i:'trash', fn:function(){ selDelete(); }}]); }
 // M5: Canc takes the selection out of the Raccolta (with the confirm), outside text fields, windows and an edit under way
 function selKeyDel(e){ if(e.key!=='Delete'||e.ctrlKey||e.altKey||e.metaKey) return; const t=e.target, tag=(t&&t.tagName)||'';
@@ -8638,6 +8716,41 @@ function ownLblSync(){ if(!ownLblGL||!toolsGL||!esriMods) return; ownLblGL.remov
     const ge=g.geometry, an= ge.type==='polygon'? centroidOf(ge) : ge.type==='point'? ge : (ge.extent&&ge.extent.center); if(!an) return;
     ownLblGL.add(new esriMods.Graphic({geometry:an, symbol:{type:'text', text:String(t).slice(0,60), color:'#ffffff', haloColor:[0,0,0,0.85], haloSize:1.6, font:{size:10, weight:'bold'}}})); }); }
 function ownLblSoon(){ clearTimeout(ownLblT); ownLblT=setTimeout(()=>{ try{ ownLblSync(); }catch(e){} }, 80); }
+// 3/11 (B2): a file this app exported comes back to its place. The parcels (foglio and particella) return to Particelle, in
+// their subgroup (made if missing; a parcel already in the Raccolta is skipped); the drawings with a category you have (of
+// the model or yours) return as drawings of it, with type, values and note, in their own group when it is one of yours. The
+// strips and the net area made by the automations are left out: they come back from their sources (marked «auto» since
+// 3/11; before, recognised by their names). Everything else is imported as before. Until 3/11 all went to «Altro».
+const IMP_AUTO_NAME=/^(Fascia (larga )?\d|Area netta\b)/;
+function impBackParcel(f){ const pr=f.properties||{}, g=f.geometry, s=v=>String(v==null? '' : v).trim();
+  const fog=s(pr.foglio), par=s(pr.particella), com=s(pr.comune), bel=s(pr.belfiore), fid=s(pr.fid);
+  if(parcels.some(p=>(fid&&s(p.fid)===fid)||(s(p.foglio)===fog&&s(p.particella)===par&&((bel&&p.belfiore===bel)||(com&&p.comune===com))))) return null;
+  let c=null; try{ const e=geojsonToEsri(g); c=e&&(e.centroid||(e.extent&&e.extent.center)); }catch(e){}
+  const area=trueAreaM2(g);
+  const p={fid:fid||null, comune:com, foglio:fog, particella:par, regione:s(pr.regione), provincia:s(pr.provincia), belfiore:bel, ncr:s(pr.ncr),
+    area_m2:area, area_nd:area==null? true : undefined, land_use:s(pr.land_use), omi:pr.omi||'', lat:c? c.y : null, lng:c? c.x : null, geometry:g};
+  if(s(pr.nome)) p.nome=s(pr.nome).slice(0,120);
+  parcels.push(p); return p; }
+function impBackDrawing(f){ const pr=f.properties||{}, cat=String(pr.category||''), c=sfCat(cat), gm=gjGeom(f.geometry); if(!c||!gm) return null;
+  const ex={nome:String(pr.nome||c.l).slice(0,120), sf_cat:cat, categoria:sfLabel(cat, pr.type), color:sfColor(cat), note:String(pr.nota||'')};
+  if(pr.type&&c.t.some(t=>t[0]===pr.type)) ex.sf_type=String(pr.type);
+  Object.keys(SF_ATTR).forEach(k=>{ const v=pr[k]; if(v!=null&&v!==''&&isFinite(+v)) ex[SF_ATTR[k][0]]=+v; });
+  const g=drwAddGraphic(gm, ex); if(!g) return null;
+  const gn=String(pr.gruppo||'').trim(), std=grpAll().some(G=>G.std&&G.name===gn);
+  if(gn&&!std&&gn!=='Particelle'&&gn!=='Particelle degli intestatari'){ const G=grpSorted().find(x=>x.name===gn), id=G? G.id : grpNew(gn); if(id) grpAssign([g], id); }
+  return g; }
+function impBack(fc){ const out={rest:[], parcels:0, dup:0, drawings:0, auto:0, zoom:[]}, subs=new Map();
+  ((fc&&fc.features)||[]).forEach(f=>{ const pr=(f&&f.properties)||{}, gt=(f&&f.geometry&&f.geometry.type)||'';
+    if(exIsParcel(pr)&&/Polygon/.test(gt)&&pr.tipo==null&&gjFinite(f.geometry)){ const p=impBackParcel(f); if(!p){ out.dup++; return; }
+      out.parcels++; try{ const e=geojsonToEsri(p.geometry); if(e) out.zoom.push(e); }catch(e){}
+      const sg=String(pr.sottogruppo||pr.sottogrupp||'').trim(); if(sg){ if(!subs.has(sg)) subs.set(sg, []); subs.get(sg).push(p); } return; }
+    if(pr.tipo==='disegno'&&pr.category&&sfCat(String(pr.category))&&gjFinite(f.geometry)){
+      if(pr.auto||IMP_AUTO_NAME.test(String(pr.nome||''))){ out.auto++; return; }
+      const g=impBackDrawing(f); if(g){ out.drawings++; out.zoom.push(g); return; } }
+    out.rest.push(f); });
+  subs.forEach((list, name)=>{ const G=pgrpSorted().find(x=>x.name===name), id=G? G.id : pgrpNew(name); if(id) pgrpAssign(list, id); });
+  if(out.parcels){ try{ render(); }catch(e){} }
+  return out; }
 function impAdd(fc, srcName){
   impAdd.note=''; impAdd.hint='';
   if(ownFile(fc)){ const r=ownAdd(fc, srcName); impAdd.note=r.note; return r.n; }
@@ -8646,8 +8759,12 @@ function impAdd(fc, srcName){
   if(((fc&&fc.features)||[]).some(f=>f&&f.properties&&exIsParcel(f.properties)&&(f.properties.belfiore||f.properties.ncr))){
     impAdd.note='particelle senza intestatari';
     impAdd.hint='«'+srcName+'» contiene le particelle senza intestatari. Per vederle per intestatario importa «Intestatari_'+srcName.replace(/\.[^.]+$/,'')+'.geojson», dalla cartella output di Estrazione intestatari.'; }
+  const back=impBack(fc), zoom=back.zoom.slice();   // 3/11 (B2): what this app exported goes back to its place
+  if(back.parcels||back.dup) impAdd.note=[impAdd.note, back.parcels+(back.parcels===1? ' particella tornata' : ' particelle tornate')+' in Particelle'+(back.dup? ' ('+back.dup+' già nella Raccolta, saltat'+(back.dup===1? 'a' : 'e')+')' : '')].filter(Boolean).join('; ');
+  if(back.drawings) impAdd.note=[impAdd.note, back.drawings+(back.drawings===1? ' disegno tornato' : ' disegni tornati')+' nella sua categoria'].filter(Boolean).join('; ');
+  if(back.auto) impAdd.note=[impAdd.note, back.auto+(back.auto===1? ' fascia o area netta automatica non reimportata' : ' fasce e aree nette automatiche non reimportate')+': rinascono dai loro disegni'].filter(Boolean).join('; ');
   const col=IMP_COLORS[impColorIdx++ % IMP_COLORS.length];
-  const feats=(fc&&fc.features)||[]; let added=0, bad=0; const zoom=[];
+  const feats=back.rest; let added=back.parcels+back.drawings, bad=0;
   feats.forEach((f,i)=>{
     if(!gjFinite(f.geometry)){ bad++; return; }   // 4b
     const gm=gjGeom(f.geometry); if(!gm) return;
@@ -10453,24 +10570,27 @@ function exSetSel(o,v){ if(o.attributes) o.attributes._sel=v; else o.sel=v; }
 function exName(o){ return o.attributes? (o.attributes.nome||geomDefName(o)) : parcelLabel(o); }
 function exPicked(){ const xlsx=($('fmt').value||'')==='xlsx', out=[];
   exSections().forEach(s=>{ if(xlsx&&!s.parcels) return; s.items.forEach(o=>{ if(exSel(o)) out.push(o); }); }); return out; }
-function exRender(){ const list=$('exList'); if(!list) return; list.innerHTML='';
-  const xlsx=($('fmt').value||'')==='xlsx'; let tot=0;
-  exSections().forEach(s=>{ const items=s.items, label=s.label; if(!items.length) return; tot+=items.length;
-    const off=xlsx&&!s.parcels, box=document.createElement('div'); box.className='exsec'+(off? ' off' : '');
+// 3/11 (B1): the sections with their ticks, drawn into a list; Esporta and Migra particelle (its parcels only) share it
+function exListRender(list, secs, isOff, again){ list.innerHTML=''; let tot=0;
+  secs.forEach(s=>{ const items=s.items, label=s.label; if(!items.length) return; tot+=items.length;
+    const off=isOff(s), box=document.createElement('div'); box.className='exsec'+(off? ' off' : '');
     const h=document.createElement('label'); h.className='exsec-h';
     const all=document.createElement('input'); all.type='checkbox'; all.disabled=off;
     const nSel=items.filter(exSel).length; all.checked=nSel===items.length; all.indeterminate=nSel>0&&nSel<items.length;
     all.setAttribute('aria-label','Tutti: '+label);
-    all.onchange=()=>{ items.forEach(o=>exSetSel(o, all.checked)); exRender(); };
+    all.onchange=()=>{ items.forEach(o=>exSetSel(o, all.checked)); again(); };
     h.appendChild(all); const ht=document.createElement('b'); ht.textContent=label; h.appendChild(ht);
     const hn=document.createElement('small'); hn.textContent=nSel? nSel+' su '+items.length : items.length; h.appendChild(hn);
     box.appendChild(h);
     items.forEach(o=>{ const r=document.createElement('label'); r.className='exrow';
       const c=document.createElement('input'); c.type='checkbox'; c.checked=exSel(o); c.disabled=off;
-      c.onchange=()=>{ exSetSel(o, c.checked); exRender(); };
+      c.onchange=()=>{ exSetSel(o, c.checked); again(); };
       const t=document.createElement('span'); t.textContent=exName(o); t.title=t.textContent;
       r.appendChild(c); r.appendChild(t); box.appendChild(r); });
     list.appendChild(box); });
+  return tot; }
+function exRender(){ const list=$('exList'); if(!list) return;
+  const xlsx=($('fmt').value||'')==='xlsx', tot=exListRender(list, exSections(), s=>xlsx&&!s.parcels, exRender);
   if(!tot) list.innerHTML='<div class="empty">La Raccolta è vuota: niente da esportare.</div>';
   const n=exPicked().length;
   $('exMsg').innerHTML= xlsx? '<div class="notice">L\'XLSX è una tabella: contiene solo le particelle'+(parcels.length? '' : ' (nessuna nella Raccolta)')+'.</div>'
@@ -11104,7 +11224,7 @@ function srchShowRow(obj, soft){ const root=byId('drawerElenco'); if(!root) retu
     export:{name:'Salva ed esporta', mods:[
       {id:'proj', t:'Progetto', s:'Nome, salvataggio e apertura del file .axpo', i:'save', roots:['#modProj'], info:'proj'},   // R3-1 (I4): the default module of the tab
       {id:'edit', t:'Modifica AREAS COLLECTION', s:"L'editor del portale (serve l'accesso)", i:'pen', roots:['#modEdit']},
-      {id:'print', t:'Stampa', s:'Il widget di stampa del portale', i:'print', roots:['#modPrint']}],
+      {id:'print', t:'Stampa', s:'Un foglio PDF in scala con la Raccolta', i:'print', roots:['#modPrint'], info:'print'}],   // 2026-11-03 (S1–S6): 33-print.js
      groups:[
       {label:'Esporta', tools:[{id:'dl', t:'Esporta', i:'export', size:'large', primary:true, press:'#dl'},
         {id:'x-geo', t:'GeoJSON · KML · KMZ', i:'braces', size:'small', fn:function(){ exportAs('geojson'); }, offOf:'#dl'},
@@ -11116,7 +11236,7 @@ function srchShowRow(obj, soft){ const root=byId('drawerElenco'); if(!root) retu
       {label:'Progetto', tools:[{id:'p-save', t:'Salva progetto', i:'save', size:'large', mod:'proj', fn:function(){ projSave(false); }},
         {id:'p-saveas', t:'Salva come…', i:'save', size:'small', mod:'proj', fn:function(){ projSave(true); }},
         {id:'p-open', t:'Apri progetto…', i:'folder', size:'small', mod:'proj', press:'#projOpenBtn'}]},
-      {label:'Stampa', tools:[{id:'print', t:'Stampa', i:'print', size:'large', mod:'print', off:function(){ return isPhone()? 'Solo sul computer' : null; }}]}]}
+      {label:'Stampa', tools:[{id:'print', t:'Stampa', i:'print', size:'large', mod:'print'}]}]}   // S6: on the phone too
   };
   window.SHELL=SHELL;   // 7a-2: the registry of the commands (29b-commands.js) reads the ribbon's description
   /* the ⓘ of every group, written once in 5a (26/10, plan §6q F5): what the group is for, its tools by the names on the
@@ -11126,7 +11246,7 @@ function srchShowRow(obj, soft){ const root=byId('drawerElenco'); if(!root) retu
     'Raccolta':"Dalle particelle della Raccolta: Crea area lorda la mette nel gruppo Aree di progetto (dalle selezionate, o da tutte); Etichette sulla mappa accende i numeri; Zoom sulle particelle le inquadra. Per sceglierle sulla mappa: Modifica › Seleziona o Riquadro, oppure il tasto destro su una particella.",
     'Collega a sito AREAS':"Il sito di AREAS COLLECTION a cui vanno i disegni sul portale; è facoltativo, perché salvando ogni oggetto prende da solo l'area che tocca. Sito dalla mappa lo sceglie con un clic, Carica elementi porta nella Raccolta quelli già salvati, Togli il sito lo toglie. Serve l'accesso.",
     'Cosa disegni':"La categoria dei nuovi disegni: la scheda colorata ne dice nome e descrizione, un clic apre l'elenco, diviso come la Raccolta, con «Non classificato» e le categorie tue. Accanto solo i valori di quella categoria (tipo; buffer, larghezza, altezza o tensione) e la Fonte. Esclusione da layer fa di un elemento di un layer acceso un'esclusione.",
-    'Selezione':"Seleziona (clic sulla mappa; Maiusc aggiunge o toglie; un secondo clic nello stesso punto prende quello sotto) o Riquadro sceglie le particelle e gli oggetti; Deseleziona svuota la selezione. La selezione è la spunta della Raccolta: in cima alla Raccolta la sua barra, a destra in Proprietà quanti sono e la scheda dell'oggetto selezionato.",
+    'Selezione':"Seleziona (clic sulla mappa; Maiusc aggiunge o toglie; un secondo clic nello stesso punto prende quello sotto) o Riquadro sceglie le particelle e gli oggetti; Deseleziona svuota la selezione. Gli stessi tre stanno anche sulla mappa, sotto le Misure, in ogni scheda. La selezione è la spunta della Raccolta: in cima alla Raccolta la sua barra, a destra in Proprietà quanti sono e la scheda dell'oggetto selezionato.",
     'Modifica':"Sulla selezione: Rimodella (i vertici di un oggetto), Sposta e ruota, Dividi (una linea taglia le aree), Unisci (le aree selezionate diventano una), Copia (dove clicchi, anche parallela a distanza fissa) ed Elimina (anche col tasto Canc). Le particelle non si modificano. Annulla e Ripeti, in alto, valgono per ogni modifica.",
     'Con quale strumento':"Punto, Linea, Area, Rettangolo, Cerchio o A mano libera: scegli e disegna sulla mappa (linee e aree finiscono con un doppio clic). Il disegno prende la categoria di Cosa disegni e va nella Raccolta; Esc smette.",
     'Supporto al disegno':"Un pulsante apre le impostazioni: aggancio ai vertici e ai bordi, misure e angoli mentre disegni, misure esatte di rettangolo e cerchio (anche parallele a un lato), griglia (passo, allinea a un lato, raddrizza). Il nome del pulsante dice cosa è acceso.",
@@ -11144,9 +11264,9 @@ function srchShowRow(obj, soft){ const root=byId('drawerElenco'); if(!root) retu
     'Servizi web':"WMS · WFS · REST: incolli l'indirizzo di un servizio, scegli i suoi layer e li aggiungi alla mappa (scheda Layer, a destra). Si leggono solo servizi https che permettono la lettura da altri siti.",
     'Portale':"Layer dal portale: apre la scheda Layer a destra, con la ricerca per titolo dei layer del portale. Serve l'accesso.",
     'Esporta':"Esporta scarica la Raccolta: GeoJSON · KML · KMZ, Shapefile (.zip) o Tabella XLSX delle particelle. Esporta gli oggetti spuntati, o tutto se non ne spunti; il KML ha una cartella per gruppo, lo shapefile un file per gruppo.",
-    'Portale AGOL':"Scritture sul portale, ognuna confermata in una finestra: Migra particelle in AREAS (le particelle diventano aree di AREAS COLLECTION), Salva disegni in Site Features (la seconda volta aggiorna, non duplica) e Modifica AREAS COLLECTION con l'editor del portale. Serve l'accesso.",
+    'Portale AGOL':"Scritture sul portale, ognuna confermata in una finestra: Migra particelle in AREAS (le particelle spuntate, o tutte, diventano aree di AREAS COLLECTION: una per particella, un'unica area o un'area per sottogruppo), Salva disegni in Site Features (la seconda volta aggiorna, non duplica) e Modifica AREAS COLLECTION con l'editor del portale. Serve l'accesso.",
     'Progetto':"Il progetto .axpo con tutto il lavoro: Salva progetto (Ctrl+S), Salva come… e Apri progetto… (Ctrl+O); a destra, in Proprietà, anche la copia da condividere senza dati personali. Il lavoro resta anche nel browser; lo stesso file si apre in PV Predesign.",
-    'Stampa':"Stampa la mappa in scala su un foglio, con il widget di stampa del portale. Il catasto AdE non va in stampa; serve il computer."};
+    'Stampa':"Stampa salva un foglio PDF A4 o A3 con la Raccolta in scala esatta (adatta, come la mappa o fissa), su uno sfondo a scelta, con dati, legenda, scala, nord e note. Mentre il pannello è aperto, un rettangolo tratteggiato sulla mappa mostra cosa entra nel foglio. Il catasto AdE non va in stampa."};
   var curMod={};
   function tabMod(tab, id){ var t=SHELL[tab]; return t? ((t.mods||[]).filter(function(m){ return m.id===id; })[0]||null) : null; }
   function tabTool(tab, id){ var t=SHELL[tab], out=null; (t&&t.groups||[]).forEach(function(g){ g.tools.forEach(function(x){ if(x.id===id) out=x; }); }); return out; }
@@ -11194,8 +11314,11 @@ function srchShowRow(obj, soft){ const root=byId('drawerElenco'); if(!root) retu
       if(d.icon){ var u=b.querySelector('use'), nm='#i-'+d.icon(); if(u&&u.getAttribute('href')!==nm) u.setAttribute('href', nm); }
       if(d.color) b.style.setProperty('--c', d.color()||'');
       var ck=(typeof cmdKeyText==='function')? cmdKeyText(d.id) : '', tt=why||(d.tip? d.tip() : d.s)||(src&&src.title)||lab; b.title=(ck&&!why&&tt.indexOf(ck)<0)? tt+' ('+ck+')' : tt; });   /* 7a-2: the shortcut in the tooltip */
-    ribbonCtx(tab);
+    ribbonCtx(tab); try{ if(typeof selMapSync==='function') selMapSync(); }catch(e){}   // 3/11 (T1): the map's selection button
+    prWantSync();
     var r=$g('ribbon'); if(r){ r.classList.remove('tight'); if(r.scrollWidth>r.clientWidth+1) r.classList.add('tight'); } }   // no room for the context: it hides (tab 2 at 1366 px)
+  // 3/11 (S3): the sheet's rectangle stays on the map while the print module is in sight, and goes when it is left or the panel closes
+  function prWantSync(){ try{ if(window.prWant) window.prWant(curTab()==='export'&&curMod.export==='print'&&!document.body.classList.contains('side-collapsed')); }catch(e){} }
   var ribbonT=null; function ribbonSoon(){ clearTimeout(ribbonT); ribbonT=setTimeout(function(){ ribbonSync(); try{ formSync(); }catch(e){} }, 0); }   // 22/10: a timeout, not a frame: a background tab or a stalled paint must not delay the states
   function fmtHa(v){ return (Math.round(v*10)/10).toLocaleString('it-IT', {minimumFractionDigits:1, maximumFractionDigits:1})+' ha'; }
   function kindCount(k){ try{ return toolsGL.graphics.toArray().filter(function(g){ return g.attributes&&g.attributes._kind===k; }).length; }catch(e){ return 0; } }
@@ -11277,9 +11400,10 @@ function srchShowRow(obj, soft){ const root=byId('drawerElenco'); if(!root) retu
     Array.prototype.forEach.call(document.querySelectorAll('#ribbon [data-mod]'), function(b){ b.setAttribute('aria-pressed', b.dataset.mod===m.id? 'true' : 'false'); });
     if(tab===curTab()&&typeof spanel!=='undefined'&&spanel!=='props') spanelSet('props', true);   // R3-3 (Q5): a module brings «Proprietà» back
     if(tab===curTab()){ var st=$g('sideTitle'), ss=$g('sideSub'); if(st) st.textContent=m.t; if(ss) ss.textContent=m.s||'';
-      if(tab==='export'&&isPhone()){ if(st) st.textContent=t.name; if(ss) ss.textContent='Esporta, portale e progetto'; }   // phase 3: the two modules of tab 5 stay on the computer
+      if(tab==='export'&&isPhone()&&m.id!=='print'){ if(st) st.textContent=t.name; if(ss) ss.textContent='Esporta, portale e progetto'; }   // phase 3: Modifica AREAS COLLECTION stays on the computer (the print goes on the phone since 3/11, S6)
       var sc=$g('sideContent'); if(sc) sc.scrollTop=0; }
     if(m.id==='proj'&&window.projModRender) window.projModRender();   // R3-1 (I4)
+    if(m.id==='print'&&tab===curTab()&&window.prSync) window.prSync(true);   // 3/11 (S3): the lists, and the sheet's rectangle on the map
     if((tab==='geoproc'||tab==='analizza')&&window.toolSync) window.toolSync(m.id);   // 2B-2: the tool shown is the current one, the previous one's map mode goes off
     if(was!==m.id&&tab===curTab()&&(t.groups||[]).some(function(g){ return !!g.when; })){ ribbonRender(tab); sheetToolsRender(tab); }   // 22/10: the groups that depend on the module
     ribbonSoon(); }
@@ -11412,7 +11536,7 @@ function srchShowRow(obj, soft){ const root=byId('drawerElenco'); if(!root) retu
   var MORE=[['modifica','Modifica','cursor'],['geoproc','Geoprocessi','geoproc'],['import','Importa','import'],['export','Salva ed esporta','export'],['layers','Layer','layers'],['legend','Legenda','legend'],['basemaps','Mappa di base','basemap'],['bookmarks','Luoghi (segnalibri)','bookmark'],['settings','Impostazioni','settings'],['guide','Guida rapida','help']];   // J5g: on a phone the ⚙ of the top bar is here
   function mbarBuild(){ if(!mbar||mbar.children.length) return;
     mbar.innerHTML=MBAR.map(function(d){ return '<button type="button" data-m="'+d[0]+'" aria-selected="false">'+icon(d[2])+escH(d[1])+(d[0]==='raccolta'? '<span class="badge" id="mbRcBadge" hidden>0</span>' : '')+'</button>'; }).join('');
-    if(moreMenu) moreMenu.innerHTML=MORE.map(function(d){ return '<button type="button" role="menuitem" data-go="'+d[0]+'">'+icon(d[2])+escH(d[1])+'</button>'; }).join('')+'<p class="hint">Stampa e Modifica AREAS COLLECTION restano sul computer.</p>';
+    if(moreMenu) moreMenu.innerHTML=MORE.map(function(d){ return '<button type="button" role="menuitem" data-go="'+d[0]+'">'+icon(d[2])+escH(d[1])+'</button>'; }).join('')+'<p class="hint">Modifica AREAS COLLECTION resta sul computer.</p>';
     try{ tabsProfSync(); }catch(e){}   // K7
     mbar.addEventListener('click', function(e){ var b=e.target.closest('[data-m]'); if(!b) return; var m=b.dataset.m; var wasMore=!!(moreMenu&&!moreMenu.hidden); moreClose();
       if(m==='raccolta'){ if(leftOpen()&&lastPtab==='elenco') openPanel(null); else openPanel('elenco'); }
@@ -11644,6 +11768,7 @@ function srchShowRow(obj, soft){ const root=byId('drawerElenco'); if(!root) retu
       +'<li>Lo Shapefile va in un .zip con i suoi file (.shp, .shx, .dbf e, se c\'è, .prj).</li>'
       +'<li>Se il file non dice in che sistema di coordinate è (uno shapefile senza .prj), si apre da solo <b>Coordinate sconosciute</b> (scheda Analizza) con i sistemi possibili: scegli quello giusto e il file intero viene convertito.</li>'
       +'<li>Il GeoJSON di <b>Estrazione intestatari</b> viene riconosciuto: le sue particelle vanno nel blocco Particelle, colorate e raggruppate per intestatario.</li>'
+      +'<li>Un file esportato da qui torna al suo posto: le particelle nel gruppo Particelle, nel loro sottogruppo (quelle già nella Raccolta si saltano), i disegni nella loro categoria e nel loro gruppo. Le fasce e l’area netta automatiche non si reimportano: rinascono dai loro disegni.</li>'
       +'<li>Un .dwg scelto qui passa a <b>Disegni CAD</b>.</li>'
       +'<li>Il file viene letto sul tuo PC: non viene caricato da nessuna parte.</li></ul>'},
     proj:{t:'Progetto', s:'Il file .axpo: tutto il lavoro in un file, da riaprire o passare ai colleghi.', h:
@@ -11654,6 +11779,21 @@ function srchShowRow(obj, soft){ const root=byId('drawerElenco'); if(!root) retu
       +'<h3>Da sapere</h3><ul>'
       +'<li>Il lavoro si salva comunque da solo in questo browser: particelle e geometrie, non DWG e immagini. Il file .axpo conserva tutto, DWG e immagini compresi, e si apre anche in <b>PV Predesign</b>.</li>'
       +'<li>Per ripartire da una mappa pulita: <b>'+icon('settings')+' Impostazioni</b>, in alto › <b>Svuota il lavoro</b>.</li></ul>'},
+    print:{t:'Stampa', s:'Un foglio PDF con la Raccolta in scala, come il report di PV Predesign.', h:   // 3/11 (S1–S6)
+      '<h3>Come si usa</h3><ol>'
+      +'<li>Scegli il <b>foglio</b> (A4 o A3, orizzontale o verticale), la <b>scala</b> e lo <b>sfondo</b>. Il rettangolo tratteggiato sulla mappa mostra cosa entra nel foglio; <b>'+icon('target')+' Inquadra</b> porta la mappa lì.</li>'
+      +'<li>In <b>Nella mappa</b> spunta i gruppi della Raccolta da disegnare (le particelle anche con i numeri) e, se servono, i layer accesi della mappa.</li>'
+      +'<li>In <b>Sul foglio</b> scegli dati, legenda con scala e nord, e scrivi le note.</li>'
+      +'<li>Premi <b>'+icon('print')+' Salva PDF</b>.</li></ol>'
+      +'<h3>La scala</h3><ul>'
+      +'<li><b>Adatta alla Raccolta</b>: i gruppi spuntati entrano nel foglio, alla scala tonda più vicina (1:2.000, 1:2.500, 1:5.000…).</li>'
+      +'<li><b>Come la mappa</b>: il centro e la scala della mappa. Le scale fisse partono dal centro della mappa.</li>'
+      +'<li>Le misure sul foglio sono vere: la Raccolta è disegnata in metri, non come immagine.</li></ul>'
+      +'<h3>Da sapere</h3><ul>'
+      +'<li>Il <b>catasto dell’Agenzia</b> non va in stampa: il suo server non permette di copiarne l’immagine. Le particelle della Raccolta si disegnano con i loro numeri.</li>'
+      +'<li>Le particelle degli intestatari partono spente e si stampano <b>senza nomi</b>.</li>'
+      +'<li>Un layer acceso il cui server non permette la copia resta fuori: il foglio si fa lo stesso e lo dice.</li>'
+      +'<li>Il foglio porta la scritta «scouting, non per costruzione»: è un documento di lavoro.</li></ul>'},
     elev:{t:'Profilo altimetrico', s:'La quota del terreno lungo una linea che disegni (scheda Analizza, gruppo Analisi terreno).', h:
       '<h3>Come si usa</h3><ol>'
       +'<li>Nel pannello premi <b>Nuovo profilo</b> e disegna una linea sulla mappa: un clic per vertice, doppio clic per finire.</li>'
@@ -11905,7 +12045,8 @@ function srchShowRow(obj, soft){ const root=byId('drawerElenco'); if(!root) retu
       +'<li><b>'+icon('cursor')+' Seleziona</b>: clicca sulla mappa una particella o un oggetto della Raccolta; <kbd>Maiusc</kbd>+clic aggiunge o toglie, un clic nel vuoto svuota. Dove più oggetti si sovrappongono prendo il più piccolo (una particella prima dell\'area lorda che la copre): un secondo clic nello stesso punto prende quello sotto.</li>'
       +'<li><b>'+icon('sel-rect')+' Riquadro</b>: un rettangolo seleziona ogni particella e oggetto che tocca (<kbd>Maiusc</kbd> aggiunge). <b>'+icon('close')+' Deseleziona</b> svuota la selezione.</li>'
       +'<li>Nella <b>Raccolta</b>: la spunta di una riga (<kbd>Maiusc</kbd>+clic spunta tutte le righe fino all\'ultima spuntata), o «Spunta tutti» nell\'intestazione del gruppo (con il filtro, solo le righe trovate).</li>'
-      +'<li>Sulla mappa, il <b>tasto destro</b> su una particella o un oggetto la seleziona, o la aggiunge alla selezione.</li></ul>'
+      +'<li>Sulla mappa, il <b>tasto destro</b> su una particella o un oggetto la seleziona, o la aggiunge alla selezione.</li>'
+      +'<li>Da qualsiasi scheda: il pulsante <b>'+icon('cursor')+'</b> sulla mappa, sotto le Misure, ha Seleziona, Riquadro e Deseleziona; il <b>tasto destro</b> su un oggetto selezionato offre gli strumenti di modifica che valgono per la selezione (Rimodella, Sposta e ruota, Dividi, Unisci, Copia), poi i gruppi, lo zoom e Togli.</li></ul>'
       +'<p>Particelle e oggetti selezionati hanno un contorno blu; a destra, in Proprietà, la scheda Modifica dice quanti sono, e in cima alla Raccolta compare la <b>barra della selezione</b>: quanti sono, Zoom, Sottogruppo (o Gruppo), Togli e Deseleziona. Il <b>tasto destro</b> su una riga selezionata, o sulla mappa su un oggetto selezionato, offre le stesse azioni per tutta la selezione. Con un oggetto solo, a destra in <b>Proprietà</b> vedi la sua scheda: categoria, tipo e attributi.</p>'
       +'<h3>Cosa puoi fare</h3><ul>'
       +'<li><b>Rimodella</b>: sposti i vertici dell\'oggetto selezionato (un punto si sposta). Clic fuori per finire.</li>'
@@ -12026,6 +12167,8 @@ function srchShowRow(obj, soft){ const root=byId('drawerElenco'); if(!root) retu
   }
   var lastMode=null;
   setInterval(function(){
+    try{ if(typeof selMapSync==='function') selMapSync(); }catch(e){}   // 3/11 (T1): the map's selection button follows the modes
+    prWantSync();
     var m=modeInfo(); if(m===lastMode) return; lastMode=m;   // riscrivo solo se cambia: è un role=status,
     if(banner){ if(m){banner.innerHTML=m; banner.title=banner.textContent; banner.hidden=false;} else banner.hidden=true; }   // i lettori di schermo lo rileggerebbero; giro 3: testo completo nel tooltip
     if(vd) vd.classList.toggle('mode-on', !!m);
@@ -12172,11 +12315,11 @@ function srchShowRow(obj, soft){ const root=byId('drawerElenco'); if(!root) retu
     {sel:'#ribbon', title:'Modifica', body:"Quello che c'è già. <b>Selezione</b>: Seleziona (clic sulla mappa), Riquadro, Deseleziona; la selezione è la spunta della Raccolta. <b>Modifica</b>, sulla selezione: rimodella, sposta e ruota, dividi, unisci, copia (anche parallela, a distanza fissa) ed elimina. A destra quanti sono e la scheda dell'oggetto selezionato.", open:function(){ openTab('modifica'); }, placement:'below'},
     {sel:'#ribbon', title:'Geoprocessi', body:"Metti gli oggetti in <b>A</b> (A dalla mappa, gli spuntati o per categoria; B serve a Parte comune e Sottrai), scegli l'operazione in <b>Geoprocessi</b> e premi <b>Esegui</b> a destra: il risultato è un oggetto nuovo nella Raccolta, gruppo Analisi.", open:function(){ openTab('geoproc'); }, placement:'below'},
     {sel:'#ribbon', title:'Importa', body:"<b>File</b>: GeoJSON, KML, KMZ, Shapefile e il file degli intestatari; <b>CAD</b>: un DWG letto nel browser, senza uscire dal PC, con il sistema stimato o allineato con due punti; <b>Immagini</b>: il GeoTIFF da solo, foto, planimetrie e PDF con punti noti; <b>Servizi web</b>: WMS, WFS e ArcGIS REST dal loro indirizzo; <b>Portale</b>: un layer cercato per titolo.", open:function(){ openTab('import'); }, placement:'below'},
-    {sel:'#ribbon', title:'Salva ed esporta', body:"<b>Esporta</b> in GeoJSON, KML, KMZ, Shapefile o XLSX; <b>Portale AGOL</b>: Migra particelle in AREAS, Salva disegni in Site Features, Modifica AREAS COLLECTION; <b>Progetto</b>: salva e apri il file .axpo; <b>Stampa</b> la mappa in scala.", open:function(){ openTab('export'); }, placement:'below'},
+    {sel:'#ribbon', title:'Salva ed esporta', body:"<b>Esporta</b> in GeoJSON, KML, KMZ, Shapefile o XLSX; <b>Portale AGOL</b>: Migra particelle in AREAS, Salva disegni in Site Features, Modifica AREAS COLLECTION; <b>Progetto</b>: salva e apri il file .axpo; <b>Stampa</b> un foglio PDF con la Raccolta in scala, su uno sfondo a scelta.", open:function(){ openTab('export'); }, placement:'below'},
     {sel:'#leftPanel', title:'La Raccolta', body:"In gruppi: Particelle, Aree di progetto, Aree di esclusione, Analisi, Altro, Immagini, e i tuoi con <b>+ Gruppo</b>. In alto il filtro per nome e <b>Comprimi</b>; ogni riga ha la cifra a destra, l'occhio e il menu "+icon('more')+". La spunta è la selezione: la usano anche i geoprocessi e l'esportazione.", open:function(){ openDrawer('elenco'); }, placement:'right'},
     {sel:'#sideTabs', title:'Proprietà, Layer, Legenda', body:"A destra: <b>Proprietà</b> dello strumento aperto o dell'oggetto selezionato; <b>Layer</b> della mappa, con la ricerca nel portale e il <b>filtro per attributo</b>; <b>Legenda</b> dei layer accesi.", open:function(){ if(window.spanelSet) window.spanelSet('layers'); }, placement:'left'},
     {sel:'#sideUndock', title:'Allarga e sgancia', body:"I due pannelli si allargano trascinando il bordo interno (doppio clic per tornare com'erano) e si sganciano con "+icon('undock')+" in una finestra da mettere sul secondo schermo; chiudendo la finestra tornano al loro posto.", open:function(){ if(window.spanelSet) window.spanelSet('props'); }, placement:'left'},
-    {sel:'#trStack', title:'Ricerca e misure', body:"La lente cerca indirizzi e coordinate: lat lon, ma anche X Y in Gauss-Boaga o UTM, di cui indovina il sistema. Sotto, "+icon('measure')+" misura una distanza o un'area sulla mappa; le misure non si salvano.", placement:'left'},
+    {sel:'#trStack', title:'Ricerca e misure', body:"La lente cerca indirizzi e coordinate: lat lon, ma anche X Y in Gauss-Boaga o UTM, di cui indovina il sistema. Sotto, "+icon('measure')+" misura una distanza o un'area sulla mappa; le misure non si salvano. Più sotto, "+icon('cursor')+" seleziona da qualsiasi scheda: Seleziona, Riquadro, Deseleziona; col tasto destro sulla selezione la modifichi.", placement:'left'},
     {sel:'#zoomHomeBtn', title:'Zoom, luoghi e mappa di base', body:"In alto a sinistra zoom, bussola e posizione GPS, poi "+icon('home')+" <b>Zoom sulla Raccolta</b> e "+icon('bookmark')+" <b>Luoghi</b>, i segnalibri. In basso a destra la <b>mappa di base</b>, con l'opacità.", placement:'right'},
     {sel:'#statusbar', title:'La barra di stato', body:"Il pin fissa le coordinate del prossimo clic; accanto le coordinate del puntatore nel sistema che scegli, la scala (un menu: la mappa va alla scala scelta), con il terreno analizzato la quota e la pendenza sotto il puntatore, e lo stato del Catasto AdE; a destra la modalità in corso, l'aggancio e l'ora dell'ultimo salvataggio nel browser.", placement:'above'},
     {sel:'#wmBtn', title:'Mappa del portale', body:"In alto, sempre visibile: quale web map del portale è in uso (General Map o una Check Vincoli regionale) e il menu per cambiarla, con ricerca per nome. Cambiando mappa restano particelle, disegni e risultati; si perdono i layer accesi e i filtri di quella mappa.", open:function(){ window.toolClose&&window.toolClose(); }, placement:'bottom'},
@@ -12254,6 +12397,238 @@ function srchShowRow(obj, soft){ const root=byId('drawerElenco'); if(!root) retu
   try{ if(!localStorage.getItem('axpo_tour_seen')&&!window.matchMedia('(max-width:768px)').matches){ localStorage.setItem('axpo_tour_seen','1'); setTimeout(function(){ startTour(TOUR_START); }, 1800); } }catch(e){}
   window.__startTour=startTour; window.__TOUR_START=TOUR_START; window.__TOUR_ALL=TOUR_ALL;
 })();
+</script>
+<script>
+// ══ The print, as a PDF (2026-11-03, decisions S1–S6 of the user) ═════════════════════════════════════════════════
+// As the report of PV Predesign (its app/js/report.js): jsPDF, one page with a blue bar, the title and the date, the map in
+// a frame at an exact scale, a column with the figures, the legend and the notes, a footer. The Raccolta is drawn as vectors
+// in the local metric frame (16b-geo-frame.js), so the scale on the paper is true; under it, when chosen, an image of a
+// basemap of the app (and of the layers switched on) taken by a MapView out of sight over the same extent, at 150 dpi. The
+// cadastre of the Agenzia cannot go in: its server does not let the browser copy its image (no CORS); the parcels of the
+// Raccolta are drawn with their numbers instead. The owners' parcels go without their names. The panel is the module
+// «Stampa» of Salva ed esporta; while it is open a dashed rectangle on the map shows what the sheet holds. The Esri Print
+// widget is gone.
+const PR_JSPDF='https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+const PR_DPI=150, PR_SCALES=[250,500,1000,1500,2000,2500,3000,4000,5000,7500,10000,15000,20000,25000,50000,100000,250000,500000];
+const PR_BLUE=[57,69,207], PR_PARCEL='#F5A623';
+let prOn=false, prT=0, prLibP=null, prNumsOn=true, prLayersOn=false;
+const prSel=new Map();   // the groups ticked in the panel, kept while it is redrawn
+// jsPDF, fetched at the first print and run with no AMD `define` in sight (the SDK's loader would take it as a module)
+function prLib(){ if(window.jspdf&&window.jspdf.jsPDF) return Promise.resolve(window.jspdf.jsPDF);
+  if(!prLibP) prLibP=fetch(PR_JSPDF).then(r=>{ if(!r.ok) throw new Error('HTTP '+r.status); return r.text(); })
+    .then(src=>{ (new Function('define', 'exports', 'module', src)).call(window, undefined, undefined, undefined);
+      if(!(window.jspdf&&window.jspdf.jsPDF)) throw new Error('jsPDF non trovato'); return window.jspdf.jsPDF; })
+    .catch(e=>{ prLibP=null; throw new Error('la libreria del PDF non si scarica ('+((e&&e.message)||e)+')'); });
+  return prLibP; }
+// the standard fonts of a PDF are Latin-1: the other characters become their nearest ASCII
+function prTxt(s){ return String(s==null? '' : s).replace(/[–—]/g, '-').replace(/[‘’]/g, "'").replace(/[“”]/g, '"').replace(/…/g, '...')
+  .replace(/→/g, '->').replace(/≈/g, '~').replace(/[^\x00-\xFF]/g, ''); }
+function prRgb(hex){ const h=String(hex||'#2FB6E6').replace('#',''); const n=parseInt(h.length===3? h.split('').map(c=>c+c).join('') : h, 16);
+  return [(n>>16)&255, (n>>8)&255, n&255]; }
+function prTimeout(p, ms, what){ return Promise.race([p, new Promise((_, ko)=>setTimeout(()=>ko(new Error(what)), ms))]); }
+function prNice(m){ const e=Math.pow(10, Math.floor(Math.log10(m))); return [5, 2, 1].map(x=>x*e).find(x=>x<=m)||e; }
+function prN(n){ return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, '.'); }   // 1.500 as in the list (Italian Intl leaves four digits ungrouped)
+function prItaDate(d){ const p=n=>('0'+n).slice(-2); return p(d.getDate())+'/'+p(d.getMonth()+1)+'/'+d.getFullYear(); }
+
+// ── what can go in the map: the groups of the Raccolta ──
+function prGroupDefs(){ const out=[];
+  if(parcels.some(p=>p.geometry)) out.push({id:'parcels', name:'Particelle', n:parcels.length, on:true});
+  if(toolsGL){ const own=toolsGL.graphics.toArray().filter(g=>g.geometry&&g.attributes&&ownIs(g)); if(own.length) out.push({id:'own', name:'Particelle degli intestatari (senza nomi)', n:own.length, on:false});
+    grpAll().forEach(G=>{ const items=prItems(G.id); if(items.length) out.push({id:G.id, name:G.name, n:items.length, on:items.some(g=>g.visible!==false)}); }); }
+  return out; }
+function prItems(gid){ if(gid==='parcels') return parcels.filter(p=>p.geometry);
+  if(!toolsGL) return [];
+  if(gid==='own') return toolsGL.graphics.toArray().filter(g=>g.geometry&&g.attributes&&ownIs(g));
+  return sectionGraphics(gid).filter(g=>g.geometry&&!(g.attributes&&ownIs(g))); }
+function prGroupsRender(){ const box=$('prGroups'); if(!box) return; const defs=prGroupDefs();
+  box.innerHTML=defs.map(d=>{ const on=prSel.has(d.id)? prSel.get(d.id) : d.on;
+      return '<label class="chk" title="'+esc(d.n+(d.n===1? ' oggetto' : ' oggetti'))+'"><input type="checkbox" data-g="'+esc(d.id)+'"'+(on? ' checked' : '')+'> '+esc(d.name)+'</label>'
+        +(d.id==='parcels'? '<label class="chk prsub" title="Il numero di ogni particella"><input type="checkbox" id="prNums"'+(prNumsOn? ' checked' : '')+'> con i numeri</label>' : ''); }).join('')
+    +'<label class="chk" title="I layer accesi della mappa (vincoli, servizi aggiunti), se il loro server permette di copiarne l’immagine"><input type="checkbox" id="prLayers"'+(prLayersOn? ' checked' : '')+'> Layer accesi della mappa</label>'
+    +(defs.length? '' : '<div class="thint">La Raccolta è vuota: il foglio avrà solo lo sfondo.</div>');
+  prWhatSum(); }
+function prWhatSum(){ const s=$('prWhatSum'), box=$('prGroups'); if(!s||!box) return; const n=box.querySelectorAll('input[data-g]:checked').length;
+  s.textContent=n? n+(n===1? ' gruppo' : ' gruppi') : 'solo lo sfondo'; }
+// the basemaps of the app (the gallery's), and the one in use when it is not one of them (a web map's own)
+function prBaseFill(){ const s=$('prBase'); if(!s) return; const L=window.APP_BASEMAPS||[], cur=view&&view.map&&view.map.basemap;
+  const i=L.findIndex(b=>b===cur||(cur&&b.id&&b.id===cur.id)), keep=s.value;
+  s.innerHTML='<option value="none">Nessuno (solo vettori)</option>'+(cur&&i<0? '<option value="cur">In uso · '+esc(cur.title||'mappa di base')+'</option>' : '')
+    +L.map((b, j)=>'<option value="'+j+'">'+esc(b.title)+'</option>').join('');
+  s.value= s.dataset.set&&[...s.options].some(o=>o.value===keep)? keep : (i>=0? String(i) : (cur? 'cur' : 'none')); }
+// the app's own basemap, not a copy: Basemap.clone() keeps the same layer instances and most layers have no clone();
+// the view out of sight leaves it before closing (prShot), so nothing of the app is destroyed
+function prBaseOf(v){ if(v==='none'||v==null||v==='') return null;
+  return (v==='cur'? view.map.basemap : (window.APP_BASEMAPS||[])[+v])||null; }
+function prBaseTitle(v){ if(v==='none'||v==null||v==='') return ''; if(v==='cur') return (view.map.basemap&&view.map.basemap.title)||'mappa di base';
+  const b=(window.APP_BASEMAPS||[])[+v]; return b? b.title : ''; }
+function prOpts(){ const v=id=>{ const e=$(id); return e? e.value : ''; }, c=id=>{ const e=$(id); return !!(e&&e.checked); }, box=$('prGroups');
+  return {title:v('prTitle').trim(), paper:v('prPaper')||'a4', orient:v('prOrient')||'l', scale:v('prScale')||'fit', base:v('prBase')||'none', layers:c('prLayers'),
+    groups:box? [...box.querySelectorAll('input[data-g]:checked')].map(x=>x.dataset.g) : [], nums:c('prNums'), legend:c('prLegend'), data:c('prData'), notes:v('prNotes').trim()}; }
+
+// ── the sheet: the page and the map's frame in millimetres ──
+function prLayout(o){ const k=o.paper==='a3'? Math.SQRT2 : 1, land=o.orient!=='p', W=(land? 297 : 210)*k, H=(land? 210 : 297)*k, M=12*k;
+  if(land){ const colW=87*k, gap=8*k, map={x:M, y:24*k, w:W-2*M-colW-gap, h:H-24*k-16*k}; return {W, H, M, k, land, map, col:{x:map.x+map.w+gap, y:map.y, w:colW, h:map.h}}; }
+  const map={x:M, y:24*k, w:W-2*M, h:(H-24*k-16*k)*0.66}, cy=map.y+map.h+7*k; return {W, H, M, k, land, map, col:{x:M, y:cy, w:W-2*M, h:H-16*k-cy}}; }
+// the geometries of the chosen groups, in the view's reference
+function prGeoms(o){ const gs=[]; o.groups.forEach(id=>prItems(id).forEach(x=>{ const g=x.attributes? x.geometry : geojsonToEsri(x.geometry); if(g) gs.push(g); })); return gs; }
+// the extent on the ground: the scale, the centre, the frame (null before the projection engine)
+function prFrame(o){ if(!view||!geoFrameReady()) return null; const L=prLayout(o); let f, cx, cy, N;
+  if(o.scale==='fit'){ const gs=prGeoms(o);
+    if(gs.length){ f=geoFrameFor(gs); let x0=Infinity, y0=Infinity, x1=-Infinity, y1=-Infinity;
+      gs.forEach(g=>{ const l=f.toLocal(g), e=l&&(l.extent||(l.type==='point'? {xmin:l.x, ymin:l.y, xmax:l.x, ymax:l.y} : null)); if(!e) return;
+        x0=Math.min(x0, e.xmin); y0=Math.min(y0, e.ymin); x1=Math.max(x1, e.xmax); y1=Math.max(y1, e.ymax); });
+      if(isFinite(x0)){ cx=(x0+x1)/2; cy=(y0+y1)/2; const need=Math.max((x1-x0)*1000/L.map.w, (y1-y0)*1000/L.map.h, 1)*1.12;
+        N=PR_SCALES.find(s=>s>=need)||Math.ceil(need/10000)*10000; } } }
+  if(N==null){ const c=geoProject(view.center, geoWgs()); f=geoFrameAt(c.x, c.y); const l=f.toLocal(view.center); cx=l.x; cy=l.y;
+    N= (o.scale==='fit'||o.scale==='view')? Math.max(100, Math.round(view.scale*Math.cos(c.y*Math.PI/180)/100)*100) : +o.scale; }
+  const gw=L.map.w*N/1000, gh=L.map.h*N/1000, x0=cx-gw/2, y1=cy+gh/2;
+  const rect=new esriMods.Graphic({geometry:{type:'polygon', rings:[[[x0, y1], [x0+gw, y1], [x0+gw, y1-gh], [x0, y1-gh], [x0, y1]]], spatialReference:f.sr}}).geometry;
+  return {L, f, N, cx, cy, gw, gh, x0, y1, s:1000/N, rectView:f.toView(rect)}; }
+function prFrameDraw(){ if(!view) return; try{ view.graphics.removeMany(view.graphics.toArray().filter(g=>g.__pr)); }catch(e){}
+  if(!prOn) return; let fr=null; try{ fr=prFrame(prOpts()); }catch(e){ console.warn('[stampa]', e); }
+  const info=$('prInfo'); if(info) info.textContent= fr? 'Scala 1:'+prN(fr.N)+' · il foglio copre '+prN(Math.round(fr.gw))+' × '+prN(Math.round(fr.gh))+' m' : '';
+  if(!fr||!fr.rectView) return;
+  const g=new esriMods.Graphic({geometry:fr.rectView, symbol:{type:'simple-fill', color:[0, 0, 0, 0], outline:{color:[57, 69, 207], width:2, style:'dash'}}}); g.__pr=true; view.graphics.add(g); }
+function prFrameSoon(){ clearTimeout(prT); prT=setTimeout(prFrameDraw, 60); }
+// the module is shown or left (modShow): the lists, the title, the rectangle on the map
+function prSync(on){ prOn=!!on; if(prOn){ prBaseFill(); prGroupsRender(); const t=$('prTitle'); if(t&&!t.value) t.placeholder=prTitleDefault(); geoFrameLoad().then(prFrameSoon).catch(()=>{}); }
+  else prFrameDraw(); }
+function prTitleDefault(){ return (typeof projCur!=='undefined'&&projCur)? projCur : (prComuni(parcels).slice(0, 2).join(' · ')||'Geoportale AxpoSolar Italia'); }
+function prComuni(list){ const c=new Map(); (list||[]).forEach(p=>{ const k=String(p.comune||'').trim(); if(k) c.set(k, (c.get(k)||0)+1); });
+  return [...c.entries()].sort((a, b)=>b[1]-a[1]).map(x=>x[0]); }
+
+// ── the background: MapViews out of sight over the frame's extent, then their screenshots ──
+// one image of a map, {url, slow, empty}; o.hide(layer) keeps a layer out of this view only (a layer view's own
+// visibility), o.white paints the places without data white (a JPEG would make them black: an AGEA year covers only part of
+// Italy); the view leaves its map before it is destroyed, since the map or the basemap are the app's own. A view still
+// loading after a minute (a server that keeps retrying) gives what it has, flagged slow; an image of one colour is empty
+async function prShot(map, ext, pw, ph, o){ const div=document.createElement('div'); let v=null, slow=false; o=o||{};
+  div.style.cssText='position:fixed;left:-20000px;top:0;width:'+pw+'px;height:'+ph+'px;pointer-events:none'; document.body.appendChild(div);
+  try{ v=new esriMods.MapView({container:div, map:map, extent:ext, spatialReference:view.spatialReference, constraints:{snapToZoom:false, rotationEnabled:false}, ui:{components:[]},
+      background:o.white? {color:[255, 255, 255, 1]} : undefined});
+    v.on('layerview-create', e=>{ if(o.hide&&o.hide(e.layer)) e.layerView.visible=false; });
+    v.on('layerview-create-error', e=>{ if(o.failed&&e.layer&&!(o.hide&&o.hide(e.layer))) o.failed.push(e.layer.title||'layer'); });
+    await prTimeout(v.when(), 20000, 'la mappa di sfondo non si apre');
+    v.extent=ext; await new Promise(res=>setTimeout(res, 500));
+    for(let i=0; i<120&&v.updating; i++) await new Promise(res=>setTimeout(res, 500));   // half a second at a time (one long timer would jump ahead under virtual time)
+    slow=v.updating; await new Promise(res=>setTimeout(res, 300));
+    const shot=await v.takeScreenshot({format:o.fmt||'jpg', quality:88}), D=shot.data&&shot.data.data; let empty=false;
+    if(D){ let a=0, a2=0, n=0; for(let i=0; i<D.length; i+=64){ const l=(D[i]+D[i+1]+D[i+2])/3*D[i+3]/255; a+=l; a2+=l*l; n++; }
+      const mu=a/n; empty=Math.sqrt(Math.max(0, a2/n-mu*mu))<1.5; }
+    return {url:shot.dataUrl, slow:slow, empty:empty};
+  } finally{ try{ if(v){ v.map=null; v.destroy(); } }catch(e){} try{ div.remove(); }catch(e){} } }
+// the basemap (a JPEG) and, when asked, the layers switched on in the app's map without its basemap and its drawings (a PNG
+// with a clear background, laid over it); an empty image is left out; {base, layers, failed, slow, empty}. At d dpi the view
+// out of sight stands at 1:N·96/d for the SDK (1:1.000 on paper is 1:640 at 150 dpi): past a layer's maxScale it would not
+// draw (the AGEA orthophotos stop at 1:2.257), so such a layer lowers the dpi of its image to its own detail
+function prDpiFor(layers, N, d){ return layers.reduce((x, l)=>(l&&l.maxScale>0)? Math.min(x, N*96/l.maxScale*0.98) : x, d); }
+async function prBackground(fr, o, dpi){ const m=fr.L.map, d=dpi||PR_DPI, out={base:null, layers:null, failed:[], slow:false, empty:false};
+  const px=q=>[Math.max(16, Math.round(m.w/25.4*q)), Math.max(16, Math.round(m.h/25.4*q))];
+  // the extent in the view's reference: the centre and the spans of the frame's edges (the frame is a true rectangle on the ground)
+  const P=(x, y)=>fr.f.toView(new esriMods.Graphic({geometry:{type:'point', x:x, y:y, spatialReference:fr.f.sr}}).geometry);
+  const c=P(fr.cx, fr.cy), l=P(fr.x0, fr.cy), r=P(fr.x0+fr.gw, fr.cy), t=P(fr.cx, fr.y1), b=P(fr.cx, fr.y1-fr.gh);
+  const ext={xmin:c.x-(r.x-l.x)/2, xmax:c.x+(r.x-l.x)/2, ymin:c.y-(t.y-b.y)/2, ymax:c.y+(t.y-b.y)/2, spatialReference:view.spatialReference};
+  const base=prBaseOf(o.base);
+  const take=s=>{ if(s.slow) out.slow=true; return s.empty? null : s.url; };
+  if(base){ const z=px(prDpiFor(base.baseLayers.toArray().concat(base.referenceLayers.toArray()), fr.N, d));
+    const s=await prShot(new esriMods.Map({basemap:base}), ext, z[0], z[1], {fmt:'jpg', white:true}); out.empty=s.empty; out.base=take(s); }
+  const M=view.map, ops=o.layers&&M? M.allLayers.toArray().filter(x=>x.visible&&x.type!=='graphics'&&x.type!=='elevation'&&!(M.basemap&&(M.basemap.baseLayers.includes(x)||M.basemap.referenceLayers.includes(x)))) : [];
+  if(ops.length){ const inBase=x=>!!(M.basemap&&(M.basemap.baseLayers.includes(x)||M.basemap.referenceLayers.includes(x)));
+    const z=px(prDpiFor(ops, fr.N, d)); out.layers=take(await prShot(M, ext, z[0], z[1], {fmt:'png', hide:x=>x.type==='graphics'||inBase(x), failed:out.failed})); }
+  return out; }
+
+// ── the drawing ──
+function prPath(doc, parts, X, close){ parts.forEach(p=>{ p.forEach((pt, i)=>{ const q=X(pt); if(i===0) doc.moveTo(q[0], q[1]); else doc.lineTo(q[0], q[1]); }); if(close) doc.close(); }); }
+function prDraw(doc, g, X, hex, k){ const rgb=prRgb(hex);
+  if(g.type==='polygon'&&g.rings&&g.rings.length){ doc.setFillColor(rgb[0], rgb[1], rgb[2]); doc.setGState(new doc.GState({opacity:0.22})); prPath(doc, g.rings, X, true); doc.fillEvenOdd();
+    doc.setGState(new doc.GState({opacity:1})); doc.setDrawColor(rgb[0], rgb[1], rgb[2]); doc.setLineWidth(0.35*k); prPath(doc, g.rings, X, true); doc.stroke(); return true; }
+  if(g.type==='polyline'&&g.paths&&g.paths.length){ doc.setDrawColor(rgb[0], rgb[1], rgb[2]); doc.setLineWidth(0.5*k); prPath(doc, g.paths, X, false); doc.stroke(); return true; }
+  const pts= g.type==='point'? [[g.x, g.y]] : g.type==='multipoint'? (g.points||[]) : [];
+  pts.forEach(p=>{ const q=X(p); doc.setFillColor(rgb[0], rgb[1], rgb[2]); doc.setDrawColor(255, 255, 255); doc.setLineWidth(0.2*k); doc.circle(q[0], q[1], 0.9*k, 'FD'); });
+  return pts.length>0; }
+function prLabelOf(x){ const a=x.attributes;
+  if(!a) return 'Particelle'; if(ownIs(x)) return 'Particelle degli intestatari';
+  const c=a.sf_cat&&sfCat(a.sf_cat); if(c) return c.l; return a._kind==='import'? 'Importati' : a._sub==='geoproc'? 'Analisi' : 'Disegni'; }
+function prHaOf(g){ try{ return Math.abs(esriMods.geometryEngine.geodesicArea(g, 'hectares'))||0; }catch(e){ return 0; } }
+// the PDF: returns {doc, name, info}; nothing is saved here (prGo saves, the test reads)
+async function prBuild(o, opt){ opt=opt||{};
+  const JsPDF=await prLib(); await geoFrameLoad(); const fr=prFrame(o); if(!fr) throw new Error('la mappa non è ancora pronta');
+  const L=fr.L, k=L.k, m=L.map, doc=new JsPDF({orientation:L.land? 'landscape' : 'portrait', unit:'mm', format:o.paper==='a3'? 'a3' : 'a4'});
+  const info={N:fr.N, bg:false, bgNote:'', legend:[], figures:{}, labels:0};
+  // the background (an error does not stop the sheet: it goes without, and says why)
+  let bg=null; if(o.base!=='none'||o.layers){ try{ bg=await prBackground(fr, o, opt.dpi); }catch(e){ info.bgNote='sfondo non disponibile ('+((e&&e.message)||e)+')'; } }
+  if(bg&&bg.base){ doc.addImage(bg.base, 'JPEG', m.x, m.y, m.w, m.h); info.bg=true; }
+  if(bg&&bg.layers){ doc.addImage(bg.layers, 'PNG', m.x, m.y, m.w, m.h, undefined, 'FAST'); info.layers=true; }   // deflated: raw it is 4 bytes a pixel
+  if(bg&&bg.failed.length) info.bgNote='non stampati (il loro server non lo permette): '+[...new Set(bg.failed)].slice(0, 3).join(', ');
+  else if(bg&&bg.empty&&bg.slow) info.bgNote='lo sfondo non si è caricato in un minuto: il foglio esce senza';
+  else if(bg&&bg.empty) info.bgNote='lo sfondo «'+prBaseTitle(o.base)+'» è vuoto qui (fuori copertura o senza dettagli a questa scala): il foglio esce senza';
+  else if(bg&&bg.slow) info.bgNote='lo sfondo era ancora in caricamento dopo un minuto: potrebbe mancare qualche tessera';
+  // the Raccolta, clipped to the frame
+  const X=p=>[m.x+(p[0]-fr.x0)*fr.s, m.y+(fr.y1-p[1])*fr.s], seen=new Map(), dark=info.bg&&/satellit|ortofoto|imagery/i.test(prBaseTitle(o.base));
+  const P=[], parcelsIn=[];
+  doc.saveGraphicsState(); doc.rect(m.x, m.y, m.w, m.h, null); doc.clip(); doc.discardPath();
+  o.groups.forEach(id=>prItems(id).forEach(x=>{ const g=x.attributes? x.geometry : geojsonToEsri(x.geometry); if(!g) return; let l=null; try{ l=fr.f.toLocal(g); }catch(e){} if(!l) return;
+    const hex= x.attributes? (graphicColorHex(x)||'#2FB6E6') : PR_PARCEL, lab=prLabelOf(x);
+    if(prDraw(doc, l, X, hex, k)&&!seen.has(lab)) seen.set(lab, hex);
+    if(!x.attributes){ parcelsIn.push(x); if(o.nums&&l.type==='polygon'){ try{ const c=l.centroid; if(c) P.push([X([c.x, c.y]), String(x.particella||'')]); }catch(e){} } } }));
+  if(P.length){ doc.setFont('helvetica', 'bold'); doc.setFontSize(6.5*Math.sqrt(k)); doc.setTextColor(dark? 255 : 40, dark? 255 : 40, dark? 255 : 40);
+    P.forEach(t=>{ if(t[1]){ doc.text(prTxt(t[1]), t[0][0], t[0][1], {align:'center', baseline:'middle'}); info.labels++; } }); }
+  doc.restoreGraphicsState();
+  doc.setDrawColor(201, 201, 207); doc.setLineWidth(0.3); doc.rect(m.x, m.y, m.w, m.h, 'S');
+  info.legend=[...seen.entries()].map(e=>({t:e[0], c:e[1]}));
+  // scale bar and north arrow, on white, inside the frame
+  if(o.legend){ const len=prNice(fr.gw/4), bw=len*fr.s, bx=m.x+4*k, by=m.y+m.h-6*k;
+    doc.setFillColor(255, 255, 255); doc.setGState(new doc.GState({opacity:0.85})); doc.rect(bx-2*k, by-5*k, bw+10*k, 9*k, 'F'); doc.setGState(new doc.GState({opacity:1}));
+    doc.setDrawColor(30, 30, 30); doc.setLineWidth(0.25); doc.setFillColor(30, 30, 30); doc.rect(bx, by, bw/2, 1.6*k, 'FD'); doc.setFillColor(255, 255, 255); doc.rect(bx+bw/2, by, bw/2, 1.6*k, 'FD');
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(7*Math.sqrt(k)); doc.setTextColor(30, 30, 30);
+    doc.text('0', bx, by-1*k, {align:'center'}); doc.text(len>=1000? String(len/1000).replace('.', ',')+' km' : len+' m', bx+bw, by-1*k, {align:'center'});
+    const nx=m.x+m.w-7*k, ny=m.y+8*k; doc.setFillColor(255, 255, 255); doc.setGState(new doc.GState({opacity:0.85})); doc.circle(nx, ny, 5*k, 'F'); doc.setGState(new doc.GState({opacity:1}));
+    doc.setFillColor(30, 30, 30); doc.triangle(nx, ny-3.6*k, nx-2*k, ny+2.4*k, nx+2*k, ny+2.4*k, 'F'); doc.setFontSize(6.5*Math.sqrt(k)); doc.setTextColor(255, 255, 255); doc.text('N', nx, ny+1.6*k, {align:'center'}); }
+  // the header
+  const today=new Date(), comuni=prComuni(parcelsIn.length? parcelsIn : parcels), cw=geoProject(fr.f.toView(new esriMods.Graphic({geometry:{type:'point', x:fr.cx, y:fr.cy, spatialReference:fr.f.sr}}).geometry), geoWgs());
+  doc.setFillColor(PR_BLUE[0], PR_BLUE[1], PR_BLUE[2]); doc.rect(0, 0, L.W, 3*k, 'F');
+  doc.setFont('helvetica', 'bold'); doc.setFontSize(15*Math.sqrt(k)); doc.setTextColor(29, 29, 31); doc.text(prTxt(o.title||prTitleDefault()), L.M, 13*k);
+  doc.setFont('helvetica', 'normal'); doc.setFontSize(8.5*Math.sqrt(k)); doc.setTextColor(107, 107, 112);
+  doc.text(prTxt([prItaDate(today), comuni.slice(0, 3).join(', ')+(comuni.length>3? ' e altri '+(comuni.length-3) : ''), cw? cw.y.toFixed(5).replace('.', ',')+' N  '+cw.x.toFixed(5).replace('.', ',')+' E' : ''].filter(Boolean).join(' · ')), L.M, 18.5*k);
+  // the column: the figures, the legend, the notes
+  const C=L.col; let y=C.y+3*k; const lh=4.4*Math.sqrt(k), bottom=C.y+C.h, two=!L.land;
+  const head=t=>{ if(y>bottom-lh) return false; doc.setFont('helvetica', 'bold'); doc.setFontSize(9.5*Math.sqrt(k)); doc.setTextColor(29, 29, 31); doc.text(prTxt(t), C.x, y); y+=lh*1.2; return true; };
+  const row=(a, b)=>{ if(y>bottom) return; doc.setFont('helvetica', 'normal'); doc.setFontSize(8.2*Math.sqrt(k)); doc.setTextColor(58, 58, 60); doc.text(prTxt(a), C.x, y);
+    if(b!=null) doc.text(prTxt(b), C.x+(two? 70*k : C.w), y, {align: two? 'left' : 'right'}); y+=lh; };
+  if(o.data){ const haP=parcelsIn.reduce((s, p)=>s+(p.area_m2||0), 0)/1e4, sumBy=cat=>o.groups.reduce((s, id)=>s+prItems(id).filter(x=>x.attributes&&x.attributes.sf_cat===cat&&x.geometry&&x.geometry.type==='polygon').reduce((a, x)=>a+prHaOf(x.geometry), 0), 0);
+    const F=info.figures; if(parcelsIn.length) F.parcels=parcelsIn.length+(parcelsIn.length===1? ' particella' : ' particelle')+' · '+fmtHa2(haP);
+    const g=sumBy('gross'), n=sumBy('net'), x=sumBy('exclusion'); if(g) F.gross=fmtHa2(g); if(n) F.net=fmtHa2(n); if(x) F.excl=fmtHa2(x);
+    if(comuni.length) F.comuni=comuni.slice(0, 3).join(', ')+(comuni.length>3? '…' : '');
+    if(Object.keys(F).length&&head('Dati')){ if(F.parcels) row('Particelle', F.parcels); if(F.gross) row('Area lorda', F.gross); if(F.net) row('Area netta', F.net);
+      if(F.excl) row('Esclusioni (somma)', F.excl); if(F.comuni) row(comuni.length===1? 'Comune' : 'Comuni', F.comuni); y+=lh*0.6; } }
+  if(o.legend&&info.legend.length&&head('Legenda')){ info.legend.forEach(e=>{ if(y>bottom) return; const c=prRgb(e.c); doc.setFillColor(c[0], c[1], c[2]); doc.setGState(new doc.GState({opacity:0.35}));
+      doc.rect(C.x, y-2.6*k, 5*k, 3.2*k, 'F'); doc.setGState(new doc.GState({opacity:1})); doc.setDrawColor(c[0], c[1], c[2]); doc.setLineWidth(0.35*k); doc.rect(C.x, y-2.6*k, 5*k, 3.2*k, 'S');
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(8.2*Math.sqrt(k)); doc.setTextColor(58, 58, 60); doc.text(prTxt(e.t), C.x+7*k, y); y+=lh; }); y+=lh*0.6; }
+  if(o.notes&&head('Note')){ doc.setFont('helvetica', 'normal'); doc.setFontSize(8.2*Math.sqrt(k)); doc.setTextColor(58, 58, 60);
+    doc.splitTextToSize(prTxt(o.notes), C.w).forEach(l=>{ if(y<=bottom){ doc.text(l, C.x, y); y+=lh; } }); }
+  // the footer
+  const bt=prBaseTitle(o.base); doc.setFont('helvetica', 'normal'); doc.setFontSize(7.5*Math.sqrt(k)); doc.setTextColor(142, 142, 147);
+  doc.text(prTxt('Geoportale AxpoSolar Italia · '+prItaDate(today)+' · scouting, non per costruzione'), L.M, L.H-6*k);
+  doc.text(prTxt('Scala 1:'+prN(fr.N)+' ('+(o.paper==='a3'? 'A3' : 'A4')+')'+(info.bg&&bt? ' · sfondo '+bt+' (Esri e altri fornitori)' : '')), L.W-L.M, L.H-6*k, {align:'right'});
+  const safe=s=>s.normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^A-Za-z0-9]+/g, '_').replace(/^_+|_+$/g, '');
+  const name=(safe(o.title)||exBaseName(parcelsIn))+'_stampa.pdf';
+  return {doc, name, info}; }
+async function prGo(){ const b=$('prGo'); if(b&&b.disabled) return; if(b){ b.disabled=true; } toolMsg('prMsg', 'Preparo il foglio…');
+  try{ const r=await prBuild(prOpts()); const url=URL.createObjectURL(r.doc.output('blob')), a=document.createElement('a'); a.href=url; a.download=r.name;
+    document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url), 4000);
+    toolMsg('prMsg', 'PDF salvato: '+r.name+(r.info.bgNote? ' — '+r.info.bgNote : '')+'.', r.info.bgNote? '' : 'ok');
+  }catch(e){ toolMsg('prMsg', 'Il foglio non si fa: '+((e&&e.message)||e)+'.', 'err'); console.warn('[stampa]', e); }
+  finally{ if(b) b.disabled=false; } }
+window.prSync=prSync;
+window.prWant=function(on){ if(!!on!==prOn) prSync(on); };   // 30-ui-glue.js: the module in sight or not (a change only)
+document.addEventListener('DOMContentLoaded', function(){
+  const box=$('prGroups'); if(box) box.addEventListener('change', e=>{ const t=e.target; if(!t) return;
+    if(t.dataset&&t.dataset.g) prSel.set(t.dataset.g, t.checked); if(t.id==='prNums') prNumsOn=t.checked; if(t.id==='prLayers') prLayersOn=t.checked; prWhatSum(); prFrameSoon(); });
+  ['prPaper', 'prOrient', 'prScale', 'prBase'].forEach(id=>{ const s=$(id); if(s) s.addEventListener('change', ()=>{ if(id==='prBase') s.dataset.set='1'; prFrameSoon(); }); });
+  const fb=$('prFrame'); if(fb) fb.onclick=()=>{ let fr=null; try{ fr=prFrame(prOpts()); }catch(e){} if(fr&&fr.rectView&&view) view.goTo(fr.rectView.extent.clone().expand(1.15)).catch(()=>{}); };
+  const go=$('prGo'); if(go) go.onclick=prGo;
+  window.addEventListener('axpo-view', ()=>{ try{ esriMods.reactiveUtils.when(()=>view.stationary, ()=>{ if(prOn) prFrameSoon(); }); }catch(e){} });
+});
 </script>
 </body>
 </html>
