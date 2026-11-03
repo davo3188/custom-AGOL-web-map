@@ -975,7 +975,7 @@ dialog.dialog::backdrop { background: rgba(11, 18, 25, .45); }
   .subsec:first-child{margin-top:0}
 
   /* ══ MODALI unificate (export / promote / help) ══ */
-  #catModal,#promoteModal,#exportModal,#helpModal,#sfModal,#helpMenu,#cadModal,#infoModal,#setModal{position:fixed;inset:0;background:#000a;display:none;align-items:center;justify-content:center;z-index:1000}
+  #catModal,#promoteModal,#exportModal,#helpModal,#sfModal,#helpMenu,#cadModal,#infoModal,#setModal,#lcModal{position:fixed;inset:0;background:#000a;display:none;align-items:center;justify-content:center;z-index:1000}
   .dialog{width:440px;max-width:92vw;max-height:90vh;overflow-y:auto}   /* the kit's .dialog; the app sets the size and lets long ones scroll */
   .dialog h2{margin:0 0 4px;font-size:16px}
   .dialog .sub{color:var(--mut);font-size:12px;margin-bottom:12px}
@@ -1689,6 +1689,18 @@ dialog.dialog::backdrop { background: rgba(11, 18, 25, .45); }
   .svcstat{padding:8px 10px;margin-bottom:10px;border:1px solid var(--err);border-left-width:4px;border-radius:8px;font-size:12px;line-height:1.4;background:var(--panel)}
   .svcstat b{display:block;margin-bottom:2px}
   .svcstat button{margin:6px 0 0;padding:4px 10px;font-size:11.5px}
+  /* 3/11 (C3, C4): the layers of the map that do not load here — one row in the Layer panel, then the window */
+  .lcrow{display:flex;align-items:center;gap:6px;width:100%;margin:0 0 8px;padding:5px 8px;border:1px solid var(--line);border-radius:7px;background:none;color:var(--mut);font:inherit;font-size:12px;text-align:left;cursor:pointer}
+  .lcrow:hover{background:var(--hover)} .lcrow.warn{color:var(--txt);border-color:var(--err);border-left-width:3px}
+  .lcrow.warn .icon{color:var(--err);flex:none} .lcrow span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  #lcModal .dialog{width:520px}
+  .lclist{max-height:min(52vh,420px);overflow-y:auto;margin-top:8px;border:1px solid var(--line);border-radius:8px;padding:4px 6px}
+  .lclist:empty{display:none}
+  .lcsec{padding:4px 0 6px;border-bottom:1px solid var(--line)} .lcsec:last-child{border-bottom:none}
+  .lcsec>b{display:block;padding:4px;font-size:12.5px;font-weight:600}
+  .lcitem{display:flex;align-items:baseline;gap:8px;padding:3px 4px 3px 14px;font-size:12px;border-radius:5px}
+  .lcitem:hover{background:var(--hover)} .lcitem span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .lcitem small{flex:none;max-width:45%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px;color:var(--mut)}
 
   /* ══ PHONE (phase 3, 2026-10-21; plan §6e H1–H8): the family's bottom bar (kit .mbar, five entries) and the two panels
      as sheets over the map (kit .sheet: 31 % of the screen at rest, 84 % with the handle; the class is set by the script
@@ -2554,6 +2566,7 @@ dialog.dialog::backdrop { background: rgba(11, 18, 25, .45); }
         <div class="thint">Richiede accesso. Clicca un risultato per aggiungerlo.</div>
         <div class="tlab" style="margin-top:14px">Layer in mappa</div>
         <div class="thint" id="wmLayersNote" style="margin:-4px 0 8px"></div>
+        <button type="button" class="lcrow" id="lcRow" hidden></button>   <!-- 3/11 (C4): the layers that do not load here, 16c-layer-check.js -->
         <div id="layerListBox" class="wbox"></div>
       </div>
     <div class="ptabc panel-b sidepane open" data-panel="legend" id="sideLegend" role="tabpanel" aria-label="Legenda">
@@ -2730,7 +2743,7 @@ dialog.dialog::backdrop { background: rgba(11, 18, 25, .45); }
       <li><b>Importa</b> — <b>File</b>: GeoJSON, KML, KMZ, Shapefile (.zip) e il file di <b>Estrazione intestatari</b>, colorato e raggruppato per intestatario in fondo al blocco <b>Particelle</b> della Raccolta, dove il cestino della riga «Per intestatario» lo toglie tutto (i nominativi restano fuori dal salvataggio automatico e dal portale); <b>CAD</b>: un DWG letto nel browser, con il sistema proposto, oppure allineato a mano con due punti; <b>Immagini</b>: GeoTIFF e world file si posizionano da soli, PNG, JPG e PDF con sposta, scala, ruota o punti noti; <b>Servizi web</b>: WMS, WFS e ArcGIS REST dal loro indirizzo; <b>Portale</b>: un layer cercato per titolo.</li>
       <li><b>Salva ed esporta</b> — <b>Esporta</b>: GeoJSON, KML, KMZ, Shapefile (.zip) o la tabella XLSX delle particelle, con gli oggetti spuntati nella Raccolta o con tutto (il KML ha una cartella per gruppo, lo shapefile un file per gruppo; il nome del file viene da comune, data e numero di particelle); <b>Portale AGOL</b>: Migra particelle in AREAS (le spuntate o tutte, scelte anche nella sua finestra: una per particella, un'unica area dissolta o un'area per sottogruppo), Salva disegni in Site Features (categoria, tipo, attributi e sito: la seconda volta aggiorna, non duplica), Modifica AREAS COLLECTION; <b>Progetto</b>: Salva, Salva come, Apri; <b>Stampa</b>: un foglio PDF A4 o A3 con la Raccolta in scala, sfondo a scelta, dati, legenda e note (il rettangolo tratteggiato sulla mappa mostra il foglio).</li>
       <li><b>Raccolta</b>, a sinistra — tutto quello che raccogli, ad albero come i layer di QGIS: i gruppi (Particelle, Aree di progetto, Aree di esclusione, Analisi, Altro, Immagini, e i tuoi, <b>+ Gruppo</b>), dentro i sottogruppi delle particelle, poi gli oggetti, ogni livello un po' più rientrato; numero ed ettari a destra, occhio, nomi e menu passando sopra la riga. In alto il filtro per nome e <b>Comprimi</b>. Ogni riga ha la spunta (la selezione, che usano anche geoprocessi ed esportazione; <kbd>Maiusc</kbd>+clic spunta un intervallo), il colore, il nome (le particelle per foglio e numero, poi il comune), la cifra a destra, l'occhio e il menu <b data-icon="more"></b>, anche col tasto destro: rinomina, zoom, sposta in un gruppo, Proprietà, elimina. Un clic sulla riga fa lampeggiare l'oggetto sulla mappa, un doppio clic ci fa lo zoom. <b>Trascina</b> una riga su un sottogruppo (le particelle) o su un gruppo (gli altri oggetti) per spostarla: se è spuntata, vanno con lei tutte le selezionate; sulla riga Particelle una particella esce dai sottogruppi; dove non può andare non si accende nulla e, al rilascio, ti dico perché. La riga di un sottogruppo, o di un gruppo tuo, trascinata su un'altra ne cambia l'ordine. Annulla rimette tutto. Con qualcosa selezionato (spuntato qui, o scelto sulla mappa con <b>Modifica</b> › Seleziona e Riquadro) compare in cima la <b>barra della selezione</b>: Zoom, Sottogruppo o Gruppo (anche nuovo), Togli (o il tasto <kbd>Canc</kbd>; Annulla rimette tutto) e Deseleziona; il tasto destro su una riga selezionata, o sulla mappa su un oggetto selezionato, offre le stesse azioni per tutta la selezione. Il menu di un gruppo, di un sottogruppo e di Particelle ha lo <b>Zoom</b> su tutti i loro oggetti. Il bordo destro la allarga, <b data-icon="undock"></b> la sgancia in una finestra per il secondo schermo.</li>
-      <li><b>Pannello a destra</b> — tre schede. <b>Proprietà</b>: le impostazioni dello strumento aperto e, in Modifica, la scheda dell'oggetto selezionato (categoria, tipo e attributi). <b>Layer</b>: cerca un layer per nome; dal pannello di ogni layer (icona a cursori) trasparenza, popup e <b>filtro per attributo</b> (l'icona diventa un imbuto quando è attivo); i layer aggiunti da te hanno il menu <b>…</b> con Zoom e Rimuovi dalla mappa. Un clic sulla mappa apre il popup anche sui layer a <b>tasselli vettoriali</b> che portano gli attributi (es. i vincoli paesaggistici della Campania nella vista d'insieme): campi e titolo come configurati nell'item, l'elemento non si evidenzia. Il <b>Catasto AdE</b> è l'immagine ufficiale del WMS dell'Agenzia delle Entrate: fogli da 1:25.000, particelle e fabbricati da 1:5.000, numeri da 1:2.000. <b>Legenda</b>: i layer accesi. Anche questo pannello si allarga dal bordo e si sgancia.</li>
+      <li><b>Pannello a destra</b> — tre schede. <b>Proprietà</b>: le impostazioni dello strumento aperto e, in Modifica, la scheda dell'oggetto selezionato (categoria, tipo e attributi). <b>Layer</b>: cerca un layer per nome; dal pannello di ogni layer (icona a cursori) trasparenza, popup e <b>filtro per attributo</b> (l'icona diventa un imbuto quando è attivo); i layer aggiunti da te hanno il menu <b>…</b> con Zoom e Rimuovi dalla mappa. Un clic sulla mappa apre il popup anche sui layer a <b>tasselli vettoriali</b> che portano gli attributi (es. i vincoli paesaggistici della Campania nella vista d'insieme): campi e titolo come configurati nell'item, l'elemento non si evidenzia. A ogni cambio di mappa l'app controlla quali layer si caricano: quelli di server senza CORS (o che non rispondono) qui non si vedono, mentre nel Map Viewer sì; la riga <b>«n layer non disponibili qui»</b> apre l'elenco per motivo, con <b>Apri nel Map Viewer</b> e <b>Copia elenco</b>, e vi aggiunge i layer che avevi acceso nella mappa di prima e che quella nuova non ha. Il <b>Catasto AdE</b> è l'immagine ufficiale del WMS dell'Agenzia delle Entrate: fogli da 1:25.000, particelle e fabbricati da 1:5.000, numeri da 1:2.000. <b>Legenda</b>: i layer accesi. Anche questo pannello si allarga dal bordo e si sgancia.</li>
       <li><b>Sulla mappa</b> — in alto a destra la lente della <b>ricerca</b> (indirizzi, lat lon, oppure X Y in Gauss-Boaga o UTM, di cui indovina il sistema) e, sotto, <b data-icon="measure"></b> le <b>misure</b>: lineare, area, Pulisci (non si salvano); più sotto <b data-icon="cursor"></b> la <b>selezione</b>: Seleziona, Riquadro, Deseleziona, da qualsiasi scheda (le modifiche stanno nel tasto destro sulla selezione). In alto a sinistra zoom, bussola, posizione GPS, <b>Zoom sulla Raccolta</b> e <b>Luoghi</b>, i segnalibri; in basso a destra la <b>mappa di base</b>, con l'opacità; in basso al centro lo scalimetro. Col tasto destro: aggiungi la particella qui, analisi di contesto qui, buffer qui, copia le coordinate, apri in Google Maps, centra qui.</li>
       <li><b>Barra di stato</b>, in basso — il pin fissa le coordinate del prossimo clic; le coordinate del puntatore nel sistema che scegli; la scala, che scegli anche dal suo menu; con il terreno analizzato, la <b>quota</b> e la <b>pendenza</b> sotto il puntatore (in rosso oltre il limite); lo stato del Catasto AdE; a destra la modalità in corso, l'aggancio e l'ora dell'ultimo salvataggio nel browser (in rosso se il browser è pieno).</li>
       <li><b>Progetto .axpo</b> — <b data-icon="save">Salva progetto</b> mette tutto in un file .axpo, come un progetto QGIS: vista, basemap, area di lavoro, mappa e layer del portale (accesi, trasparenza, ordine), servizi web, particelle, disegni e gruppi della Raccolta, categorie tue, geoprocessi, import, sito AREAS, i file di <b>DWG e immagini</b> con il loro posizionamento e il <b>terreno</b> con il suo limite. <b data-icon="folder">Apri progetto</b> lo ripristina (sostituisce il lavoro corrente). <kbd>Ctrl</kbd>+<kbd>S</kbd> risalva sullo stesso file, <kbd>Ctrl</kbd>+<kbd>Maiusc</kbd>+<kbd>S</kbd> salva con nome, <kbd>Ctrl</kbd>+<kbd>O</kbd> apre. Lo stesso file si apre in PV Predesign, che ne legge aree, esclusioni e terreno. Per passarlo a chi non deve vedere gli intestatari, nel modulo Progetto <b>Copia da condividere…</b>: tutto il lavoro tranne i dati personali.</li>
@@ -2744,6 +2757,19 @@ dialog.dialog::backdrop { background: rgba(11, 18, 25, .45); }
 
 <!-- ── FINESTRA «COME FUNZIONA» dei moduli della scheda Import (testi in IMP_INFO) ── -->
 <!-- 2/11 (J5g): the settings, opened by the ⚙ of the top bar (they were «Impostazioni avanzate» at the foot of every panel) -->
+<!-- 3/11 (C3): the layers of the map in use that do not load in this app, by reason (16c-layer-check.js) -->
+<div id="lcModal" role="dialog" aria-modal="true" aria-labelledby="lcTitle">
+  <div class="dialog">
+    <button id="lcClose" class="mclose" title="Chiudi" aria-label="Chiudi">×</button>
+    <h2 id="lcTitle">Layer non disponibili</h2>
+    <div class="sub" id="lcSub"></div>
+    <div id="lcList" class="lclist"></div>
+    <div class="btns">
+      <button type="button" class="btn" id="lcMv" data-icon="external" title="Apre questa mappa nel Map Viewer di ArcGIS Online, dove questi layer si vedono">Apri nel Map Viewer</button>
+      <button type="button" class="btn" id="lcCopy" data-icon="clipboard" title="Copia l’elenco con gli indirizzi dei servizi, da mandare a chi gestisce i dati">Copia elenco</button>
+    </div>
+  </div>
+</div>
 <div id="setModal" role="dialog" aria-modal="true" aria-labelledby="setTitle">
   <div class="dialog">
     <button id="setClose" class="mclose" title="Chiudi" aria-label="Chiudi">×</button>
@@ -4730,7 +4756,8 @@ async function llFilterUi(wrap, layer){
   onField(); onOp(); show(); }
 // ── caricamento di una web map del portale (General Map o CV) ──────────────
 // hideLayers=true → spegne i layer operativi (per le CV, che caricano lazy quando
-// l'utente li accende). NO loadAll: caricherebbe avidamente i WMS regionali (CORS).
+// l'utente li accende). NO loadAll: caricherebbe avidamente i WMS regionali (CORS). 3/11 (C1): the descriptions of the
+// layers are then loaded by lcAfter (16c-layer-check.js), a few at a time and without their images, to say which fail.
 // cambio rapido di regione: se la mappa chiesta prima arriva dopo, non deve sostituire quella chiesta per ultima (e
 // portarsi via particelle, strumenti, DWG e immagini). Ogni richiesta ha un numero; dopo l'attesa conta solo l'ultima.
 let wmReq=0;
@@ -4755,6 +4782,7 @@ async function loadWebMap(id, hideLayers, label){
     await wm.load();
     if(my!==wmReq) return false;   // nel frattempo è stata chiesta un'altra mappa
     if(hideLayers) wm.layers.forEach(l=>{ l.visible=false; });
+    try{ lcMark(wm); }catch(e){}   // 3/11 (C5): the visibility each layer starts with
     try{ wm.ground={layers:[new esriMods.ElevationLayer({url:WORLD_ELEV})]}; }catch(e){}   // profilo elevazione dopo lo swap
     // il catasto è sempre il mio WMS: quello della web map (se c'è, anche più di uno) esce dalla mappa caricata,
     // così in legenda c'è un solo catasto, con trasparenza e popup dell'app
@@ -4765,9 +4793,11 @@ async function loadWebMap(id, hideLayers, label){
     try{ cadReattach(wm); }catch(e){}                    // disegni CAD importati: seguono la mappa, sotto le particelle
     // anche immagini e layer aggiunti dal portale stavano nella mappa vecchia: al cambio di regione o al
     // login sparivano dalla mappa restando nell'elenco (e nel salvataggio automatico)
+    let lcPrev=[]; try{ lcPrev=lcPrevOn(view.map, wm); }catch(e){}   // 3/11 (C5): what the user turned on in the old map
     wmCarry(view.map, wm);   // fix 26/10: every layer the app put on the map goes to the new one
     view.map=wm;
     try{ wmRefresh(); }catch(e){}   // P3: il selettore in alto mostra la mappa in uso
+    try{ lcAfter(wm, id, lcPrev); }catch(e){}   // 3/11 (C1, C2): which layers load in this app
     if(bootVP){ try{ const _b=vpFromJSON(bootVP); if(_b) view.viewpoint=_b; }catch(e){} }   // post-login: vista com'era
     else if(parcels.length) view.goTo(gl.graphics.toArray()).catch(()=>{});
     setTimeout(setupAreasEditor, 800);                  // abilita l'edit se AREAS COLLECTION è nella mappa
@@ -5040,6 +5070,122 @@ function geoShape(center, fn){ const f=geoFrameFor([center]); if(!f) return null
 function geoSegment(a, b, sr){ const line=new esriMods.Graphic({geometry:{type:'polyline', paths:[[a, b]], spatialReference:sr}}).geometry;
   const f=geoFrameFor([line]); if(!f) return null; const p=f.toLocal(line).paths[0], dx=p[1][0]-p[0][0], dy=p[1][1]-p[0][1];
   return {az:(Math.atan2(dx, dy)*180/Math.PI+360)%180, len:Math.hypot(dx, dy), a:p[0], b:p[1], f:f}; }
+// ══ Which layers of the web map load in this app (3/11/2026, decisions C1–C5 of the user) ═══════════════════════════
+// The Map Viewer reaches servers without CORS through the ArcGIS Online proxy; this app cannot. And the SDK's LayerList
+// loads every layer of the list, even a hidden one, and drops the row of a layer whose load failed: a layer of a Check
+// Vincoli vanished without a word (tried on 3/11 with GNA and Regione Lazio). After every map change (loadWebMap) the
+// app loads the description of each layer of the map — not its images; LC_CONC at a time, LC_WAIT each — and sorts the
+// failures by reason (C1); a message says how many with «Vedi elenco ›» (C2); the window «Layer non disponibili» lists
+// them, opens the map in the Map Viewer and copies the list (C3); a row of the Layer panel opens it too, and a layer that
+// fails later, when its images are drawn, joins the list (C4); the layers turned on in the map before that the new one
+// does not have are listed as well (C5). It shows the problem, it does not cure it: that takes a proxy or other sources.
+const LC_CONC=4, LC_WAIT=30000;
+const LC_WHY={cors:{t:'Bloccati dal browser', h:'Il server non permette la lettura da altre app (CORS) o non risponde: dal browser le due cose non si distinguono. Nel Map Viewer si vedono perché passa dal proxy di ArcGIS Online'},
+  http:{t:'Indirizzo http', h:'Una pagina https non può leggere un servizio http (contenuto misto)'},
+  auth:{t:'Richiedono un accesso', h:'Il servizio chiede credenziali che questa sessione non ha'},
+  server:{t:'Errore del server', h:'Il servizio risponde con un errore: inesistente, spostato o guasto'},
+  slow:{t:'Non rispondono', h:'Nessuna risposta entro 30 s: il server è lento o fermo. Se poi risponde, il layer esce da solo dall’elenco'}};
+let lcState={id:null, label:'', total:0, done:0, fail:[], prev:[], run:0, busy:false}, lcUiT=null;
+// the layers of a map that come from the web map: not the app's own, not the ones the user added (they carry over)
+function lcLayers(map){ const out=[];
+  const walk=(arr, path, vis)=>{ (arr||[]).forEach(l=>{ if(!l||l===gl||l===labelsGL||l===toolsGL||l===catasto||l.listMode==='hide'||l._projItem||l._projSvc||l._cad) return;
+    const v=vis&&l.visible!==false;
+    if(l.type==='group'){ walk(l.layers&&l.layers.toArray? l.layers.toArray() : [], path.concat(l.title||'Gruppo'), v); return; }
+    if(!l.url&&!(l.portalItem&&l.portalItem.id)) return;   // graphics kept inside the web map
+    out.push({l:l, path:path, vis:v}); }); };
+  walk(map&&map.layers&&map.layers.toArray? map.layers.toArray() : [], [], true); return out; }
+function lcName(it){ return it.path.concat(it.l.title||'Layer').join(' › '); }
+function lcKey(l){ return [l.url||'', l.layerId!=null? l.layerId : '', (l.portalItem&&l.portalItem.id)||'', l.title||''].join('|'); }
+// the reason of a failed load, from the error the SDK gives (svcMsgs walks the nested errors)
+function lcReason(url, err, https){ if(https&&/^http:\/\//i.test(String(url||''))) return 'http';
+  const s=svcMsgs(err), st=(s.match(/\[http (\d+)\]/g)||[]).map(x=>+x.replace(/\D/g,'')).filter(Boolean);
+  if(st.some(n=>n===401||n===403||n===498||n===499)||/token|not authori[sz]ed|identity/i.test(s)) return 'auth';
+  if(!st.length&&/failed to fetch|networkerror|load failed/i.test(s)) return 'cors';
+  return 'server'; }
+// C5: right after loadWebMap, the visibility each layer starts with; at the next change, what the user turned on
+function lcMark(map){ lcLayers(map).forEach(x=>{ x.l._lcVis0=x.vis; }); }
+function lcPrevOn(oldMap, newMap){ if(!oldMap||oldMap===newMap) return [];
+  const keep=new Set(lcLayers(newMap).map(x=>lcKey(x.l)));
+  return lcLayers(oldMap).filter(x=>x.vis&&x.l._lcVis0===false&&!keep.has(lcKey(x.l))).map(x=>({name:lcName(x)})); }
+function lcAdd(it, why, detail, my){ if(my!==lcState.run) return; const l=it.l;
+  lcState.fail=lcState.fail.filter(x=>x.l!==l);
+  lcState.fail.push({l:l, name:lcName(it), url:l.url||'', host:l.url? svcHost(l.url) : 'item del portale', why:why, detail:String(detail||'').slice(0,300)}); lcUiSoon(); }
+function lcDrop(l, my){ if(my!==lcState.run) return; lcState.fail=lcState.fail.filter(x=>x.l!==l); lcUiSoon(); }
+// ⚠️ the load of a secured ArcGIS service the session cannot read sends the page to the sign-in (the OAuth redirect of
+// the IdentityManager: seen on 3/11 with AREAS COLLECTION signed out). Such a service, or the item of a layer, is first
+// asked without prompting; when it needs an access the layer is listed and not loaded. WMS and WMTS never prompt.
+let lcReqP=null;
+function lcReq(){ return lcReqP||(lcReqP=new Promise((res, rej)=>{ try{ require(['esri/request'], res); }catch(e){ rej(e); } })); }
+async function lcGuard(l){ if(l.loadStatus==='loaded') return null;
+  let u=String(l.url||''); const it=l.portalItem&&l.portalItem.id;
+  if(!/\/rest\/services\//i.test(u)){ if(u||!it) return null; u=((l.portalItem.portal&&l.portalItem.portal.restUrl)||PORTAL+'/sharing/rest')+'/content/items/'+encodeURIComponent(it); }
+  try{ const rq=await lcReq(); await rq(u, {query:{f:'json'}, authMode:'no-prompt', responseType:'json'}); return null; }
+  catch(e){ const s=svcMsgs(e); return /\[http (401|403|498|499)\]|token required|not authori[sz]ed|identity-manager/i.test(s)? s : null; } }   // any other failure: the load says it
+async function lcOne(it, https, my, wait){ const l=it.l; let to=null;
+  const late=new Promise(r=>{ to=setTimeout(()=>r('slow'), wait); });
+  const work=lcGuard(l).then(g=>g? {auth:g} : Promise.resolve(l.load()).then(()=>'ok'));
+  const done=r=>{ if(r&&r.auth) lcAdd(it, 'auth', r.auth, my); else lcDrop(l, my); }, fail=e=>lcAdd(it, lcReason(l.url, e, https), svcMsgs(e), my);
+  try{ const r=await Promise.race([work, late]); clearTimeout(to);
+    if(r==='slow'){ lcAdd(it, 'slow', 'nessuna risposta in '+Math.round(wait/1000)+' s', my); work.then(done, fail); }   // it goes on: if it loads later, it leaves the list
+    else done(r); }
+  catch(e){ clearTimeout(to); fail(e); } }
+// C1: the check of a map; opt.wait only for the tests
+async function lcCheck(map, id, label, prev, opt){ const my=lcState.run+1, L=lcLayers(map), https=location.protocol==='https:', wait=(opt&&opt.wait)||LC_WAIT;
+  lcState={id:id||null, label:label||'', total:L.length, done:0, fail:[], prev:prev||[], run:my, busy:true}; lcUi();
+  lcWatch();
+  let i=0; const next=async()=>{ while(i<L.length&&my===lcState.run){ const it=L[i++]; await lcOne(it, https, my, wait); if(my!==lcState.run) return; lcState.done++; lcUiSoon(); } };
+  await Promise.all(Array.from({length:Math.min(LC_CONC, L.length)}, next));
+  if(my!==lcState.run) return null;   // another map came in the meantime
+  lcState.busy=false; lcUi(); return lcState; }
+// C4: a layer that loads but cannot draw (its images) joins the list
+function lcWatch(){ if(lcWatch.h||!window.view||!view.on) return;
+  lcWatch.h=view.on('layerview-create-error', e=>{ try{ const l=e&&e.layer; if(!l||lcState.fail.some(x=>x.l===l)) return;
+    const it=lcLayers(view.map).find(x=>x.l===l); if(it) lcAdd(it, lcReason(l.url, e.error, location.protocol==='https:'), svcMsgs(e.error)||'il layer non si disegna', lcState.run); }catch(x){} }); }
+// C2: after loadWebMap, the check and one message
+function lcAfter(map, id, prev){ const label=wmLabel(id);
+  return lcCheck(map, id, label, prev).then(s=>{ if(!s) return s; const n=s.fail.length, p=s.prev.length; if(!n&&!p) return s;
+    const parts=[]; if(n) parts.push(n+' layer su '+s.total+(n===1? ' non si carica' : ' non si caricano')+' in questa app');
+    if(p) parts.push(p+(p===1? ' layer acceso nella mappa di prima non c’è più' : ' layer accesi nella mappa di prima non ci sono più'));
+    msg('«'+label+'»: '+parts.join('; ')+'.', '', {action:{label:'Vedi elenco ›', fn:lcOpen}}); return s; })
+    .catch(e=>{ console.warn('[layer] controllo non riuscito:', e); return null; }); }
+// C4: the row of the Layer panel; the window follows while it is open
+function lcUiSoon(){ clearTimeout(lcUiT); lcUiT=setTimeout(lcUi, 200); }
+function lcUi(){ const s=lcState, n=s.fail.length, p=s.prev.length, row=byId('lcRow');
+  if(row){ row.hidden=!s.busy&&!n&&!p; row.classList.toggle('warn', !!n);
+    row.innerHTML=(n? icon('warning','sm') : '')+'<span></span>';
+    row.lastChild.textContent= s.busy? 'Controllo dei layer… '+s.done+' di '+s.total+(n? ' · '+n+' non disponibili' : '')
+      : n? (n===1? '1 layer non disponibile qui' : n+' layer non disponibili qui') : (p===1? '1 layer della mappa di prima non c’è più' : p+' layer della mappa di prima non ci sono più');
+    row.title= n? 'Server senza CORS o non raggiungibili: nel Map Viewer si vedono, in questa app no. Clicca per l’elenco.' : 'Clicca per l’elenco.'; }
+  const note=byId('wmLayersNote'); if(note) note.title= s.busy? '' : s.total? 'Controllati '+s.total+' layer di questa mappa'+(n? ': '+n+' non si caricano' : ': si caricano tutti') : '';
+  const m=byId('lcModal'); if(m&&m.style.display==='flex') lcRender(); }
+// C3: the window
+function lcRender(){ const box=byId('lcList'), sub=byId('lcSub'), s=lcState; if(!box) return; box.textContent='';
+  const n=s.fail.length;
+  if(sub) sub.textContent= s.busy? 'Controllo in corso: '+s.done+' di '+s.total+' layer…'
+    : n? n+' su '+s.total+' layer di «'+s.label+'» non si caricano in questa app. Nel Map Viewer di ArcGIS Online si vedono: passa da un proxy che questa app non può usare.'
+    : s.total? 'I '+s.total+' layer di «'+s.label+'» si caricano tutti.' : 'Nessun layer del portale in questa mappa.';
+  const section=(title, hint, rows)=>{ const sec=document.createElement('div'); sec.className='lcsec';
+    const h=document.createElement('b'); h.textContent=title+' · '+rows.length; if(hint) h.title=hint; sec.appendChild(h);
+    rows.forEach(x=>{ const r=document.createElement('div'); r.className='lcitem'; const t=document.createElement('span'); t.textContent=x.name; r.appendChild(t);
+      if(x.host){ const hs=document.createElement('small'); hs.textContent=x.host; r.appendChild(hs); }
+      r.title=x.name+(x.url? '\n'+x.url : '')+(x.detail? '\n'+x.detail : ''); sec.appendChild(r); });
+    box.appendChild(sec); };
+  Object.keys(LC_WHY).forEach(k=>{ const rows=s.fail.filter(x=>x.why===k).sort((a,b)=>a.name.localeCompare(b.name)); if(rows.length) section(LC_WHY[k].t, LC_WHY[k].h, rows); });
+  if(s.prev.length) section('Accesi nella mappa di prima, non in questa', 'Layer che avevi acceso nella mappa precedente e che questa mappa non ha', s.prev);
+  const mv=byId('lcMv'); if(mv) mv.disabled=!s.id; }
+function lcOpen(){ const m=byId('lcModal'); if(!m) return; try{ sideModalHere(m); }catch(e){} lcRender(); m.style.display='flex'; }
+function lcClose(){ const m=byId('lcModal'); if(m) m.style.display='none'; }
+function lcText(){ const s=lcState, d=new Date(), p=x=>('0'+x).slice(-2), out=['Layer non disponibili nel Geoportale — '+s.label+' ('+d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate())+')',
+    s.fail.length+' su '+s.total+' layer non si caricano.'];
+  Object.keys(LC_WHY).forEach(k=>{ const rows=s.fail.filter(x=>x.why===k).sort((a,b)=>a.name.localeCompare(b.name)); if(!rows.length) return;
+    out.push('', LC_WHY[k].t+' · '+rows.length); rows.forEach(x=>out.push('- '+x.name+' — '+x.host+(x.url? ' — '+x.url : ''))); });
+  if(s.prev.length){ out.push('', 'Accesi nella mappa di prima, non in questa · '+s.prev.length); s.prev.forEach(x=>out.push('- '+x.name)); }
+  return out.join('\n'); }
+async function lcCopy(){ try{ await navigator.clipboard.writeText(lcText()); msg('Elenco copiato: incollalo in una mail o in un messaggio.','ok'); }
+  catch(e){ msg('Copia non riuscita: questo browser non lascia scrivere negli appunti.','err'); } }
+function lcMapViewer(){ if(!lcState.id) return; window.open(PORTAL+'/apps/mapviewer/index.html?webmap='+encodeURIComponent(lcState.id), '_blank', 'noopener'); }
+window.addEventListener('DOMContentLoaded', function(){ const on=(id, fn)=>{ const b=byId(id); if(b) b.onclick=fn; };
+  on('lcRow', lcOpen); on('lcClose', lcClose); on('lcCopy', lcCopy); on('lcMv', lcMapViewer); });
 // ══ Pendenze da DTM (2026-10-04) ═══════════════════════════════════════════════════════════
 // Geoprocessi e analisi › Pendenze da DTM (a module of tab 3 since 2B-2): quote del terreno sull'area lorda più 25 m, pendenza, aree oltre un limite scelto
 // dall'utente → un disegno «Esclusione · Pendenza elevata» nella Raccolta. Stesso metodo del modulo del terreno
@@ -11580,7 +11726,7 @@ function srchShowRow(obj, soft){ const root=byId('drawerElenco'); if(!root) retu
   mbarApply();
 
   /* 3c ── finestre (dialoghi): semantica, fuoco dentro la finestra e ritorno al comando che l'ha aperta */
-  var DLG=['exportModal','promoteModal','sfModal','cadModal','helpModal','infoModal','helpMenu'];
+  var DLG=['exportModal','promoteModal','sfModal','cadModal','helpModal','infoModal','helpMenu','lcModal'];   /* 3/11 (C3): lcModal */
   function dlgFocusables(m){ return Array.prototype.filter.call(m.querySelectorAll('button,[href],input,select,textarea,[tabindex]:not([tabindex="-1"])'),
     function(el){ return !el.disabled && el.offsetParent!==null; }); }
   DLG.forEach(function(id){ var m=$g(id); if(!m) return; var h=m.querySelector('h2');
@@ -12102,7 +12248,7 @@ function srchShowRow(obj, soft){ const root=byId('drawerElenco'); if(!root) retu
   if($g('sideInfo')) $g('sideInfo').onclick=function(){ if(this.dataset.info) impInfo(this.dataset.info); };   // 2/11 (N2): the «i» of a one-card module
 
   /* 6a ── click sul backdrop chiude (riusa i pulsanti esistenti) */
-  [['exportModal','exCancel'],['promoteModal','pmCancel'],['sfModal','sfCancel'],['helpModal','helpClose'],['cadModal','cadCancel'],['infoModal','infoClose'],['setModal','setClose']].forEach(function(p){
+  [['exportModal','exCancel'],['promoteModal','pmCancel'],['sfModal','sfCancel'],['helpModal','helpClose'],['cadModal','cadCancel'],['infoModal','infoClose'],['setModal','setClose'],['lcModal','lcClose']].forEach(function(p){
     var el=$g(p[0]); if(!el) return;
     el.addEventListener('click',function(e){ if(e.target===el){ var b=$g(p[1]); if(b) b.click(); else el.style.display='none'; } });
   });
@@ -12180,6 +12326,7 @@ function srchShowRow(obj, soft){ const root=byId('drawerElenco'); if(!root) retu
     var hm=$g('helpModal'), em=$g('exportModal'), pm=$g('promoteModal'), im=$g('infoModal');
     if(im&&im.style.display==='flex'){ im.style.display='none'; return; }
     var stm=$g('setModal'); if(stm&&stm.style.display==='flex'){ $g('setClose').click(); return; }   // J5g
+    var lcm=$g('lcModal'); if(lcm&&lcm.style.display==='flex'){ $g('lcClose').click(); return; }   // 3/11 (C3)
     if(hm&&hm.style.display==='flex'){ hm.style.display='none'; return; }
     if(em&&getComputedStyle(em).display==='flex'){ $g('exCancel').click(); return; }
     if(pm&&getComputedStyle(pm).display==='flex'){ $g('pmCancel').click(); return; }
