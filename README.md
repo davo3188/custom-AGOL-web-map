@@ -82,7 +82,7 @@ py -3 scripts/build.py --check    exit 1 if the built file is not up to date
 py -3 scripts/make_tokens.py      writes src/css/10-tokens.css from design/tokens.json (the family's tokens); --check
 py -3 scripts/make_icons.py       writes src/html/05-icons.html, the sprite of the family icons the sources use; --check, --list
 py -3 scripts/make_kit.py         writes src/css/12-kit.css and 13-geo-kit.css from design/kit.css and geo-kit.css (verbatim); --check
-py -3 tests/run.py                headless checks, Python + Chrome, 33 harnesses, about eight minutes (see tests/README.md)
+py -3 tests/run.py                headless checks, Python + Chrome, 38 harnesses, about eight minutes (see tests/README.md)
 ```
 
 `design/` holds the design system's inputs, copied verbatim from the family (`tokens.json`, `icons/*.svg`, `kit.css`,
@@ -366,7 +366,7 @@ the last message; how it works is the «i» by the panel's title.
 
 ### Salva ed esporta
 
-Groups **Esporta · Portale AGOL · Progetto · Stampa**; the default module is *Progetto* (J5f: the name with its state,
+Groups **Esporta · Portale AGOL · Progetto · Stampa · Risk Matrix**; the default module is *Progetto* (J5f: the name with its state,
 «non salvato» or «salvato alle 15:42»; what the work holds; *Salva*, *Salva come…*, *Apri…*; *Copia da condividere…*,
 whose tooltip and the «i» say what the copy leaves out).
 - **Esporta** opens the export window, also on a format (*GeoJSON · KML · KMZ*, *Shapefile (.zip)*, *Tabella XLSX*). It
@@ -396,6 +396,38 @@ whose tooltip and the «i» say what the copy leaves out).
   is drawn as vectors, the basemap and the layers as images. While the module is in sight a dashed rectangle on the map
   shows the sheet; *Inquadra* brings the map to it. The cadastre of the Agenzia does not print (its server gives no CORS):
   the parcels of the Raccolta carry their numbers instead.
+- **Risk Matrix** (since 2026-11-05, R1 of `docs/plan-risk-matrix.md`, on the computer and on a phone): the 28 rows of the
+  company template IT_RISK_MATRIX_2025 in five sections (Conformity with Group Strategy, Compliance check, Site
+  assessment, Land rights, Grid connection) and the project's box (code, name, coordinates, region, municipality,
+  surface, power, yield). Opening the module writes a draft in English from the project: the box from the gross area (or
+  the parcels), the parcels of the area and the AREAS site; the objects drawn by row (exclusions by type, lines,
+  obstacles, accesses, the connection) with hectares and % inside the gross area or the distance (up to 1 km; the
+  connection at any distance; overlapping objects of a type count once); the slope exclusion with its limit and DTM;
+  Land rights viability from the parcels; Name of landowner from the owners' file. Everything is the PM's to edit: the
+  colour (six, never proposed by the app), Description, References, Comments and the box; a field the PM wrote stays
+  through *Ricalcola*, and when the calculation changes the row shows • and the field «il calcolo è cambiato» with
+  *vedi* and *riscrivi dal calcolo*. Flags: the files imported (a name like a plan → References of Urban zoning) and the
+  owners' file. *Cosa ha trovato il calcolo* lists the facts under each row.
+  **R2 (2026-11-05): the layers.** A line «Layer» with **Interroga** and a section **Fonti**: the files imported (a theme
+  and the field of their classes, guessed from the file), the national layers (Natura 2000 SCI/SAC and SPA, EUAP, IBA,
+  Corine 2018, the elemens HV lines and PV projects, the substations, the seismic zone) and the open map's layers grouped
+  by theme — guessed from the layer's name and groups, changed from a menu (also *Escludi*), remembered per map in the
+  browser; base maps and internal layers (Survey, KPI, Solar belt, AREAS) left out; a dot says what the last run found.
+  *Interroga* asks each layer with a theme for what lies within 1 km of the gross area (10 km for Surrounding area, 20 km
+  for the nearest substation) and writes one line per layer: hectares and % inside, the classes of its legend, a name,
+  the distance; the connection route's crossings in Grid constraints; WMS and tiles as «Checked on the map». A new gross
+  area makes the results stale; when the open map is not the region's Check Vincoli the module offers it.
+  **R3a (2026-11-06): the Excel.** A line «Excel» with the company template (picked once, kept by the browser) and
+  **Crea l'Excel** (the template filled: texts, colours — the PM's or orange — and the box; the name from code and name),
+  **Aggiorna…** (the project's matrix: only what the panel has, the rest of the file as it is) and *Leggi una matrice nel
+  pannello* (a filled matrix into the panel as the PM's). The template's «Risk category» gives the meaning of each colour
+  on the swatches of each row.
+  **R3b (2026-11-06):** two boxes, *Cadastral* and *Constraints*: the sheet «Cadastral» gets the table of the parcels (with
+  the owners, Excel only) and a map on satellite with their numbers; «Constraints» a map per row with findings, with only
+  that theme's layers, the gross area and the route, under what the PM pasted.
+  **R4 (2026-11-06):** in *Stampa*, a section «Risk Matrix»: *Allega la Risk Matrix* adds after the sheet A4 landscape pages
+  with all the rows, their colours and texts (never the owners' names), and optionally a page per map of a theme and the
+  table of the parcels.
 
 ### The Raccolta
 
@@ -484,7 +516,8 @@ foot of every panel) are the ⚙ of the top bar.
   *Togli*. The tab Modifica keeps all of them, with the card of the selected object.
 - **Top left**: zoom, compass (the map rotates; a click puts north up), GPS (Esri Locate at 1:2,500; needs https),
   **Zoom sulla Raccolta**, **Luoghi** (Esri Bookmarks that also restore layer visibility, `cat_bookmarks`).
-- **Bottom right** the basemap chip: *Topografica*, *Satellite*, *Ortofoto AGEA* 2024, 2023 and 2022, *Stradale*, with
+- **Bottom right** the basemap chip: *Topografica*, *Satellite*, *Satellite ibrida* (with roads and names), *Ortofoto AGEA*
+  (since 2026-11-06 one basemap: the years 2022, 2023, 2024 stacked, the most recent on top), *Stradale*, with
   an opacity slider (`axpo_bm_opacity`). **Bottom centre** the scale bar at 70 %; the Esri attribution is a thin line.
 - **Right-click**: *Aggiungi particella qui*, *Analisi di contesto qui*, *Buffer qui*, *Copia coordinate*, *Apri in Google
   Maps*, *Centra qui*.
@@ -585,7 +618,8 @@ How the app works inside, by subject, with the traps to know before editing. The
   output is reproducible byte for byte, with LF endings, and goes through a `.tmp` file that then replaces the target.
 - Order: `html/00-head.html`; all CSS in one `<style>` (tokens, base, kit, geo-kit, icon placement, then the app's
   rules by area); the body (`05-icons.html`, top bar, app body, modals); five classic `<script>` blocks: `09-icons.js`
-  to `29-logo.js` in one, then `30-ui-glue.js`, `31-measure-coords.js`, `32-tour.js` and `33-print.js` in one each.
+  to `29-logo.js` in one, then `30-ui-glue.js`, `31-measure-coords.js`, `32-tour.js`, `33-print.js`, `34-risk-matrix.js`,
+  `35-risk-sources.js`, `36-risk-excel.js`, `37-risk-images.js` and `38-risk-pdf.js` in one each.
 - `design/` holds the family's inputs verbatim (`tokens.json`, `icons/*.svg`, `kit.css`, `geo-kit.css`); change them
   there, then run the generators. `make_tokens.py` → `src/css/10-tokens.css` (light values on `:root`, dark values that
   differ on `[data-theme="dark"]`, `{ref}` → `var(--ref)`, old names kept as aliases: `--acc`, `--on-accent`,
@@ -686,6 +720,62 @@ How the app works inside, by subject, with the traps to know before editing. The
   the panel closed take it away). `prBuild(o, {dpi})` returns `{doc, name, info}` (the test reads it; `prGo` saves): the
   background, then the Raccolta as jsPDF paths in the frame's metres, clipped to the frame, then the scale bar and north,
   the header, the column, the footer. Standard PDF fonts are Latin-1: `prTxt` turns ’ – → … into ASCII.
+- **The Risk Matrix** (2026-11-05, R1; `34-risk-matrix.js`, plan `docs/plan-risk-matrix.md`). `rmState = {v, at, box,
+  rows}`; a field is `{v, a, m, o, n}` (text, last draft, written by the PM, from the owners' file, newer draft aside).
+  `rmCalc` measures in the local metric frame (16b): the base is the union of the gross areas (or of the parcels), each
+  object of the site-features model goes to its row by `RM_OF` (category and type), gathered by row, category and type
+  (`rmMeasure`: hectares or metres inside, a point inside, the distance outside; the parts inside of a type are unioned);
+  `put` writes `v` only when `m` is false, otherwise keeps the new draft in `n`. `rmSync` runs it at every `modShow` of
+  the module; the PM's input updates the field and its mark in place (no redraw while typing); one row open at a time
+  (`rmRowRedraw`). Saved in `captureWork` (`riskMatrix`, without the `o` fields when `noOwn`), restored in `applyWork`,
+  emptied by `clearWork`, left out of the history (Annulla is for the map's objects). Drafts in English, like the
+  template; no thresholds of the template in the code (it holds internal ones and this repository has a public copy):
+  they come with the file the PM opens (R3).
+- **The Risk Matrix's layers** (2026-11-05, R2; `35-risk-sources.js`). `rsSources()` lists the national layers (`RS_NAT`)
+  and the map's (`lcLayers`, kind `fl` feature layer, `ms` map service, `vis` image), each with a theme from `rsGuess`
+  (`RS_INT`, `RS_OUT`, then `RS_KW` on the title, then on the groups) or the PM's (`axpo_rm_themes` per map id, `*` for
+  the national). `rsRun()` describes each endpoint once (`?f=json`), expands a map service into its feature layers
+  (`rsLeaves`, base ones out), then asks `/query` with the extent of the base widened by the radius (`rsEnv`), only the
+  fields of the legend, a name and the fixed lists `RS_SPF`, `authMode: 'no-prompt'`, 4 at a time, 30 s each; each
+  feature is clipped to the extent, projected in the local frame and measured by `rsAddFeat` (route first, then inside,
+  else the distance); `rsLines` writes the line (one class first, more as «classes:»; within 10 km a count). The records
+  go to `rmState.lay.src`; `rsMerge` (called by `rmCalc`) puts them in the rows with the theme of now, adds «Nothing
+  within …» when a row has only misses, the references, and the files with a theme (measured live). `rsSig` (hectares
+  and centroid) makes them stale on a new gross area, `rsRouteSig` the crossings on a new route. Imports keep the fields
+  that look like classes (`impClassKeys` in `24-import-files.js`) in `src_attrs`. Tests stub the servers with
+  `window.rsReqStub` and the map with `window.rsMapStub`.
+- **The Risk Matrix's Excel** (2026-11-06, R3a; `36-risk-excel.js`). `rxOpen(buf)` reads the workbook with JSZip and
+  DOMParser: the sheets from `workbook.xml` and its relations, the shared strings, `styles.xml`, the sheet «Risk Matrix»
+  (`rxMapSheet`: rows by label with `rxRowKey`, bigram similarity on `RX_ALIAS` within the section of `RX_SEC`; the box by
+  `RX_BOX` from column G on) and «Risk category» (`rxReadCat`). `rxWrite(X, 'make'|'update')` sets inline strings in C/E/F,
+  numbers for Power and Yield, a fill on D by cloning the cell's style (`rxStyles().withFill`, reusing a fill of the same
+  colour), wrapped text where the style has none, `fullCalcOnLoad`; `rxBlob` writes back only the three parts it changed
+  (`createFolders: false`). `rxRead` puts a matrix into the panel. The template lives in IndexedDB (`axpo_rm` › `files` ›
+  `template`) with its meanings in memory (`rxCat`, used by `rxCatTip` in the swatches' tooltips). Tests build an invented
+  template; the company's is never in this repository.
+- **The Risk Matrix's images** (2026-11-06, R3b; `37-risk-images.js`). `riRun(X, say)` from `rxRun`: `riParcels` (the parcels of
+  the base, the owners' names by comune · sheet · parcel), `riThemes` (rows with findings: `lay` with the themes of now and
+  the drawn objects), `riCadImage` / `riThemeImage` (shots by `riShot` → `prShot` of 33-print.js, which since 6/11 takes
+  `show` — the LayerView's visibility in the view out of sight — and `waits`; `riCompose` lays them on a canvas with the
+  vectors), `riWriteSheet` (cells, a drawing with `oneCellAnchor`s, relations, media, content types, `riDim`). Tests
+  stub the shots with `window.riShotStub`.
+- **The Risk Matrix in the PDF** (2026-11-06, R4; `38-risk-pdf.js`). `prOpts` reads `prRisk`, `prRiskMaps`, `prRiskParcels`;
+  `prBuild` calls `rpPages(doc, o)` after the sheet: `rpPage` (the band, title, box, footer with the page number), the
+  matrix as a table drawn with `splitTextToSize` (a row's height from its longest cell, at most 40 lines; the header again on
+  a new page), the maps from `riThemes`/`riThemeImage` (37), the parcels from `riParcels` without owners. `rpSync` ticks
+  «Allega» when the module opens and the matrix has content (`dataset.set` keeps the PM's choice).
+- **Trap (PDF strings):** jsPDF writes the parentheses of a text as `\(` and `\)` in the file: a test looking for a text
+  with parentheses in `doc.output()` must search them escaped.
+- **Trap (maps out of sight):** they draw only while the page is in sight; with the browser pane hidden the view never
+  stops «updating» and the image is empty — in the print too.
+- **Trap (the template's sample colours):** the empty 2025 template already has green, light green and yellow in column D.
+  «Crea l'Excel» therefore always writes a colour (the PM's or orange); only «Aggiorna…» keeps the file's.
+- **Trap (dark theme, the lists of the selects):** the list a `<select>` opens is drawn by the browser, light unless the page
+  says otherwise: with the theme's light text on it, unreadable (seen by the user on 6/11). `[data-theme="dark"]` sets
+  `color-scheme: dark`, and the options get `--panel` and `--txt` (11-base-theme.css).
+- **Trap (CORS sent twice):** the ISPRA server of the lithological map answers with `Access-Control-Allow-Origin:
+  <origin>, *`: Python and curl read it, every browser refuses it («multiple values»). A service that works in a script
+  can still fail in the app: try it from the page.
 - **Trap (print background):** the images come from MapViews out of sight (`prShot`, a div at −20000 px) over the
   frame's extent, then `takeScreenshot`. `Basemap.clone()` keeps the same layer instances, and most layers have no
   `clone()` in 4.34 (TileLayer, WMSLayer): destroying a view destroys its map, so a copy would destroy the app's
@@ -894,8 +984,10 @@ How the app works inside, by subject, with the traps to know before editing. The
 - **Controls**: zoom, compass, GPS (`Locate`, 1:2,500, needs https), then `#ctlExtra` at index 3 of `view.ui`; top
   right the lens `#trStack` (the kit's `.geosearch` around the Esri Search) and `#msBtn` (its menu drives the
   Measurement widget's `activeTool`; card `#msCard`; `measureUi` and a watch on `activeTool` keep them in step); bottom
-  right the basemap chip (`#bmPop`: BasemapGallery, AGEA orthophotos as `ImageryTileLayer` basemaps `agea<year>` in
-  `BM_BY_ID`, an opacity slider for every base layer, `axpo_bm_opacity`). The right-click menu (`wireContextMenu`,
+  right the basemap chip (`#bmPop`: BasemapGallery; since 2026-11-06 one AGEA basemap `agea` with an `ImageryTileLayer` per
+  year, the most recent last — out of its regions a year sends transparent tiles or a 404, so the older shows through —,
+  the old ids `agea<year>` of saved work mapped to it in `BM_BY_ID`; `hybrid` = World Imagery with the reference layers
+  World Transportation and World Boundaries and Places; an opacity slider for every base layer, `axpo_bm_opacity`). The right-click menu (`wireContextMenu`,
   `#ctxMenu`) acts on the clicked point (add a parcel, context, «Buffer qui», copy coordinates, Google Maps, centre).
 - **Status bar** (`31-measure-coords.js`): the pin (arm, then freeze the next click); the pointer in the system of
   `#sbCrs` (WGS 84 decimal or DMS, UTM 32/33, Monte Mario 3003/3004, RDN2008 6707/6708; `projection` loads on the
@@ -1454,7 +1546,7 @@ How the app works inside, by subject, with the traps to know before editing. The
 
 - **Work state** (`captureWork(noOwn)`, `14-state-project.js`), shared by the browser save and the project: `basemap`,
   `viewpoint`, `parcels`, `addedItems`, `services`, `site`, `netAuto`, `netSetback`, `terrainExtent`, `groups`,
-  `parcelGroups`, `customCats`, `toolGeoms` (`serializeToolGeoms`: drawings, buffers and imports as
+  `parcelGroups`, `customCats`, `riskMatrix` (since 2026-11-05), `toolGeoms` (`serializeToolGeoms`: drawings, buffers and imports as
   `{g: GeoJSON 4326, a: whitelisted attributes, v: visible, s: symbol JSON}`). `applyWork` restores the flags, groups,
   subgroups and
   custom categories before any object, then the site, extent, parcels (junk dropped) and graphics (symbols through
@@ -1581,6 +1673,23 @@ How the app works inside, by subject, with the traps to know before editing. The
   - `lcheck`: which layers load: the reasons; a map of invented layers (one loads, one without CORS in a group, a
     404, a slow one that answers later, a secured one never loaded, a real WMS with no server); the row, the window,
     *Copia elenco*, *Apri nel Map Viewer*, Esc; the message after a change; the layers of the map before.
+  - `riskmatrix`: the Risk Matrix: the 28 rows and the box; the draft of an invented project (two overlapping exclusions
+    counted once, distances, a line and a pole, a boundary access, the slope, the connection, the parcels of the area, a
+    file named like a plan, the owners' names marked `o`); the PM's colour, text and box field kept by *Ricalcola* with
+    «il calcolo è cambiato» until *riscrivi dal calcolo*; the browser's save without the owners' names. `axpo` checks the
+    field in the project file, the copy to share and an old file.
+  - `risksources`: the Risk Matrix's layers, servers and map stubbed: the themes guessed (PAI, PTPR, a WMS, internal and
+    base layers out); *Interroga* — Natura 2000 with its name, a PAI by legend class, a map service's layer at 50 m, Corine
+    by class, PV projects within 10 km, the nearest substation and its saturation, the seismic zone and the box, an HV line,
+    the route's crossing; only the fields needed asked; a theme changed with no request; an imported plan by zone; saved;
+    stale on a new gross area.
+  - `riskexcel`: the Risk Matrix's Excel on an invented template (typos, sample colours, an older row, «Risk category»):
+    the template kept with its meanings; *Crea l'Excel* (cells, colours, box, title, name, only three parts changed);
+    *Aggiorna…* (the file's text and colour kept where the panel has none); *Leggi una matrice nel pannello*.
+  - `riskimages`: «Cadastral» and «Constraints» on an invented template with an image of the PM, shots stubbed: the table,
+    the maps under the existing image, drawing parts, relations, media, content types; nothing with the boxes off.
+  - `riskpdf`: the Risk Matrix in the PDF of Stampa: the box ticked by itself; the matrix pages, two map pages (shots
+    stubbed), the parcels; no owner's name; unticked, the sheet alone.
 - **Trap:** the history photographs the work 0.5 s after it settles, and every change pushes the photo back: a harness
   that removes something and then tests Annulla waits for `drwHist.timer` to be 0 first, or the state before the
   removal was never photographed (`owners` failed once under the full suite on 2026-10-30).
@@ -2634,6 +2743,51 @@ prompting (`lcGuard`). It shows the problem and does not cure it: that takes a p
 or other sources. New harness `lcheck` (33). Backup: `geoportale_axpo_pre-controllo-layer_2026-11-03.html` (from
 UBS-IT `a4c0dd8`).
 
+**2026-11-05: the Risk Matrix, R1 (approved by the user, plan `docs/plan-risk-matrix.md`).** The PMs fill the company's
+Risk Matrix (Excel, template 2025) by hand, copying GIS facts and pasting screenshots. The user's decisions D1–D8: a
+module in Salva ed esporta; the colour is the PM's only; Excel and PDF as outputs; radii 1 km and 10 km; every layer with
+a theme; every row in the panel; the owners' names in the Excel only; the changes G1–G6 to the GIS tool. And: everything
+editable, an imported plan and the owners' file flagged. R1 is the panel and the draft from the project, saved in the
+`.axpo` (`riskMatrix`). New harness `riskmatrix` (34); `axpo`, `texts` (26 groups) and `profiles` (Risk Matrix in Base) extended. R2 (the map's layers),
+R3 (the Excel) and R4 (the PDF) follow. Backup: `geoportale_axpo_pre-risk-matrix_2026-11-05.html` (from UBS-IT `099d0c5`).
+
+**2026-11-05: the Risk Matrix, R2 — the layers (approved by the user: R2-1…R2-5, `docs/plan-risk-matrix.md` §8).** The
+themes are chosen in «Fonti» inside the module (not in Importa nor in the Layer panel); the layers are asked with
+*Interroga*; the module offers the region's Check Vincoli; one line per layer with hectares, %, classes, distance; the
+internal layers out (the user: their contacts and outcomes may be used one day). Twelve national layers; the ISPRA
+lithological map left out (its server's CORS is broken for browsers) and PNIEC replaced by the elemens PV projects (its
+services now ask for a token). Imports keep the fields that look like classes. New: `35-risk-sources.js`, harness
+`risksources` (35); `riskmatrix` updated (a file named like a plan is now measured). Backup:
+`geoportale_axpo_pre-risk-r2_2026-11-05.html` (from UBS-IT `d5743c3`).
+
+**2026-11-06: the Risk Matrix, R3a — the Excel (approved by the user: R3-1…R3-7, `docs/plan-risk-matrix.md` §9; R3a
+covers R3-1, R3-2, R3-3, R3-6, R3-7).** The company template picked once and kept by the browser; *Crea l'Excel*,
+*Aggiorna…*, *Leggi una matrice nel pannello*; the meanings of the colours from «Risk category» on the swatches. The file
+is changed in its XML, cell by cell; tried on a copy of the 2025 template and opened in Excel 16. New: `36-risk-excel.js`,
+harness `riskexcel` (36). R3b (the images of «Cadastral» and «Constraints») follows. Backup:
+`geoportale_axpo_pre-risk-r3a_2026-11-06.html` (from UBS-IT `c4fc733`).
+
+**2026-11-06: three small changes asked by the user.** (1) Dark theme: the lists of the selects were light with light text
+— `color-scheme: dark` and dark options; all the 42 selects of the page checked in the browser. (2) A basemap *Satellite
+ibrida* (World Imagery with roads and names). (3) The AGEA orthophotos as one basemap, *Ortofoto AGEA*: the years 2022,
+2023 and 2024 stacked with the most recent on top, so each region shows its latest flight (checked over Rome, 2023, and
+Milan); the three basemaps per year are gone, a saved work with one of them opens the single one. Tests: `print` (the
+list of backgrounds), `NOISE` of the runner (the hybrid's reference layers). Backup:
+`geoportale_axpo_pre-accorgimenti_2026-11-06.html` (from UBS-IT `31d4a73`).
+
+**2026-11-06: the Risk Matrix, R3b — Cadastral and Constraints (R3-4, R3-5; details approved by the user:
+`docs/plan-risk-matrix.md` §10).** The table of the parcels and a satellite map in «Cadastral»; a map per row with findings
+in «Constraints», with only the theme's layers (shown in the view out of sight alone), the gross area and the route; the
+images added to the file's drawings below what is there. Tried on the 2025 template and opened in Excel 16. New:
+`37-risk-images.js`, harness `riskimages` (37); `prShot` takes `show` and `waits`. Backup:
+`geoportale_axpo_pre-risk-r3b_2026-11-06.html` (from UBS-IT `34ec9cb`, the branch of the three small changes it builds on).
+
+**2026-11-06: the Risk Matrix, R4 — the PDF (approved by the user: R4-1…R4-6, `docs/plan-risk-matrix.md` §11).** In Stampa,
+«Allega la Risk Matrix» (ticked by itself when the matrix has content), «Una mappa per tema», «Tabella delle particelle»: A4
+landscape pages after the sheet, all the rows with colour and texts, the generic legend, the owners counted and never named.
+New: `38-risk-pdf.js`, harness `riskpdf` (38); `prTxt` maps more characters to Latin-1. The pages read back with Windows'
+PDF renderer. Backup: `geoportale_axpo_pre-risk-r4_2026-11-06.html` (from UBS-IT `740f8dc`).
+
 ## 8. Repository contents
 
 ```
@@ -2658,7 +2812,8 @@ scripts/make_geo_fixtures.py  writes tests/fixtures/geo_expected.json with arcpy
 tests/                     run.py and harness/*.py: headless checks, Python + Chrome (tests/README.md); fixtures/ = the expected measures, made once by scripts/make_geo_fixtures.py with arcpy (developer-only: the app and the runner never need ArcGIS Pro)
 docs/                      architecture.md: the map of the app for people who do not read the code; axpo-format.md: the
                            project file, field by field (phase 9);
-                           plan-ribbon-refactor.md: the refactor plan and its decisions; archive/readme-2026-10-26.md:
+                           plan-ribbon-refactor.md: the refactor plan and its decisions; plan-risk-matrix.md: the Risk
+                           Matrix, its template, decisions and phases (2026-11-05); archive/readme-2026-10-26.md:
                            §4 and §5 as they were before 5b, word for word (the dated notes of every feature and phase)
 ```
 
@@ -2891,3 +3046,33 @@ in §7):
   (`#lcRow`); `src/html/30-modals.html` (`#lcModal`, the guide); `src/css/40-map-chrome.css`, `src/css/85-status-phone.css`;
   `tests/README.md`; `docs/architecture.md`; `../reports/collaudo_login_vero_2026-10-27.md` (1.7); this README (§3, §4,
   §5, §7, §8).
+- **Risk Matrix, R1 (2026-11-05).** New: `src/js/34-risk-matrix.js` (in `src/manifest.txt` after `33-print.js`),
+  `tests/harness/riskmatrix.py`, `docs/plan-risk-matrix.md`. Changed: `src/html/20-app-body.html` (`#modRisk`),
+  `src/html/30-modals.html` (the guide); `src/js/14-state-project.js` (`riskMatrix` in `captureWork`, `applyWork`,
+  `clearWork`, the copy to share, `projNormalize`); `src/js/30-ui-glue.js` (the module, its group, the ⓘ and «i» texts,
+  `rmSync` from `modShow`); `src/js/32-tour.js`; `src/css/60-tour.css` (`.rm*`); `tests/harness/axpo.py`, `profiles.py`,
+  `texts.py`; `tests/README.md`; `docs/axpo-format.md` (§3, §5.8, §6, §7); `docs/architecture.md`; this README (§3, §4, §5, §7, §8).
+- **Risk Matrix, R2 (2026-11-05).** New: `src/js/35-risk-sources.js` (in `src/manifest.txt` after `34-risk-matrix.js`),
+  `tests/harness/risksources.py`. Changed: `src/js/34-risk-matrix.js` (`rmBase`, the state `files` and `lay`, `rsMerge`
+  and `rsRender` called, files with a theme not counted twice); `src/js/24-import-files.js` (`impClassKeys`);
+  `src/html/20-app-body.html` (`#rmLay`); `src/css/60-tour.css` (`.rs*`); `src/js/30-ui-glue.js`, `src/js/32-tour.js`,
+  `src/html/30-modals.html` (texts); `tests/harness/riskmatrix.py`; `tests/README.md`; `docs/plan-risk-matrix.md` (§4–§8);
+  `docs/axpo-format.md` (§5.8); `docs/architecture.md`; this README (§3, §4, §5, §7, §8).
+- **Risk Matrix, R3a (2026-11-06).** New: `src/js/36-risk-excel.js` (in `src/manifest.txt` after `35-risk-sources.js`),
+  `tests/harness/riskexcel.py`. Changed: `src/js/34-risk-matrix.js` (the swatches' tooltips from `rxCatTip`);
+  `src/html/20-app-body.html` (`#rmXls`); `src/css/60-tour.css` (`.rx*`); `src/js/30-ui-glue.js`, `src/js/32-tour.js`,
+  `src/html/30-modals.html` (texts); `tests/README.md`; `docs/plan-risk-matrix.md` (§6, §9); `docs/architecture.md`; this
+  README (§3, §4, §5, §7, §8).
+- **Dark selects, hybrid satellite, one AGEA (2026-11-06).** Changed: `src/css/11-base-theme.css` (`color-scheme`, the
+  options); `src/js/11-map-model.js` (`bmHybrid`, `bmAgea` stacked, `APP_BASEMAPS`, `BM_BY_ID`); `src/js/30-ui-glue.js`
+  (`bmSync`: the hybrid's thumbnail); `tests/harness/print.py`; `tests/run.py` (`NOISE`); this README (§4, §5, §7, §8).
+- **Risk Matrix, R3b (2026-11-06).** New: `src/js/37-risk-images.js` (in `src/manifest.txt` after `36-risk-excel.js`),
+  `tests/harness/riskimages.py`. Changed: `src/js/36-risk-excel.js` (`riRun` called, the two boxes, the message);
+  `src/js/33-print.js` (`prShot`: `show`, `waits`); `src/css/60-tour.css` (`.rxopts`); `src/js/30-ui-glue.js`,
+  `src/html/30-modals.html` (texts); `tests/README.md`; `docs/plan-risk-matrix.md` (§6, §10); `docs/architecture.md`; this
+  README (§3, §4, §5, §7, §8).
+- **Risk Matrix, R4 (2026-11-06).** New: `src/js/38-risk-pdf.js` (in `src/manifest.txt` after `37-risk-images.js`),
+  `tests/harness/riskpdf.py`. Changed: `src/js/33-print.js` (`prOpts`, `rpPages` called in `prBuild`, the message, `rpSync` in
+  `prSync`, `prTxt`); `src/html/20-app-body.html` (`#prRiskSec`); `src/css/60-tour.css` (`.rpsub`); `src/js/30-ui-glue.js`,
+  `src/html/30-modals.html` (texts); `tests/README.md`; `docs/plan-risk-matrix.md` (§6, §11); `docs/architecture.md`; this
+  README (§3, §4, §5, §7, §8).
