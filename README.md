@@ -794,6 +794,13 @@ How the app works inside, by subject, with the traps to know before editing. The
   `…/MapServer/export` (`layers=show:<id>`, transparent PNG) — a close shot for the hectares, a wide one for the distance —
   and counts the pixels drawn (widened by one) in the mask of the gross area. `rsReq(url, query, 'blob')` gives the image;
   a stub of a test returns a `Blob` or a `Promise` of one.
+- **Copies read once** (2026-11-11, plan §13.4). `rsLeaves` drops the copies by scale of a map service (same name and
+  geometry, ranges of scales that do not meet: `rsScaleOf`; the most detailed stays) and gives each layer its geometry
+  from the service's list (`gt`, the job's `gt0`). `rsNatUrls()` / `rsMsDup(l, natU)`: a layer of a map service that is
+  a national one is not read; a service made only of them leaves a record `{th:'out', dup:1}` and is listed as
+  «Già letto tra i layer nazionali» (not when the PM gave it a theme: `j.own`). `rsMerge` says a line once per row
+  (`said`). `rsReqQ` asks again a request dropped by the network (`rsDown`, cleared at each run); `rsCanImage` wants
+  polygons known. `rsSubsOnly(l, ids, set)` and `rsHeld` serve «Vedi sulla mappa» and `riThemeImage` (37).
 - **`rsSee(k)`** (2026-11-11, U8, plan §13.3): `rsSeen` = `{k, keep, temp, vp}` — the visibilities changed (layers, groups,
   sublayers) with their value of before, the national layers added, the viewpoint. `rsSeeOff()` puts them back; called by
   `modShow` when another module is shown, by `rmSetState`, dropped when the map changes. `projVis(o)` (14-state-project.js)
@@ -1729,7 +1736,8 @@ How the app works inside, by subject, with the traps to know before editing. The
     base layers out); *Interroga* — Natura 2000 with its name, a PAI by legend class, a map service's layer at 50 m, Corine
     by class, PV projects within 10 km, the nearest substation and its saturation, the seismic zone and the box, an HV line,
     the route's crossing; only the fields needed asked; a theme changed with no request; an imported plan by zone; saved;
-    stale on a new gross area.
+    stale on a new gross area. 11/11: a copy by scale and a national layer inside a map service never asked; a line said once; a
+    request dropped by the network asked again; the picture only for polygons.
   - `riskexcel`: the Risk Matrix's Excel on an invented template (typos, sample colours, an older row, «Risk category»):
     the template kept with its meanings; *Crea l'Excel* (cells, colours, box, title, name, only three parts changed);
     *Aggiorna…* (the file's text and colour kept where the panel has none); *Leggi una matrice nel pannello*.
@@ -2863,6 +2871,19 @@ the layers of that row on the map, the area framed; the same button, a note abov
 map back; the project is saved with the visibility of before. Harness `risksteps` extended. Backup:
 `geoportale_axpo_pre-risk-u8_2026-11-11.html` (from UBS-IT `c781a6f`).
 
+**2026-11-11: the Risk Matrix, the copies read twice (found by the user on a real file; `docs/plan-risk-matrix.md` §13.4).**
+A map service that repeats its layers by scale (Lombardia's PTCP: three times) is read in its most detailed copy; a
+layer of the map that is a national one is read once, also inside a map service (ISPRA's lithological map); a line is
+said once per row; the picture of a theme shows only the layers of that theme; the terrain analysed has its name in
+English and a mark when it is not the area of the check. A request dropped by the network is asked again; the picture
+of a layer is the last resort, and only for polygons. Harnesses `risksources`, `riskmatrix` extended. Backup:
+`geoportale_axpo_pre-risk-dup_2026-11-11.html` (from UBS-IT `c675217`).
+
+**2026-11-11: the Risk Matrix, the references of the map (approved by the user; `docs/plan-risk-matrix.md` §13.5).** The
+References say the map once — «Map «…»:» — and under it a layer per line with a dash, the layers with nothing counted
+last; a row whose layers found nothing keeps its single line. `rsMerge` (`refs`, `mAdd`). Harness `risksources` extended.
+Backup: `geoportale_axpo_pre-risk-refs_2026-11-11.html` (from UBS-IT `42aaf9f`).
+
 ## 8. Repository contents
 
 ```
@@ -3166,3 +3187,9 @@ in §7):
 - **Lithological map (2026-11-11).** Changed: `src/js/35-risk-sources.js` (`RS_JSONP`, `rsJpBox`, `rsJsonpRaw`, `rsJsonp`, the
   source `lito`), `src/js/30-ui-glue.js` (text); `tests/harness/risksources.py`; `tests/README.md`;
   `docs/plan-risk-matrix.md` (§13.2); this README.
+- **The copies read twice (2026-11-11).** Changed: `src/js/35-risk-sources.js` (`rsLeaves`, `rsScaleOf`, `rsNatUrls`,
+  `rsMsDup`, `rsReqQ`, `rsCanImage`, `rsSubsOnly`, `rsHeld`, `rsCut`, the second attempt of `rsRun`, `rsMerge`),
+  `src/js/37-risk-images.js` (`riThemeImage`), `src/js/34-risk-matrix.js` (`rmAreaEn`, the mark on Topography);
+  `tests/harness/risksources.py`, `riskmatrix.py`; `tests/README.md`; `docs/plan-risk-matrix.md` (§13.4); this README.
+- **The references of the map (2026-11-11).** Changed: `src/js/35-risk-sources.js` (`rsMerge`); `tests/harness/risksources.py`;
+  `tests/README.md`; `docs/plan-risk-matrix.md` (§13.5); this README.
