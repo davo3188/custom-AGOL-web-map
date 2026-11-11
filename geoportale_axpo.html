@@ -1367,6 +1367,35 @@ dialog.dialog::backdrop { background: rgba(11, 18, 25, .45); }
   .rmrow.open .rmname{font-weight:600}
   .rmprev{flex:1;min-width:0;color:var(--mut);font-size:11.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .rmchg{flex:none;color:var(--warn);font-weight:700}
+  .rmchg.rmun{color:var(--err, #d93025);padding:0 2px}   /* 10/11: layers of this row not read */
+  /* 10/11 (U1): the four guided steps of the Risk Matrix — a number (a tick when done), the title, the state on the right */
+  .rmstep{margin:0;border-top:1px solid var(--line)} .rmstep:first-of-type{border-top:0}
+  .rmstep>summary{display:flex;align-items:center;gap:8px;padding:8px 2px;cursor:pointer;list-style:none;border-radius:6px} .rmstep>summary::-webkit-details-marker{display:none}
+  .rmstep>summary:hover{background:var(--hover)} .rmstep>summary:focus-visible{outline:2px solid var(--focus);outline-offset:-2px}
+  .rmnb{flex:none;display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border:1px solid var(--line-strong);border-radius:50%;font-style:normal;font-size:11px;font-weight:600;color:var(--mut)}
+  .rmstep.cur .rmnb{border-color:var(--accent);background:var(--accent);color:#fff} .rmstep.ok .rmnb{border-color:var(--ok, #2e9e5b);color:var(--ok, #2e9e5b)}
+  .rmst-t{flex:none;font-size:12.5px;font-weight:600;color:var(--txt)} .rmstep:not(.cur):not(.ok) .rmst-t{color:var(--mut)}
+  .rmst-s{flex:1;min-width:0;text-align:right;font-size:11.5px;color:var(--mut);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .rmst-b{padding:0 0 10px 28px} .rmst-b>.btns{margin:2px 0 6px}
+  .rmfilt{display:flex;align-items:center;gap:6px;margin:2px 0 6px}
+  .rmchip{flex:none;width:auto;margin:0;padding:2px 9px;border:1px solid var(--line-strong);border-radius:999px;background:transparent;color:var(--mut);font-size:11.5px;line-height:16px;cursor:pointer}
+  .rmchip b{font-weight:600} .rmchip.on{border-color:var(--accent);background:color-mix(in srgb, var(--accent) 16%, transparent);color:var(--txt)}
+  .rmfilt .rmre{flex:none;margin-left:auto;padding:2px 6px}
+  .rmcn{align-self:center;margin-left:6px;font-size:11.5px;color:var(--txt)} .rmcn.no{color:var(--mut)}
+  .rmnone{padding:6px 2px}
+  .rmseerow{margin:0 0 4px} .rmsee .icon{width:13px;height:13px;margin-right:3px;vertical-align:-2px} .rmsee.on{font-weight:600}   /* U8 */
+  /* 10/11 (asked by the user): the marks of «Layer letti» and their legend — full: inside the area; half: near; empty: read,
+     nothing; a cross: not read (grey: needs the sign-in); dashed: an image, to look at */
+  #modRisk .rsres.in{background:var(--accent);border-color:var(--accent)} #modRisk .rsres.near{border-color:var(--accent);background:linear-gradient(90deg, var(--accent) 50%, transparent 50%)}
+  #modRisk .rsres.miss{background:transparent} #modRisk .rsres.vis{background:transparent;border-style:dashed;border-radius:2px}
+  #modRisk .rsres.err,#modRisk .rsres.login{position:relative;width:9px;height:9px;border:0;border-radius:0;background:none}
+  #modRisk .rsres.err::before,#modRisk .rsres.login::before{content:'✕';position:absolute;left:-1px;top:-5px;font-size:11px;line-height:18px;font-weight:700;color:var(--err, #d93025)}
+  #modRisk .rsres.login::before{color:var(--mut)}
+  .rsleg{display:flex;flex-wrap:wrap;gap:3px 12px;padding:2px 2px 8px;font-size:11px;color:var(--mut)} .rsleg span{display:inline-flex;align-items:center;gap:5px}
+  .rsstat{display:none;padding:0 2px 6px;font-size:11.5px;color:var(--mut)} .rsstat.busy{display:block}
+  #modRisk .rxopts label{display:flex;align-items:center;gap:5px;margin:0;font-size:12px;font-weight:400;text-transform:none;letter-spacing:0;color:var(--txt)}   /* the id beats the labels' capitals (20-shell.css) */
+  #modRisk .rxopts input{width:auto;margin:0}
+  #modRisk .rxths{flex-wrap:wrap;gap:4px 14px;padding-left:22px} .rxmore{margin:2px 0 0;font-size:11.5px;color:var(--mut)} .rxmore>summary{padding:4px 2px;cursor:pointer} .rxmore .rxread{padding:2px 2px 4px;line-height:1.7}
   .rmed{padding:4px 2px 10px 21px}
   .rmsw{display:flex;gap:5px;margin:2px 0 6px}
   .rmc{flex:none;width:28px;height:22px;margin:0;padding:0;border:1px solid color-mix(in srgb, var(--c) 70%, #000);border-radius:5px;background:var(--c);font-size:10px;line-height:20px;color:var(--mut);cursor:pointer}
@@ -1950,7 +1979,7 @@ dialog.dialog::backdrop { background: rgba(11, 18, 25, .45); }
   <symbol id="i-sel-poly" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="m4 8 8.5-4.5 7.5 6-3 9.5-11.5-2.5z" stroke-dasharray="3 2.5"/><path d="M4 8h.01M12.5 3.5h.01M20 9.5h.01M17 19h.01M5.5 16.5h.01" stroke-width="3"/></symbol>
   <symbol id="i-sel-rect" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="14" rx="1" stroke-dasharray="3 2.5"/><path d="M3.5 5h.01M20.5 19h.01" stroke-width="3"/></symbol>
   <symbol id="i-service" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></symbol>
-  <symbol id="i-settings" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"/></symbol>
+  <symbol id="i-settings" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M10.2 5.1L10.5 2.5L13.5 2.5L13.8 5.1L15.6 5.9L17.6 4.2L19.8 6.4L18.1 8.5L18.9 10.2L21.5 10.5L21.5 13.5L18.9 13.8L18.1 15.5L19.8 17.6L17.6 19.8L15.6 18.1L13.8 18.9L13.5 21.5L10.5 21.5L10.2 18.9L8.5 18.1L6.4 19.8L4.2 17.6L5.9 15.5L5.1 13.8L2.5 13.5L2.5 10.5L5.1 10.2L5.9 8.4L4.2 6.4L6.4 4.2L8.4 5.9Z"/><circle cx="12" cy="12" r="3"/></symbol>
   <symbol id="i-sheet" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="1"/><path d="M3 16h18"/><path d="m6 13 3-4 3 3 2-2 4 3"/></symbol>
   <symbol id="i-slope" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 19h18L21 6z"/><path d="M11 19a8 8 0 0 0-2.3-5.6"/></symbol>
   <symbol id="i-slot-a" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="17" height="17" rx="3"/><path d="M8.5 16.5 12 7.5l3.5 9M9.8 13.3h4.4"/></symbol>
@@ -2618,13 +2647,18 @@ dialog.dialog::backdrop { background: rgba(11, 18, 25, .45); }
              template, a draft from the project, everything editable by the PM; the explanations are in the «i» (IMP_INFO.risk) -->
         <div class="modbox" id="modRisk">
         <div class="tlab">Risk Matrix</div>
-        <div class="j5row j5h" id="rmInfo"></div>
-        <div id="rmFlags"></div>
-        <div id="rmLay"></div>
-        <div id="rmXls"></div>
-        <div id="rmBody"></div>
-        <div class="btns"><button type="button" class="btn" id="rmCalc" data-icon="refresh" title="Rifà la bozza dal progetto: i campi che hai scritto tu restano come sono">Ricalcola</button></div>
+        <!-- 2026-11-10 (review, U1): four guided steps, each with its state; the next thing to do is the one open, with the
+             only primary button. The ids of R1–R4 stay where they were filled (rmInfo, rmFlags, rmLay, rmBody, rmXls) -->
+        <details class="rmstep" data-st="1"><summary><i class="rmnb">1</i><span class="rmst-t">Area del progetto</span><span class="rmst-s" id="rmInfo"></span></summary>
+          <div class="rmst-b"><div id="rmArea"></div><div id="rmFlags"></div><div id="rmBox"></div></div></details>
+        <details class="rmstep" data-st="2"><summary><i class="rmnb">2</i><span class="rmst-t">Controllo dei vincoli</span><span class="rmst-s" id="rmSum2"></span></summary>
+          <div class="rmst-b"><div id="rmLay"></div></div></details>
+        <details class="rmstep" data-st="3"><summary><i class="rmnb">3</i><span class="rmst-t">Rivedi le righe</span><span class="rmst-s" id="rmSum3"></span></summary>
+          <div class="rmst-b"><div id="rmFilt"></div><div id="rmBody"></div></div></details>
+        <details class="rmstep" data-st="4"><summary><i class="rmnb">4</i><span class="rmst-t">Esporta</span><span class="rmst-s" id="rmSum4"></span></summary>
+          <div class="rmst-b"><div id="rmXls"></div></div></details>
         <div id="rmMsg" class="thint" role="status" aria-live="polite"></div>
+        <input type="file" id="rxFile" accept=".xlsx,.xlsm" hidden>
         </div>
     </div></div>
   </div>
@@ -2815,7 +2849,7 @@ dialog.dialog::backdrop { background: rgba(11, 18, 25, .45); }
       <li><b>Modifica</b> — quello che c'è già. <b>Selezione</b>: Seleziona (clic sulla mappa, <kbd>Maiusc</kbd> aggiunge o toglie), Riquadro, Deseleziona; la selezione è la spunta della Raccolta. <b>Modifica</b>, sulla selezione: Rimodella, Sposta e ruota, Dividi, Unisci (le aree selezionate diventano una), Copia (dove clicchi, anche parallela a distanza fissa: le opzioni nella sua finestra) ed Elimina. A destra, in Proprietà, quanti sono e la scheda dell'oggetto selezionato (categoria, tipo e attributi). Le particelle si selezionano ma non si modificano.</li>
       <li><b>Geoprocessi</b> — <b>Oggetti di partenza</b>: metti gli oggetti in A con A dalla mappa, dalle righe spuntate o per categoria (B serve a Parte comune e Sottrai); <b>Geoprocessi</b>: Buffer, Unione, Parte comune, Sottrai B da A, Contorno, Semplifica, Ritaglia, poi <b>Esegui</b> a destra: il risultato è un oggetto nuovo nella Raccolta, gruppo Analisi, e quelli di partenza restano.</li>
       <li><b>Importa</b> — <b>File</b>: GeoJSON, KML, KMZ, Shapefile (.zip) e il file di <b>Estrazione intestatari</b>, colorato e raggruppato per intestatario in fondo al blocco <b>Particelle</b> della Raccolta, dove il cestino della riga «Per intestatario» lo toglie tutto (i nominativi restano fuori dal salvataggio automatico e dal portale); <b>CAD</b>: un DWG letto nel browser, con il sistema proposto, oppure allineato a mano con due punti; <b>Immagini</b>: GeoTIFF e world file si posizionano da soli, PNG, JPG e PDF con sposta, scala, ruota o punti noti; <b>Servizi web</b>: WMS, WFS e ArcGIS REST dal loro indirizzo; <b>Portale</b>: un layer cercato per titolo.</li>
-      <li><b>Salva ed esporta</b> — <b>Esporta</b>: GeoJSON, KML, KMZ, Shapefile (.zip) o la tabella XLSX delle particelle, con gli oggetti spuntati nella Raccolta o con tutto (il KML ha una cartella per gruppo, lo shapefile un file per gruppo; il nome del file viene da comune, data e numero di particelle); <b>Portale AGOL</b>: Migra particelle in AREAS (le spuntate o tutte, scelte anche nella sua finestra: una per particella, un'unica area dissolta o un'area per sottogruppo), Salva disegni in Site Features (categoria, tipo, attributi e sito: la seconda volta aggiorna, non duplica), Modifica AREAS COLLECTION; <b>Progetto</b>: Salva, Salva come, Apri; <b>Stampa</b>: un foglio PDF A4 o A3 con la Raccolta in scala, sfondo a scelta, dati, legenda e note (il rettangolo tratteggiato sulla mappa mostra il foglio), con la Risk Matrix allegata se la spunti; <b>Risk Matrix</b>: le righe della matrice dei rischi del modello aziendale, con una bozza in inglese dal progetto e, con Interroga, dai layer della mappa aperta e da quelli nazionali entro 1 km dall’area (in Fonti il tema di ogni layer e file); colore, testi, fonti e commenti li scegli e li modifichi tu, Ricalcola non tocca ciò che hai scritto; <b>Crea l’Excel</b> compila il modello aziendale (scelto una volta, il browser lo ricorda), <b>Aggiorna…</b> scrive nella matrice del progetto, e una matrice già compilata si può leggere nel pannello; i fogli Cadastral e Constraints ricevono la tabella delle particelle e una mappa per tema.</li>
+      <li><b>Salva ed esporta</b> — <b>Esporta</b>: GeoJSON, KML, KMZ, Shapefile (.zip) o la tabella XLSX delle particelle, con gli oggetti spuntati nella Raccolta o con tutto (il KML ha una cartella per gruppo, lo shapefile un file per gruppo; il nome del file viene da comune, data e numero di particelle); <b>Portale AGOL</b>: Migra particelle in AREAS (le spuntate o tutte, scelte anche nella sua finestra: una per particella, un'unica area dissolta o un'area per sottogruppo), Salva disegni in Site Features (categoria, tipo, attributi e sito: la seconda volta aggiorna, non duplica), Modifica AREAS COLLECTION; <b>Progetto</b>: Salva, Salva come, Apri; <b>Stampa</b>: un foglio PDF A4 o A3 con la Raccolta in scala, sfondo a scelta, dati, legenda e note (il rettangolo tratteggiato sulla mappa mostra il foglio), con la Risk Matrix allegata se la spunti; <b>Risk Matrix</b>: quattro passi per la matrice dei rischi del modello aziendale — l’area del progetto, il <b>controllo dei vincoli</b> sui layer della mappa aperta e nazionali entro 1 km dall’area (in «Layer letti» il tema di ogni layer e file), la revisione di colore, testi, fonti e commenti (il ricalcolo non tocca ciò che hai scritto), l’esportazione: <b>Crea l’Excel</b> compila il modello aziendale (scelto una volta, il browser lo ricorda), <b>Aggiorna…</b> scrive nella matrice del progetto, e una matrice già compilata si può leggere nel pannello; i fogli Cadastral e Constraints ricevono la tabella delle particelle e le mappe che scegli.</li>
       <li><b>Raccolta</b>, a sinistra — tutto quello che raccogli, ad albero come i layer di QGIS: i gruppi (Particelle, Aree di progetto, Aree di esclusione, Analisi, Altro, Immagini, e i tuoi, <b>+ Gruppo</b>), dentro i sottogruppi delle particelle, poi gli oggetti, ogni livello un po' più rientrato; numero ed ettari a destra, occhio, nomi e menu passando sopra la riga. In alto il filtro per nome e <b>Comprimi</b>. Ogni riga ha la spunta (la selezione, che usano anche geoprocessi ed esportazione; <kbd>Maiusc</kbd>+clic spunta un intervallo), il colore, il nome (le particelle per foglio e numero, poi il comune), la cifra a destra, l'occhio e il menu <b data-icon="more"></b>, anche col tasto destro: rinomina, zoom, sposta in un gruppo, Proprietà, elimina. Un clic sulla riga fa lampeggiare l'oggetto sulla mappa, un doppio clic ci fa lo zoom. <b>Trascina</b> una riga su un sottogruppo (le particelle) o su un gruppo (gli altri oggetti) per spostarla: se è spuntata, vanno con lei tutte le selezionate; sulla riga Particelle una particella esce dai sottogruppi; dove non può andare non si accende nulla e, al rilascio, ti dico perché. La riga di un sottogruppo, o di un gruppo tuo, trascinata su un'altra ne cambia l'ordine. Annulla rimette tutto. Con qualcosa selezionato (spuntato qui, o scelto sulla mappa con <b>Modifica</b> › Seleziona e Riquadro) compare in cima la <b>barra della selezione</b>: Zoom, Sottogruppo o Gruppo (anche nuovo), Togli (o il tasto <kbd>Canc</kbd>; Annulla rimette tutto) e Deseleziona; il tasto destro su una riga selezionata, o sulla mappa su un oggetto selezionato, offre le stesse azioni per tutta la selezione. Il menu di un gruppo, di un sottogruppo e di Particelle ha lo <b>Zoom</b> su tutti i loro oggetti. Il bordo destro la allarga, <b data-icon="undock"></b> la sgancia in una finestra per il secondo schermo.</li>
       <li><b>Pannello a destra</b> — tre schede. <b>Proprietà</b>: le impostazioni dello strumento aperto e, in Modifica, la scheda dell'oggetto selezionato (categoria, tipo e attributi). <b>Layer</b>: cerca un layer per nome; dal pannello di ogni layer (icona a cursori) trasparenza, popup e <b>filtro per attributo</b> (l'icona diventa un imbuto quando è attivo); i layer aggiunti da te hanno il menu <b>…</b> con Zoom e Rimuovi dalla mappa. Un clic sulla mappa apre il popup anche sui layer a <b>tasselli vettoriali</b> che portano gli attributi (es. i vincoli paesaggistici della Campania nella vista d'insieme): campi e titolo come configurati nell'item, l'elemento non si evidenzia. A ogni cambio di mappa l'app controlla quali layer si caricano: quelli di server senza CORS (o che non rispondono) qui non si vedono, mentre nel Map Viewer sì; la riga <b>«n layer non disponibili qui»</b> apre l'elenco per motivo, con <b>Apri nel Map Viewer</b> e <b>Copia elenco</b>, e vi aggiunge i layer che avevi acceso nella mappa di prima e che quella nuova non ha. Il <b>Catasto AdE</b> è l'immagine ufficiale del WMS dell'Agenzia delle Entrate: fogli da 1:25.000, particelle e fabbricati da 1:5.000, numeri da 1:2.000. <b>Legenda</b>: i layer accesi. Anche questo pannello si allarga dal bordo e si sgancia.</li>
       <li><b>Sulla mappa</b> — in alto a destra la lente della <b>ricerca</b> (indirizzi, lat lon, oppure X Y in Gauss-Boaga o UTM, di cui indovina il sistema) e, sotto, <b data-icon="measure"></b> le <b>misure</b>: lineare, area, Pulisci (non si salvano); più sotto <b data-icon="cursor"></b> la <b>selezione</b>: Seleziona, Riquadro, Deseleziona, da qualsiasi scheda (le modifiche stanno nel tasto destro sulla selezione). In alto a sinistra zoom, bussola, posizione GPS, <b>Zoom sulla Raccolta</b> e <b>Luoghi</b>, i segnalibri; in basso a destra la <b>mappa di base</b>, con l'opacità; in basso al centro lo scalimetro. Col tasto destro: aggiungi la particella qui, analisi di contesto qui, buffer qui, copia le coordinate, apri in Google Maps, centra qui.</li>
@@ -4267,14 +4301,16 @@ function projLayers(){   // quelli della lista Layer: niente basemap, terreno, l
   cadFiles.forEach(f=>f.layers.forEach(L=>skip.add(L.grp)));
   return view.map.allLayers.toArray().filter(l=>l.listMode!=='hide'&&!skip.has(l)); }
 function projSubKey(l,sl){ return (l.type==='wms'&&sl.name)? sl.name : (sl.id!=null? String(sl.id) : sl.name); }
+// 11/11 (U8): while the Risk Matrix shows the layers of one row, the project keeps the visibility of before (rsSeeVis)
+function projVis(o){ return (typeof rsSeeVis==='function')? rsSeeVis(o) : o.visible; }
 function projCaptureLayers(){
-  return projLayers().map(l=>{ const s={k:projKey(l), t:l.title||'', v:l.visible!==false};
+  return projLayers().map(l=>{ const s={k:projKey(l), t:l.title||'', v:projVis(l)!==false};
     if('opacity' in l&&l.opacity!=null) s.op=Math.round(l.opacity*1000)/1000;
     if('popupEnabled' in l) s.pop=l.popupEnabled!==false;
     if(llLabelable(l)) s.lab=l.labelsVisible!==false;   // etichette accese/spente
     if(llFilterable(l)) s.def=l.definitionExpression||'';   // filtro per attributo (anche "nessuno", se la web map ne aveva uno)
     const subs=l.loaded&&(l.allSublayers||l.sublayers);   // sottolayer (WMS, map service): solo se già letti
-    if(subs&&subs.length){ s.sub={}; subs.forEach(sl=>{ const k=projSubKey(l,sl); if(k==null) return; s.sub[k]=sl.visible!==false;
+    if(subs&&subs.length){ s.sub={}; subs.forEach(sl=>{ const k=projSubKey(l,sl); if(k==null) return; s.sub[k]=projVis(sl)!==false;
       if(sl.definitionExpression) (s.sdef||(s.sdef={}))[k]=sl.definitionExpression; }); }
     return s; }); }
 function projCaptureOrder(){   // ordine dei layer della lista, per contenitore (mappa e gruppi)
@@ -11512,7 +11548,7 @@ function srchShowRow(obj, soft){ const root=byId('drawerElenco'); if(!root) retu
     'Portale AGOL':"Scritture sul portale, ognuna confermata in una finestra: Migra particelle in AREAS (le particelle spuntate, o tutte, diventano aree di AREAS COLLECTION: una per particella, un'unica area o un'area per sottogruppo), Salva disegni in Site Features (la seconda volta aggiorna, non duplica) e Modifica AREAS COLLECTION con l'editor del portale. Serve l'accesso.",
     'Progetto':"Il progetto .axpo con tutto il lavoro: Salva progetto (Ctrl+S), Salva come… e Apri progetto… (Ctrl+O); a destra, in Proprietà, anche la copia da condividere senza dati personali. Il lavoro resta anche nel browser; lo stesso file si apre in PV Predesign.",
     'Stampa':"Stampa salva un foglio PDF A4 o A3 con la Raccolta in scala esatta (adatta, come la mappa o fissa), su uno sfondo a scelta, con dati, legenda, scala, nord e note. Mentre il pannello è aperto, un rettangolo tratteggiato sulla mappa mostra cosa entra nel foglio. Il catasto AdE non va in stampa.",
-    'Risk Matrix':"Risk Matrix apre le righe della matrice dei rischi aziendale, con una bozza in inglese dal progetto e, con Interroga, dai layer della mappa e nazionali entro 1 km dall’area. Colore e testi li scegli e modifichi tu; Ricalcola non tocca ciò che hai scritto. Crea l’Excel compila il modello aziendale, Aggiorna scrive in una matrice esistente."};
+    'Risk Matrix':"Risk Matrix guida in quattro passi la matrice dei rischi aziendale: l’area, il controllo dei vincoli sui layer della mappa e nazionali entro 1 km, la revisione di colori e testi, l’Excel o il PDF. Le bozze sono in inglese, come il modello; ciò che scrivi tu non viene toccato dal ricalcolo."};
   var curMod={};
   function tabMod(tab, id){ var t=SHELL[tab]; return t? ((t.mods||[]).filter(function(m){ return m.id===id; })[0]||null) : null; }
   function tabTool(tab, id){ var t=SHELL[tab], out=null; (t&&t.groups||[]).forEach(function(g){ g.tools.forEach(function(x){ if(x.id===id) out=x; }); }); return out; }
@@ -11651,6 +11687,12 @@ function srchShowRow(obj, soft){ const root=byId('drawerElenco'); if(!root) retu
     if(m.id==='proj'&&window.projModRender) window.projModRender();   // R3-1 (I4)
     if(m.id==='print'&&tab===curTab()&&window.prSync) window.prSync(true);   // 3/11 (S3): the lists, and the sheet's rectangle on the map
     if(m.id==='risk'&&tab===curTab()&&window.rmSync) window.rmSync();   // 5/11 (R1): the draft again from the project (what the PM wrote stays)
+    // 10/11 (U5): the rows of the Risk Matrix need room for their names: the panel is widened while the module is shown
+    // (not saved, not on a phone, not when undocked) and goes back to the PM's width on leaving
+    if(tab===curTab()){ var rk=(tab==='export'&&m.id==='risk');
+      if(rk&&!modShow.wide&&!isPhone()&&!(typeof sideUndocked==='function'&&sideUndocked())){ var sd=$g('side'), sw=sd? sd.getBoundingClientRect().width : 0; if(sw&&sw<390){ try{ pwSet('right', 390, false); modShow.wide=true; }catch(x){} } }
+      else if(!rk&&modShow.wide){ modShow.wide=false; try{ pwApply(); }catch(x){} }
+      if(!rk&&typeof rsSeeOff==='function'){ try{ rsSeeOff(); }catch(x){} } }
     if((tab==='geoproc'||tab==='analizza')&&window.toolSync) window.toolSync(m.id);   // 2B-2: the tool shown is the current one, the previous one's map mode goes off
     if(was!==m.id&&tab===curTab()&&(t.groups||[]).some(function(g){ return !!g.when; })){ ribbonRender(tab); sheetToolsRender(tab); }   // 22/10: the groups that depend on the module
     ribbonSoon(); }
@@ -12043,30 +12085,36 @@ function srchShowRow(obj, soft){ const root=byId('drawerElenco'); if(!root) retu
       +'<li>Un layer acceso il cui server non permette la copia resta fuori: il foglio si fa lo stesso e lo dice.</li>'
       +'<li>Il foglio porta la scritta «scouting, non per costruzione»: è un documento di lavoro.</li></ul>'},
     risk:{t:'Risk Matrix', s:'La matrice dei rischi del progetto, con le righe del modello aziendale 2025.', h:   // 5/11 (R1), docs/plan-risk-matrix.md
-      '<h3>Come si usa</h3><ol>'
-      +'<li>Apri il modulo: dal progetto viene una <b>bozza</b> delle righe che il GIS conosce (area lorda, particelle, esclusioni, linee, ostacoli, accessi, connessione, pendenze). Le bozze sono in inglese, come il modello.</li>'
-      +'<li>Clicca una riga: scegli il <b>colore</b> e scrivi o correggi <b>Description</b>, <b>References</b> e <b>Comments</b>. Anche i dati del progetto (codice, coordinate, comune…) si modificano.</li>'
-      +'<li>Sotto ogni riga, <b>Cosa ha trovato il calcolo</b> elenca i fatti da cui viene la bozza.</li>'
-      +'<li>Riga <b>Layer</b>, <b>'+icon('search')+' Interroga</b>: i layer con un tema della mappa aperta e i layer nazionali (Natura 2000, aree protette, IBA, Corine, linee AT, progetti FV, sottostazioni, zona sismica) dicono cosa c’è entro 1 km dall’area lorda (10 km per Surrounding area): ettari e % dentro l’area, le classi della legenda, la distanza, cosa attraversa la connessione. Le righe entrano nella bozza. Per una Check Vincoli servono 30–60 secondi.</li></ol>'
-      +'<h3>Fonti</h3><ul>'
-      +'<li>Ogni file importato e ogni layer ha un <b>tema</b>, cioè la riga della matrice che informa: è indovinato dal nome del layer o del suo gruppo e lo cambi dal menu (anche <b>Escludi</b>). Il tema dei layer resta legato alla mappa, in questo browser; quello dei file resta nel progetto.</li>'
+      '<h3>Come si usa: quattro passi</h3><ol>'
+      +'<li><b>Area del progetto</b>: serve l’area lorda (o almeno le particelle). Dal progetto viene una <b>bozza</b> in inglese, come il modello: area, particelle, esclusioni, linee, ostacoli, accessi, connessione, pendenze. Qui correggi anche i dati del progetto (codice, coordinate, comune…).</li>'
+      +'<li><b>Controllo dei vincoli</b>: <b>'+icon('search')+' Controlla i vincoli</b> legge i layer con un tema della mappa aperta e i layer nazionali (Natura 2000, aree protette, IBA, Corine, carta geologica, carta litologica, corsi d’acqua EU-Hydro, linee AT, progetti FV, sottostazioni, zona sismica) e scrive nella bozza cosa c’è entro 1 km dall’area lorda (10 km per Surrounding area): ettari e % dentro l’area, le classi della legenda, la distanza, cosa attraversa la connessione. Uno o due minuti per una Check Vincoli; non serve accendere i layer.</li>'
+      +'<li><b>Rivedi le righe</b>: clicca una riga, scegli il <b>colore</b> e correggi <b>Description</b>, <b>References</b> e <b>Comments</b>. <b>Da fare</b> mostra le righe con una bozza ancora senza colore, <b>A mano</b> quelle che il GIS non conosce (prezzi, date, contratti), <b>Tutte</b> le 28. Sotto ogni riga, <b>Cosa ha trovato il calcolo</b> elenca i fatti da cui viene la bozza. <b>'+icon('map')+' Vedi sulla mappa</b> accende solo i layer di quella riga e inquadra l’area; lo stesso pulsante rimette la mappa com’era (anche uscendo dal modulo).</li>'
+      +'<li><b>Esporta</b>: <b>Crea l’Excel</b> per una matrice nuova, <b>Aggiorna…</b> per una che esiste già, <b>PDF con la matrice</b> per allegarla alla stampa; scegli qui quali mappe allegare.</li></ol>'
+      +'<ul><li>Il passo da fare è quello aperto, con il pulsante colorato; i passi fatti hanno la spunta. Li puoi aprire in qualsiasi ordine.</li>'
+      +'<li><b>Per modificare una matrice già fatta</b>: riapri il progetto salvato (dentro ci sono testi, colori e risultati) oppure, se hai solo l’Excel, usa prima <b>Leggi una matrice nel pannello</b>; poi cambia il perimetro, rifai il controllo, rivedi le righe segnate «il calcolo è cambiato» e premi <b>Aggiorna…</b>.</li></ul>'
+      +'<h3>Layer letti</h3><ul>'
+      +'<li>Ogni file importato e ogni layer ha un <b>tema</b>, cioè la riga della matrice che informa: è indovinato dal nome del layer o del suo gruppo e lo cambi dal menu (anche <b>Escludi</b>). La scelta resta in questo browser e viaggia con il progetto salvato.</li>'
       +'<li>Per un file scegli anche il <b>campo delle classi</b> (le zone di un PRG): la bozza dà ettari e % per zona.</li>'
-      +'<li>Esclusi di partenza: le carte di base e i <b>layer interni</b> (Survey, KPI, Solar belt, AREAS). Il pallino accanto a un layer dice cosa ha trovato l’ultima interrogazione.</li></ul>'
+      +'<li>Esclusi di partenza: le carte di base e i <b>layer interni</b> (Survey, KPI, Solar belt, AREAS). Il simbolo accanto a un layer dice cosa ha trovato l’ultimo controllo: pieno, qualcosa dentro l’area; mezzo, qualcosa vicino; vuoto, letto e niente; croce, non letto; tratteggiato, un’immagine da guardare.</li>'
+      +'<li>Se un servizio non riesce a mandare le forme (poligoni enormi, come le alluvioni ISPRA), l’area coperta è misurata sull’immagine della mappa: la riga dice «measured on the map image».</li></ul>'
       +'<h3>Excel</h3><ul>'
       +'<li>La prima volta scegli il modello aziendale <b>IT_RISK_MATRIX</b> (SharePoint › 09 Risk Matrix): questo browser lo ricorda, <b>Cambia</b> ne sceglie un altro. Dal suo foglio Risk category viene il significato dei sei colori, che vedi passando sui quadratini di ogni riga.</li>'
       +'<li><b>'+icon('export')+' Crea l’Excel</b>: il modello compilato con i testi, i colori e i dati del progetto (una riga senza colore esce arancio); il nome del file viene da codice e nome del progetto.</li>'
-      +'<li><b>'+icon('import')+' Aggiorna…</b>: scegli la matrice del progetto; scrive solo i campi che il pannello ha compilati, il resto del file resta com’è (anche il colore di una riga che nel pannello non ne ha). Salva il file scaricato al posto dell’originale.</li>'
+      +'<li><b>'+icon('import')+' Aggiorna…</b>: scegli la matrice del progetto; scrive solo i campi che il pannello ha compilati, il resto del file resta com’è (anche il colore di una riga che nel pannello non ne ha). La tabella e le mappe scritte prima dal Geoportale vengono sostituite, quelle incollate da te restano. Se il file ha già testi diversi da quelli del pannello, te lo chiede prima di sostituirli. Salva il file scaricato al posto dell’originale.</li>'
       +'<li><b>Leggi una matrice nel pannello</b>: i testi, i colori e i dati di una matrice già compilata entrano nel pannello come scritti da te.</li>'
-      +'<li>Con <b>Cadastral</b> spuntato, il foglio omonimo riceve la tabella delle particelle dell’area (con gli intestatari, se c’è il loro file) e una mappa su satellite con i numeri; con <b>Constraints</b>, una mappa per ogni riga con risultati, con i soli layer di quel tema, l’area lorda e la connessione. Le immagini vanno sotto quelle già incollate; un layer il cui server non ne permette la copia resta fuori, e il titolo lo dice. Servono 30–60 secondi.</li>'
+      +'<li>Con <b>Cadastral</b> spuntato, il foglio omonimo riceve la tabella delle particelle dell’area (con gli intestatari, se c’è il loro file) e una mappa su satellite con i numeri; con <b>Constraints</b>, una mappa per ogni riga con risultati che lasci spuntata, con i soli layer di quel tema, l’area lorda e la connessione. La stessa scelta vale per le mappe del PDF. Le immagini vanno sotto quelle già incollate; un layer il cui server non ne permette la copia resta fuori, e il titolo lo dice. Servono 30–60 secondi.</li>'
       +'<li>Il file cambia solo nelle celle scritte: immagini, firme, fogli e formattazione restano. Le righe si trovano per nome, anche nei modelli degli anni passati.</li></ul>'
       +'<h3>La bozza e i tuoi testi</h3><ul>'
-      +'<li>Un campo che scrivi tu resta tuo: <b>'+icon('refresh')+' Ricalcola</b> non lo tocca. Se il calcolo cambia, la riga ha un punto (•) e il campo dice «il calcolo è cambiato», con <b>vedi</b> e <b>riscrivi dal calcolo</b>.</li>'
+      +'<li>Un campo che scrivi tu resta tuo: il ricalcolo (<b>'+icon('refresh')+'</b> nel passo 3, e da solo ogni volta che apri il modulo) non lo tocca. Se il calcolo cambia, la riga ha un punto (•) e il campo dice «il calcolo è cambiato», con <b>vedi</b> e <b>riscrivi dal calcolo</b>.</li>'
       +'<li>Il colore lo scegli solo tu. Una riga senza colore, nel file Excel, esce arancio («check not possible or ongoing»).</li></ul>'
       +'<h3>Da sapere</h3><ul>'
       +'<li>Il modulo segnala i <b>file importati</b> e il <b>file degli intestatari</b>: i nomi entrano solo nella riga Name of landowner e nel foglio Cadastral dell’Excel, mai nel PDF.</li>'
-      +'<li>I layer fatti di immagini (WMS, tile) non si interrogano: vanno nelle References come «Checked on the map» e li guardi tu sulla mappa.</li>'
+      +'<li>La riga <b>Name of landowner</b> è un dato personale chiunque la scriva: i suoi testi restano nel progetto salvato e nell’Excel, mai nel salvataggio automatico, nella copia da condividere o nel PDF.</li>'
+      +'<li>I layer fatti di immagini (WMS, tile) non si interrogano: vanno nelle References come «To check on the map» e li guardi tu sulla mappa.</li>'
+      +'<li>Un layer <b>non letto</b> (serve l’accesso ad AGOL, il server non risponde, la risposta è parziale) è scritto nella riga come «Not checked: …» e la riga ha un «!» rosso: quel controllo manca.</li>'
+      +'<li><b>Topography</b> riassume il DTM analizzato in Analizza › Pendenze da DTM: quote, classi di pendenza, esposizione, parte oltre il limite. <b>Hydrography</b> dice se corsi d’acqua o canali attraversano l’area e nomina ogni fonte sul rischio alluvioni.</li>'
       +'<li>Se la mappa aperta non è la Check Vincoli della regione dell’area, il modulo la propone. I layer nazionali del portale chiedono l’accesso ad AGOL; quelli dell’EEA e dell’ISPRA no.</li>'
-      +'<li>Se cambi l’area lorda, i risultati dei layer escono dalla bozza finché non premi di nuovo Interroga; se cambi mappa restano, e il modulo dice da quale mappa vengono.</li>'
+      +'<li>Se cambi l’area lorda, i risultati dei layer escono dalla bozza finché non rifai il controllo; se cambi mappa restano, e il modulo dice da quale mappa vengono.</li>'
       +'<li>Tutto resta nel progetto .axpo; nel salvataggio automatico del browser e nella copia da condividere i campi presi dal file degli intestatari non ci sono.</li>'
       +'<li><b>PDF</b>: in Salva ed esporta › Stampa, sezione Risk Matrix, la matrice si allega al foglio della mappa: tutte le righe con il colore (arancio se non scelto) e i testi, la legenda dei colori, le mappe per tema e le particelle. Nel PDF non ci sono mai i nomi degli intestatari: la riga dice quanti sono.</li></ul>'},
     elev:{t:'Profilo altimetrico', s:'La quota del terreno lungo una linea che disegni (scheda Analizza, gruppo Analisi terreno).', h:
@@ -12876,10 +12924,10 @@ async function prBuild(o, opt){ opt=opt||{};
     if(b!=null) doc.text(prTxt(b), C.x+(two? 70*k : C.w), y, {align: two? 'left' : 'right'}); y+=lh; };
   if(o.data){ const haP=parcelsIn.reduce((s, p)=>s+(p.area_m2||0), 0)/1e4, sumBy=cat=>o.groups.reduce((s, id)=>s+prItems(id).filter(x=>x.attributes&&x.attributes.sf_cat===cat&&x.geometry&&x.geometry.type==='polygon').reduce((a, x)=>a+prHaOf(x.geometry), 0), 0);
     const F=info.figures; if(parcelsIn.length) F.parcels=parcelsIn.length+(parcelsIn.length===1? ' particella' : ' particelle')+' · '+fmtHa2(haP);
-    const g=sumBy('gross'), n=sumBy('net'), x=sumBy('exclusion'); if(g) F.gross=fmtHa2(g); if(n) F.net=fmtHa2(n); if(x) F.excl=fmtHa2(x);
+    const g=sumBy('gross'), n=sumBy('net'); if(g) F.gross=fmtHa2(g); if(n) F.net=fmtHa2(n);   // 10/11: the hectares of the exclusions are no longer on the sheet (it may be shown to a landowner)
     if(comuni.length) F.comuni=comuni.slice(0, 3).join(', ')+(comuni.length>3? '…' : '');
     if(Object.keys(F).length&&head('Dati')){ if(F.parcels) row('Particelle', F.parcels); if(F.gross) row('Area lorda', F.gross); if(F.net) row('Area netta', F.net);
-      if(F.excl) row('Esclusioni (somma)', F.excl); if(F.comuni) row(comuni.length===1? 'Comune' : 'Comuni', F.comuni); y+=lh*0.6; } }
+      if(F.comuni) row(comuni.length===1? 'Comune' : 'Comuni', F.comuni); y+=lh*0.6; } }
   if(o.legend&&info.legend.length&&head('Legenda')){ info.legend.forEach(e=>{ if(y>bottom) return; const c=prRgb(e.c); doc.setFillColor(c[0], c[1], c[2]); doc.setGState(new doc.GState({opacity:0.35}));
       doc.rect(C.x, y-2.6*k, 5*k, 3.2*k, 'F'); doc.setGState(new doc.GState({opacity:1})); doc.setDrawColor(c[0], c[1], c[2]); doc.setLineWidth(0.35*k); doc.rect(C.x, y-2.6*k, 5*k, 3.2*k, 'S');
       doc.setFont('helvetica', 'normal'); doc.setFontSize(8.2*Math.sqrt(k)); doc.setTextColor(58, 58, 60); doc.text(prTxt(e.t), C.x+7*k, y); y+=lh; }); y+=lh*0.6; }
@@ -12947,10 +12995,14 @@ const RM_EN={landscape:'Landscape constraint', woodland:'Woodland', archaeologic
   water:'Water pipeline', ditch:'Ditch / channel', road:'Road', railway:'Railway', tree:'Trees', pole:'Pole / pylon', building:'Building', 'site-access':'Site access',
   'grid-connection':'Grid connection point', estimated:'Connection route (estimated)', confirmed:'Connection route (confirmed)',
   'exclusion:other':'Other constraint', 'linear:other':'Other linear infrastructure', 'obstacle:other':'Other obstacle'};   // «other» by category
+const RM_CAT_EN={exclusion:'Exclusion area', linear:'Linear infrastructure', obstacle:'Obstacle', access:'Access'};   // an object without a type
 const RM_SRC_EN={desk:'desk analysis', survey:'site survey', official:'official data', geoprocess:'geoprocess', import:'imported', 'site-notes':'Site Notes'};
 const RM_NEAR=1000;   // D4: a drawn object farther than this from the gross area belongs to something else
 const RM_PLAN=/(^|[^a-z])(prg|puc|pat|pi|pug|psc|poc|rue|ptcp|ptpr|ppr|pptr|pai|piano|piani|zonizzazione|zone|vincoli|nta|cdu)([^a-z]|$)/i;   // a file name that looks like a plan
-let rmState=rmEmpty(), rmOpen=null, rmFacts={}, rmFlags=[], rmBaseInfo='', rmBusy=false;
+let rmState=rmEmpty(), rmOpen=null, rmFacts={}, rmFlags=[], rmWarn={}, rmBaseInfo='', rmBusy=false;
+// 10/11 (U1–U4): the four guided steps — is there a base, the rows shown (todo, hand, all), the step that was current
+let rmHasBase=false, rmOnParcels=false, rmFilter='todo', rmStepCur=0, rmStepForce=false;
+const RM_IT={g:'Verde · nessun vincolo', lg:'Verde chiaro · vincoli minori', y:'Giallo · mitigabile', o:'Arancio · da verificare', r:'Rosso · bloccante', na:'Non applicabile'};   // the short name of a colour, beside the swatches
 const rmSecOpen=new Set(['site']);   // the sections left open
 
 function rmEmpty(){ return {v:1, at:null, box:{}, rows:{}, files:{}, lay:null}; }   // R2: files = the PM's theme and class field per imported file; lay = the layers' results
@@ -12960,6 +13012,10 @@ function rmField(o){ o=(o&&typeof o==='object')? o : {}; const f={v:String(o.v==
 function rmRow(k){ return rmState.rows[k]||(rmState.rows[k]={c:'', d:rmField(), e:rmField(), f:rmField()}); }
 function rmBoxF(k){ return rmState.box[k]||(rmState.box[k]=rmField()); }
 function rmKeys(){ const out=[]; RM_ROWS.forEach(S=>S.rows.forEach(r=>out.push(r[0]))); return out; }
+// 10/11 (review, decision of the user): the row of the owners is personal data by its key, whoever wrote its texts (the
+// owners' file, the PM by hand, a matrix read from Excel): never in the automatic save, the copy to share or the PDF
+const RM_PERS=new Set(['landowner']);
+function rmPers(k){ return RM_PERS.has(k); }
 
 // ── the state, for the project file and the browser ──
 function rmGetState(noOwn){   // noOwn: without the fields drafted from the owners' file (automatic save, copy to share)
@@ -12968,11 +13024,15 @@ function rmGetState(noOwn){   // noOwn: without the fields drafted from the owne
   const box={}, rows={};
   RM_BOX.forEach(b=>{ const f=F(rmState.box[b[0]]); if(f) box[b[0]]=f; });
   Object.keys(rmState.rows).forEach(k=>{ const r=rmState.rows[k], o={}; if(r.c) o.c=r.c;
-    ['d','e','f'].forEach(x=>{ const f=F(r[x]); if(f) o[x]=f; }); if(Object.keys(o).length) rows[k]=o; });
+    if(!(noOwn&&rmPers(k))) ['d','e','f'].forEach(x=>{ const f=F(r[x]); if(f) o[x]=f; });
+    if(Object.keys(o).length) rows[k]=o; });
   const files=rmState.files&&Object.keys(rmState.files).length? JSON.parse(JSON.stringify(rmState.files)) : null, lay=rmState.lay? JSON.parse(JSON.stringify(rmState.lay)) : null;   // R2: no personal data in either
   if(!rmState.at&&!Object.keys(box).length&&!Object.keys(rows).length&&!files&&!lay) return null;
-  const out={v:1, at:rmState.at||null, box:box, rows:rows}; if(files) out.files=files; if(lay) out.lay=lay; return out; }
-function rmSetState(st){ rmState=rmEmpty(); rmOpen=null; rmFacts={}; rmFlags=[]; rmBaseInfo='';
+  const out={v:1, at:rmState.at||null, box:box, rows:rows}; if(files) out.files=files; if(lay) out.lay=lay;
+  try{ if(!riOpt.cad||!riOpt.con||riOpt.off.length) out.opt={cad:riOpt.cad, con:riOpt.con, off:riOpt.off.slice()}; }catch(e){}
+  return out; }
+function rmSetState(st){ try{ if(typeof rsSeeOff==='function') rsSeeOff(true); }catch(e){} rmState=rmEmpty(); rmOpen=null; rmFacts={}; rmFlags=[]; rmWarn={}; rmBaseInfo=''; rmHasBase=false; rmOnParcels=false; rmStepCur=0;
+  try{ riOpt.cad=true; riOpt.con=true; riOpt.off=[]; const o=st&&st.opt; if(o&&typeof o==='object'){ riOpt.cad=o.cad!==false; riOpt.con=o.con!==false; if(Array.isArray(o.off)) riOpt.off=o.off.filter(x=>typeof x==='string'); } }catch(e){}   // the maps chosen for the Excel and the PDF travel with the project
   if(st&&typeof st==='object'){ rmState.at=typeof st.at==='string'? st.at : null;
     const box=(st.box&&typeof st.box==='object')? st.box : {}, rows=(st.rows&&typeof st.rows==='object')? st.rows : {};
     RM_BOX.forEach(b=>{ if(box[b[0]]) rmState.box[b[0]]=rmField(box[b[0]]); });
@@ -13013,22 +13073,48 @@ function rmBase(){ const all=toolsGL.graphics.toArray().filter(g=>g.geometry&&g.
   if(geoFrameReady()){ try{ base=grossG.length? geoUnion(grossG) : (parcelG.length? geoUnion(parcelG) : null); onParcels=!grossG.length&&!!base; }catch(e){ base=null; }
     if(base){ try{ f=geoFrameFor([base]); B=f? geoClean(f.toLocal(base)) : null; baseHa=B? Math.abs(esriMods.geometryEngine.planarArea(B, 'square-meters')||0)/1e4 : 0; }catch(e){ B=null; } } }
   return {all:all, base:base, baseHa:baseHa, f:f, B:B, onParcels:onParcels}; }
+// Topography from the DTM analysed (17-slope.js keeps a grid per area analysed): inside the area analysed, the elevation, the
+// mean and the highest slope, the hectares per slope class, the aspect (where the ground goes down to) and the part over
+// the PM's limit, said «excluded» when its exclusion is in the project. One block per grid.
+function rmTopo(all){ const out=[]; let Gs=[]; try{ Gs=(typeof slpGrids!=='undefined'&&Array.isArray(slpGrids))? slpGrids : []; }catch(e){}
+  Gs.forEach(G=>{ try{ const m=G.meta, g=G.g, inG=G.inG, z=G.z; if(!m||!g||!inG||!z) return;
+      const cls=SLP_CLASSES.map(()=>0), asp={s:0, ew:0, n:0, flat:0}; let n=0, sum=0, top=0, z0=Infinity, z1=-Infinity;
+      for(let k=0; k<inG.length; k++){ if(!inG[k]) continue; const x=g.gx[k], y=g.gy[k], s=Math.hypot(x, y)*100; if(!Number.isFinite(s)) continue;
+        n++; sum+=s; if(s>top) top=s; const q=z[k]; if(Number.isFinite(q)){ if(q<z0) z0=q; if(q>z1) z1=q; }
+        const ci=SLP_CLASSES.findIndex(c=>s>=c[0]&&s<c[1]); if(ci>=0) cls[ci]++;
+        if(s<2) asp.flat++; else { const az=(Math.atan2(-x, -y)*180/Math.PI+360)%360; if(az>=315||az<45) asp.n++; else if(az>=135&&az<225) asp.s++; else asp.ew++; } }
+      if(!n) return;
+      const cha=m.cell*m.cell/1e4, pc=v=>(Math.round(v/n*1000)/10).toFixed(1)+' %', L=G.limit||{}, st=G.st||{};
+      const lt=L.maxAny!=null? 'slope > '+L.maxAny+' %' : 'slope N-S > '+L.maxNS+' % or E-W > '+L.maxEW+' %';
+      const excl=(all||[]).some(x=>x.attributes&&x.attributes.sf_slope&&x.attributes.sf_slope.grid===m.id);
+      const d=['Terrain analysed ('+(m.area_name||'area')+'): '+rmHa(n*cha)+(isFinite(z0)? ', elevation '+Math.round(z0)+'–'+Math.round(z1)+' m a.s.l.' : '')+', mean slope '+(sum/n).toFixed(1)+' %, maximum '+Math.round(top)+' %',
+        'Slope classes: '+SLP_CLASSES.map((c, i)=>cls[i]? (c[1]===Infinity? '> '+c[0] : c[0]+'–'+c[1])+' % '+rmHa(cls[i]*cha)+' ('+pc(cls[i])+')' : '').filter(Boolean).join(', '),
+        'Aspect (downhill towards): '+[['s', 'south'], ['ew', 'east or west'], ['n', 'north'], ['flat', 'flat (under 2 %)']].filter(a=>asp[a[0]]).map(a=>a[1]+' '+pc(asp[a[0]])).join(', '),
+        'Over the limit ('+lt+'): '+rmHa(st.overHa||0)+' ('+(Math.round((st.pct||0)*10)/10).toFixed(1)+' %)'+((st.overHa||0)>0? (excl? ', excluded in the project' : ', not yet an exclusion of the project') : '')];
+      out.push({id:m.id, d:d, ref:'DTM '+(m.name||'Esri World Elevation')+', cell '+m.cell+' m'+(m.loadedAt? ' ('+String(m.loadedAt).slice(0, 10)+')' : '')}); }catch(e){} });
+  return out; }
+// 10/11 (review): a parcel is of the area when at least 1 % of it (and a square metre) lies inside the gross area: a
+// neighbour that only touches is not. Without a gross area every parcel is of the area. Shared with 37 (Cadastral, PDF)
+function rmParcelIn(b, p){ if(!b.B||b.onParcels||!p.geometry) return true; const GE=esriMods.geometryEngine;
+  try{ const g=geojsonToEsri(p.geometry), X=g&&geoClean(b.f.toLocal(g)); if(!X||!GE.intersects(b.B, X)) return false;
+    const I=GE.intersect(b.B, X), a=I&&I.rings? Math.abs(GE.planarArea(I, 'square-meters')||0) : 0, pa=Math.abs(GE.planarArea(X, 'square-meters')||0);
+    return a>=Math.max(1, pa*0.01); }catch(e){ return true; } }
 // ── the draft ──
 async function rmCalc(quiet){ if(rmBusy) return; rmBusy=true;
   try{ if(!view||!esriMods||!toolsGL){ if(!quiet) toolMsg('rmMsg', 'La mappa non è ancora pronta: riprova tra un attimo.', 'err'); return; }
     try{ await geoFrameLoad(); }catch(e){}
-    const D={box:{}, rows:{}}, facts={}, flags=[], row=k=>D.rows[k]||(D.rows[k]={d:[], e:new Set(), o:false});
+    const D={box:{}, rows:{}}, facts={}, flags=[], warn={}, row=k=>D.rows[k]||(D.rows[k]={d:[], e:new Set(), o:false});
     const fact=(k, t)=>{ (facts[k]||(facts[k]=[])).push(t); };
     const bs=rmBase(), all=bs.all, baseHa=bs.baseHa, f=bs.f, B=bs.B, onParcels=bs.onParcels;
     const impNames=new Set(all.filter(g=>g.attributes._kind==='import'&&!ownIs(g)).map(g=>String(g.attributes.source||'file')));
     const taken=s=>impNames.has(String(s||'file'))&&typeof rsFileTaken==='function'&&rsFileTaken(String(s||'file'));   // R2: a file with a theme is measured by 35-risk-sources.js
-    rmBaseInfo= B? (onParcels? 'Particelle (nessuna area lorda) ' : 'Area lorda ')+fmtHa2(baseHa) : 'Nessuna area lorda né particelle con geometria';
+    rmBaseInfo= B? (onParcels? 'Particelle ' : 'Area lorda ')+fmtHa2(baseHa) : 'manca l’area lorda'; rmHasBase=!!B; rmOnParcels=!!(B&&onParcels);
     // the box: the centroid, the hectares, the comuni and regions of the parcels in the area, the AREAS site
     if(B){ try{ const c=f.toWgs(B.centroid||B.extent.center); if(c) D.box.coords=c.y.toFixed(5)+', '+c.x.toFixed(5); }catch(e){}
       D.box.surface=rmHa(baseHa)+(onParcels? ' (parcels)' : ''); }
     const GE=esriMods.geometryEngine;
-    const inBase=p=>{ if(!B||onParcels||!p.geometry) return true; try{ const g=geojsonToEsri(p.geometry); return !!g&&GE.intersects(B, geoClean(f.toLocal(g))); }catch(e){ return true; } };
-    const pin=parcels.filter(p=>p&&inBase(p));
+    const inBase=p=>rmParcelIn(bs, p);
+    const pin=parcels.filter(p=>p&&inBase(p)); if(B&&!onParcels&&pin.length) rmBaseInfo+=' · '+pin.length+(pin.length===1? ' particella' : ' particelle');
     const byCom=new Map(); pin.forEach(p=>{ const k=String(p.comune||'').trim()||'?'; const e=byCom.get(k)||{n:0, ha:0, fg:new Set(), reg:String(p.regione||'').trim()};
       e.n++; e.ha+=(+p.area_m2||0)/1e4; if(p.foglio!=null&&p.foglio!=='') e.fg.add(String(p.foglio)); byCom.set(k, e); });
     const own=all.filter(ownIs);
@@ -13056,7 +13142,7 @@ async function rmCalc(quiet){ if(rmBusy) return; rmBusy=true;
       plans.filter(x=>!taken(x.n)).forEach(x=>{ row('zoning').e.add('Imported plan: '+x.n); fact('zoning', 'Piano importato (dal nome del file): '+x.n); }); }
     // the objects drawn, gathered by row, category and type
     const agg=new Map();
-    all.forEach(g=>{ const a=g.attributes; if(ownIs(g)||a.sf_auto||(a._kind==='import'&&taken(a.source))) return; const k=rmRowOf(a.sf_cat, a.sf_type); if(!k) return;
+    all.forEach(g=>{ const a=g.attributes; if(ownIs(g)||a.sf_auto||(a._kind==='import'&&taken(a.source)&&!(typeof rsRole==='function'&&rsRole(g)))) return; const k=rmRowOf(a.sf_cat, a.sf_type); if(!k) return;
       const r=f? rmMeasure(f, B, g.geometry) : null; if(f&&!r) return;
       const far=r&&r.dist!=null&&r.dist>RM_NEAR; if(far&&a.sf_cat!=='connection'&&a.sf_type!=='grid-connection') return;
       const key=k+'|'+a.sf_cat+'|'+(a.sf_type||'')+(a.sf_slope? '|slope' : ''), A=agg.get(key)||{k:k, cat:a.sf_cat, type:a.sf_type||'', n:0, ha:0, m:0, len:0, pts:0, near:null, src:new Set(), volt:new Set(), slope:null, files:new Set()};
@@ -13064,34 +13150,38 @@ async function rmCalc(quiet){ if(rmBusy) return; rmBusy=true;
         if(r.dist!=null&&!(r.ha>0||r.m>0||r.inPt)) A.near=A.near==null? r.dist : Math.min(A.near, r.dist); }
       if(a.sf_src) A.src.add(a.sf_src); if(a._kind==='import'&&a.source) A.files.add(String(a.source)); if(+a.sf_voltage>0) A.volt.add(+a.sf_voltage); if(a.sf_slope) A.slope=a.sf_slope;
       agg.set(key, A); });
-    const near=(d, lead)=>d<1? 'on the boundary of the gross area' : (lead? 'nearest outside at ' : 'at ')+rmM(d)+(lead? '' : ' from the gross area');   // under a metre: on the line
-    agg.forEach(A=>{ const R=row(A.k), lab=A.cat==='connection'? (RM_EN[A.type]||'Connection route') : (RM_EN[A.cat+':'+A.type]||RM_EN[A.type]||sfLabel(A.cat, A.type)||A.cat);
+    // 10/11 (asked by the user): Topography is the summary of the DTM analysed (Analizza › Pendenze da DTM)
+    const topo=rmTopo(all); topo.forEach(T=>{ const R=row('topo'); T.d.forEach(x=>{ R.d.push(x); fact('topo', x); }); R.e.add(T.ref); });
+    const topoIds=new Set(topo.map(T=>T.id));
+    const near=(d, lead)=>d<1? 'on the boundary' : lead? 'nearest outside at '+rmM(d) : rmM(d)+' away';   // under a metre: on the line. 10/11: shorter words («inside», «away»)
+    agg.forEach(A=>{ if(A.slope&&topoIds.has(A.slope.grid)) return;   // said by the summary of its DTM
+      const R=row(A.k), lab=A.cat==='connection'? (RM_EN[A.type]||'Connection route') : (RM_EN[A.cat+':'+A.type]||RM_EN[A.type]||RM_CAT_EN[A.cat]||sfLabel(A.cat, A.type)||A.cat);
       if(A.parts&&A.parts.length>1){ try{ const U=GE.union(A.parts); A.ha=U? Math.abs(GE.planarArea(U, 'square-meters')||0)/1e4 : A.ha; }catch(e){} }   // overlapping objects count once
       let line;
       if(A.slope){ const L=A.slope.limit||{}, lt=L.maxAny!=null? 'slope > '+L.maxAny+' %' : 'slope N-S > '+L.maxNS+' % or E-W > '+L.maxEW+' %';
-        line='Areas with '+lt+(B? ': '+rmHa(A.ha)+' inside the gross area ('+rmPct(A.ha, baseHa)+')' : '');
+        line='Areas with '+lt+(B? ': '+rmHa(A.ha)+' inside ('+rmPct(A.ha, baseHa)+')' : '');
         R.e.add('DTM '+(A.slope.dtm||A.slope.source||'Esri World Elevation')+(A.slope.cell? ', cell '+A.slope.cell+' m' : '')+(A.slope.date? ' ('+A.slope.date+')' : '')); }
       else if(A.cat==='connection') line=lab+': '+rmM(A.len)+(A.n>1? ' ('+A.n+' routes)' : '');
-      else if(A.type==='grid-connection') line=lab+(A.pts? ' inside the gross area' : A.near!=null&&isFinite(A.near)? ' '+near(A.near, false) : '');
+      else if(A.type==='grid-connection') line=lab+(A.pts? ' inside the area' : A.near!=null&&isFinite(A.near)? ' '+near(A.near, false) : '');
       else { const p=[];
-        if(A.ha>0) p.push(rmHa(A.ha)+' inside the gross area ('+rmPct(A.ha, baseHa)+')');
-        if(A.m>0) p.push(rmM(A.m)+' inside the gross area');
-        if(A.pts>0) p.push(A.pts+' inside the gross area');
+        if(A.ha>0) p.push(rmHa(A.ha)+' inside ('+rmPct(A.ha, baseHa)+')');
+        if(A.m>0) p.push(rmM(A.m)+' inside');
+        if(A.pts>0) p.push(A.pts+' inside');
         if(A.near!=null&&isFinite(A.near)) p.push(near(A.near, p.length>0));
         line=lab+(A.n>1? ' ('+A.n+')' : '')+(A.volt.size? ' '+[...A.volt].sort((x, y)=>x-y).join('/')+' kV' : '')+(p.length? ': '+p.join(', ') : ''); }
       R.d.push(line); fact(A.k, line);
       if(!A.slope){ R.drawn=true; A.src.forEach(s=>(R.srcs||(R.srcs=new Set())).add(RM_SRC_EN[s]||s)); }
       A.files.forEach(x=>R.e.add('Imported file: '+x)); });
     Object.keys(D.rows).forEach(k=>{ const R=D.rows[k]; if(R.drawn) R.e.add('Geoportale, drawn'+(R.srcs&&R.srcs.size? ' ('+[...R.srcs].join(', ')+')' : '')); });   // one reference per row
-    if(typeof rsMerge==='function'){ try{ rsMerge({f:f, B:B, baseHa:baseHa, row:row, fact:fact, D:D, sig:rsSig(bs)}); }catch(e){ console.warn('[risk matrix, layers]', e); } }   // R2: files with a theme, layers
-    if(![...agg.values()].some(A=>A.slope)) fact('topo', 'Pendenze non analizzate: Analizza › Pendenze da DTM mette l’esclusione nella Raccolta.');
+    if(typeof rsMerge==='function'){ try{ rsMerge({f:f, B:B, baseHa:baseHa, row:row, fact:fact, D:D, sig:rsSig(bs), warn:(k, t)=>{ warn[k]=(warn[k]? warn[k]+'\n' : '')+t; }}); }catch(e){ console.warn('[risk matrix, layers]', e); } }   // R2: files with a theme, layers
+    if(!topo.length&&![...agg.values()].some(A=>A.slope)) fact('topo', 'Pendenze non analizzate: Analizza › Pendenze da DTM mette l’esclusione nella Raccolta.');
     // into the fields: what the PM did not write
     const put=(fld, draft, ownSrc)=>{ draft=String(draft||'');
       if(!fld.m){ fld.v=draft; fld.a=draft; fld.o=!!(ownSrc&&draft); delete fld.n; }
       else { if(draft!==fld.a) fld.n=draft; else delete fld.n; if(ownSrc&&draft) fld.o=true; } };
     RM_BOX.forEach(b=>put(rmBoxF(b[0]), D.box[b[0]]||''));
-    rmKeys().forEach(k=>{ const R=D.rows[k], r=rmRow(k); put(r.d, R? R.d.join('\n') : '', !!(R&&R.o)); put(r.e, R? [...R.e].join(' / ') : ''); });
-    rmFacts=facts; rmFlags=flags; rmState.at=new Date().toISOString();
+    rmKeys().forEach(k=>{ const R=D.rows[k], r=rmRow(k); put(r.d, R? R.d.join('\n') : '', !!(R&&R.o)); put(r.e, R? [...R.e].join('\n') : ''); });
+    rmFacts=facts; rmFlags=flags; rmWarn=warn; rmState.at=new Date().toISOString();
     rmRender(); saveStateDebounced();
     if(!quiet){ const n=rmKeys().filter(k=>rmRow(k).d.a).length, ch=rmKeys().filter(k=>{ const r=rmRow(k); return ['d','e'].some(x=>r[x].n!=null); }).length;
       toolMsg('rmMsg', 'Bozza rifatta: '+n+(n===1? ' riga' : ' righe')+' con un testo dal calcolo'+(ch? '; in '+ch+(ch===1? ' riga' : ' righe')+' scritte da te il calcolo è cambiato (•)' : '')+'.', 'ok'); }
@@ -13102,50 +13192,92 @@ async function rmCalc(quiet){ if(rmBusy) return; rmBusy=true;
 function rmColour(c){ return RM_RISK.find(x=>x[0]===c)||null; }
 function rmDot(r){ const c=rmColour(r.c); return '<i class="rmdot'+(c? ' set'+(c[0]==='na'? ' na' : '') : '')+'" style="--c:'+(c&&c[1]? c[1] : 'transparent')+'"></i>'; }
 function rmChanged(r){ return ['d','e'].some(x=>r[x].m&&r[x].n!=null); }
-function rmMarkHtml(f){ if(f.m) return 'scritto a mano'+(f.n!=null? ' · <span class="rmwarn">il calcolo è cambiato</span> · <button type="button" class="rmlink" data-act="see">vedi</button>' : '')
+function rmMarkHtml(f, pers){ if(pers){ const b=rmMarkHtml(f, false); return (b? b+'<br>' : '')+'dato personale: resta nel progetto salvato e nell’Excel, mai nel salvataggio automatico né nel PDF'; }
+  if(f.m) return 'scritto a mano'+(f.n!=null? ' · <span class="rmwarn">il calcolo è cambiato</span> · <button type="button" class="rmlink" data-act="see">vedi</button>' : '')
     +((f.n!=null||f.a)? ' · <button type="button" class="rmlink" data-act="redo">riscrivi dal calcolo</button>' : '')+(f.n!=null? '<div class="rmnew" hidden>'+esc(f.n||'(vuoto)')+'</div>' : '');
   return f.a? 'bozza dal calcolo, modificabile' : ''; }
 function rmRowHtml(k, l){ const r=rmRow(k), c=rmColour(r.c), open=rmOpen===k, prev=r.d.v.split('\n')[0];
   const tip=(k2, x)=>typeof rxCatTip==='function'? rxCatTip(k2, x[0], x[2]) : x[2];   // R3a: the meaning of the colour for this row, from the template's «Risk category»
   let h='<div class="rmrow'+(open? ' open' : '')+'" data-k="'+k+'"><button type="button" class="rmhead" aria-expanded="'+open+'" title="'+esc(c? tip(k, c) : 'Colore non scelto: nel file Excel esce arancio')+'">'
-    +rmDot(r)+'<span class="rmname">'+esc(l)+'</span><span class="rmprev">'+esc(prev)+'</span>'+(rmChanged(r)? '<span class="rmchg" title="Il calcolo è cambiato">•</span>' : '')+'</button>';
+    +rmDot(r)+'<span class="rmname">'+esc(l)+'</span><span class="rmprev">'+esc(prev)+'</span>'+(rmWarn[k]? '<span class="rmchg rmun" title="'+esc(rmWarn[k])+'">!</span>' : '')+(rmChanged(r)? '<span class="rmchg" title="Il calcolo è cambiato">•</span>' : '')+'</button>';
   if(open){ const facts=rmFacts[k]||[];
     h+='<div class="rmed"><div class="rmsw" role="radiogroup" aria-label="Risk evaluation">'+RM_RISK.map(x=>'<button type="button" class="rmc'+(x[0]==='na'? ' na' : '')+(r.c===x[0]? ' on' : '')
-      +'" data-c="'+x[0]+'" role="radio" aria-checked="'+(r.c===x[0])+'" title="'+esc(tip(k, x))+'" style="--c:'+(x[1]||'transparent')+'">'+(x[0]==='na'? 'n/a' : '')+'</button>').join('')+'</div>'
+      +'" data-c="'+x[0]+'" role="radio" aria-checked="'+(r.c===x[0])+'" title="'+esc(tip(k, x))+'" style="--c:'+(x[1]||'transparent')+'">'+(x[0]==='na'? 'n/a' : '')+'</button>').join('')
+      +'<span class="rmcn'+(r.c? '' : ' no')+'">'+esc(r.c? RM_IT[r.c] : 'scegli il colore')+'</span></div>'+rmSeeHtml(k)
       +[['d','Description'],['e','References'],['f','Comments']].map(z=>{ const fl=r[z[0]], id='rm_'+k+'_'+z[0];
         return '<label class="rmlab" for="'+id+'">'+z[1]+'</label><textarea id="'+id+'" data-k="'+k+'" data-x="'+z[0]+'" rows="'+Math.min(6, Math.max(2, fl.v.split('\n').length))+'" spellcheck="false">'+esc(fl.v)+'</textarea>'
-          +'<div class="rmmark" data-k="'+k+'" data-x="'+z[0]+'">'+rmMarkHtml(fl)+'</div>'; }).join('')
+          +'<div class="rmmark" data-k="'+k+'" data-x="'+z[0]+'">'+rmMarkHtml(fl, rmPers(k)&&!!fl.v)+'</div>'; }).join('')
       +(facts.length? '<details class="rmfacts"><summary>Cosa ha trovato il calcolo ('+facts.length+')</summary><ul>'+facts.map(t=>'<li>'+esc(t)+'</li>').join('')+'</ul></details>' : '')+'</div>'; }
   return h+'</div>'; }
 function rmBoxHtml(){ return RM_BOX.map(b=>{ const fl=rmBoxF(b[0]), id='rmB_'+b[0];
   return '<div class="kv rmkv" data-b="'+b[0]+'"><label for="'+id+'">'+esc(b[1])+'</label><input id="'+id+'" data-b="'+b[0]+'" value="'+esc(fl.v)+'" spellcheck="false" autocomplete="off">'+rmBoxMark(fl)+'</div>'; }).join(''); }
 function rmBoxMark(fl){ return fl.m? '<em class="rmbm" title="'+esc(fl.n!=null? 'Scritto a mano; il calcolo ora dice: '+(fl.n||'(vuoto)') : 'Scritto a mano')+'">'+(fl.n!=null? '<button type="button" class="rmlink" data-act="redo" title="Riscrivi dal calcolo: '+esc(fl.n||'(vuoto)')+'">•</button>' : '✎')+'</em>' : ''; }
+// 10/11 (U3): a row «to do» has a draft or a warning and no colour; «by hand» has nothing the GIS knows and no colour
+function rmTodo(k){ const r=rmRow(k); return !r.c&&!!(r.d.v||rmWarn[k]); }
+function rmHand(k){ const r=rmRow(k); return !r.c&&!r.d.v&&!rmWarn[k]; }
+function rmShown(k){ return rmFilter==='all'||k===rmOpen||(rmFilter==='todo'? rmTodo(k) : rmHand(k)); }
+// U8 (11/11): «Vedi sulla mappa», in the open row when the last check gave it layers (35-risk-sources.js, rsSee)
+function rmLabel(k){ let l=k; RM_ROWS.forEach(S=>S.rows.forEach(r=>{ if(r[0]===k) l=r[1]; })); return l; }
+function rmSeeHtml(k){ if(typeof rsSeeCan!=='function') return ''; const on=!!rsSeen&&rsSeen.k===k; if(!on&&!rsSeeCan(k)) return '';
+  return '<div class="rmseerow"><button type="button" class="rmlink rmsee'+(on? ' on' : '')+'" data-act="see-map" aria-pressed="'+on+'" title="'+(on? 'Riaccende i layer di prima e torna all’inquadratura di prima' : 'Accende solo i layer di questa riga e inquadra l’area: i vincoli si guardano un tema per volta')+'">'
+    +icon('map')+' '+(on? 'Rimetti la mappa com’era' : 'Vedi sulla mappa')+'</button></div>'; }
+function rmFiltRender(){ const el=$('rmFilt'); if(!el) return; const keys=rmKeys(), n={todo:keys.filter(rmTodo).length, hand:keys.filter(rmHand).length, all:keys.length};
+  el.innerHTML='<div class="rmfilt" role="group" aria-label="Righe da mostrare">'
+    +[['todo', 'Da fare', 'Righe con una bozza o un avviso, ancora senza il colore'], ['hand', 'A mano', 'Righe che il GIS non conosce: si scrivono a mano'], ['all', 'Tutte', 'Tutte le righe del modello']]
+      .map(f=>'<button type="button" class="rmchip'+(rmFilter===f[0]? ' on' : '')+'" data-f="'+f[0]+'" aria-pressed="'+(rmFilter===f[0])+'" title="'+esc(f[2])+'">'+f[1]+' <b>'+n[f[0]]+'</b></button>').join('')
+    +'<button type="button" class="btn sm rmre" id="rmCalc" title="Rifà la bozza dal progetto: i campi che hai scritto tu restano come sono" aria-label="Rifà la bozza dal progetto">'+icon('refresh')+'</button></div>'
+    +((typeof rsSeen!=='undefined'&&rsSeen)? '<div class="rmflag rsnote rmseen">'+icon('map')+'<span>Sulla mappa solo i layer di «'+esc(rmLabel(rsSeen.k))+'». <button type="button" class="rmlink" data-act="see-off">Rimetti com’era ›</button></span></div>' : ''); }
+// step 1 without a base: where to make one
+function rmAreaHtml(){ if(!rmHasBase) return '<div class="btns rmarea"><button type="button" class="btn primary" data-act="draw">Disegna l’area lorda</button><button type="button" class="btn" data-act="find">Cerca le particelle</button></div>';
+  return rmOnParcels? '<div class="rmflag">'+icon('info')+'<span>Il calcolo usa le particelle. <button type="button" class="rmlink" data-act="gross">Crea l’area lorda dalle particelle ›</button></span></div>' : ''; }
 function rmRender(){ const box=$('rmBody'); if(!box) return;
-  const nBox=RM_BOX.filter(b=>rmBoxF(b[0]).v).length;
-  let h='<details class="imod flat rmsec" data-s="box"'+(rmSecOpen.has('box')? ' open' : '')+'><summary><span class="im-t"><b>Project</b></span><span class="im-n im-txt">'+nBox+'/'+RM_BOX.length+'</span></summary><div class="im-body">'+rmBoxHtml()+'</div></details>';
-  RM_ROWS.forEach(S=>{ const set=S.rows.filter(r=>rmRow(r[0]).c).length;
-    h+='<details class="imod flat rmsec" data-s="'+S.s+'"'+(rmSecOpen.has(S.s)? ' open' : '')+'><summary><span class="im-t"><b>'+esc(S.l)+'</b></span><span class="im-n im-txt" title="Righe con il colore scelto">'+set+'/'+S.rows.length+'</span></summary><div class="im-body">'
-      +S.rows.map(r=>rmRowHtml(r[0], r[1])).join('')+'</div></details>'; });
-  box.innerHTML=h; rmInfoRender(); if(typeof rsRender==='function') rsRender(); }   // R2: the line «Layer» and the section «Fonti» (35-risk-sources.js)
-function rmInfoRender(){ const el=$('rmInfo'); if(el){ const keys=rmKeys(), drafts=keys.filter(k=>rmRow(k).d.v).length, cols=keys.filter(k=>rmRow(k).c).length;
-    el.innerHTML='<span class="j5k">'+esc(rmBaseInfo||'Risk Matrix')+'</span><span class="j5v">'+drafts+' descrizioni · '+cols+'/'+keys.length+' colori</span>'; }
-  const fl=$('rmFlags'); if(fl) fl.innerHTML=rmFlags.map(x=>'<div class="rmflag rmf-'+x.k+'">'+icon(x.k==='own'? 'user' : 'import')+'<span>'+esc(x.t)+'</span></div>').join(''); }
+  const bx=$('rmBox'); if(bx) bx.innerHTML=rmBoxHtml();
+  const ar=$('rmArea'); if(ar) ar.innerHTML=rmAreaHtml();
+  let h='';
+  RM_ROWS.forEach(S=>{ const rows=S.rows.filter(r=>rmShown(r[0])); if(!rows.length) return; const set=S.rows.filter(r=>rmRow(r[0]).c).length;
+    h+='<details class="imod flat rmsec" data-s="'+S.s+'"'+((rmFilter!=='all'||rmSecOpen.has(S.s))? ' open' : '')+'><summary><span class="im-t"><b>'+esc(S.l)+'</b></span><span class="im-n im-txt" title="Righe con il colore scelto">'+set+'/'+S.rows.length+'</span></summary><div class="im-body">'
+      +rows.map(r=>rmRowHtml(r[0], r[1])).join('')+'</div></details>'; });
+  if(!h) h='<div class="thint rmnone">'+(rmFilter==='todo'? 'Nessuna riga da fare: quelle con una bozza hanno il colore.' : 'Nessuna riga da scrivere a mano.')+'</div>';
+  box.innerHTML=h; rmFiltRender(); rmInfoRender();
+  if(typeof rsRender==='function') rsRender();   // R2: the check of the layers and «Layer letti» (35-risk-sources.js)
+  if(typeof rxRender==='function') rxRender();   // step 4: its list of maps follows the rows with findings
+  rmStepsRender(); }
+function rmInfoRender(){ const el=$('rmInfo'); if(el){ el.textContent=rmBaseInfo||''; el.title=rmBaseInfo||''; }
+  const fl=$('rmFlags'); if(fl) fl.innerHTML=rmFlags.map(x=>'<div class="rmflag rmf-'+x.k+'">'+icon(x.k==='own'? 'user' : 'import')+'<span>'+esc(x.t)+'</span></div>').join('');
+  const keys=rmKeys(), s3=$('rmSum3'); if(s3) s3.textContent=keys.filter(k=>rmRow(k).c).length+' di '+keys.length+' con il colore'; }
+// 10/11 (U1): the four steps. Done: 1 a base; 2 the layers checked for this area; 3 a colour on every row with a draft.
+// The first not done is the current one: it opens when the module is shown and when it changes (the others stay as the PM
+// left them), and it has the only primary button
+function rmStepState(){ const keys=rmKeys(), L=rmState.lay, s1=rmHasBase, s2=s1&&!!(L&&Array.isArray(L.src))&&!(typeof rsStale!=='undefined'&&rsStale==='area');
+  const s3=s2&&keys.some(k=>rmRow(k).c)&&!keys.some(rmTodo); return {ok:[s1, s2, s3, false], cur:!s1? 1 : !s2? 2 : !s3? 3 : 4}; }
+function rmStepsRender(){ const root=$('modRisk'); if(!root) return; const S=rmStepState(), force=rmStepForce; rmStepForce=false;
+  root.querySelectorAll('details.rmstep').forEach(d=>{ const n=+d.dataset.st, ok=S.ok[n-1], cur=S.cur===n; d.classList.toggle('ok', ok); d.classList.toggle('cur', cur);
+    const nb=d.querySelector('.rmnb'); if(nb) nb.textContent=ok? '✓' : String(n);
+    if(force) d.open=cur; else if(cur&&S.cur!==rmStepCur) d.open=true; });
+  rmStepCur=S.cur;
+  const go=$('rsGo'); if(go) go.classList.toggle('primary', S.cur===2); const mk=$('rxMake'); if(mk) mk.classList.toggle('primary', S.cur>=3); }
 // a row, drawn again in its place (the others keep their state)
 function rmRowRedraw(k){ const el=document.querySelector('#rmBody .rmrow[data-k="'+k+'"]'); if(!el) return; let l=k; RM_ROWS.forEach(S=>S.rows.forEach(r=>{ if(r[0]===k) l=r[1]; }));
   const t=document.createElement('div'); t.innerHTML=rmRowHtml(k, l); el.replaceWith(t.firstChild);
   const sec=document.querySelector('#rmBody .rmrow[data-k="'+k+'"]'), det=sec&&sec.closest('details'), S=det&&RM_ROWS.find(x=>x.s===det.dataset.s);
   if(S){ const n=det.querySelector(':scope>summary .im-n'); if(n) n.textContent=S.rows.filter(r=>rmRow(r[0]).c).length+'/'+S.rows.length; }
-  rmInfoRender(); }
-function rmEdit(fl, v){ fl.v=v; fl.m=(v!==fl.a); if(!fl.m) delete fl.n; if(!v) fl.o=false; }
+  rmFiltRender(); rmInfoRender(); rmStepsRender(); }
+function rmEdit(fl, v){ fl.v=v; fl.m=(v!==fl.a); if(!fl.m) delete fl.n; }   // 10/11: the flag o stays (emptied, the last draft a still holds the names)
 function rmRedo(fl){ fl.v=fl.n!=null? fl.n : fl.a; fl.a=fl.v; fl.m=false; delete fl.n; }
 // the module in sight: the draft again (the fields written by the PM stay)
-window.rmSync=function(){ rmCalc(true); };
+window.rmSync=function(){ rmStepForce=true; rmCalc(true); };   // the module shown: the current step opens
 document.addEventListener('DOMContentLoaded', function(){
   const root=$('modRisk'); if(!root) return;
-  const cb=$('rmCalc'); if(cb) cb.onclick=()=>rmCalc(false);
   root.addEventListener('toggle', e=>{ const d=e.target; if(d&&d.classList&&d.classList.contains('rmsec')){ if(d.open) rmSecOpen.add(d.dataset.s); else rmSecOpen.delete(d.dataset.s); } }, true);
   root.addEventListener('click', e=>{ const t=e.target.closest('button'); if(!t||!root.contains(t)) return;
+    if(t.id==='rmCalc'){ rmCalc(false); return; }
+    if(t.classList.contains('rmchip')){ rmFilter=t.dataset.f; rmRender(); return; }
+    if(t.dataset.act==='draw'){ showTab('disegno'); return; }
+    if(t.dataset.act==='find'){ showTab('ricerca'); return; }
+    if(t.dataset.act==='gross'){ try{ sfGrossMake(); }catch(err){} setTimeout(()=>rmCalc(true), 300); return; }
     const rw=t.closest('.rmrow'), k=rw&&rw.dataset.k;
+    if(t.dataset.act==='see-map'&&k){ Promise.resolve(rsSee(k)).then(()=>{ rmRowRedraw(k); }); return; }
+    if(t.dataset.act==='see-off'){ const was=rsSeen&&rsSeen.k; rsSeeOff(); if(was) rmRowRedraw(was); rmFiltRender(); return; }
     if(t.classList.contains('rmhead')){ rmOpen=rmOpen===k? null : k; const prev=root.querySelector('.rmrow.open'); if(prev&&prev.dataset.k!==k) rmRowRedraw(prev.dataset.k); rmRowRedraw(k);
       if(rmOpen){ const ta=document.getElementById('rm_'+k+'_d'); if(ta) ta.focus({preventScroll:true}); } return; }
     if(t.classList.contains('rmc')&&k){ const r=rmRow(k); r.c=r.c===t.dataset.c? '' : t.dataset.c; rmRowRedraw(k); saveStateDebounced(); return; }
@@ -13156,7 +13288,7 @@ document.addEventListener('DOMContentLoaded', function(){
       saveStateDebounced(); } });
   root.addEventListener('input', e=>{ const t=e.target;
     if(t.tagName==='TEXTAREA'&&t.dataset.k){ const r=rmRow(t.dataset.k), fl=r[t.dataset.x], was=fl.m; rmEdit(fl, t.value);
-      const mk=t.nextElementSibling; if(mk&&mk.classList.contains('rmmark')&&(was!==fl.m||!fl.m)) mk.innerHTML=rmMarkHtml(fl);
+      const mk=t.nextElementSibling; if(mk&&mk.classList.contains('rmmark')&&(was!==fl.m||!fl.m||rmPers(t.dataset.k))) mk.innerHTML=rmMarkHtml(fl, rmPers(t.dataset.k)&&!!fl.v);
       if(t.dataset.x==='d'){ const p=t.closest('.rmrow').querySelector('.rmprev'); if(p) p.textContent=fl.v.split('\n')[0]; rmInfoRender(); }
       saveStateDebounced(); }
     else if(t.tagName==='INPUT'&&t.dataset.b){ const fl=rmBoxF(t.dataset.b); rmEdit(fl, t.value); const kv=t.closest('.rmkv'), em=kv&&kv.querySelector('.rmbm');
@@ -13184,18 +13316,28 @@ document.addEventListener('DOMContentLoaded', function(){
 // cannot be asked: they go in the References as «Checked on the map». Requests never prompt for a sign-in (no-prompt);
 // the national layers of the portal need the AGOL access, the EEA and ISPRA ones do not. R2-3: when the open map is not
 // the Check Vincoli of the area's region, the panel offers it.
-const RS_R=1000, RS_R10=10000, RS_RSUB=20000, RS_ROUTE=100, RS_CONC=4, RS_WAIT=30000;
+const RS_R=1000, RS_R10=10000, RS_RSUB=20000, RS_ROUTE=100, RS_CONC=4, RS_WAIT=30000, RS_PAGES=25;
+const RS_RETRY=12000;   // the wait of the second attempt, in milliseconds
+const RS_PART=' (partial answer: the server returned only a part, the figures may be higher)';
 // the rows a source can inform, with short names for the menus (the template's names are longer)
 const RS_TH=[['zoning','Urban zoning'],['flora','Flora/fauna'],['archaeo','Archaeological / historical'],['landscape','Landscape'],['topo','Topography'],
   ['utility','Utility infrastructure'],['hydro','Hydrography'],['soil','Soil type'],['fire','Fire risk'],['surround','Surrounding area'],['others','Others'],
   ['grid_constr','Grid constraints'],['grid_tech','Grid technical feasibility']];
 // the theme from a layer's title, then from its groups: the first match wins (the order matters: «142 c fiumi» is landscape)
 const RS_INT=/survey|\bkpi\b|solar ?belt|areas? collection|site ?features|sites? notes|scouting/;
-const RS_OUT=/carte di base|google|\bosm\b|openstreet|confini|\bistat\b|catast|\bctrn?\b|\bdbtre?\b|ortofoto|orto ?foto|\bdtm\b|\bdem\b|\bdsm\b|modell[oi] digital|hillshade|ombreggiat|curve di livello|contour|basemap|toponom|limiti (amministrativ|comunal|provincial|regional)|quadro d.unione|\bigm\b|cartografia di base|carta tecnica|land anagraphic|screenshot|itinerario/;
+const RS_OUT=/carte di base|google|\bosm\b|openstreet|confini|\bistat\b|catast|\bctrn?\b|\bdbtre?\b|ortofoto|orto ?foto|\bdtm\b|\bdem\b|\bdsm\b|modell[oi] digital|hillshade|ombreggiat|curve di livello|contour|basemap|toponom|limiti (amministrativ|comunal|provincial|regional)|quadr[oi] (d.|di |dell.)?unione|\bigm\b|cartografia di base|carta tecnica|land anagraphic|screenshot|itinerario|areale delle cp|\bcer\b/;
+// 10/11 (review): names that win over the base maps («IT - IGM - Elettrodotti», «Catasto incendi»), and titles that are
+// only administrative limits
+const RS_FIRST=[['fire', /incend|percors[ei] dal fuoco/], ['utility', /elettrodott/]];
+const RS_OUT_T=/^(comuni|comuni italiani|province|regioni|regionisimplify|limiti comunali)$/;
 const RS_KW=[
   ['topo', /slope|pendenz|acclivit|clivometr/],
-  ['landscape', /\b136\b|\b142\b|paesagg|\bppr\d*\b|\bptpr\b|\bpptr\b|\bppar\b|\bpit\b|bellezze|galasso|usi civici|bosc|forest|vegetaz|crinal|vincoli? d\.? ?lgs|42\/04|42\/2004|ulivi|uliveti|panoram|forme di tutela/],
-  ['archaeo', /archeolog|beni culturali|storico.culturali|architetton|vincoli in rete|monumental|tratturi|centri storici|\bvir\b|\bsitap\b|repertorio beni|beni identitari/],
+  ['fire', /incend|fuoco|aree percorse/],   // 10/11: the specific words before the generic ones («incendi boschivi» is not woodland)
+  ['zoning', /non ?idone|aree idonee|idoneit|\bno ?fer\b/],
+  ['others', /sism/],
+  ['surround', /pniec|fotovoltaic|agrivoltaic|agrivolat|eolic|aerogenerat|impianti fer|impianti fv/],
+  ['landscape', /(?<![0-9])(136|142)(?![0-9])|\bsitap\b|1497|alberi monumentali|paesagg|\bppr\d*\b|\bptpr\b|\bpptr\b|\bppar\b|\bpit\b|bellezze|galasso|usi civici|bosc|forest|vegetaz|crinal|vincoli? d\.? ?lgs|42\/04|42\/2004|ulivi|uliveti|panoram|forme di tutela/],
+  ['archaeo', /archeolog|beni culturali|storico.culturali|architetton|vincoli in rete|monumental|tratturi|centri storici|\bvir\b|repertorio beni|beni identitari|unesco/],
   ['flora', /natura ?2000|\bzsc\b|\bsic\b|\bzps\b|parch|riserv|aree protette|\beuap\b|\biba\b|ramsar|rete ecologica|habitat|biodivers|\boasi\b|aree naturali|zone umide|corridoi/],
   ['fire', /incend|fuoco|aree percorse/],
   ['hydro', /\bpai\b|pgra|alluvion|allagab|idraul|esondaz|fran[ae]|franos|\biffi\b|dissest|reticolo|idrograf|fium|fluvial|corsi d.acqua|acque pubbliche|bacin|bonifica\b|idrogeolog|pericolosit|rischio idr|inondaz|sorgent|falda|pozz|aree di attenzione|intrusione ?salina/],
@@ -13216,7 +13358,18 @@ const RS_NAT=[
   {id:'iba', t:'Important Bird Areas (PCN)', u:RS_HOST+'PCN_IBA_Important_Bird_Areas_/FeatureServer/0', th:'flora', nm:['codice_iba','nome_iba'], cl:'-', login:1, ref:'Important Bird Areas (Geoportale Nazionale)'},
   // not the ISPRA lithological map (sgi2.isprambiente.it): on 5/11/2026 its server sent Access-Control-Allow-Origin twice
   // («<origin>, *») and every browser refuses such an answer; it needs a copy on the portal or a proxy
-  {id:'clc', t:'Corine Land Cover 2018 (ISPRA)', u:'https://sinacloud.isprambiente.it/arcgisina/rest/services/corine_land_cover/CorineLandCover/MapServer/4', th:'soil', cl:'@', ref:'Corine Land Cover 2018, 4th level (ISPRA)'}]
+  {id:'clc', t:'Corine Land Cover 2018 (ISPRA)', u:'https://sinacloud.isprambiente.it/arcgisina/rest/services/corine_land_cover/CorineLandCover/MapServer/4', th:'soil', cl:'@', ref:'Corine Land Cover 2018, 4th level (ISPRA)'},
+  // 10/11 (asked by the user: lithology and pedology for Soil type). ISPRA's lithological map still cannot be read by a
+  // browser (its server's CORS header) and no national soil map has a service that can: the geological map 1:500 000 of the
+  // Geoportale Nazionale, published on the portal, gives the formation and the lithology
+  {id:'geo500', t:'Geological map 1:500 000 (PCN)', u:RS_HOST+'PCN_Carta_geologica/FeatureServer/0', th:'soil', cl:'formazione', nm:['litho1', 'litho2'], login:1, ref:'Geological map of Italy 1:500 000 (Geoportale Nazionale)'},
+  // 11/11: ISPRA's lithological map 1:100 000, read as JSONP in a sandboxed frame (rsJsonp): no sign-in needed
+  {id:'lito', t:'Lithological map 1:100 000 (ISPRA)', u:'https://sgi2.isprambiente.it/arcgis/rest/services/servizi/litologica/MapServer/0', th:'soil', cl:'litologia', nm:['nome_ulf'],
+    ref:'Lithological map of Italy 1:100 000 (ISPRA, Geological Survey of Italy)'},
+  // 10/11 (asked by the user: Hydrography says whether channels cross the area): the rivers and canals of EU-Hydro
+  // (Copernicus Land Monitoring Service, EEA; public, with CORS), nine layers by Strahler order read as one (rsWater)
+  {id:'water', t:'Watercourses and canals – EU-Hydro (Copernicus)', u:'https://image.discomap.eea.europa.eu/arcgis/rest/services/EUHydro/EUHydro_RiverNetworkDatabase/MapServer', th:'hydro', sp:'water', nm:['nameText'], cl:'-',
+    ref:'EU-Hydro River Network Database (Copernicus Land Monitoring Service)'}]
   .concat(LINE_LAYERS.map(x=>({id:'hv'+x.volt.replace(/\D/g, ''), t:'HV line '+x.volt+' (elemens)', u:x.url, th:'utility', cl:'-', login:1, ref:'High-voltage grid (elemens)'})))
   .concat([
   {id:'pv', t:'PV projects under authorisation (elemens)', u:PV_PROC_URL, th:'surround', r:RS_R10, sp:'pv', cl:'-', login:1, ref:'PV projects database (elemens)'},
@@ -13224,19 +13377,22 @@ const RS_NAT=[
   {id:'ingv', t:'Seismic classification (INGV)', u:RS_HOST+'IT_INGV_classificazione_sismica/FeatureServer/0', th:'others', sp:'ingv', login:1, ref:'Seismic classification of the comuni (INGV, 2023)'}]);
 const RS_G5=new Set(['zoning','flora','archaeo','landscape','hydro','utility','fire','others']);   // G5: the themes whose crossings by the connection route count (not soil, surroundings, grid)
 const RS_SPF={pv:['status','capacity_mw'], sub:['name','operator','max_voltage_kv','status','saturation_level','saturation_date']};   // the only fields asked of these two (never the others)
+const RS_WATER_IDS=[5, 6, 7, 8, 9, 10, 11, 12, 13];   // EU-Hydro › River_Net_lines › Strahler 1…9
+const RS_WC=/retic|idrograf|fium|corsi d.acqua|canal|foss[oi]|torrent|acque pubbliche|river|stream|alve[oi]/;   // a line layer of watercourses, by its name
 let rsBusy=false, rsProg='', rsStale='', rsList=[], rsFileNames=[];
 const rsOpenG=new Set();   // the groups of «Fonti» left open
 
 // ── the themes: guessed, and the PM's choices (per map, in this browser) ──
-function rsGuess(path, title){ const t=String(title||'').toLowerCase(), g=(path||[]).join(' / ').toLowerCase();
+function rsGuess(path, title){ const t=String(title||'').toLowerCase().replace(/_/g, ' '), g=(path||[]).join(' / ').toLowerCase().replace(/_/g, ' ');   // 10/11: «Quadro_di_unione» reads as its words
   if(RS_INT.test(t)||RS_INT.test(g)) return {t:'out', why:'int'};
-  if(RS_OUT.test(t)||RS_OUT.test(g)) return {t:'out', why:'base'};
+  for(const k of RS_FIRST) if(k[1].test(t)) return {t:k[0], why:'kw'};
+  if(RS_OUT.test(t)||RS_OUT.test(g)||RS_OUT_T.test(t.trim())) return {t:'out', why:'base'};
   for(const s of [t, g]) for(const k of RS_KW) if(k[1].test(s)) return {t:k[0], why:'kw'};
   return {t:'', why:'none'}; }
 let rsOvMem=null;
 function rsOvAll(){ if(rsOvMem) return rsOvMem; try{ rsOvMem=JSON.parse(localStorage.getItem('axpo_rm_themes')||'{}')||{}; }catch(e){ rsOvMem={}; } return rsOvMem; }
 function rsOv(map){ return rsOvAll()[map||'']||{}; }
-function rsOvSet(map, k, t, g0){ const a=rsOvAll(), m=a[map||'']||(a[map||'']={}); if(t===g0) delete m[k]; else m[k]=t;
+function rsOvSet(map, k, t, g0){ const a=rsOvAll(), m=a[map||'']||(a[map||'']={}); m[k]=t;
   try{ localStorage.setItem('axpo_rm_themes', JSON.stringify(a)); }catch(e){} }
 function rsThLabel(t){ const x=RS_TH.find(r=>r[0]===t); return x? x[1] : ''; }
 
@@ -13247,11 +13403,16 @@ function rsLayerUrl(l){ const u=String((l&&l.url)||'').replace(/\/+$/, '');
   if(/\/(Feature|Map)Server$/i.test(u)&&l.layerId!=null) return u+'/'+l.layerId;
   return null; }
 function rsKind(l){ const ty=String((l&&l.type)||''); if(ty==='feature') return 'fl'; if(ty==='map-image'&&l.url) return 'ms'; return 'vis'; }
-function rsSources(){ const map=wmCurrentId()||'', ov=rsOv(map), ovN=rsOv('*'), out=[];
-  RS_NAT.forEach(n=>{ const k='nat:'+n.id; out.push({k:k, n:n.t, ty:'nat', th:ovN[k]!=null? ovN[k] : n.th, g0:n.th, why:ovN[k]!=null? 'pm' : 'nat', nat:n}); });
-  rsMapList().forEach(it=>{ const l=it.l, k='map:'+lcKey(l), gs=rsGuess(it.path, l.title);
-    out.push({k:k, n:String(l.title||'Layer'), path:it.path||[], ty:rsKind(l), th:ov[k]!=null? ov[k] : gs.t, g0:gs.t, why:ov[k]!=null? 'pm' : gs.why, l:l}); });
+function rsSources(){ const map=wmCurrentId()||'', ov=rsOv(map), ovN=rsOv('*'), out=[], L=rmState.lay, src=(L&&Array.isArray(L.src))? L.src : [];
+  // 10/11: without a choice in this browser, the theme saved with the results (the project opened on another PC)
+  const rec=(k, ok)=>{ if(!ok) return null; const e=src.find(x=>x.k===k||x.pk===k); if(!e) return null; const t=e.pk? e.pth : e.th; return t!=null? t : null; };
+  RS_NAT.forEach(n=>{ const k='nat:'+n.id, r=rec(k, true); out.push({k:k, n:n.t, ty:'nat', th:ovN[k]!=null? ovN[k] : r!=null? r : n.th, g0:n.th, why:ovN[k]!=null? 'pm' : (r!=null&&r!==n.th)? 'rec' : 'nat', nat:n}); });
+  const natU=new Set(RS_NAT.map(n=>String(n.u).toLowerCase()));   // 10/11: a layer of the map that is one of the national ones is read once (as national)
+  rsMapList().forEach(it=>{ const l=it.l, k='map:'+lcKey(l), u=rsKind(l)==='fl'? String(rsLayerUrl(l)||'').toLowerCase() : '', gs=(u&&natU.has(u))? {t:'out', why:'dup'} : rsGuess(it.path, l.title), r=rec(k, !!L&&L.map===map);
+    out.push({k:k, n:String(l.title||'Layer'), path:it.path||[], ty:rsKind(l), th:ov[k]!=null? ov[k] : r!=null? r : gs.t, g0:gs.t, why:ov[k]!=null? 'pm' : (r!=null&&r!==gs.t)? 'rec' : gs.why, int:gs.why==='int', l:l}); });
   return out; }
+// an object of a file that has a role in the project (10/11): it stays with its category, the file's theme does not measure it
+function rsRole(g){ const c=g&&g.attributes&&g.attributes.sf_cat; return c==='gross'||c==='net'||c==='connection'||c==='access'; }
 // the files imported (not the owners' file), by name
 function rsFiles(){ const m=new Map(); try{ toolsGL.graphics.toArray().forEach(g=>{ const a=g.attributes; if(!a||a._kind!=='import'||ownIs(g)||!g.geometry) return;
     const s=String(a.source||'file'); if(!m.has(s)) m.set(s, []); m.get(s).push(g); }); }catch(e){} return m; }
@@ -13270,20 +13431,25 @@ function rsRoute(f){ if(!f) return null; try{ const GE=esriMods.geometryEngine;
       .map(g=>geoClean(f.toLocal(g.geometry))).filter(x=>x&&geoFinite(x));
     return !L.length? null : L.length>1? GE.union(L) : L[0]; }catch(e){ return null; } }
 function rsSig(b){ if(!b||!b.B||!b.f) return ''; try{ const c=b.f.toWgs(b.B.centroid||b.B.extent.center); return Math.round(b.baseHa*1000)+'|'+c.x.toFixed(5)+'|'+c.y.toFixed(5); }catch(e){ return ''; } }
-function rsRouteSig(RT){ if(!RT) return ''; try{ return String(Math.round(Math.abs(esriMods.geometryEngine.planarLength(RT, 'meters')||0))); }catch(e){ return ''; } }
+function rsRouteLen(RT){ if(!RT) return ''; try{ return String(Math.round(Math.abs(esriMods.geometryEngine.planarLength(RT, 'meters')||0))); }catch(e){ return ''; } }
+// 10/11: the length, the extent to the metre and the number of vertices (a route moved aside keeps its length)
+function rsRouteSig(RT){ if(!RT) return ''; try{ const e=RT.extent, n=(RT.paths||[]).reduce((a, p)=>a+p.length, 0);
+    return [rsRouteLen(RT), Math.round(e.xmin), Math.round(e.ymin), Math.round(e.xmax), Math.round(e.ymax), n].join('|'); }catch(e){ return ''; } }
+function rsKm(r){ return r>=1000? String(Math.round(r/100)/10)+' km' : Math.round(r)+' m'; }   // «1 km», «10 km»: a radius, not a measure
+function rsRadOf(e){ if(e.r) return e.r; const N=e.ty==='nat'? RS_NAT.find(n=>'nat:'+n.id===e.k) : null; return (N&&N.r)||(e.g0==='surround'? RS_R10 : RS_R); }   // the radius asked (a result of before 10/11 has none)
 // the extent, in the view's system, of the base widened by R (and of the route widened by RS_ROUTE)
 function rsEnv(c, R){ const GE=esriMods.geometryEngine; let ext=null;
   const add=X=>{ if(!X) return; let v=null; try{ v=c.f.toView(X); }catch(e){} const e=v&&v.extent; if(!e) return; ext=ext? ext.union(e) : e.clone(); };
   try{ add(GE.buffer(c.B, R, 'meters')); }catch(e){}
   if(c.RT){ try{ add(GE.buffer(c.RT, RS_ROUTE, 'meters')); }catch(e){} }
   return ext? {xmin:ext.xmin, ymin:ext.ymin, xmax:ext.xmax, ymax:ext.ymax, spatialReference:{wkid:c.wkid}} : null; }
-function rsAggNew(){ return {n:0, cnt:0, parts:[], m:0, pts:0, near:null, nearC:'', nearN:'', nearAt:null, cls:new Map(), names:[], rtM:0, rtN:0, rtCls:new Map(), recs:[]}; }
-function rsCls(map, cl){ if(!map.has(cl)) map.set(cl, {parts:[], m:0, n:0}); return map.get(cl); }
+function rsAggNew(){ return {n:0, cnt:0, parts:[], m:0, pts:0, near:null, nearC:'', nearN:'', nearAt:null, cls:new Map(), names:[], rtPolys:[], rtN:0, rtCls:new Map(), recs:[]}; }
+function rsCls(map, cl){ if(!map.has(cl)) map.set(cl, {parts:[], m:0, n:0, polys:[]}); return map.get(cl); }
 // one feature (X, in the local frame) against the route c.RT (G5, at any distance from the area) and the base c.B;
 // R: how far from the base it still counts
 function rsAddFeat(A, c, X, cl, nm, R, at){ const GE=esriMods.geometryEngine, B=c.B; let inside=false, d=0;
   if(c.RT&&X.type!=='point'&&X.type!=='multipoint'){ try{ if(GE.intersects(c.RT, X)){
-      if(X.type==='polygon'){ const I=GE.intersect(c.RT, X), m=I&&I.paths? Math.abs(GE.planarLength(I, 'meters')||0) : 0; if(m>0){ A.rtM+=m; rsCls(A.rtCls, cl).m+=m; } }
+      if(X.type==='polygon'){ A.rtPolys.push(X); rsCls(A.rtCls, cl).polys.push(X); }   // 10/11: measured in rsLines on their union (nested polygons count once)
       else { A.rtN++; rsCls(A.rtCls, cl).n++; } } }catch(e){} }
   try{ if(GE.intersects(B, X)){
       if(X.type==='polygon'){ const I=GE.intersect(B, X), h=I&&I.rings? Math.abs(GE.planarArea(I, 'square-meters')||0) : 0; if(h>0){ inside=true; A.parts.push(I); rsCls(A.cls, cl).parts.push(I); } }
@@ -13296,28 +13462,54 @@ function rsAddFeat(A, c, X, cl, nm, R, at){ const GE=esriMods.geometryEngine, B=
   return true; }
 // the lines of the draft for one source (English, like the template): inside (one class: named first; more: «classes:»
 // with hectares and %), else the nearest; within 10 km: how many; the route
-function rsLines(A, title, baseHa, R){ const GE=esriMods.geometryEngine, d=[], g=[];
+function rsLines(A, title, baseHa, R, RT){ const GE=esriMods.geometryEngine, d=[], g=[];
+  const rtLen=ps=>{ if(!RT||!ps||!ps.length) return 0; try{ const U=ps.length>1? GE.union(ps) : ps[0], I=U&&GE.intersect(RT, U); return I&&I.paths? Math.abs(GE.planarLength(I, 'meters')||0) : 0; }catch(e){ return 0; } };
   const area=ps=>{ if(!ps.length) return 0; try{ const U=ps.length>1? GE.union(ps) : ps[0]; return U? Math.abs(GE.planarArea(U, 'square-meters')||0)/1e4 : 0; }catch(e){ return 0; } };
   const list=(map, fn)=>[...map].map(x=>[x[0], fn(x[1])]).filter(x=>x[0]!==''&&x[1]>0).sort((a, b)=>b[1]-a[1]);
-  const many=(L, fmt)=>'; classes: '+L.slice(0, 6).map(fmt).join(', ')+(L.length>6? ' (+'+(L.length-6)+' more)' : '');
+  const many=(L, fmt)=>' — '+L.slice(0, 6).map(fmt).join(', ')+(L.length>6? ' (+'+(L.length-6)+' more)' : '');
   const names=()=>A.names.length? ' — '+A.names.slice(0, 3).join('; ')+(A.names.length>3? ' (+'+(A.names.length-3)+')' : '') : '';
-  if(R>RS_R){ if(A.cnt) d.push(title+': '+A.cnt+(A.cnt===1? ' feature' : ' features')+' within '+rmM(R)+(A.n? ' ('+A.n+' inside the gross area)' : '')+(A.near!=null? ', nearest at '+rmM(A.near) : '')); }
+  if(R>RS_R){ if(A.cnt) d.push(title+': '+A.cnt+' within '+rsKm(R)+(A.n? ' ('+A.n+' inside)' : '')+(A.near!=null? ', the nearest '+rmM(A.near)+' away' : '')); }
   else if(A.parts.length||A.m>0||A.pts>0){ let p, L, fmt;
-    if(A.parts.length){ const ha=area(A.parts); p=rmHa(ha)+' inside the gross area ('+rmPct(ha, baseHa)+')'; L=list(A.cls, v=>area(v.parts)); fmt=x=>x[0]+' '+rmHa(x[1])+' ('+rmPct(x[1], baseHa)+')'; }
-    else if(A.m>0){ p=rmM(A.m)+' inside the gross area'; L=list(A.cls, v=>v.m); fmt=x=>x[0]+' '+rmM(x[1]); }
-    else { p=A.pts+' inside the gross area'; L=list(A.cls, v=>v.n); fmt=x=>x[0]+' '+x[1]; }
-    d.push(title+': '+(L.length===1? L[0][0]+', '+p : p+(L.length? many(L, fmt) : ''))+names()); }
-  else if(A.near!=null){ const w=[A.nearN, A.nearC].filter(Boolean); d.push(title+': nearest at '+rmM(A.near)+(w.length? ' ('+w.join(', ')+')' : '')); }
-  if(A.rtM>0){ const L=list(A.rtCls, v=>v.m); g.push('Connection route crosses '+title+': '+rmM(A.rtM)+(L.length? ' ('+L.slice(0, 6).map(x=>x[0]+' '+rmM(x[1])).join(', ')+')' : '')); }
+    if(A.parts.length){ const ha=area(A.parts); p=rmHa(ha)+' inside ('+rmPct(ha, baseHa)+')'; L=list(A.cls, v=>area(v.parts)); fmt=x=>x[0]+' '+rmHa(x[1]); }
+    else if(A.m>0){ p=rmM(A.m)+' inside'; L=list(A.cls, v=>v.m); fmt=x=>x[0]+' '+rmM(x[1]); }
+    else { p=A.pts+' inside'; L=list(A.cls, v=>v.n); fmt=x=>x[0]+' '+x[1]; }
+    d.push(title+': '+(L.length===1? L[0][0]+', '+p+names() : p+(L.length? many(L, fmt) : names()))); }   // the names only without a list of classes
+  else if(A.near!=null){ const w=[A.nearN, A.nearC].filter(Boolean); d.push(title+': '+rmM(A.near)+' away'+(w.length? ' ('+w.join(', ')+')' : '')); }
+  const rtM=rtLen(A.rtPolys);
+  if(rtM>0){ const L=list(A.rtCls, v=>rtLen(v.polys)); g.push('Connection route crosses '+title+': '+rmM(rtM)+(L.length? ' ('+L.slice(0, 6).map(x=>x[0]+' '+rmM(x[1])).join(', ')+')' : '')); }
   if(A.rtN>0) g.push('Connection route crosses '+title+(A.rtN>1? ' ('+A.rtN+' features)' : ''));
   return {d:d, g:g}; }
 
 // ── the requests (never a sign-in prompt), described once per run ──
-let rsReqP=null;
+let rsReqP=null, rsWaitNow=RS_WAIT;
 function rsReqMod(){ return rsReqP||(rsReqP=new Promise((res, rej)=>{ try{ require(['esri/request'], res, rej); }catch(e){ rej(e); } })); }
-function rsLate(p){ let t=null; return Promise.race([p, new Promise((_, rej)=>{ t=setTimeout(()=>rej(new Error('nessuna risposta in '+Math.round(RS_WAIT/1000)+' s')), RS_WAIT); })]).finally(()=>clearTimeout(t)); }
-async function rsReq(url, query){ if(window.rsReqStub) return rsLate(Promise.resolve(window.rsReqStub(url, query)));
-  const rq=await rsReqMod(); const r=await rsLate(rq(url, {query:query, responseType:'json', authMode:'no-prompt', timeout:RS_WAIT}));
+function rsLate(p){ let t=null; const w=rsWaitNow; return Promise.race([p, new Promise((_, rej)=>{ t=setTimeout(()=>rej(new Error('nessuna risposta in '+Math.round(w/1000)+' s')), w); })]).finally(()=>clearTimeout(t)); }
+// 11/11 (asked by the user: the lithological map of ISPRA, on the portal only as a link to ISPRA's server). That server
+// (ArcGIS 10.2) answers a browser with the CORS header written twice, and every browser throws the answer away; it also
+// answers as a script (JSONP), which a browser takes. A script of someone else's server must not run in this page — it
+// would have the PM's session with the portal — so it runs in a frame of its own without an origin (sandbox with scripts
+// only: no cookies, no storage, no way to the page that holds it), which can only post the data back. Only for the
+// servers listed in RS_JSONP
+const RS_JSONP=/^https:\/\/sgi2\.isprambiente\.it\//i;
+let rsJpFrame=null, rsJpN=0; const rsJpWait=new Map();
+function rsJpBox(){ if(rsJpFrame&&rsJpFrame.isConnected) return Promise.resolve(rsJpFrame);
+  return new Promise(res=>{ const f=document.createElement('iframe'), S='scr'+'ipt'; f.setAttribute('sandbox', 'allow-scripts'); f.setAttribute('aria-hidden', 'true'); f.tabIndex=-1; f.style.cssText='position:absolute;width:0;height:0;border:0;visibility:hidden';
+    f.srcdoc='<!doctype html><meta charset="utf-8"><'+S+'>addEventListener("message",function(e){var m=e.data||{};if(!m.id||!m.src)return;var cb="__rs"+m.id,s=document.createElement("'+S+'"),done=false;'
+      +'function end(o){if(done)return;done=true;try{delete window[cb];}catch(x){}s.remove();o.id=m.id;parent.postMessage(o,"*");}'
+      +'window[cb]=function(d){end({data:d});};s.onerror=function(){end({err:"bloccato dal browser o server fermo"});};s.onload=function(){end({err:"risposta non valida"});};'
+      +'s.src=m.src.split("{cb}").join(cb);document.head.appendChild(s);});parent.postMessage({ready:1},"*");</'+S+'>';
+    window.addEventListener('message', e=>{ if(e.source!==f.contentWindow) return; const m=e.data||{};
+      if(m.ready){ rsJpFrame=f; res(f); return; }
+      const w=rsJpWait.get(m.id); if(!w) return; rsJpWait.delete(m.id); if(m.err) w.rej(new Error(String(m.err))); else w.res(m.data); });
+    document.body.appendChild(f); }); }
+// src: the address, with «{cb}» where the name of the callback goes
+async function rsJsonpRaw(src){ const f=await rsJpBox(), id=String(++rsJpN);
+  return new Promise((res, rej)=>{ rsJpWait.set(id, {res:res, rej:rej}); f.contentWindow.postMessage({id:id, src:String(src)}, '*'); }); }
+function rsJsonp(url, query){ const q=new URLSearchParams(query||{}); q.set('f', 'json'); return rsJsonpRaw(url+'?'+q.toString()+'&callback={cb}'); }
+async function rsReq(url, query, type){ if(window.rsReqStub) return rsLate(Promise.resolve(window.rsReqStub(url, query, type)));
+  if(RS_JSONP.test(url)){ if(type&&type!=='json') throw new Error('immagine non disponibile da questo server');
+    const j=await rsLate(rsJsonp(url, query)); if(j&&j.error) throw new Error((j.error.message||'errore')+(j.error.code? ' ['+j.error.code+']' : '')); return j; }
+  const rq=await rsReqMod(); const r=await rsLate(rq(url, {query:query, responseType:type||'json', authMode:'no-prompt', timeout:rsWaitNow}));
   const d=r&&r.data; if(d&&d.error) throw new Error((d.error.message||'errore')+(d.error.code? ' ['+d.error.code+']' : '')); return d; }
 function rsErr(e){ const s=String((e&&e.message)||e||'errore'); return /token|49[89]|40[13]|not authori/i.test(s)? 'richiede un accesso' : /failed to fetch|network|cors/i.test(s)? 'bloccato dal browser o server fermo' : s.slice(0, 80); }
 function rsF(D, name){ const n=String(name||'').toLowerCase(); return ((D&&D.fields)||[]).find(x=>String(x.name).toLowerCase()===n)||null; }
@@ -13342,40 +13534,50 @@ function rsNameFields(D, s, cls){ if(s.nm) return s.nm.map(x=>rsF(D, x)).filter(
   return [F.name]; }
 function rsGt(t){ return t==='esriGeometryPolygon'? 'polygon' : t==='esriGeometryPolyline'? 'polyline' : t==='esriGeometryPoint'? 'point' : t==='esriGeometryMultipoint'? 'multipoint' : null; }
 // one layer: what lies within R of the base, measured; e = the result kept in the .axpo
-async function rsAsk(s, c, desc){ const e={k:s.k, n:s.n, ty:s.ty, g0:s.g0, d:[], g:[]}; if(s.pk) e.pk=s.pk; if(s.ref) e.ref=s.ref;
-  try{ const D=await desc(s.url), ty=rsGt(D&&D.geometryType); if(!ty){ e.err='senza geometria'; return e; }
+async function rsAsk(s, c, desc){ const e={k:s.k, n:s.n, ty:s.ty, g0:s.g0, th:s.th, d:[], g:[]}; if(s.pk){ e.pk=s.pk; e.pth=s.pth; } if(s.ref) e.ref=s.ref;
+  try{ const D=await desc(s.url), ty=rsGt(D&&D.geometryType); if(!ty){ e.err='senza geometria'; return e; } e.gt=ty;
     const cls=rsClassOf(D, s.rend, s.cl), nf=rsNameFields(D, s, cls), oid=D.objectIdField||(((D.fields||[]).find(x=>x.type==='esriFieldTypeOID'))||{}).name;
     const flds=[...new Set(cls.fields.concat(nf, (RS_SPF[s.sp]||[]).map(x=>(rsF(D, x)||{}).name).filter(Boolean)))]; if(!flds.length&&oid) flds.push(oid);
     const R=s.r||(s.th==='surround'? RS_R10 : RS_R), env=rsEnv(c, R); if(!env){ e.err='area non misurabile'; return e; }
-    const Q=await rsReq(s.url+'/query', {f:'json', where:s.where||'1=1', geometry:JSON.stringify(env), geometryType:'esriGeometryEnvelope', inSR:String(c.wkid),
-      spatialRel:'esriSpatialRelIntersects', outFields:flds.join(',')||'*', returnGeometry:'true', outSR:String(c.wkid), maxAllowableOffset:'1', geometryPrecision:'2'});
-    const A=rsAggNew(), gt=rsGt(Q&&Q.geometryType)||ty, GE=esriMods.geometryEngine, E=new esriMods.Graphic({geometry:Object.assign({type:'extent'}, env)}).geometry;
-    ((Q&&Q.features)||[]).forEach(ft=>{ if(!ft||!ft.geometry) return; let g=geoGeom(Object.assign({type:gt, spatialReference:{wkid:c.wkid}}, ft.geometry)); if(!g) return;
+    e.r=R;
+    const q0={f:'json', where:s.where||'1=1', geometry:JSON.stringify(env), geometryType:'esriGeometryEnvelope', inSR:String(c.wkid),
+      spatialRel:'esriSpatialRelIntersects', outFields:flds.join(',')||'*', returnGeometry:'true', outSR:String(c.wkid), maxAllowableOffset:'1', geometryPrecision:'2'};
+    // 10/11 (review): a server gives at most maxRecordCount features per answer; the next pages are asked, and an answer
+    // still cut is «partial» (never a «nothing» by a cut answer)
+    const canPage=!!oid&&!!(D.advancedQueryCapabilities&&D.advancedQueryCapabilities.supportsPagination);
+    let Q=null, feats=[], part=false;
+    for(let pg=0; pg<RS_PAGES; pg++){ Q=await rsReq(s.url+'/query', canPage? Object.assign({}, q0, {orderByFields:oid, resultOffset:String(feats.length)}) : q0);
+      const F=(Q&&Q.features)||[]; feats=feats.concat(F);
+      if(!(Q&&Q.exceededTransferLimit)) break;
+      if(!canPage||!F.length||pg===RS_PAGES-1){ part=true; break; } }
+    const A=s.A||rsAggNew(), gt=rsGt(Q&&Q.geometryType)||ty, GE=esriMods.geometryEngine, E=new esriMods.Graphic({geometry:Object.assign({type:'extent'}, env)}).geometry;
+    feats.forEach(ft=>{ if(!ft||!ft.geometry) return; let g=geoGeom(Object.assign({type:gt, spatialReference:{wkid:c.wkid}}, ft.geometry)); if(!g) return;
       if(gt==='polygon'||gt==='polyline'){ try{ const k=GE.clip(g, E); if(!k) return; g=k; }catch(err){} }   // a huge polygon: only the part around the area is projected
       let X=null; try{ X=geoClean(c.f.toLocal(g)); }catch(err){} if(!X||!geoFinite(X)) return;
       const at=ft.attributes||{}, nm=nf.map(x=>rsAt(at, x)).filter(v=>v!=null&&v!=='').join(' ').slice(0, 80);
       rsAddFeat(A, c, X, cls.val(at), nm, R, s.sp? at : null); });
-    if(Q&&Q.exceededTransferLimit) e.part=1;
+    if(part) e.part=1; e.gt=gt; e.ins=A.n; if(gt==='polyline'&&RS_WC.test(String(s.n).toLowerCase().replace(/_/g, ' '))) e.wc=1;
+    if(s.A) return e;   // measured into a shared sum (rsWater): the lines are written there
     if(s.sp==='pv') rsPv(e, A, s);
     else if(s.sp==='sub') rsSub(e, A, s);
-    else { const L=rsLines(A, s.n, c.baseHa, R); e.d=L.d; e.g=L.g; }
+    else { const L=rsLines(A, s.t||s.n, c.baseHa, R, c.RT); e.d=L.d; e.g=L.g; }
   }catch(err){ e.err=rsErr(err); }
   return e; }
 // the PV projects within 10 km: how many, how many MW, by status, the nearest
 function rsPv(e, A, s){ if(!A.cnt) return; let mw=0; const st=new Map();
   A.recs.forEach(r=>{ const v=+rsAt(r.at, 'capacity_mw'); if(isFinite(v)) mw+=v; const t=String(rsAt(r.at, 'status')||'').trim()||'status not given'; st.set(t, (st.get(t)||0)+1); });
   const sts=[...st].sort((a, b)=>b[1]-a[1]).slice(0, 4).map(x=>x[0]+' '+x[1]).join(', ');
-  e.d=[s.n+': '+A.cnt+(A.cnt===1? ' project' : ' projects')+' within '+rmM(s.r||RS_R10)+(mw>0? ' ('+(Math.round(mw*10)/10).toFixed(1)+' MW' : ' (')+(sts? (mw>0? '; ' : '')+sts : '')+')'
-    +(A.n? ', '+A.n+' inside the gross area' : '')+(A.near!=null? ', nearest at '+rmM(A.near) : '')]; }
+  e.d=[s.n+': '+A.cnt+(A.cnt===1? ' project' : ' projects')+' within '+rsKm(s.r||RS_R10)+(mw>0? ' ('+(Math.round(mw*10)/10).toFixed(1)+' MW' : ' (')+(sts? (mw>0? '; ' : '')+sts : '')+')'
+    +(A.n? ', '+A.n+' inside' : '')+(A.near!=null? ', the nearest '+rmM(A.near)+' away' : '')]; }
 // the nearest substation (and its saturation, into Grid constraints)
 function rsSub(e, A, s){ const best=A.recs.slice().sort((a, b)=>a.d-b.d)[0]; if(!best) return; const at=best.at, v=x=>{ const y=rsAt(at, x); return y==null? '' : String(y).trim(); };
   const nm=v('name')||'substation without a name', op=v('operator'), kv=v('max_voltage_kv'), st=v('status');
-  e.d=['Nearest substation: '+nm+(op? ' – '+op : '')+(kv? ', '+kv+' kV' : '')+(st? ' ('+st+')' : '')+(best.d>0? ' at '+rmM(best.d) : ' inside the gross area')];
+  e.d=['Nearest substation: '+nm+(op? ' – '+op : '')+(kv? ', '+kv+' kV' : '')+(st? ' ('+st+')' : '')+(best.d>0? ', '+rmM(best.d)+' away' : ', inside the area')];
   const sat=v('saturation_level'), sd=rsAt(at, 'saturation_date');
   if(sat){ let ds=''; try{ if(sd!=null&&sd!=='') ds=new Date(+sd||sd).toISOString().slice(0, 10); }catch(err){}
     e.x=[{k:'grid_constr', d:['Saturation of '+nm+': '+sat+(ds? ' ('+ds+')' : '')]}]; } }
 // the comuni of the area (ISTAT) and their seismic zone (INGV): also the box's municipality and region without parcels
-async function rsIngv(s, c){ const e={k:s.k, n:s.n, ty:'nat', g0:s.g0, ref:s.ref, d:[], g:[]};
+async function rsIngv(s, c){ const e={k:s.k, n:s.n, ty:'nat', g0:s.g0, th:s.th, ref:s.ref, d:[], g:[]};
   try{ const env=rsEnv({f:c.f, B:c.B, RT:null, wkid:c.wkid}, 1); const Q=await rsReq(ISTAT_COMUNI_URL+'/query', {f:'json', where:'1=1', geometry:JSON.stringify(env), geometryType:'esriGeometryEnvelope',
       inSR:String(c.wkid), spatialRel:'esriSpatialRelIntersects', outFields:'PRO_COM,COMUNE', returnGeometry:'true', outSR:String(c.wkid), maxAllowableOffset:'5', geometryPrecision:'1'});
     const GE=esriMods.geometryEngine, codes=[];
@@ -13389,11 +13591,48 @@ async function rsIngv(s, c){ const e={k:s.k, n:s.n, ty:'nat', g0:s.g0, ref:s.ref
     e.box={muni:rows.map(a=>a.COMUNE).join(', '), region:[...new Set(rows.map(a=>a.REGIONE).filter(Boolean))].join(', ')};
   }catch(err){ e.err=rsErr(err); }
   return e; }
+// 10/11 (seen on ISPRA's flood mosaics in the user's first real project: polygons as large as a river plain, a server
+// that cannot send them — «nessuna risposta», «Error performing query operation» — and the area was inside them): a layer
+// of a map service whose query fails is measured on its own image. The service draws the layer over the area and its
+// radius; the pixels drawn (widened by one, for hatched fills) are counted inside the gross area — hectares, to about
+// 1 % — and, with nothing inside, the nearest one gives the distance. No classes, no names: the line says «map image»
+function rsCanImage(s, prev){ return !s.sp&&/\/MapServer\/\d+$/i.test(String(s.url||''))&&!RS_JSONP.test(String(s.url||''))&&!(prev&&prev.gt&&prev.gt!=='polygon'); }
+async function rsImage(s, c){ const m=/^(.*\/MapServer)\/(\d+)$/i.exec(String(s.url||'')); if(!m) return null;
+  const GE=esriMods.geometryEngine, R=s.r||(s.th==='surround'? RS_R10 : RS_R), BV=c.f.toView(c.B); if(!BV||!BV.extent) return null;
+  // one image of the layer over an extent (in the view's system), its pixels drawn widened by one, and the area in the same pixels
+  const shot=async (ev)=>{ const W=480, H=Math.max(80, Math.min(960, Math.round(W*(ev.ymax-ev.ymin)/(ev.xmax-ev.xmin))));
+    const q={f:'image', format:'png32', transparent:'true', layers:'show:'+m[2], bbox:[ev.xmin, ev.ymin, ev.xmax, ev.ymax].join(','), bboxSR:String(c.wkid), imageSR:String(c.wkid), size:W+','+H, dpi:'96'};
+    if(s.where){ const ld={}; ld[m[2]]=s.where; q.layerDefs=JSON.stringify(ld); }
+    const blob=await rsReq(m[1]+'/export', q, 'blob'); if(!blob||typeof blob.size!=='number'||!blob.size) return null;
+    const bmp=await createImageBitmap(blob), cv=document.createElement('canvas'); cv.width=W; cv.height=H; const g=cv.getContext('2d', {willReadFrequently:true}); g.drawImage(bmp, 0, 0, W, H);
+    const img=g.getImageData(0, 0, W, H).data, mk=document.createElement('canvas'); mk.width=W; mk.height=H;
+    const mg=mk.getContext('2d', {willReadFrequently:true}), X=x=>(x-ev.xmin)/(ev.xmax-ev.xmin)*W, Y=y=>(ev.ymax-y)/(ev.ymax-ev.ymin)*H;
+    mg.beginPath(); (BV.rings||[]).forEach(r=>{ r.forEach((pt, k)=>{ if(k) mg.lineTo(X(pt[0]), Y(pt[1])); else mg.moveTo(X(pt[0]), Y(pt[1])); }); mg.closePath(); }); mg.fill('evenodd');
+    const mask=mg.getImageData(0, 0, W, H).data, on=new Uint8Array(W*H);
+    for(let y=0; y<H; y++) for(let x=0; x<W; x++){ if(img[(y*W+x)*4+3]>24){ for(let dy=-1; dy<=1; dy++) for(let dx=-1; dx<=1; dx++){ const xx=x+dx, yy=y+dy; if(xx>=0&&yy>=0&&xx<W&&yy<H) on[yy*W+xx]=1; } } }
+    return {W:W, H:H, on:on, A:(x, y)=>x>=0&&y>=0&&x<W&&y<H&&mask[(y*W+x)*4+3]>127}; };
+  const e={k:s.k, n:s.n, ty:s.ty, g0:s.g0, th:s.th, d:[], g:[], r:R, gt:'polygon', img:1, ins:0}, title=s.t||s.n; if(s.pk){ e.pk=s.pk; e.pth=s.pth; } if(s.ref) e.ref=s.ref;
+  // the close shot: the area with a margin of a twentieth, about a metre per pixel for 20 hectares
+  const ex=BV.extent, mx=(ex.xmax-ex.xmin)*0.05, my=(ex.ymax-ex.ymin)*0.05, S1=await shot({xmin:ex.xmin-mx, ymin:ex.ymin-my, xmax:ex.xmax+mx, ymax:ex.ymax+my}); if(!S1) return null;
+  let nIn=0, nBoth=0; for(let y=0; y<S1.H; y++) for(let x=0; x<S1.W; x++){ if(S1.A(x, y)){ nIn++; if(S1.on[y*S1.W+x]) nBoth++; } }
+  if(!nIn) return null;
+  if(nBoth/nIn>0.005){ const ha=c.baseHa*nBoth/nIn; e.ins=1; e.d=[title+': about '+(Math.round(ha*10)/10).toFixed(1)+' ha inside (about '+Math.round(nBoth/nIn*100)+' %), measured on the map image']; return e; }
+  // nothing inside: the wide shot, for the nearest thing drawn within the radius
+  const buf=GE.buffer(c.B, R, 'meters'), V=buf&&c.f.toView(buf), S2=V&&V.extent? await shot(V.extent) : null; if(!S2) return e;
+  const edge=[], far=[]; for(let y=0; y<S2.H; y++) for(let x=0; x<S2.W; x++){ if(S2.A(x, y)){ if(!S2.A(x-1, y)||!S2.A(x+1, y)||!S2.A(x, y-1)||!S2.A(x, y+1)) edge.push(x, y); } else if(S2.on[y*S2.W+x]&&!(x&1)&&!(y&1)) far.push(x, y); }
+  if(far.length&&edge.length){ let best=Infinity; for(let a2=0; a2<far.length; a2+=2) for(let b2=0; b2<edge.length; b2+=2){ const dx=far[a2]-edge[b2], dy=far[a2+1]-edge[b2+1], d2=dx*dx+dy*dy; if(d2<best) best=d2; }
+    const LB=buf.extent, dist=Math.sqrt(best)*(LB.xmax-LB.xmin)/S2.W; if(dist<=R) e.d=[title+': about '+rmM(dist)+' away, measured on the map image']; }
+  return e; }
+// the watercourses and canals of EU-Hydro: its nine layers measured as one source
+async function rsWater(s, c, desc){ const e={k:s.k, n:s.n, ty:'nat', g0:s.g0, th:s.th, ref:s.ref, d:[], g:[], gt:'polyline', wc:1, r:RS_R}, A=rsAggNew(); let bad=0, part=false;
+  await Promise.all(RS_WATER_IDS.map(async id=>{ const x=await rsAsk(Object.assign({}, s, {url:s.url+'/'+id, sp:null, A:A}), c, desc); if(x.err) bad++; if(x.part) part=true; }));
+  if(bad===RS_WATER_IDS.length){ e.err='bloccato dal browser o server fermo'; return e; }
+  const L=rsLines(A, s.n, c.baseHa, RS_R, c.RT); e.d=L.d; e.g=L.g; e.ins=A.n; if(part||bad) e.part=1; return e; }
 // a map service: its layers with geometry (not the groups), with the path of their groups; the base ones out
 async function rsLeaves(s, desc){ const D=await desc(s.url), L=(D&&D.layers)||[], by=new Map(L.map(x=>[x.id, x]));
   const path=x=>{ const p=[]; let q=x, n=0; while(q&&q.parentLayerId!=null&&q.parentLayerId>=0&&n++<20){ q=by.get(q.parentLayerId); if(q) p.unshift(q.name); } return p; };
   return L.filter(x=>!(x.subLayerIds&&x.subLayerIds.length)&&(!x.type||/feature/i.test(x.type))).map(x=>({id:x.id, name:String(x.name||x.id), path:path(x)}))
-    .filter(x=>!RS_OUT.test(x.name.toLowerCase())&&!RS_INT.test(x.name.toLowerCase())); }
+    .filter(x=>{ const n=x.name.toLowerCase().replace(/_/g, ' '); return !RS_OUT.test(n)&&!RS_INT.test(n); }); }
 function rsSubOf(l, id){ try{ return (l.allSublayers&&l.allSublayers.find(x=>x.id===id))||null; }catch(e){ return null; } }
 function rsRendOf(o){ try{ return o&&o.renderer&&o.renderer.toJSON? o.renderer.toJSON() : null; }catch(e){ return null; } }
 
@@ -13401,49 +13640,68 @@ function rsRendOf(o){ try{ return o&&o.renderer&&o.renderer.toJSON? o.renderer.t
 async function rsRun(){ if(rsBusy) return; rsBusy=true; rsProg='Preparo…'; rsRender();
   try{ if(!view||!esriMods||!toolsGL){ toolMsg('rmMsg', 'La mappa non è ancora pronta: riprova tra un attimo.', 'err'); return; }
     await geoFrameLoad(); const b=rmBase();
-    if(!b.B){ toolMsg('rmMsg', 'Per interrogare i layer serve un’area lorda (o delle particelle con la geometria).', 'err'); return; }
+    if(!b.B){ toolMsg('rmMsg', 'Per il controllo serve un’area lorda (o delle particelle con la geometria).', 'err'); return; }
     const c={f:b.f, B:b.B, baseHa:b.baseHa, RT:rsRoute(b.f), wkid:(view.spatialReference&&view.spatialReference.wkid)||102100};
     const map=wmCurrentId()||'', S=rsSources().filter(s=>s.th&&s.th!=='out'), out=[], cache=new Map();
-    const desc=u=>{ if(!cache.has(u)) cache.set(u, rsReq(u, {f:'json'})); return cache.get(u); };
+    const desc=u=>{ if(!cache.has(u)) cache.set(u, rsReq(u, {f:'json'}).catch(err=>{ cache.delete(u); throw err; })); return cache.get(u); };
     const jobs=[];
     S.forEach(s=>{ const base={k:s.k, n:s.n, ty:s.ty==='nat'? 'nat' : 'map', g0:s.g0, th:s.th};
-      if(s.ty==='vis'){ out.push({k:s.k, n:s.n, ty:'vis', g0:s.g0}); return; }
+      if(s.ty==='vis'){ out.push({k:s.k, n:s.n, ty:'vis', g0:s.g0, th:s.th}); return; }
       if(s.ty==='nat'){ const N=s.nat; if(N.login&&!signedIn){ out.push(Object.assign(base, {ref:N.ref, d:[], g:[], err:'login'})); return; }
         jobs.push(Object.assign(base, {url:N.u, nm:N.nm, cl:N.cl, r:N.r, sp:N.sp, ref:N.ref})); return; }
       if(s.ty==='fl'){ const u=rsLayerUrl(s.l); if(!u){ out.push(Object.assign(base, {d:[], g:[], err:'layer non caricato'})); return; }
-        jobs.push(Object.assign(base, {url:u, where:s.l.definitionExpression||'', rend:rsRendOf(s.l), noNames:s.why==='int', cl:'@'})); return; }
-      jobs.push(Object.assign(base, {ms:true, url:String(s.l.url).replace(/\/+$/, ''), l:s.l, noNames:s.why==='int'})); });
+        jobs.push(Object.assign(base, {url:u, where:s.l.definitionExpression||'', rend:rsRendOf(s.l), noNames:!!s.int, cl:'@'})); return; }
+      jobs.push(Object.assign(base, {ms:true, url:String(s.l.url).replace(/\/+$/, ''), l:s.l, noNames:!!s.int, own:s.why==='pm'||s.why==='rec'})); });
     // the map services first: their layers become jobs
     const ms=jobs.filter(j=>j.ms), plain=jobs.filter(j=>!j.ms); let i=0;
     rsProg='Leggo i servizi della mappa…'; rsStatus();
-    await rsPool(ms.map(j=>async()=>{ try{ const L=await rsLeaves(j, desc);
-        L.forEach(x=>{ const sl=rsSubOf(j.l, x.id); plain.push({k:j.k+'#'+x.id, pk:j.k, n:j.n+' › '+(x.path.length? x.path.concat(x.name).join(' › ') : x.name), ty:'map', g0:j.g0, th:j.th,
+    const late=[], leaves=async(j, last)=>{ const add=[]; try{ const L=await rsLeaves(j, desc);
+        // 10/11 (review): a sublayer has the theme of its own name (a service «Forme di tutela» holds Natura 2000, fires,
+        // archaeology…); the theme the PM chose for the service wins for all of them
+        L.forEach(x=>{ const sl=rsSubOf(j.l, x.id), gl=j.own? null : rsGuess(x.path, x.name), lt=(gl&&gl.why==='kw')? gl.t : j.th;
+          add.push({k:j.k+'#'+x.id, pk:j.k, pth:j.th, t:(x.path.length? x.path.slice(-1).concat(x.name).join(' › ') : x.name), n:j.n+' › '+(x.path.length? x.path.concat(x.name).join(' › ') : x.name), ty:'map', g0:j.g0, th:lt,
           url:j.url+'/'+x.id, where:(sl&&sl.definitionExpression)||'', rend:rsRendOf(sl), noNames:j.noNames, cl:'@'}); });
-        if(!L.length) out.push({k:j.k, n:j.n, ty:'map', g0:j.g0, d:[], g:[], err:'nessun layer interrogabile'}); }
-      catch(err){ out.push({k:j.k, n:j.n, ty:'map', g0:j.g0, d:[], g:[], err:rsErr(err)}); } }));
-    const tot=plain.length; rsProg='Interrogo 0/'+tot+'…'; rsStatus();
-    await rsPool(plain.map(j=>async()=>{ const e=j.sp==='ingv'? await rsIngv(j, c) : await rsAsk(j, c, desc); out.push(e); i++; rsProg='Interrogo '+i+'/'+tot+'…'; rsStatus(); }));
+        if(!L.length) out.push({k:j.k, n:j.n, ty:'map', g0:j.g0, th:j.th, d:[], g:[], err:'nessun layer interrogabile'}); }
+      catch(err){ if(last) out.push({k:j.k, n:j.n, ty:'map', g0:j.g0, th:j.th, d:[], g:[], err:rsErr(err)}); else late.push(j); }
+      return add; };
+    await rsPool(ms.map(j=>async()=>{ (await leaves(j, false)).forEach(x=>plain.push(x)); }));
+    let tot=plain.length; rsProg='Leggo 0/'+tot+'…'; rsStatus();
+    const one=j=>j.sp==='ingv'? rsIngv(j, c) : j.sp==='water'? rsWater(j, c, desc) : rsAsk(j, c, desc);
+    const ask=async j=>{ const e=await one(j); out.push(e); i++; rsProg='Leggo '+i+'/'+tot+'…'; rsStatus(); };
+    await rsPool(plain.map(j=>()=>ask(j)));
+    // 10/11 (seen on the real Check Vincoli Lazio): a service that does not answer at first — the map is still loading its
+    // layers from the same server — is asked once more, after the others
+    if(late.length){ const more=[]; rsProg='Riprovo '+late.length+(late.length===1? ' servizio…' : ' servizi…'); rsStatus();
+      await rsPool(late.map(j=>async()=>{ (await leaves(j, true)).forEach(x=>more.push(x)); })); tot+=more.length; await rsPool(more.map(j=>()=>ask(j))); more.forEach(x=>plain.push(x)); }
+    // the layers that gave no answer (a run started while the map was loading, a slow server): once more now that the
+    // others are done, with a shorter wait; a server that is down costs twelve seconds more, not thirty
+    const mute=e=>!!e&&((!!e.err&&/nessuna risposta|bloccato|timeout|error performing|query operation|\[5\d\d\]/i.test(e.err))||(e.k==='nat:water'&&!!e.part));
+    const again=plain.filter(j=>mute(out.find(x=>x.k===j.k)));
+    if(again.length){ rsProg='Riprovo '+again.length+' layer…'; rsStatus(); rsWaitNow=RS_RETRY;
+      try{ await rsPool(again.map(j=>async()=>{ const n=out.findIndex(x=>x.k===j.k); let e=null;
+          if(rsCanImage(j, out[n])){ try{ e=await rsImage(j, c); }catch(err){ e=null; } }   // a map service that cannot send its shapes: its image
+          if(!e) e=await one(j); if(n>=0&&e&&!mute(e)) out[n]=e; })); }finally{ rsWaitNow=RS_WAIT; } }
     const order=new Map(S.map((s, n)=>[s.k, n])); out.sort((a, b)=>(order.get(a.pk||a.k)||0)-(order.get(b.pk||b.k)||0)||String(a.k).localeCompare(String(b.k), undefined, {numeric:true}));
     const ing=out.find(e=>e.box);
-    rmState.lay={v:1, at:new Date().toISOString(), map:map, mapT:wmLabel(map||null), sig:rsSig(b), rsig:rsRouteSig(c.RT), src:out.map(e=>{ const o=Object.assign({}, e); delete o.th; return o; })};
+    rmState.lay={v:1, at:new Date().toISOString(), map:map, mapT:wmLabel(map||null), sig:rsSig(b), rsig:rsRouteSig(c.RT), src:out.map(e=>Object.assign({}, e))};   // 10/11: with the theme (th), it travels with the project
     if(ing) rmState.lay.box=ing.box;
     rsBusy=false; rsProg='';
     for(let k=0; k<100&&rmBusy; k++) await new Promise(r=>setTimeout(r, 100));   // a draft already under way (the module just shown) would skip this one
     await rmCalc(true);
     const hit=out.filter(e=>(e.d&&e.d.length)||(e.g&&e.g.length)).length, bad=out.filter(e=>e.err&&e.err!=='login').length, lg=out.filter(e=>e.err==='login').length, vis=out.filter(e=>e.ty==='vis').length;
-    toolMsg('rmMsg', 'Layer interrogati: '+(out.length-vis-lg)+', con qualcosa vicino all’area: '+hit+(bad? '; non raggiunti: '+bad : '')+(lg? '; '+lg+' nazionali richiedono l’accesso ad AGOL' : '')
+    toolMsg('rmMsg', 'Controllo fatto: '+(out.length-vis-lg)+' layer letti, '+hit+' con qualcosa vicino all’area'+(bad? '; non letti: '+bad : '')+(lg? '; '+lg+' nazionali richiedono l’accesso ad AGOL' : '')
       +(vis? '; '+vis+' da guardare sulla mappa (immagini)' : '')+'. Le righe sono nella bozza.', bad? '' : 'ok');
-  }catch(e){ console.warn('[risk matrix, layers]', e); toolMsg('rmMsg', 'L’interrogazione non è riuscita: '+((e&&e.message)||e)+'.', 'err'); }
+  }catch(e){ console.warn('[risk matrix, layers]', e); toolMsg('rmMsg', 'Il controllo non è riuscito: '+((e&&e.message)||e)+'.', 'err'); }
   finally{ rsBusy=false; rsProg=''; rsRender(); } }
 async function rsPool(tasks, n){ let i=0; const run=async()=>{ while(i<tasks.length){ const t=tasks[i++]; try{ await t(); }catch(e){} } };
   await Promise.all(Array.from({length:Math.min(n||RS_CONC, tasks.length||1)}, run)); }
 
 // ── into the draft (called by rmCalc): the files with a theme, then the layers' results with the themes of now ──
-function rsThemeNow(e, L){ if(e.ty==='nat'){ const o=rsOv('*')[e.k]; return o!=null? o : e.g0; } const o=rsOv(L.map)[e.pk||e.k]; return o!=null? o : e.g0; }
+function rsThemeNow(e, L){ const o=(e.ty==='nat'? rsOv('*') : rsOv(L.map))[e.pk||e.k]; return o!=null? o : e.th!=null? e.th : e.g0; }   // the choice in this browser, else the theme saved with the result
 function rsMerge(c){ rsStale='';
   // G1, G4: the files imported with a theme, measured now (they are in the project)
   if(c.B){ rsFiles().forEach((gs, name)=>{ const t=rsFileTheme(name); if(!t||t==='out') return; const fld=rsFileField(name, gs), R=t==='surround'? RS_R10 : RS_R, A=rsAggNew();
-      gs.forEach(g=>{ let X=null; try{ X=geoClean(c.f.toLocal(g.geometry)); }catch(e){} if(!X||!geoFinite(X)) return;
+      gs.forEach(g=>{ if(rsRole(g)) return; let X=null; try{ X=geoClean(c.f.toLocal(g.geometry)); }catch(e){} if(!X||!geoFinite(X)) return;
         const v=fld==='nome'? g.attributes.nome : fld? (g.attributes.src_attrs||{})[fld] : ''; rsAddFeat(A, {B:c.B, RT:null}, X, v==null? '' : String(v).slice(0, 60), '', R, null); });
       const L=rsLines(A, name, c.baseHa, R), Rw=c.row(t);
       L.d.forEach(x=>{ Rw.d.push(x); c.fact(t, x); }); if(!L.d.length) c.fact(t, 'File «'+name+'»: niente entro '+rmM(R)+' dall’area');
@@ -13451,45 +13709,111 @@ function rsMerge(c){ rsStale='';
   const L=rmState.lay; if(!L||!Array.isArray(L.src)) return;
   if(!c.B||L.sig!==c.sig){ rsStale='area'; return; }
   if(L.box){ if(!c.D.box.muni&&L.box.muni) c.D.box.muni=L.box.muni; if(!c.D.box.region&&L.box.region) c.D.box.region=L.box.region; }
-  const rtOk=L.rsig===rsRouteSig(rsRoute(c.f)); if(!rtOk&&L.src.some(e=>e.g&&e.g.length)) rsStale='route';
-  const per=new Map(), P=t=>{ if(!per.has(t)) per.set(t, {hit:0, miss:[], vis:[], err:[], login:[], ref:new Set(), mh:[], mm:0}); return per.get(t); };
+  const rtNow=rsRoute(c.f), rtOk=/^\d*$/.test(String(L.rsig||''))? String(L.rsig||'')===rsRouteLen(rtNow) : L.rsig===rsRouteSig(rtNow);   // a result of before 10/11 has the length alone
+  if(!rtOk) rsStale='route';   // 10/11: also a route drawn after the run (its surroundings were never asked)
+  const per=new Map(), P=t=>{ if(!per.has(t)) per.set(t, {hit:0, miss:[], vis:[], err:[], login:[], part:[], ref:new Set(), mh:[], mm:0, ln:0, lnIn:0}); return per.get(t); };
   L.src.forEach(e=>{ const t=rsThemeNow(e, L); if(!t||t==='out') return; const p=P(t);
     if(e.ty==='vis'){ p.vis.push(e.n); return; }
     if(e.err){ (e.err==='login'? p.login : p.err).push(e); return; }
-    if(e.d&&e.d.length){ p.hit++; e.d.forEach(x=>{ c.row(t).d.push(x); c.fact(t, x); }); if(e.ty==='nat') p.ref.add(e.ref); else p.mh.push(e.n); }
+    if(e.gt==='polyline'&&e.wc){ p.ln++; if(e.ins>0) p.lnIn++; }   // a line layer of watercourses (not the roads at risk of a PAI)
+    if(e.d&&e.d.length){ p.hit++; e.d.forEach(x=>{ const y=x+(e.part? RS_PART : ''); c.row(t).d.push(y); c.fact(t, y); }); if(e.ty==='nat') p.ref.add(e.ref); else p.mh.push(e.n); }
+    else if(e.part) p.part.push(e);   // cut by the server and nothing in the part received: not a «nothing»
     else { p.miss.push(e); if(e.ty==='nat') p.ref.add(e.ref); else p.mm++; }
     if(rtOk&&RS_G5.has(t)&&e.g&&e.g.length){ e.g.forEach(x=>{ c.row('grid_constr').d.push(x); c.fact('grid_constr', x); }); c.row('grid_constr').e.add(e.ty==='nat'? e.ref : 'Map «'+L.mapT+'»: '+e.n); }
     (e.x||[]).forEach(o=>{ (o.d||[]).forEach(x=>{ c.row(o.k).d.push(x); c.fact(o.k, x); }); if(e.ref) c.row(o.k).e.add(e.ref); }); });
-  per.forEach((p, t)=>{ const R=c.row(t), rad=rmM(t==='surround'? RS_R10 : RS_R);
-    if(!p.hit&&p.miss.length) R.d.push(p.miss.length<=3? 'Nothing within '+rad+' of the gross area in: '+p.miss.map(e=>e.n).join(', ') : 'Nothing within '+rad+' of the gross area in the '+p.miss.length+' layers checked');
+  per.forEach((p, t)=>{ const R=c.row(t);
+    // nothing found: with the radius that was asked (10/11); Hydrography names every layer, also beside a finding (asked by the user)
+    // the layers of a map service are said by the service, with how many (a PAI has twenty of them)
+    const byR=new Map(); p.miss.forEach(e=>{ const r=rsRadOf(e), nm=e.pk? String(e.n).split(' › ')[0] : e.n; if(!byR.has(r)) byR.set(r, new Map()); const m=byR.get(r); m.set(nm, (m.get(nm)||0)+1); });
+    const rr=[...byR.keys()], rad=rr.length===1? 'within '+rmM(rr[0]) : 'nearby';
+    // 10/11 (asked by the user): shorter words, and a line per layer
+    if(!p.hit||t==='hydro') byR.forEach((m, r)=>{ const ns=[...m].map(x=>x[0]+(x[1]>1? ' ('+x[1]+' layers)' : '')), nl=[...m.values()].reduce((a, b)=>a+b, 0);
+      R.d.push((t==='hydro'||ns.length<=3)? 'Nothing within '+rsKm(r)+':\n'+ns.map(x=>'- '+x).join('\n') : 'Nothing within '+rsKm(r)+' in the '+nl+' layers checked'); });
+    if(t==='hydro'&&p.ln) R.d.push(p.lnIn? 'Watercourses or channels cross the area' : 'No watercourse or channel crosses the area');
+    // the layers not read are said in the row (10/11): never an all-clear by silence
+    const un=p.login.concat(p.err, p.part);
+    if(un.length){ const why=new Map(), put=(e, w)=>{ const nm=(e.pk? String(e.n).split(' › ')[0] : e.n)+'|'+w; why.set(nm, (why.get(nm)||0)+1); };   // by service, as the layers with nothing
+      p.login.forEach(e=>put(e, 'sign-in to ArcGIS Online needed')); p.err.forEach(e=>put(e, 'server not reached')); p.part.forEach(e=>put(e, 'partial answer: server limit'));
+      R.d.push('Not checked:\n'+[...why].map(x=>{ const a=x[0].split('|'); return '- '+a[0]+(x[1]>1? ' ('+x[1]+' layers)' : '')+': '+a[1]; }).join('\n'));
+      if(c.warn) c.warn(t, 'Layer non letti: '+un.map(e=>e.n).join(', ')); }
     p.ref.forEach(x=>R.e.add(x));
-    if(p.mh.length) R.e.add('Map «'+L.mapT+'»: '+p.mh.join('; ')+(p.mm? ' (and '+p.mm+(p.mm===1? ' other layer' : ' other layers')+' with nothing within '+rad+')' : ''));
-    else if(p.mm) R.e.add('Map «'+L.mapT+'»: '+p.mm+(p.mm===1? ' layer' : ' layers')+' checked, nothing within '+rad);
-    if(p.vis.length) R.e.add('Checked on the map: '+p.vis.join('; '));
-    if(p.miss.length) c.fact(t, 'Niente entro '+rad+': '+p.miss.map(e=>e.n).join(', '));
+    p.mh.forEach(x=>R.e.add('Map «'+L.mapT+'»: '+x)); if(p.mh.length&&p.mm) R.e.add('Map «'+L.mapT+'»: '+p.mm+(p.mm===1? ' other layer' : ' other layers')+' with nothing '+rad);
+    if(!p.mh.length&&p.mm) R.e.add('Map «'+L.mapT+'»: '+p.mm+(p.mm===1? ' layer' : ' layers')+' checked, nothing '+rad);
+    p.vis.forEach(x=>R.e.add('To check on the map: '+x));
+    if(p.miss.length) c.fact(t, 'Niente vicino all’area ('+rr.map(r=>rmM(r)).join(', ')+'): '+p.miss.map(e=>e.n).join(', '));
     if(p.vis.length) c.fact(t, 'Da guardare sulla mappa (immagini, non si interrogano): '+p.vis.join(', '));
     if(p.err.length) c.fact(t, 'Non raggiunti: '+p.err.map(e=>e.n+' ('+e.err+')').join(', '));
+    if(p.part.length) c.fact(t, 'Risposta parziale (limite del server): '+p.part.map(e=>e.n).join(', '));
     if(p.login.length) c.fact(t, 'Serve l’accesso ad AGOL: '+p.login.map(e=>e.n).join(', ')); }); }
 
+// ── U8 (11/11, approved by the user): «Vedi sulla mappa» — only the layers of a row on the map, the area framed ──
+// The layers of the open map that the last check gave to the row (with something found, or images to look at) go on, with
+// their groups and, for a map service, only its layers with findings; the other layers of the map go off; the national
+// layers with findings are added for the time being. The same button, another row, leaving the module, another map or
+// another project put everything back (visibility, the layers added, the viewpoint). While it lasts the project is saved
+// with the visibility of before (rsSeeVis, used by projCaptureLayers)
+let rsSeen=null;
+function rsSeeParts(k){ const L=rmState.lay, map=wmCurrentId()||'', out={map:new Map(), vis:[], nat:[]}; if(!L||!Array.isArray(L.src)) return out; const S=rsSources();
+  L.src.forEach(e=>{ if(rsThemeNow(e, L)!==k) return; const hit=(e.d&&e.d.length)||(e.g&&e.g.length);
+    if(e.ty==='nat'){ if(hit){ const n=RS_NAT.find(x=>'nat:'+x.id===e.k); if(n&&n.sp!=='ingv'&&!RS_JSONP.test(n.u)) out.nat.push(n); } return; }
+    if(L.map!==map) return; const s=S.find(x=>x.k===(e.pk||e.k)); if(!s||!s.l) return;
+    if(e.ty==='vis'){ if(out.vis.indexOf(s.l)<0) out.vis.push(s.l); return; }
+    if(hit){ if(!out.map.has(s.l)) out.map.set(s.l, []); if(e.pk) out.map.get(s.l).push(+String(e.k).split('#').pop()); } });
+  return out; }
+function rsSeeCan(k){ const P=rsSeeParts(k); return !!(P.map.size||P.vis.length||P.nat.length); }
+function rsSeeVis(o){ if(rsSeen){ const x=rsSeen.keep.find(y=>y[0]===o); if(x) return x[1]; } return o.visible; }
+function rsSeeOff(quiet){ const S=rsSeen; if(!S) return; rsSeen=null;
+  for(let i=S.keep.length-1; i>=0; i--){ try{ S.keep[i][0].visible=S.keep[i][1]; }catch(e){} }
+  S.temp.forEach(l=>{ try{ view.map.remove(l); }catch(e){} });
+  if(S.vp){ try{ const g=view.goTo(S.vp); if(g&&g.catch) g.catch(()=>{}); }catch(e){} }
+  if(!quiet) toolMsg('rmMsg', 'Mappa rimessa com’era.'); }
+async function rsSee(k){ if(rsSeen){ const was=rsSeen.k; rsSeeOff(true); if(was===k){ toolMsg('rmMsg', 'Mappa rimessa com’era.'); return; } }
+  await geoFrameLoad(); const b=rmBase(); if(!b.B){ toolMsg('rmMsg', 'Serve un’area lorda (o delle particelle con la geometria).', 'err'); return; }
+  const P=rsSeeParts(k), keep=[], temp=[], want=new Set([...P.map.keys()].concat(P.vis)), set=(o, v)=>{ if(!o||o.visible===v) return; keep.push([o, o.visible]); o.visible=v; };
+  let vp=null; try{ vp=view.viewpoint.clone(); }catch(e){}
+  rsMapList().forEach(it=>{ const l=it.l; if(want.has(l)){ let p=l, n=0; while(p&&p!==view.map&&n++<10){ set(p, true); p=p.parent; } } else set(l, false); });
+  for(const [l, ids] of P.map){ if(!ids.length) continue; try{ if(l.load&&!l.loaded) await Promise.race([l.load(), new Promise(r=>setTimeout(r, 5000))]); }catch(e){}
+    const subs=l.allSublayers; if(!subs||!subs.forEach) continue;
+    subs.forEach(sl=>{ if(sl.sublayers&&sl.sublayers.length) return; set(sl, ids.indexOf(sl.id)>=0); });
+    subs.forEach(sl=>{ if(ids.indexOf(sl.id)<0) return; let p=sl.parent, n=0; while(p&&p!==l&&n++<10){ set(p, true); p=p.parent; } }); }
+  if(!window.rsMapStub) P.nat.forEach(n=>{ (n.sp==='water'? RS_WATER_IDS.map(id=>n.u+'/'+id) : [n.u]).forEach(u=>{ try{ const fl=new esriMods.FeatureLayer({url:u, title:n.t, opacity:0.75, listMode:'hide'}); view.map.add(fl); temp.push(fl); }catch(e){} }); });
+  rsSeen={k:k, keep:keep, temp:temp, vp:vp};
+  try{ const GE=esriMods.geometryEngine, RT=k==='grid_constr'? rsRoute(b.f) : null, G=RT? GE.union([GE.buffer(b.B, 300, 'meters'), GE.buffer(RT, 300, 'meters')]) : GE.buffer(b.B, k==='surround'? RS_R10 : RS_R, 'meters'), V=G&&b.f.toView(G);
+    if(V&&V.extent){ const g=view.goTo(V.extent.clone().expand(1.08)); if(g&&g.catch) g.catch(()=>{}); } }catch(e){}
+  const n=want.size+P.nat.length; toolMsg('rmMsg', 'Sulla mappa '+(n===1? 'il layer' : 'i '+n+' layer')+' di «'+(rsThLabel(k)||k)+'». Per tornare com’era premi di nuovo il pulsante.', 'ok'); }
 // ── the panel: the line with «Interroga», the notes, the section «Fonti» ──
 function rsWhen(iso){ try{ const d=new Date(iso), p=x=>('0'+x).slice(-2); return d.getDate()+'/'+(d.getMonth()+1)+' alle '+p(d.getHours())+':'+p(d.getMinutes()); }catch(e){ return ''; } }
-function rsStatText(){ const L=rmState.lay; if(rsBusy) return rsProg||'Interrogo…';
-  if(!L||!Array.isArray(L.src)) return 'non ancora interrogati';
+function rsStatText(){ const L=rmState.lay; if(rsBusy) return rsProg||'Leggo…';
+  if(!L||!Array.isArray(L.src)) return 'non ancora fatto';
   const hit=L.src.filter(e=>(e.d&&e.d.length)||(e.g&&e.g.length)).length, map=wmCurrentId()||'';
   const fresh=L.map!==map? 0 : rsList.filter(s=>s.th&&s.th!=='out'&&s.ty!=='vis'&&!L.src.some(e=>e.k===s.k||e.pk===s.k)).length;   // given a theme after the run
-  return 'interrogati il '+rsWhen(L.at)+' · '+hit+' con risultati'+(fresh? ' · '+fresh+' da interrogare' : ''); }
-function rsStatus(){ const el=$('rsStat'); if(el) el.textContent=rsStatText(); const go=$('rsGo'); if(go) go.disabled=rsBusy; }
+  const wide=L.map!==map? 0 : rsList.filter(s=>s.th==='surround'&&L.src.some(e=>(e.k===s.k||e.pk===s.k)&&!e.err&&e.ty!=='vis'&&rsRadOf(e)<RS_R10)).length;   // moved to Surrounding area: asked at 1 km only
+  const un=L.src.filter(e=>e.err||e.part).length;
+  const vis=L.src.filter(e=>e.ty==='vis').length;
+  return 'fatto il '+rsWhen(L.at)+' · '+hit+' con risultati'+(vis? ' · '+vis+' da guardare' : '')+(un? ' · '+un+(un===1? ' non letto' : ' non letti') : '')+((fresh+wide)? ' · '+(fresh+wide)+' da leggere' : ''); }
+// the line of step 2: what matters first (the layers not read, the check to do again), the date in the tooltip
+function rsSumText(){ const L=rmState.lay; if(rsBusy||!L||!Array.isArray(L.src)) return rsStatText();
+  if(rsStale==='area') return 'da rifare: l’area è cambiata';
+  const hit=L.src.filter(e=>(e.d&&e.d.length)||(e.g&&e.g.length)).length, un=L.src.filter(e=>e.err||e.part).length, vis=L.src.filter(e=>e.ty==='vis').length;
+  return (rsStale==='route'? 'connessione cambiata · ' : '')+(un? un+(un===1? ' non letto · ' : ' non letti · ') : '')+hit+' con risultati'+(vis? ' · '+vis+' da guardare' : ''); }
+// the state: in the line of step 2 (always) and under the button while the layers are read
+function rsStatus(){ const t=rsStatText(), el=$('rsStat'); if(el){ el.textContent=t; el.classList.toggle('busy', rsBusy); } const s2=$('rmSum2'); if(s2){ s2.textContent=rsSumText(); s2.title=t; } const go=$('rsGo'); if(go) go.disabled=rsBusy; }
 function rsRegion(){ const v=(rmBoxF('region').v||'').split(',')[0].trim(); return v; }
 function rsOpt(cur, extra){ return (extra||[]).concat([['', 'Nessun tema']], RS_TH, [['out', 'Escludi']]).map(o=>'<option value="'+o[0]+'"'+(o[0]===cur? ' selected' : '')+'>'+esc(o[1])+'</option>').join(''); }
+// 10/11 (asked by the user): what the last check says of a source — «in» something inside the area, «near» something within
+// the radius, «miss» read and nothing, «err» not read, «login» needs the sign-in, «vis» an image that cannot be read. A
+// service read in part has its mark and, beside it, the cross of the layers not read (x)
 function rsResOf(k){ const L=rmState.lay; if(!L||!Array.isArray(L.src)) return null; const es=L.src.filter(e=>e.k===k||e.pk===k); if(!es.length) return null;
-  const hit=es.filter(e=>(e.d&&e.d.length)||(e.g&&e.g.length)), err=es.filter(e=>e.err);
-  if(hit.length) return {c:'hit', t:hit.map(e=>e.d.concat(e.g).join('\n')).join('\n')};
-  if(err.length) return {c:err.every(e=>e.err==='login')? 'login' : 'err', t:err.map(e=>e.n+': '+(e.err==='login'? 'serve l’accesso ad AGOL' : e.err)).join('\n')};
-  if(es.some(e=>e.ty==='vis')) return {c:'vis', t:'Immagine: da guardare sulla mappa'};
-  return {c:'miss', t:'Niente vicino all’area'}; }
-function rsRowHtml(s, i){ const r=rsResOf(s.k), why=s.why==='int'? 'Layer interno (contatti, esiti, KPI): escluso; puoi dargli un tema' : s.why==='base'? 'Cartografia di base: esclusa' : s.why==='pm'? 'Tema scelto da te' : s.why==='kw'? 'Tema dal nome del layer o del suo gruppo' : s.why==='nat'? 'Layer nazionale' : 'Nessun tema riconosciuto dal nome';
+  const hit=es.filter(e=>(e.d&&e.d.length)||(e.g&&e.g.length)), err=es.filter(e=>e.err||e.part), x=!err.length? '' : err.some(e=>e.err!=='login')? 'err' : 'login';
+  const txt=hit.map(e=>e.d.concat(e.g).join('\n')).concat(err.map(e=>e.n+': '+(e.err==='login'? 'serve l’accesso ad AGOL' : e.err||'risposta parziale'))).join('\n');
+  if(hit.length) return {c:hit.some(e=>e.ins>0||/ inside/.test((e.d||[]).join(' ')))? 'in' : 'near', x:x, t:txt};
+  if(err.length) return {c:x, x:'', t:txt};
+  if(es.some(e=>e.ty==='vis')) return {c:'vis', x:'', t:'Immagine: non si può leggere, va guardata sulla mappa'};
+  return {c:'miss', x:'', t:'Letto: niente vicino all’area'}; }
+const RS_LEG=[['in', 'dentro l’area'], ['near', 'vicino'], ['miss', 'niente'], ['err', 'non letto'], ['vis', 'immagine: da guardare']];
+function rsRowHtml(s, i){ const r=rsResOf(s.k), why=s.why==='int'? 'Layer interno (contatti, esiti, KPI): escluso; puoi dargli un tema' : s.why==='base'? 'Cartografia di base: esclusa' : s.why==='dup'? 'Già letto tra i layer nazionali: escluso' : s.why==='pm'? 'Tema scelto da te' : s.why==='rec'? 'Tema salvato con il progetto' : s.why==='kw'? 'Tema dal nome del layer o del suo gruppo' : s.why==='nat'? 'Layer nazionale' : 'Nessun tema riconosciuto dal nome';
   const tip=(s.path&&s.path.length? s.path.join(' › ')+' › ' : '')+s.n+'\n'+why+(s.ty==='vis'? '\nImmagine (WMS, tile): non si interroga, va guardata sulla mappa' : '');
-  return '<div class="rsrow" title="'+esc(tip)+'"><span class="rsres'+(r? ' '+r.c : '')+'" title="'+esc(r? r.t : 'Non ancora interrogato')+'"></span>'
+  return '<div class="rsrow" title="'+esc(tip)+'"><span class="rsres'+(r? ' '+r.c : '')+'" title="'+esc(r? r.t : 'Non ancora letto')+'"></span>'+(r&&r.x? '<span class="rsres '+r.x+'" title="'+esc(r.t)+'"></span>' : '')
     +'<span class="rst">'+(s.ty==='vis'? icon('image', 'rsk') : '')+esc(s.n)+'</span><select class="rssel" data-i="'+i+'" aria-label="'+esc('Tema di '+s.n)+'">'+rsOpt(s.th)+'</select></div>'; }
 function rsFileHtml(name, gs, j){ const t=rsFileTheme(name), f=rsFileField(name, gs), ks=rsFileFields(gs), n=gs.length;
   const fo=[['', 'Nessuna classe'], ['nome', 'Nome dell’oggetto']].concat([...ks.keys()].map(k=>[k, k+' ('+ks.get(k).size+')'])).map(o=>'<option value="'+esc(o[0])+'"'+(o[0]===f? ' selected' : '')+'>'+esc(o[1])+'</option>').join('');
@@ -13500,15 +13824,15 @@ function rsGroup(id, title, inner, n){ return '<details class="rsg" data-g="'+id
 function rsRender(){ const el=$('rmLay'); if(!el) return;
   const S=rsSources(), files=rsFiles(), L=rmState.lay, map=wmCurrentId()||''; rsList=S; rsFileNames=[...files.keys()];
   const used=S.filter(s=>s.th&&s.th!=='out'), nq=used.filter(s=>s.ty!=='vis').length, nv=used.length-nq;
-  let h='<div class="j5row rsrun"><span class="j5k">Layer</span><span class="j5v" id="rsStat" title="'+esc(nq+' da interrogare ('+S.filter(s=>s.ty==='nat').length+' nazionali), '+nv+' immagini da guardare sulla mappa')+'">'+esc(rsStatText())+'</span>'
-    +'<button type="button" class="btn sm" id="rsGo"'+(rsBusy? ' disabled' : '')+' title="Chiede ai server dei layer con un tema cosa c’è entro 1 km dall’area lorda (10 km per Surrounding area) e lo scrive nella bozza. 30–60 secondi per una Check Vincoli">'+icon('search')+' Interroga</button></div>';
+  let h='<div class="btns rsrun"><button type="button" class="btn" id="rsGo"'+(rsBusy? ' disabled' : '')+' title="Legge i layer con un tema, della mappa aperta e nazionali: cosa c’è entro 1 km dall’area lorda (10 km per Surrounding area), e lo scrive nella bozza. Uno o due minuti per una Check Vincoli">'+icon('search')+' Controlla i vincoli</button></div>'
+    +'<div class="rsstat'+(rsBusy? ' busy' : '')+'" id="rsStat" title="'+esc(nq+' layer da leggere ('+S.filter(s=>s.ty==='nat').length+' nazionali), '+nv+' immagini da guardare sulla mappa')+'">'+esc(rsStatText())+'</div>';
   const reg=rsRegion(), cv=reg&&typeof cvIdFor==='function'? cvIdFor(reg) : null;
   if(cv&&cv!==map) h+='<div class="rmflag rsnote">'+icon('map')+'<span>La mappa aperta non è la Check Vincoli · '+esc(reg)+'. <button type="button" class="rmlink" data-act="cv" data-id="'+esc(cv)+'">Apri la mappa ›</button></span></div>';
-  if(L&&rsStale==='area') h+='<div class="rmflag rsnote warn">'+icon('warning')+'<span>L’area lorda è cambiata dopo l’interrogazione: i layer sono fuori dalla bozza finché non premi Interroga.</span></div>';
-  else if(L&&rsStale==='route') h+='<div class="rmflag rsnote warn">'+icon('warning')+'<span>La connessione è cambiata dopo l’interrogazione: gli attraversamenti sono fuori dalla bozza finché non premi Interroga.</span></div>';
-  else if(L&&L.map!==map) h+='<div class="rmflag rsnote">'+icon('info')+'<span>Risultati dalla mappa «'+esc(L.mapT||'')+'»: restano nella bozza; premi Interroga per la mappa aperta.</span></div>';
+  if(L&&rsStale==='area') h+='<div class="rmflag rsnote warn">'+icon('warning')+'<span>L’area lorda è cambiata dopo il controllo: i layer sono fuori dalla bozza finché non lo rifai.</span></div>';
+  else if(L&&rsStale==='route') h+='<div class="rmflag rsnote warn">'+icon('warning')+'<span>La connessione è cambiata dopo il controllo: gli attraversamenti sono fuori dalla bozza finché non lo rifai.</span></div>';
+  else if(L&&L.map!==map) h+='<div class="rmflag rsnote">'+icon('info')+'<span>Risultati dalla mappa «'+esc(L.mapT||'')+'»: restano nella bozza; rifai il controllo per la mappa aperta.</span></div>';
   // «Fonti»: files, national layers, the map's layers by theme, without a theme, excluded
-  let body='', n=0;
+  let body='<div class="rsleg">'+RS_LEG.map(x=>'<span><i class="rsres '+x[0]+'"></i>'+x[1]+'</span>').join('')+'</div>', n=0;
   if(files.size){ body+=rsGroup('files', 'File importati', [...files].map((x, j)=>rsFileHtml(x[0], x[1], j)).join(''), files.size); n+=files.size; }
   const nat=S.map((s, i)=>[s, i]).filter(x=>x[0].ty==='nat'); body+=rsGroup('nat', 'Layer nazionali', nat.map(x=>rsRowHtml(x[0], x[1])).join(''), nat.length);
   const mp=S.map((s, i)=>[s, i]).filter(x=>x[0].ty!=='nat');
@@ -13518,8 +13842,8 @@ function rsRender(){ const el=$('rmLay'); if(!el) return;
   if(outL.length) body+=rsGroup('out', 'Esclusi', outL.map(x=>rsRowHtml(x[0], x[1])).join(''), outL.length);
   if(!mp.length) body+='<div class="thint">'+(map? 'Nessun layer nella mappa aperta.' : 'Nessuna mappa del portale aperta: accedi ad AGOL e scegli una Check Vincoli.')+'</div>';
   n+=used.length;
-  h+='<details class="imod flat rmsec rssrc" data-s="src"'+(rmSecOpen.has('src')? ' open' : '')+'><summary><span class="im-t"><b>Fonti</b></span><span class="im-n im-txt" title="File e layer con un tema">'+n+'</span></summary><div class="im-body">'+body+'</div></details>';
-  el.innerHTML=h; }
+  h+='<details class="imod flat rmsec rssrc" data-s="src"'+(rmSecOpen.has('src')? ' open' : '')+'><summary><span class="im-t"><b>Layer letti</b></span><span class="im-n im-txt" title="File e layer con un tema: scegli la riga della matrice di ognuno, o escludilo">'+n+'</span></summary><div class="im-body">'+body+'</div></details>';
+  el.innerHTML=h; const s2=$('rmSum2'); if(s2){ s2.textContent=rsSumText(); s2.title=rsStatText(); } }
 document.addEventListener('DOMContentLoaded', function(){
   const root=$('modRisk'); if(!root) return;
   root.addEventListener('click', e=>{ const t=e.target.closest('button'); if(!t||!root.contains(t)) return;
@@ -13530,9 +13854,11 @@ document.addEventListener('DOMContentLoaded', function(){
   root.addEventListener('change', e=>{ const t=e.target; if(!t||!t.classList||!t.classList.contains('rssel')) return;
     if(t.dataset.f!=null){ const name=rsFileNames[+t.dataset.f]; if(name==null) return; const cur=Object.assign({t:rsFileTheme(name), f:rsFileField(name)}, (rmState.files||{})[name]||{});
       cur[t.dataset.x]=t.value; (rmState.files||(rmState.files={}))[name]=cur; }
-    else { const s=rsList[+t.dataset.i]; if(!s) return; rsOvSet(s.ty==='nat'? '*' : (wmCurrentId()||''), s.k, t.value, s.g0); }
+    else { const s=rsList[+t.dataset.i]; if(!s) return; rsOvSet(s.ty==='nat'? '*' : (wmCurrentId()||''), s.k, t.value, s.g0);
+      const L=rmState.lay;   // 10/11: the choice goes in the results too, so it travels with the project
+      if(L&&Array.isArray(L.src)&&(s.ty==='nat'||L.map===(wmCurrentId()||''))) L.src.forEach(e=>{ if(e.k===s.k){ e.th=t.value; } else if(e.pk===s.k){ e.th=t.value; e.pth=t.value; } }); }
     rmCalc(true); });
-  try{ const w=()=>{ if(window.view&&esriMods&&esriMods.reactiveUtils) esriMods.reactiveUtils.watch(()=>view.map, ()=>{ rsRender(); }); else setTimeout(w, 1000); }; w(); }catch(e){}
+  try{ const w=()=>{ if(window.view&&esriMods&&esriMods.reactiveUtils) esriMods.reactiveUtils.watch(()=>view.map, ()=>{ rsSeen=null; rsRender(); }); else setTimeout(w, 1000); }; w(); }catch(e){}
   rsRender(); });
 </script>
 <script>
@@ -13566,19 +13892,22 @@ const RX_ALIAS={pipe_ok:['already approved pipe capacity'], pipe_tot:['pipe tota
   grid_constr:['constraints'], grid_tech:['technical feasibility', 'grid connection technical feasibility'], grid_admin:['administrative feasibility', 'grid connection administrative feasibility'],
   grid_status:['status'], grid_cost:['connection cost', 'grid connection expected cost']};
 const RX_BOX={code:/^project code$/, name:/^project name$/, coords:/^coordinates$/, region:/^region$/, muni:/^municipality$/, surface:/^surface\b/, power:/^power\b/, yield:/^yield\b/};
-let rxTpl=null, rxCat=null, rxBusy=false, rxPick='';   // the template {name, buf, at}; the meanings of the colours {row: {colour: text}}
+let rxTpl=null, rxCat=null, rxBusy=false, rxPick='', rxMore=false;   // the template {name, buf, at}; the meanings of the colours {row: {colour: text}}
 
 // ── text helpers ──
 function rxNorm(s){ return String(s==null? '' : s).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, ' ').trim(); }
 function rxDice(a, b){ if(a===b) return 1; if(a.length<2||b.length<2) return 0; const m=new Map(); for(let i=0; i<a.length-1; i++){ const k=a.substr(i, 2); m.set(k, (m.get(k)||0)+1); }
   let n=0; for(let i=0; i<b.length-1; i++){ const k=b.substr(i, 2), c=m.get(k); if(c){ n++; m.set(k, c-1); } } return 2*n/(a.length+b.length-2); }
 function rxSecOf(k){ const S=RM_ROWS.find(x=>x.rows.some(r=>r[0]===k)); return S? S.s : ''; }
-// the row key of a label: within its section ≥ 0.6, anywhere ≥ 0.85 (an older template without the section's header)
-function rxRowKey(label, sec, used){ const L=rxNorm(label); if(!L) return null; let best=null, bs=0;
-  Object.keys(RX_ALIAS).forEach(k=>{ if(used&&used.has(k)) return; const inSec=!sec||rxSecOf(k)===sec;
-    RX_ALIAS[k].forEach(a=>{ let s=rxDice(L, a); if(L.indexOf(a)===0&&a.length>=8) s=Math.max(s, 0.9); if(!inSec) s-=0.15; if(s>bs){ bs=s; best=k; } }); });
-  return bs>=(sec? 0.6 : 0.85)? best : null; }
-function rxClean(s){ return String(s==null? '' : s).replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F￾￿]/g, '').slice(0, 32000); }
+// the row keys a label may be, best first: within its section ≥ 0.6, anywhere ≥ 0.85 (an older template without the section's header)
+function rxRowScores(label, sec){ const L=rxNorm(label), out=[]; if(!L) return out;
+  Object.keys(RX_ALIAS).forEach(k=>{ const inSec=!sec||rxSecOf(k)===sec; let bs=0;
+    RX_ALIAS[k].forEach(a=>{ let s=rxDice(L, a); if(L.indexOf(a)===0&&a.length>=8) s=Math.max(s, 0.9); if(!inSec) s-=0.15; if(s>bs) bs=s; });
+    if(bs>=(sec? 0.6 : 0.85)) out.push([k, bs]); });
+  return out.sort((a, b)=>b[1]-a[1]); }
+function rxRowKey(label, sec, used){ const S=rxRowScores(label, sec).filter(x=>!(used&&used.has(x[0]))); return S.length? S[0][0] : null; }
+function rxClean(s){ return String(s==null? '' : s).replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F￾￿]/g, '').slice(0, 32000)
+  .replace(/[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?<![\uD800-\uDBFF])[\uDC00-\uDFFF]/g, ''); }   // 10/11: no half of a character cut by the limit
 
 // ── the workbook in XML ──
 function rxDoc(t){ const d=new DOMParser().parseFromString(t, 'application/xml'); if(d.getElementsByTagName('parsererror').length) throw new Error('XML del file non leggibile'); return d; }
@@ -13603,7 +13932,21 @@ async function rxOpen(buf){ if(typeof JSZip==='undefined') throw new Error('libr
 function rxCellText(X, c){ if(!c) return ''; const t=c.getAttribute('t');
   if(t==='s'){ const v=rxKids(c, 'v')[0]; return v? rxUnesc(X.sst[+v.textContent]||'') : ''; }
   if(t==='inlineStr'){ const is=rxKids(c, 'is')[0]; return is? rxUnesc([...is.getElementsByTagNameNS(RX_NS, 't')].map(x=>x.textContent).join('')) : ''; }
-  const v=rxKids(c, 'v')[0]; return v? v.textContent : ''; }
+  const v=rxKids(c, 'v')[0]; return !v? '' : (!t||t==='n')? rxNumText(X, c, v.textContent) : v.textContent; }
+// 10/11 (review): a number as Excel shows it — a date, a percentage, no float noise. «Leggi» took the stored value
+// (46096 for 15/03/2026) and «Aggiorna…» wrote it back as a text
+function rxNumText(X, c, raw){ const v=+raw; if(raw===''||!isFinite(v)) return raw; let kind='';
+  try{ const d=X.sty, xf=d&&rxKids(rxOne(d, 'cellXfs'), 'xf')[+(c.getAttribute('s')||0)], id=xf? +(xf.getAttribute('numFmtId')||0) : 0;
+    if((id>=14&&id<=17)||(id>=27&&id<=31)||id===36||(id>=50&&id<=58)) kind='date'; else if((id>=18&&id<=22)||(id>=32&&id<=35)||(id>=45&&id<=47)) kind='time'; else if(id===9||id===10) kind='pct';
+    else if(id>=164){ const nf=[...d.getElementsByTagNameNS(RX_NS, 'numFmt')].find(n=>+n.getAttribute('numFmtId')===id), code=nf? String(nf.getAttribute('formatCode')||'') : '';
+      const bare=code.replace(/"[^"]*"/g, '').replace(/\[[^\]]*\]/g, '').replace(/\\./g, '').toLowerCase(), num=/[#0?]/.test(bare);
+      kind=/[dy]/.test(bare)||(/m/.test(bare)&&!/[h:s]/.test(bare)&&!num)? 'date' : (/[hs]/.test(bare)&&!num)? 'time' : /%/.test(bare)? 'pct' : ''; } }catch(e){}
+  const p2=x=>('0'+x).slice(-2);
+  if(kind==='date'||kind==='time'){ const wp=rxOne(X.wb, 'workbookPr'), off=wp&&/^(1|true)$/.test(wp.getAttribute('date1904')||'')? 1462 : 0, t=new Date(Date.UTC(1899, 11, 30)+Math.round((v+off)*86400000));
+    const day=p2(t.getUTCDate())+'/'+p2(t.getUTCMonth()+1)+'/'+t.getUTCFullYear(), hm=p2(t.getUTCHours())+':'+p2(t.getUTCMinutes());
+    return (kind==='time'&&v<1)? hm : day+((kind==='time'&&(v%1)>1e-6)? ' '+hm : ''); }
+  if(kind==='pct') return String(+(v*100).toPrecision(12))+' %';
+  return String(+v.toPrecision(12)); }
 function rxUnesc(s){ return String(s).replace(/_x([0-9A-Fa-f]{4})_/g, (m, h)=>String.fromCharCode(parseInt(h, 16))); }   // Excel writes a carriage return as _x000D_
 function rxRows(d){ const sd=rxOne(d, 'sheetData'); return sd? rxKids(sd, 'row') : []; }
 function rxCell(row, col){ return rxKids(row, 'c').find(c=>rxColN(c.getAttribute('r'))===col)||null; }
@@ -13612,14 +13955,22 @@ function rxCellMake(d, row, col){ let c=rxCell(row, col); if(c) return c; const 
   c=d.createElementNS(RX_NS, 'c'); c.setAttribute('r', rxColL(col)+r);
   const prev=row.previousElementSibling, up=prev&&prev.localName==='row'? rxCell(prev, col) : null; if(up&&up.getAttribute('s')) c.setAttribute('s', up.getAttribute('s'));
   const after=rxKids(row, 'c').find(x=>rxColN(x.getAttribute('r'))>col); row.insertBefore(c, after||null); return c; }
-// the rows of the matrix (label in any of the first three columns) and the cells of the box (label, then the value at its right)
-function rxMapSheet(X){ const rows={}, box={}, used=new Set(); let sec='';
+// the rows of the matrix (the label: the first of the first three columns with a word in it) and the cells of the box
+// (label, then the value at its right). 10/11 (review): the pairs label–row are taken by their score, the best first, so
+// an exact name is never taken by a similar one met earlier in the sheet; a number in column A does not hide the label
+// in B; the box's labels are those in the column of «Project code» (a value «Power …» is not a label)
+function rxMapSheet(X){ const rows={}, box={}, cand=[], bx=[]; let sec='';
   rxRows(X.sheet).forEach(row=>{ const cells=rxKids(row, 'c');
-    for(const c of cells){ const col=rxColN(c.getAttribute('r')); if(col>3) break; const L=rxNorm(rxCellText(X, c)); if(!L) continue;
+    for(const c of cells){ const col=rxColN(c.getAttribute('r')); if(col>3) break; const L=rxNorm(rxCellText(X, c)); if(!/[a-z]{3}/.test(L)) continue;
       const S=RX_SEC.find(x=>x[1].test(L)); if(S){ sec=S[0]; break; }
-      if(sec==='end') break; const k=rxRowKey(L, sec, used); if(k){ used.add(k); rows[k]={row:row, col:col}; } break; }
+      if(sec!=='end') cand.push({row:row, col:col, L:L, sec:sec}); break; }
     cells.forEach(c=>{ const col=rxColN(c.getAttribute('r')); if(col<7) return; const L=rxNorm(rxCellText(X, c)); if(!L) return;   // from G on: a comment in F beginning «Power…» is not the box
-      Object.keys(RX_BOX).forEach(k=>{ if(!box[k]&&RX_BOX[k].test(L)) box[k]={row:row, col:col+1}; }); }); });
+      Object.keys(RX_BOX).forEach(k=>{ if(RX_BOX[k].test(L)) bx.push({k:k, row:row, col:col}); }); }); });
+  const pairs=[]; cand.forEach((c, i)=>rxRowScores(c.L, c.sec).forEach(p=>pairs.push({i:i, k:p[0], s:p[1]})));
+  pairs.sort((a, b)=>b.s-a.s||a.i-b.i); const usedK=new Set(), usedR=new Set();
+  pairs.forEach(p=>{ if(usedK.has(p.k)||usedR.has(p.i)) return; usedK.add(p.k); usedR.add(p.i); rows[p.k]={row:cand[p.i].row, col:cand[p.i].col}; });
+  const c0=(bx.find(x=>x.k==='code')||bx[0]||{}).col;
+  bx.forEach(x=>{ if(!box[x.k]&&x.col===c0) box[x.k]={row:x.row, col:x.col+1}; });
   return {rows:rows, box:box}; }
 // «Risk category»: the header row with the five colours, then a topic per row with what each colour means
 function rxReadCat(X, d){ const st=rxStyles(X), out={}; let head=null;
@@ -13645,9 +13996,9 @@ function rxStyles(X){ if(X._st) return X._st; const d=X.sty, fills=d&&rxOne(d, '
       p.setAttribute('patternType', 'solid'); fg.setAttribute('rgb', rgb); bg.setAttribute('indexed', '64'); p.appendChild(fg); p.appendChild(bg); f.appendChild(p); fills.appendChild(f); fl.push(f); count(fills, fl.length); return fl.length-1; },
     clone(s, fn, key){ const k=key+'|'+(s||0); if(cache.has(k)) return cache.get(k); const base=xl[+s||0]||xl[0]; const x=base.cloneNode(true); fn(x);
       xfs.appendChild(x); xl.push(x); count(xfs, xl.length); cache.set(k, xl.length-1); X.styDirty=true; return xl.length-1; },
-    withFill(s, rgb){ const id=S.fill(rgb), cur=xl[+s||0]; if(cur&&+(cur.getAttribute('fillId')||0)===id) return s;
+    withFill(s, rgb){ const id=S.fill(rgb), cur=xl[+s||0]; if(cur&&+(cur.getAttribute('fillId')||0)===id) return +s||0;   // 10/11: a cell without a style has the style 0 (never the text «null»)
       return S.clone(s, x=>{ x.setAttribute('fillId', String(id)); x.setAttribute('applyFill', '1'); }, 'f'+(rgb||'none')); },
-    withWrap(s){ const cur=xl[+s||0], a=cur&&rxKids(cur, 'alignment')[0]; if(a&&a.getAttribute('wrapText')==='1') return s;
+    withWrap(s){ const cur=xl[+s||0], a=cur&&rxKids(cur, 'alignment')[0]; if(a&&a.getAttribute('wrapText')==='1') return +s||0;
       return S.clone(s, x=>{ let al=rxKids(x, 'alignment')[0]; if(!al){ al=d.createElementNS(RX_NS, 'alignment'); x.insertBefore(al, x.firstChild); } al.setAttribute('wrapText', '1');
         if(!al.getAttribute('vertical')) al.setAttribute('vertical', 'top'); x.setAttribute('applyAlignment', '1'); }, 'w'); } };
   X._st=S; return S; }
@@ -13659,67 +14010,98 @@ function rxSetText(d, c, text){ while(c.firstChild) c.removeChild(c.firstChild);
   const is=d.createElementNS(RX_NS, 'is'), t=d.createElementNS(RX_NS, 't'); t.setAttributeNS(RX_XML, 'xml:space', 'preserve'); t.textContent=rxClean(text);
   is.appendChild(t); c.appendChild(is); c.setAttribute('t', 'inlineStr'); }
 function rxSetNum(d, c, n){ while(c.firstChild) c.removeChild(c.firstChild); c.removeAttribute('t'); const v=d.createElementNS(RX_NS, 'v'); v.textContent=String(n); c.appendChild(v); }
-function rxNum(s){ const m=/^\s*(-?\d+(?:[.,]\d+)?)\s*(mwp?|kwp?|kwh\s*\/\s*kwp|ha)?\s*$/i.exec(String(s||'')); return m? +m[1].replace(',', '.') : null; }
+// 10/11 (review): Power (MWp) and Yield (kWh/kWp) as numbers, in the Italian or the English way: «10,5 MWp» 10.5, «850 kWp»
+// 0.85, «1.650 kWh/kWp» 1650, «1.234,5» 1234.5. One sign with three digits after it is thousands for a yield or for
+// kilowatts, decimals for megawatts. What cannot be read stays a text
+function rxNum(s, kind){ const m=/^\s*(-?[\d.,\s']+?)\s*(mwp?|kwp?|kwh\s*\/\s*kwp|ha)?\s*$/i.exec(String(s||'')); if(!m) return null;
+  let t=m[1].replace(/[\s']/g, ''); if(!/\d/.test(t)) return null;
+  const unit=(m[2]||'').toLowerCase().replace(/\s/g, ''), nd=(t.match(/\./g)||[]).length, nc=(t.match(/,/g)||[]).length;
+  if(nd&&nc){ const dec=t.lastIndexOf('.')>t.lastIndexOf(',')? '.' : ','; t=t.split(dec==='.'? ',' : '.').join('').replace(',', '.'); }
+  else if(nd>1||nc>1) t=t.replace(/[.,]/g, '');
+  else if(nd+nc===1){ const i=t.search(/[.,]/), lead=t.slice(0, i).replace('-', ''), three=t.length-i-1===3&&lead.length>=1&&lead.length<=3&&lead[0]!=='0';
+    t=(three&&(kind==='yield'||/^kw/.test(unit)))? t.replace(/[.,]/, '') : t.replace(',', '.'); }
+  if((t.match(/\./g)||[]).length>1) return null;
+  let v=+t; if(!isFinite(v)) return null;
+  if(kind==='power'&&/^kwp?$/.test(unit)) v=v/1000;
+  return v; }
 
 // ── writing: the template (make) or the project's matrix (update) ──
-function rxWrite(X, mode){ const d=X.sheet, st=rxStyles(X), M=X.map, rep={rows:0, colours:0, missing:[]};
+function rxWrite(X, mode){ const d=X.sheet, st=rxStyles(X), M=X.map, rep={rows:0, colours:0, missing:[], box:[]};
+  // 10/11 (review): «Aggiorna…» leaves a cell that already says what the panel says (a date stays a date, a rich text stays
+  // rich); a formula overwritten takes its chain away (rxBlob)
+  const same=(c, v)=>mode==='update'&&!!c&&rxCellText(X, c).trim()===String(v).trim(), drop=c=>{ if(rxKids(c, 'f').length) X.fDrop=true; };
   rmKeys().forEach(k=>{ const R=M.rows[k]; if(!R){ rep.missing.push(k); return; } const r=rmRow(k), row=R.row, base=R.col; rep.rows++;
-    [['d', base+1], ['e', base+3], ['f', base+4]].forEach(z=>{ const v=r[z[0]].v; if(!v) return; const c=rxCellMake(d, row, z[1]); rxSetText(d, c, v); c.setAttribute('s', String(st.withWrap(c.getAttribute('s')))); });
-    const c=rxCellMake(d, row, base+2); let col=r.c;
-    if(!col&&mode==='update'){ const k0=rxColourKey(st.fillOf(c.getAttribute('s'))); if(k0&&k0!=='na') col='keep'; }
-    if(col==='keep') return;
-    col=col||'o'; c.setAttribute('s', String(st.withFill(c.getAttribute('s'), col==='na'? null : RX_RGB[col]))); rep.colours++; });
-  Object.keys(M.box).forEach(k=>{ const v=rmBoxF(k).v; if(!v) return; const B=M.box[k], c=rxCellMake(d, B.row, B.col), n=(k==='power'||k==='yield')? rxNum(v) : null;
+    [['d', base+1], ['e', base+3], ['f', base+4]].forEach(z=>{ const v=r[z[0]].v; if(!v||same(rxCell(row, z[1]), v)) return; const c=rxCellMake(d, row, z[1]); drop(c); rxSetText(d, c, v); c.setAttribute('s', String(st.withWrap(c.getAttribute('s')))); });
+    let col=r.c; if(!col&&mode==='update') return;   // 10/11: «Aggiorna…» never touches the colour of a row the panel has not coloured, whatever the file has there
+    const c=rxCellMake(d, row, base+2); col=col||'o'; c.setAttribute('s', String(st.withFill(c.getAttribute('s'), col==='na'? null : RX_RGB[col]))); rep.colours++; });
+  RM_BOX.forEach(b=>{ const k=b[0], v=rmBoxF(k).v; if(!v) return; const B=M.box[k]; if(!B){ rep.box.push(b[1]); return; } if(same(rxCell(B.row, B.col), v)) return;
+    const c=rxCellMake(d, B.row, B.col), n=(k==='power'||k==='yield')? rxNum(v, k) : null; drop(c);
     if(n!=null) rxSetNum(d, c, n); else rxSetText(d, c, v); });
   // the title «Risk Matrix <name>» in C1: its cached value, and a full recalculation when Excel opens the file
   const nm=rmBoxF('name').v; if(nm) rxRows(d).slice(0, 3).forEach(row=>rxKids(row, 'c').forEach(c=>{ const f=rxKids(c, 'f')[0], v=rxKids(c, 'v')[0];
-    const m=f&&/^"([^"]*)"\s*&\s*\$?I\$?3$/.exec(f.textContent.trim()); if(m&&v) v.textContent=m[1]+nm; }));
+    const m=f&&/^"([^"]*)"\s*&\s*\$?I\$?3$/.exec(f.textContent.trim()); if(m&&v) v.textContent=m[1]+rxClean(nm); }));
   const cp=rxOne(X.wb, 'calcPr'); if(cp) cp.setAttribute('fullCalcOnLoad', '1');
   return rep; }
 async function rxBlob(X){ const o={createFolders:false};   // no folder entries the template does not have
+  if(X.fDrop&&X.zip.file('xl/calcChain.xml')){ try{   // 10/11: a formula was overwritten: the chain of the calculations goes, Excel makes it again
+      const ct=await X.zip.file('[Content_Types].xml').async('string'), rl=await X.zip.file('xl/_rels/workbook.xml.rels').async('string');
+      X.zip.file('[Content_Types].xml', ct.replace(/<Override\b[^>]*PartName="\/xl\/calcChain\.xml"[^>]*\/>/i, ''), o);
+      X.zip.file('xl/_rels/workbook.xml.rels', rl.replace(/<Relationship\b[^>]*calcChain[^>]*\/>/i, ''), o); X.zip.remove('xl/calcChain.xml'); }catch(e){ console.warn('[risk matrix, Excel] calcChain', e); } }
   X.zip.file(X.main.path, rxSer(X.sheet), o); if(X.styDirty) X.zip.file('xl/styles.xml', rxSer(X.sty), o); X.zip.file('xl/workbook.xml', rxSer(X.wb), o);
   return X.zip.generateAsync({type:'blob', compression:'DEFLATE', mimeType:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}); }
 function rxFileName(){ const y=((rxTpl&&/IT_RISK_MATRIX_(\d{4})/i.exec(rxTpl.name))||[])[1]||'2025', s=v=>String(v||'').replace(/[\\/:*?"<>|]+/g, '-').replace(/\s+/g, ' ').trim();
   return 'IT_RISK_MATRIX_'+y+'_'+(s(rmBoxF('code').v)||'Cxxxx')+'_'+(s(rmBoxF('name').v)||'IT xxxx')+'.xlsx'; }
 // ── reading a matrix into the panel (R3-3): what the file has becomes the PM's; the names of the owners stay personal data
 function rxRead(X){ const st=rxStyles(X), M=X.map, rep={rows:0, fields:0, colours:0};
-  const take=(fl, v, own)=>{ v=String(v||'').trim(); if(!v||v===fl.v) return false; fl.v=v; fl.m=(v!==fl.a); if(!fl.m) delete fl.n; if(own) fl.o=true; rep.fields++; return true; };
+  const take=(fl, v, own)=>{ v=String(v||'').trim(); if(own&&v) fl.o=true; if(!v||v===fl.v) return false; fl.v=v; fl.m=(v!==fl.a); if(!fl.m) delete fl.n; rep.fields++; return true; };
   Object.keys(M.rows).forEach(k=>{ const R=M.rows[k], r=rmRow(k); rep.rows++;
-    take(r.d, rxCellText(X, rxCell(R.row, R.col+1)), k==='landowner'); take(r.e, rxCellText(X, rxCell(R.row, R.col+3))); take(r.f, rxCellText(X, rxCell(R.row, R.col+4)));
+    const own=rmPers(k); take(r.d, rxCellText(X, rxCell(R.row, R.col+1)), own); take(r.e, rxCellText(X, rxCell(R.row, R.col+3)), own); take(r.f, rxCellText(X, rxCell(R.row, R.col+4)), own);
     const ck=rxColourKey(st.fillOf((rxCell(R.row, R.col+2)||{getAttribute:()=>null}).getAttribute('s'))); if(ck&&ck!=='na'&&ck!==r.c){ r.c=ck; rep.colours++; } });
   Object.keys(M.box).forEach(k=>{ const B=M.box[k]; take(rmBoxF(k), rxCellText(X, rxCell(B.row, B.col))); });
   return rep; }
 
 // ── the template, kept by this browser (IndexedDB; in memory when it cannot) ──
-function rxIdb(){ return new Promise((res, rej)=>{ try{ const q=indexedDB.open('axpo_rm', 1); q.onupgradeneeded=()=>q.result.createObjectStore('files'); q.onsuccess=()=>res(q.result); q.onerror=()=>rej(q.error); }catch(e){ rej(e); } }); }
+function rxIdb(){ return new Promise((res, rej)=>{ try{ const q=indexedDB.open('axpo_rm', 1); q.onupgradeneeded=()=>q.result.createObjectStore('files'); q.onsuccess=()=>res(q.result); q.onerror=()=>rej(q.error); q.onblocked=()=>rej(new Error('IndexedDB occupato'));
+    setTimeout(()=>rej(new Error('IndexedDB non risponde')), 3000); }catch(e){ rej(e); } }); }   // 10/11: never a wait without an end
 async function rxTplLoad(){ try{ const db=await rxIdb(); const v=await new Promise(res=>{ const q=db.transaction('files').objectStore('files').get('template'); q.onsuccess=()=>res(q.result||null); q.onerror=()=>res(null); });
     if(v&&v.buf){ rxTpl=v; try{ rxCat=(await rxOpen(v.buf)).cat||null; }catch(e){ rxCat=null; } } }catch(e){} rxRender(); }
 async function rxTplSave(name, buf){ const X=await rxOpen(buf), n=Object.keys(X.map.rows).length;
   if(n<10) throw new Error('«'+name+'» non sembra una Risk Matrix: ha '+n+' righe riconosciute su '+rmKeys().length);
   rxTpl={name:name, buf:buf, at:new Date().toISOString()}; rxCat=X.cat||null;
-  try{ const db=await rxIdb(); await new Promise(res=>{ const q=db.transaction('files', 'readwrite').objectStore('files').put(rxTpl, 'template'); q.onsuccess=res; q.onerror=res; }); }catch(e){}
+  try{ const db=await rxIdb(); await new Promise((res, rej)=>{ const tx=db.transaction('files', 'readwrite'), q=tx.objectStore('files').put(rxTpl, 'template');
+      tx.oncomplete=res; q.onsuccess=res; tx.onabort=tx.onerror=q.onerror=()=>rej(tx.error||q.error); setTimeout(()=>rej(new Error('IndexedDB non risponde')), 3000); }); }catch(e){ rxTpl.mem=true; }
   rxRender(); try{ rmRender(); }catch(e){} return n; }
 // the meaning of a colour for a row (34-risk-matrix.js, the swatches' tooltips)
 function rxCatTip(k, c, gen){ const t=rxCat&&rxCat[k]&&rxCat[k][c]; return t? gen+'\n— '+t : gen; }
 
+// 10/11 (seen in the user's own way of working: the perimeter made again, then «Aggiorna…» on the old matrix): the fields
+// where the file already has a text different from the panel's — the PM is asked before they are replaced
+function rxConflicts(X){ const M=X.map, out=[];
+  rmKeys().forEach(k=>{ const R=M.rows[k]; if(!R) return; const r=rmRow(k); let l=k; RM_ROWS.forEach(S=>S.rows.forEach(x=>{ if(x[0]===k) l=x[1]; }));
+    [['d', R.col+1, 'Description'], ['e', R.col+3, 'References'], ['f', R.col+4, 'Comments']].forEach(z=>{ const v=String(r[z[0]].v||'').trim(); if(!v) return;
+      const t=rxCellText(X, rxCell(R.row, z[1])).trim(); if(t&&t!==v) out.push(l+' › '+z[2]); }); });
+  return out; }
 // ── the actions ──
 async function rxMake(){ if(!rxTpl){ rxAsk('make'); return; } await rxRun('make', rxTpl.buf, rxFileName()); }
 async function rxRun(mode, buf, name){ if(rxBusy) return; rxBusy=true; rxRender();
   try{ for(let k=0; k<100&&rmBusy; k++) await new Promise(r=>setTimeout(r, 100));
     const X=await rxOpen(buf.slice(0)); if(Object.keys(X.map.rows).length<5) throw new Error('nel file «'+name+'» non trovo le righe della Risk Matrix');
+    if(mode==='update'){ const cf=rxConflicts(X);
+      if(cf.length&&!confirm('«'+name+'» ha già '+cf.length+(cf.length===1? ' testo diverso' : ' testi diversi')+' da quelli del pannello:\n'+cf.slice(0, 4).join('\n')+(cf.length>4? '\n…' : '')
+        +'\n\nOK: li sostituisco con i testi del pannello.\nAnnulla: non scrivo nulla. Per tenere i testi del file, usa prima «Leggi una matrice nel pannello».')){ toolMsg('rmMsg', 'Niente scritto: il file resta com’è.'); return; } }
     const rep=rxWrite(X, mode); let ri=null;
     if(typeof riRun==='function'){ try{ ri=await riRun(X, t=>toolMsg('rmMsg', t)); }catch(e){ console.warn('[risk matrix, images]', e); ri={notes:['immagini non fatte: '+((e&&e.message)||e)]}; } }   // R3b: Cadastral and Constraints
     const blob=await rxBlob(X); dlBlob(name, blob);
     const miss=rep.missing.map(k=>{ let l=k; RM_ROWS.forEach(S=>S.rows.forEach(r=>{ if(r[0]===k) l=r[1]; })); return l; });
     const extra=ri? [ri.cad&&'Cadastral: '+ri.cad, ri.con&&'Constraints: '+ri.con].concat(ri.notes||[]).filter(Boolean).join('; ') : '';
-    toolMsg('rmMsg', (mode==='make'? 'Excel creato: ' : 'Matrice aggiornata: ')+name+' ('+rep.rows+' righe'+(miss.length? '; non trovate nel file: '+miss.join(', ') : '')+(extra? '; '+extra : '')+'). '
+    toolMsg('rmMsg', (mode==='make'? 'Excel creato: ' : 'Matrice aggiornata: ')+name+' ('+rep.rows+' righe'+(miss.length? '; non trovate nel file: '+miss.join(', ') : '')+(rep.box.length? '; dati del progetto non trovati nel file: '+rep.box.join(', ') : '')+(extra? '; '+extra : '')+'). '
       +(mode==='update'? 'Salvalo al posto del file originale.' : 'I nomi degli intestatari, se ci sono, sono solo in questo file.'), 'ok'); }
   catch(e){ console.warn('[risk matrix, Excel]', e); toolMsg('rmMsg', 'Excel non creato: '+((e&&e.message)||e)+'.', 'err'); }
   finally{ rxBusy=false; rxRender(); } }
 function rxAsk(what){ rxPick=what; const f=$('rxFile'); if(!f) return; f.value=''; f.click(); }
 async function rxPicked(file){ const what=rxPick; rxPick=''; if(!file) return;
   try{ const buf=await file.arrayBuffer();
-    if(what==='tpl'||what==='make'){ const n=await rxTplSave(file.name, buf); toolMsg('rmMsg', 'Modello ricordato in questo browser: '+file.name+' ('+n+' righe riconosciute'+(rxCat? ', significato dei colori letto' : '')+').', 'ok');
+    if(what==='tpl'||what==='make'){ const n=await rxTplSave(file.name, buf); toolMsg('rmMsg', (rxTpl&&rxTpl.mem? 'Modello tenuto fino alla chiusura della pagina (il browser non lo può ricordare): ' : 'Modello ricordato in questo browser: ')+file.name+' ('+n+' righe riconosciute'+(rxCat? ', significato dei colori letto' : '')+').', 'ok');
       if(what==='make') await rxRun('make', buf, rxFileName()); return; }
     if(what==='upd'){ await rxRun('update', buf, file.name); return; }
     if(what==='read'){ const X=await rxOpen(buf); if(Object.keys(X.map.rows).length<5) throw new Error('nel file non trovo le righe della Risk Matrix');
@@ -13727,20 +14109,27 @@ async function rxPicked(file){ const what=rxPick; rxPick=''; if(!file) return;
       const rep=rxRead(X); if(!rxCat&&X.cat) rxCat=X.cat; rmRender(); saveStateDebounced();
       toolMsg('rmMsg', 'Letti da '+file.name+': '+rep.fields+(rep.fields===1? ' campo' : ' campi')+' e '+rep.colours+(rep.colours===1? ' colore' : ' colori')+' ('+rep.rows+' righe trovate).', 'ok'); } }
   catch(e){ console.warn('[risk matrix, Excel]', e); toolMsg('rmMsg', 'File non letto: '+((e&&e.message)||e)+'.', 'err'); } }
-function rxRender(){ const el=$('rmXls'); if(!el) return;
+// step 4 (10/11, U6): a new matrix or one that exists, the PDF, the maps chosen one by one (asked by the user), the rest under «Altro»
+function rxPdf(){ try{ showTab('export'); modShow('export', 'print'); const c=$('prRisk'); if(c&&!c.checked){ c.checked=true; c.dataset.set='1'; if(typeof rpSum==='function') rpSum(); } }catch(e){} }
+function rxRender(){ const el=$('rmXls'); if(!el) return; const dis=rxBusy? ' disabled' : '';
   const tip=rxTpl? 'Modello: '+rxTpl.name+(rxCat? '\nIl significato dei colori viene dal suo foglio Risk category' : '')+'\nRicordato in questo browser dal '+rsWhen(rxTpl.at) : 'Scegli il modello aziendale IT_RISK_MATRIX (SharePoint › 09 Risk Matrix): il browser lo ricorda';
-  el.innerHTML='<div class="j5row rxrow"><span class="j5k">Excel</span><span class="j5v" title="'+esc(tip)+'">'+esc(rxTpl? rxTpl.name : 'nessun modello')+'</span>'
-    +'<button type="button" class="btn sm" id="rxTplPick" title="'+esc(tip)+'">'+(rxTpl? 'Cambia' : 'Scegli…')+'</button></div>'
-    +'<div class="btns rxbtns"><button type="button" class="btn" id="rxMake"'+(rxBusy? ' disabled' : '')+' title="Il modello compilato con colori, testi e dati del progetto: un file nuovo">'+icon('export')+' Crea l’Excel</button>'
-    +'<button type="button" class="btn" id="rxUpd"'+(rxBusy? ' disabled' : '')+' title="Scegli la matrice del progetto: scrive i campi compilati nel pannello, il resto del file resta com’è">'+icon('import')+' Aggiorna…</button></div>'
+  let ths=[]; try{ ths=(typeof riThemes==='function')? riThemes(true) : []; }catch(e){}
+  const names=T=>T.nat.map(n=>n.t).concat(T.map.map(x=>x.n), T.drawn.length? [T.drawn.length+(T.drawn.length===1? ' oggetto disegnato' : ' oggetti disegnati')] : []).join('\n');
+  el.innerHTML='<div class="btns rxbtns"><button type="button" class="btn" id="rxMake"'+dis+' title="Una matrice nuova: il modello aziendale compilato con colori, testi e dati del progetto'+(rxTpl? '' : '. La prima volta chiede il modello vuoto (SharePoint › 09 Risk Matrix), poi il browser lo ricorda')+'">'+icon('export')+' Crea l’Excel</button>'
+    +'<button type="button" class="btn" id="rxUpd"'+dis+' title="Una matrice che esiste già: scegli il file; scrive i campi compilati nel pannello, il resto del file resta com’è">'+icon('import')+' Aggiorna…</button></div>'
+    +'<div class="btns rxbtns"><button type="button" class="btn" id="rxPdf" title="Apre Stampa con «Allega la Risk Matrix» spuntato: la matrice in PDF dopo il foglio della mappa, mai i nomi degli intestatari">'+icon('print')+' PDF con la matrice</button></div>'
     +(typeof riOpt!=='undefined'? '<div class="rxopts"><label title="Nel foglio Cadastral: la tabella delle particelle e una mappa su satellite con i loro numeri"><input type="checkbox" id="riCad"'+(riOpt.cad? ' checked' : '')+'> Cadastral</label>'
-      +'<label title="Nel foglio Constraints: una mappa per ogni riga con risultati, con i layer del suo tema"><input type="checkbox" id="riCon"'+(riOpt.con? ' checked' : '')+'> Constraints</label></div>' : '')
-    +'<div class="rxread"><button type="button" class="rmlink" id="rxRead" title="I testi, i colori e i dati di una matrice già compilata entrano nel pannello come scritti da te">Leggi una matrice nel pannello…</button></div>'
-    +'<input type="file" id="rxFile" accept=".xlsx,.xlsm" hidden>'; }
+      +'<label title="Una mappa per ogni riga con risultati, nel foglio Constraints dell’Excel e nel PDF: scegli quali"><input type="checkbox" id="riCon"'+(riOpt.con? ' checked' : '')+'> Constraints</label></div>'
+      +(riOpt.con&&ths.length? '<div class="rxopts rxths" role="group" aria-label="Mappe da allegare">'+ths.map(t=>'<label title="'+esc(names(t[2]))+'"><input type="checkbox" data-th="'+t[0]+'"'+(riOpt.off.indexOf(t[0])<0? ' checked' : '')+'> '+esc((typeof rsThLabel==='function'&&rsThLabel(t[0]))||t[1])+'</label>').join('')+'</div>' : '') : '')
+    +'<details class="rxmore"'+(rxMore? ' open' : '')+'><summary>Altro</summary><div class="rxread"><span title="'+esc(tip)+'">Modello: '+esc(rxTpl? rxTpl.name : 'nessuno')+'</span> · <button type="button" class="rmlink" id="rxTplPick" title="'+esc(tip)+'">'+(rxTpl? 'Cambia' : 'Scegli…')+'</button><br>'
+    +'<button type="button" class="rmlink" id="rxRead" title="I testi, i colori e i dati di una matrice già compilata entrano nel pannello come scritti da te: il ricalcolo non li tocca">Leggi una matrice nel pannello…</button></div></details>';
+  const s4=$('rmSum4'); if(s4){ s4.textContent=rxBusy? 'preparo il file…' : rxTpl? '' : 'modello da scegliere'; }
+  if(typeof rmStepsRender==='function') rmStepsRender(); }
 document.addEventListener('DOMContentLoaded', function(){
   const root=$('modRisk'); if(!root) return;
   root.addEventListener('click', e=>{ const t=e.target.closest('button'); if(!t||!root.contains(t)) return;
-    if(t.id==='rxTplPick') rxAsk('tpl'); else if(t.id==='rxMake') rxMake(); else if(t.id==='rxUpd') rxAsk('upd'); else if(t.id==='rxRead') rxAsk('read'); });
+    if(t.id==='rxTplPick') rxAsk('tpl'); else if(t.id==='rxMake') rxMake(); else if(t.id==='rxUpd') rxAsk('upd'); else if(t.id==='rxRead') rxAsk('read'); else if(t.id==='rxPdf') rxPdf(); });
+  root.addEventListener('toggle', e=>{ const d=e.target; if(d&&d.classList&&d.classList.contains('rxmore')) rxMore=d.open; }, true);
   root.addEventListener('change', e=>{ const t=e.target; if(t&&t.id==='rxFile') rxPicked(t.files&&t.files[0]); });
   rxRender(); rxTplLoad(); });
 </script>
@@ -13762,9 +14151,9 @@ const RI_W=1063, RI_H=709, RI_CM=[18, 12], RI_EMU=360000, RI_MAX=10;
 const RI_XDR='http://schemas.openxmlformats.org/drawingml/2006/spreadsheetDrawing', RI_A='http://schemas.openxmlformats.org/drawingml/2006/main';
 const RI_R='http://schemas.openxmlformats.org/officeDocument/2006/relationships', RI_PKG='http://schemas.openxmlformats.org/package/2006/relationships';
 const RI_CT='http://schemas.openxmlformats.org/package/2006/content-types';
-const riOpt={cad:true, con:true};
+const riOpt={cad:true, con:true, off:[]};   // 10/11 (asked by the user): off = the rows whose map is not wanted, in the Excel and in the PDF
 let riModsP=null;
-function riMods(){ return riModsP||(riModsP=new Promise((res, rej)=>{ try{ require(['esri/layers/TileLayer'], T=>res({TileLayer:T}), rej); }catch(e){ rej(e); } })); }
+function riMods(){ return riModsP||(riModsP=new Promise((res, rej)=>{ try{ require(['esri/layers/TileLayer'], T=>res({TileLayer:T}), rej); }catch(e){ rej(e); } }).catch(e=>{ riModsP=null; throw e; })); }   // 10/11: a failed load is tried again
 function riBase(kind, M){ const S='https://services.arcgisonline.com/ArcGIS/rest/services/', T=M.TileLayer;
   return kind==='sat'? new esriMods.Basemap({baseLayers:[new T({url:S+'World_Imagery/MapServer'})]})
     : new esriMods.Basemap({baseLayers:[new T({url:S+'Canvas/World_Light_Gray_Base/MapServer'})], referenceLayers:[new T({url:S+'Canvas/World_Light_Gray_Reference/MapServer'})]}); }
@@ -13799,14 +14188,14 @@ function riGeomView(g){ try{ return geoProject(geoGeom(g), view.spatialReference
 function riParcels(b){ const GE=esriMods.geometryEngine, all=toolsGL.graphics.toArray().filter(g=>g.geometry&&g.attributes), own=all.filter(ownIs);
   const key=(c, f, p)=>[String(c||'').trim().toLowerCase(), String(f==null? '' : f).trim(), String(p==null? '' : p).trim()].join('|');
   const names=new Map(); own.forEach(g=>{ const s=g.attributes.src_attrs||{}; names.set(key(s.comune||s.Comune, s.foglio!=null? s.foglio : s.Foglio, s.particella!=null? s.particella : s.Particella), String((g.attributes.own&&g.attributes.own.t)||'')); });
-  const inB=p=>{ if(!b.B||b.onParcels||!p.geometry) return true; try{ const g=geojsonToEsri(p.geometry); return !!g&&GE.intersects(b.B, geoClean(b.f.toLocal(g))); }catch(e){ return true; } };
+  const inB=p=>rmParcelIn(b, p);   // 10/11: the same rule as the draft (34-risk-matrix.js)
   let rows=parcels.filter(p=>p&&inB(p)).map(p=>({c:p.comune||'', f:p.foglio==null? '' : String(p.foglio), p:p.particella==null? '' : String(p.particella), ha:(+p.area_m2||0)/1e4,
     o:names.get(key(p.comune, p.foglio, p.particella))||'', g:p.geometry? geojsonToEsri(p.geometry) : null}));
   if(!rows.length) rows=own.map(g=>{ const s=g.attributes.src_attrs||{}; return {c:s.comune||s.Comune||'', f:String(s.foglio!=null? s.foglio : (s.Foglio||'')), p:String(s.particella!=null? s.particella : (s.Particella||'')),
     ha:isFinite(+s.area_ha)? +s.area_ha : 0, o:String((g.attributes.own&&g.attributes.own.t)||''), g:g.geometry}; });
   const n=v=>parseInt(v, 10)||0; rows.sort((a, z)=>a.c.localeCompare(z.c)||n(a.f)-n(z.f)||n(a.p)-n(z.p)||a.p.localeCompare(z.p)); return rows; }
 // the rows with findings: layers asked by «Interroga» (with the themes of now) and objects drawn
-function riThemes(){ const L=rmState.lay, map=wmCurrentId()||'', out=new Map(), add=(t, k, v)=>{ if(!t||t==='out'||t==='grid_tech') return; if(!out.has(t)) out.set(t, {map:[], nat:[], drawn:[], vis:[]}); out.get(t)[k].push(v); };
+function riThemes(all){ const L=rmState.lay, map=wmCurrentId()||'', out=new Map(), add=(t, k, v)=>{ if(!t||t==='out'||t==='grid_tech') return; if(!out.has(t)) out.set(t, {map:[], nat:[], drawn:[], vis:[]}); out.get(t)[k].push(v); };
   if(L&&Array.isArray(L.src)&&typeof rsThemeNow==='function'){ const S=rsSources();
     L.src.forEach(e=>{ const t=rsThemeNow(e, L), hit=(e.d&&e.d.length)||(e.g&&e.g.length); if(!t||t==='out') return;
       if(e.ty==='nat'&&hit){ const n=RS_NAT.find(x=>'nat:'+x.id===e.k); if(n&&n.sp!=='ingv') add(t, 'nat', n); }
@@ -13814,7 +14203,7 @@ function riThemes(){ const L=rmState.lay, map=wmCurrentId()||'', out=new Map(), 
       else if(e.ty==='vis'&&L.map===map){ const s=S.find(x=>x.k===e.k); if(s&&s.l) add(t, 'vis', s); } }); }
   toolsGL.graphics.toArray().forEach(g=>{ const a=g.attributes; if(!a||!g.geometry||ownIs(g)||a.sf_auto) return; const t=rmRowOf(a.sf_cat, a.sf_type); if(t) add(t, 'drawn', g); });
   const order=[]; RM_ROWS.forEach(S=>S.rows.forEach(r=>{ const T=out.get(r[0]); if(T&&(T.map.length||T.nat.length||T.drawn.length)) order.push([r[0], r[1], T]); }));
-  return order.slice(0, RI_MAX); }
+  const out2=(all? order : order.filter(x=>riOpt.off.indexOf(x[0])<0)).slice(0, all? order.length : RI_MAX); out2.more=all? 0 : Math.max(0, order.filter(x=>riOpt.off.indexOf(x[0])<0).length-RI_MAX); return out2; }   // 10/11: the themes left without a map are said
 
 // ── the images ──
 async function riCadImage(b, rows, M){ const RT=typeof rsRoute==='function'? rsRoute(b.f) : null, loc=rows.map(r=>{ try{ return r.g? b.f.toLocal(r.g) : null; }catch(e){ return null; } });
@@ -13827,7 +14216,7 @@ async function riThemeImage(b, t, T, M, failed){ const RT=typeof rsRoute==='func
   const locals=[b.B]; if(t==='grid_constr'&&RT) locals.push(RT);
   const ext=riExt(b.f, locals, pad); if(!ext) return null;
   // the basemap with the national layers that found something
-  const nat=T.nat.map(n=>new esriMods.FeatureLayer({url:n.u, title:n.t, opacity:0.6}));
+  const nat=[].concat(...T.nat.map(n=>n.sp==='water'? RS_WATER_IDS.map(id=>new esriMods.FeatureLayer({url:n.u+'/'+id, title:n.t, opacity:0.8})) : [new esriMods.FeatureLayer({url:n.u, title:n.t, opacity:0.6})]));   // 10/11: EU-Hydro is nine layers
   const s1=await riShot(new esriMods.Map({basemap:riBase('gray', M), layers:nat}), ext, {fmt:'jpg', white:true, failed:failed});
   // the app's map with only this theme's layers, switched on in that view alone
   let s2=null; const want=new Set(T.map.concat(T.vis).map(s=>s.l)), show=l=>!!l&&(want.has(l)||(l.type==='group'&&l.allLayers&&l.allLayers.some(x=>want.has(x))));
@@ -13850,6 +14239,24 @@ function riFreeRow(d, dr, rowPt){ let last=0; rxKids(riRowsDoc(d), 'row').forEac
       const rOf=n=>{ const r=n&&[...n.childNodes].find(x=>x.localName==='row'); return r? +r.textContent : 0; };
       if(to) last=Math.max(last, rOf(to)+1); else if(fr) last=Math.max(last, rOf(fr)+1+Math.ceil((ext? +ext.getAttribute('cy') : 0)/12700/rowPt)); }); }
   return last? last+2 : 1; }
+// 10/11 (decision of the user): «Aggiorna…» replaces what the Geoportale wrote in the sheet before — its pictures (named
+// «Risk Matrix n») with the title above each, the first title of a block («… — Geoportale AxpoSolar Italia, date») and
+// the table under it — and leaves what the PM pasted. The media to take away are returned: they go last, with the rest
+const RI_MARK=/ — Geoportale AxpoSolar Italia, \d{4}-\d{2}-\d{2}$/;
+function riClean(X, d, dr, drRels){ const sd=riRowsDoc(d), gone=[], rowOf=n=>rxKids(sd, 'row').find(r=>+r.getAttribute('r')===n);
+  const wipe=(n, cols)=>{ const r=rowOf(n); if(r) rxKids(r, 'c').forEach(c=>{ if(rxColN(c.getAttribute('r'))<=cols) r.removeChild(c); }); };
+  [...dr.getElementsByTagNameNS(RI_XDR, '*')].filter(e=>/Anchor$/.test(e.localName)).forEach(a=>{ const nv=a.getElementsByTagNameNS(RI_XDR, 'cNvPr')[0]; if(!nv||!/^Risk Matrix \d+$/.test(nv.getAttribute('name')||'')) return;
+    const fr=[...a.childNodes].find(x=>x.localName==='from'), rw=fr&&[...fr.childNodes].find(x=>x.localName==='row'), r0=rw? +rw.textContent : 0;
+    if(r0>=1) wipe(r0, 1);   // its title: the row above the picture
+    const bl=a.getElementsByTagNameNS(RI_A, 'blip')[0], id=bl&&(bl.getAttributeNS(RI_R, 'embed')||bl.getAttribute('r:embed'));
+    const rel=id&&[...drRels.getElementsByTagNameNS(RI_PKG, 'Relationship')].find(x=>x.getAttribute('Id')===id);
+    a.parentNode.removeChild(a);
+    if(rel){ const tg=String(rel.getAttribute('Target')||''); rel.parentNode.removeChild(rel);
+      if(![...drRels.getElementsByTagNameNS(RI_PKG, 'Relationship')].some(x=>x.getAttribute('Target')===tg)) gone.push('xl/media/'+tg.split('/').pop()); } });
+  rxKids(sd, 'row').forEach(r=>{ const c=rxCell(r, 1), t=c? rxCellText(X, c) : ''; if(!RI_MARK.test(t)&&t!=='No parcels in the project') return; const r1=+r.getAttribute('r'); wipe(r1, 1);
+    const n1=rowOf(r1+1), c1=n1&&rxCell(n1, 1);
+    if(c1&&rxCellText(X, c1)==='Municipality'){ let k=r1+1; while(k<r1+5000){ const rk=rowOf(k); if(!rk||!rxKids(rk, 'c').some(x=>x.firstChild)) break; wipe(k, 5); k++; } } });
+  return gone; }
 async function riWriteSheet(X, re, blocks){ const sh=X.sheets.find(s=>re.test(s.name)); if(!sh) return {missing:true};
   const zip=X.zip, d=rxDoc(await riPart(X, sh.path)), relP=riRels(sh.path); let relT=await riPart(X, relP);
   const rels=relT? rxDoc(relT) : rxDoc('<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\r\n<Relationships xmlns="'+RI_PKG+'"></Relationships>');
@@ -13859,6 +14266,7 @@ async function riWriteSheet(X, re, blocks){ const sh=X.sheets.find(s=>re.test(s.
   else { let n=1; while(zip.file('xl/drawings/drawing'+n+'.xml')) n++; drP='xl/drawings/drawing'+n+'.xml'; made=true;
     dr=rxDoc('<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\r\n<xdr:wsDr xmlns:xdr="'+RI_XDR+'" xmlns:a="'+RI_A+'"></xdr:wsDr>'); }
   const drRelP=riRels(drP), drRelT=await riPart(X, drRelP); drRels=drRelT? rxDoc(drRelT) : rxDoc('<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\r\n<Relationships xmlns="'+RI_PKG+'"></Relationships>');
+  const gone=made? [] : riClean(X, d, dr, drRels), media=[];
   const fmt=rxOne(d, 'sheetFormatPr'), rowPt=(fmt&&+fmt.getAttribute('defaultRowHeight'))||15;
   let r=riFreeRow(d, made? null : dr, rowPt), ids=[...dr.getElementsByTagNameNS(RI_XDR, 'cNvPr')].map(e=>+e.getAttribute('id')||0), nid=Math.max(1, ...ids)+1;
   const rid=doc=>{ const used=new Set([...doc.getElementsByTagNameNS(RI_PKG, 'Relationship')].map(x=>x.getAttribute('Id'))); let i=1; while(used.has('rId'+i)) i++; return 'rId'+i; };
@@ -13868,18 +14276,22 @@ async function riWriteSheet(X, re, blocks){ const sh=X.sheets.find(s=>re.test(s.
   blocks.forEach(B=>{
     if(B.title){ riSetCell(d, r, 1, B.title); r++; }
     if(B.table){ B.table.forEach(row=>{ row.forEach((v, i)=>{ if(v!==''&&v!=null) riSetCell(d, r, i+1, v); }); r++; }); r++; }
-    if(B.img){ const mp=nextMedia(); zip.file(mp, B.img, {createFolders:false}); const id=relAdd(drRels, RI_R+'/image', '../media/'+mp.split('/').pop());
+    if(B.img){ const mp=nextMedia(); media.push([mp, B.img]); const id=relAdd(drRels, RI_R+'/image', '../media/'+mp.split('/').pop());
       const cx=RI_CM[0]*RI_EMU, cy=RI_CM[1]*RI_EMU;   // the anchor, written as XML text and parsed: simpler than twenty createElementNS
       const frag=rxDoc('<xdr:oneCellAnchor xmlns:xdr="'+RI_XDR+'" xmlns:a="'+RI_A+'" xmlns:r="'+RI_R+'"><xdr:from><xdr:col>0</xdr:col><xdr:colOff>0</xdr:colOff><xdr:row>'+(r-1)+'</xdr:row><xdr:rowOff>0</xdr:rowOff></xdr:from>'
         +'<xdr:ext cx="'+cx+'" cy="'+cy+'"/><xdr:pic><xdr:nvPicPr><xdr:cNvPr id="'+nid+'" name="Risk Matrix '+nid+'"/><xdr:cNvPicPr><a:picLocks noChangeAspect="1"/></xdr:cNvPicPr></xdr:nvPicPr>'
         +'<xdr:blipFill><a:blip r:embed="'+id+'"/><a:stretch><a:fillRect/></a:stretch></xdr:blipFill><xdr:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="'+cx+'" cy="'+cy+'"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></xdr:spPr></xdr:pic><xdr:clientData/></xdr:oneCellAnchor>');
       dr.documentElement.appendChild(dr.importNode(frag.documentElement, true)); nid++; nImg++;
       r+=Math.ceil(RI_CM[1]*28.3465/rowPt)+2; } });
+  // 10/11 (review): the parts go in the file only now, with everything ready (a failure above leaves the file as it was)
+  let drawEl=null, before=null;
+  if(made){ drawEl=d.createElementNS(RX_NS, 'drawing');
+    before=['legacyDrawing', 'legacyDrawingHF', 'drawingHF', 'picture', 'oleObjects', 'controls', 'webPublishItems', 'tableParts', 'extLst'].map(n=>rxKids(d.documentElement, n)[0]).find(Boolean)||null; }
+  media.forEach(x=>zip.file(x[0], x[1], {createFolders:false})); gone.forEach(p=>{ if(!media.some(x=>x[0]===p)){ try{ zip.remove(p); }catch(e){} } });
   zip.file(drP, rxSer(dr), {createFolders:false}); zip.file(drRelP, rxSer(drRels), {createFolders:false});
   if(made){ relAdd(rels, RI_R+'/drawing', '../drawings/'+drP.split('/').pop()); zip.file(relP, rxSer(rels), {createFolders:false});
-    const el=d.createElementNS(RX_NS, 'drawing'); el.setAttributeNS(RI_R, 'r:id', [...rels.getElementsByTagNameNS(RI_PKG, 'Relationship')].pop().getAttribute('Id'));
-    const before=['legacyDrawing', 'legacyDrawingHF', 'drawingHF', 'picture', 'oleObjects', 'controls', 'webPublishItems', 'tableParts', 'extLst'].map(n=>rxOne(d, n)).find(Boolean);
-    d.documentElement.insertBefore(el, before||null);
+    const el=drawEl; el.setAttributeNS(RI_R, 'r:id', [...rels.getElementsByTagNameNS(RI_PKG, 'Relationship')].pop().getAttribute('Id'));
+    d.documentElement.insertBefore(el, before);
     await riCt(X, '/'+drP, 'application/vnd.openxmlformats-officedocument.drawing+xml'); }
   if(nImg) await riCt(X, null, null, 'jpeg', 'image/jpeg');
   riDim(d); zip.file(sh.path, rxSer(d), {createFolders:false});
@@ -13895,17 +14307,19 @@ async function riCt(X, part, type, ext, extType){ const p='[Content_Types].xml',
 
 // ── the run, from rxRun: the two sheets, as ticked; progress in the message; a failure leaves the rest of the file ──
 async function riRun(X, say){ const rep={cad:null, con:null, notes:[]}; if(!riOpt.cad&&!riOpt.con) return rep;
-  await geoFrameLoad(); const b=rmBase(); if(!b.B){ rep.notes.push('niente immagini: serve un’area lorda o delle particelle'); return rep; }
-  const M=await riMods(), has=re=>X.sheets.some(s=>re.test(s.name));   // a template without the sheet: no images made for nothing
+  await geoFrameLoad(); const b=rmBase(), has=re=>X.sheets.some(s=>re.test(s.name)), day=new Date().toISOString().slice(0, 10);   // a template without the sheet: no images made for nothing
+  if(!b.B) rep.notes.push('niente mappe: serve un’area lorda o delle particelle con la geometria');   // 10/11: the table of the parcels is written all the same (the owners' file alone)
+  const M=b.B? await riMods() : null;
   if(riOpt.cad&&!has(/cadastr/i)) rep.cad='foglio Cadastral non trovato';
   if(riOpt.con&&!has(/constraint/i)) rep.con='foglio Constraints non trovato';
   if(riOpt.cad&&!rep.cad){ try{ const rows=riParcels(b);
       const table=[['Municipality', 'Sheet', 'Parcel', 'Area (ha)', 'Owners']].concat(rows.map(x=>[x.c, x.f, x.p, Math.round(x.ha*10000)/10000, x.o]));
-      say('Immagine del catasto…'); let img=null; try{ img=await riCadImage(b, rows, M); }catch(e){ rep.notes.push('mappa del catasto non fatta: '+((e&&e.message)||e)); }
-      const res=await riWriteSheet(X, /cadastr/i, [{title:'Cadastral — Geoportale AxpoSolar Italia, '+new Date().toISOString().slice(0, 10)}, rows.length? {table:table} : {title:'No parcels in the project'}, img? {img:img} : {}]);
+      let img=null; if(b.B){ say('Immagine del catasto…'); try{ img=await riCadImage(b, rows, M); }catch(e){ rep.notes.push('mappa del catasto non fatta: '+((e&&e.message)||e)); } }
+      const res=await riWriteSheet(X, /cadastr/i, [{title:'Cadastral — Geoportale AxpoSolar Italia, '+day}, rows.length? {table:table} : {title:'No parcels in the project'}, img? {img:img} : {}]);
       rep.cad=res.missing? 'foglio Cadastral non trovato' : rows.length+(rows.length===1? ' particella' : ' particelle')+(res.images? ' e la mappa' : ''); }
     catch(e){ console.warn('[risk matrix, Cadastral]', e); rep.notes.push('Cadastral non scritto: '+((e&&e.message)||e)); } }
-  if(riOpt.con&&!rep.con){ try{ const th=riThemes(), blocks=[]; let i=0;
+  if(riOpt.con&&!rep.con&&b.B){ try{ const th=riThemes(), blocks=[{title:'Constraints — Geoportale AxpoSolar Italia, '+day}]; let i=0;
+      if(th.more) rep.notes.push((th.more===1? 'un altro tema' : 'altri '+th.more+' temi')+' senza mappa (al massimo '+RI_MAX+')');
       for(const [k, label, T] of th){ i++; say('Immagini dei vincoli '+i+'/'+th.length+'…'); const failed=[];
         let img=null; try{ img=await riThemeImage(b, k, T, M, failed); }catch(e){ failed.push('immagine non fatta'); }
         const names=T.nat.map(n=>n.t).concat(T.map.map(s=>s.n), T.vis.map(s=>s.n)), drawn=T.drawn.length? [T.drawn.length+(T.drawn.length===1? ' object drawn' : ' objects drawn')] : [];
@@ -13915,7 +14329,11 @@ async function riRun(X, say){ const rep={cad:null, con:null, notes:[]}; if(!riOp
     catch(e){ console.warn('[risk matrix, Constraints]', e); rep.notes.push('Constraints non scritto: '+((e&&e.message)||e)); } }
   return rep; }
 document.addEventListener('DOMContentLoaded', function(){ const root=$('modRisk'); if(!root) return;
-  root.addEventListener('change', e=>{ const t=e.target; if(!t) return; if(t.id==='riCad') riOpt.cad=t.checked; else if(t.id==='riCon') riOpt.con=t.checked; }); });
+  root.addEventListener('change', e=>{ const t=e.target; if(!t) return;
+    if(t.id==='riCad') riOpt.cad=t.checked; else if(t.id==='riCon'){ riOpt.con=t.checked; if(typeof rxRender==='function') rxRender(); }
+    else if(t.dataset&&t.dataset.th){ const k=t.dataset.th, i=riOpt.off.indexOf(k); if(t.checked&&i>=0) riOpt.off.splice(i, 1); else if(!t.checked&&i<0) riOpt.off.push(k); }
+    else return;
+    try{ saveStateDebounced(); }catch(err){} }); });
 </script>
 <script>
 // ══ The Risk Matrix, R4: attached to the PDF of «Stampa» (2026-11-06, decisions R4-1…R4-6 of the user) ════════════════════
@@ -13960,10 +14378,13 @@ async function rpPages(doc, o){ const out={pages:0, rows:0, maps:0, notes:[]}, t
   const cut=(t, w)=>{ const L=doc.splitTextToSize(prTxt(t||''), w-3); return L.length>40? L.slice(0, 39).concat(['...']) : L; };
   RM_ROWS.forEach(S=>{ if(y+12>RP_BOT) page();
     doc.setFillColor(238, 239, 243); doc.rect(RP_M, y, RP_W-2*RP_M, 5.2, 'F'); doc.setFont('helvetica', 'bold'); doc.setFontSize(8); doc.setTextColor(29, 29, 31); doc.text(prTxt(S.l), RP_M+1.5, y+3.7); y+=6.2;
-    S.rows.forEach(rw=>{ const k=rw[0], r=rmRow(k); let d=r.d.v||'';
-      if(r.d.o&&d){ const n=d.split('\n').filter(x=>x.trim()).length; d=n+(n===1? ' owner' : ' owners')+' (names in the Excel only)'; }   // D7: never a name in the PDF
+    S.rows.forEach(rw=>{ const k=rw[0], r=rmRow(k); let d=r.d.v||'', e=r.e.v||'', f=r.f.v||'';
+      // D7: never a name in the PDF. 10/11 (review): the row of the owners is personal data whoever wrote it — the count when
+      // the names come from the owners' file, else that they are in the Excel; a hand-written reference or comment too
+      if(rmPers(k)||r.d.o){ if(d){ const n=d.split('\n').filter(x=>x.trim()).length; d=(r.d.o&&!r.d.m)? n+(n===1? ' owner' : ' owners')+' (names in the Excel only)' : 'Owners: names in the Excel only'; }
+        if(rmPers(k)){ if(r.e.m&&e) e='(in the Excel only)'; if(f) f='(in the Excel only)'; } }
       doc.setFont('helvetica', 'normal'); doc.setFontSize(7.5);
-      const L=[cut(rw[1], RP_COLS[0]), null, cut(d, RP_COLS[2]), cut(r.e.v, RP_COLS[3]), cut(r.f.v, RP_COLS[4])];
+      const L=[cut(rw[1], RP_COLS[0]), null, cut(d, RP_COLS[2]), cut(e, RP_COLS[3]), cut(f, RP_COLS[4])];
       const n=Math.max(1, ...L.filter(Boolean).map(x=>x.length)), h=n*lh+2.2;
       if(y+h>RP_BOT){ page(); doc.setFont('helvetica', 'normal'); doc.setFontSize(7.5); }
       doc.setTextColor(29, 29, 31); L.forEach((lines, i)=>{ if(lines) lines.forEach((t, j)=>doc.text(t, X[i]+1.5, y+3+j*lh)); });
@@ -13973,15 +14394,17 @@ async function rpPages(doc, o){ const out={pages:0, rows:0, maps:0, notes:[]}, t
   if(o.riskMaps){ try{ await geoFrameLoad(); const b=rmBase();
       if(!b.B) out.notes.push('niente mappe: serve un’area lorda o delle particelle');
       else { const M=await riMods(), th=riThemes(); if(!th.length) out.notes.push('nessuna riga con risultati da mettere in mappa');
+        if(th.more) out.notes.push((th.more===1? 'un altro tema' : 'altri '+th.more+' temi')+' senza mappa (al massimo '+RI_MAX+')');
         for(const t of th){ const k=t[0], label=t[1], T=t[2], failed=[]; let img=null;
           try{ img=await riThemeImage(b, k, T, M, failed); }catch(e){ failed.push('immagine non fatta'); }
           const names=T.nat.map(x=>x.t).concat(T.map.map(x=>x.n), T.vis.map(x=>x.n)), drawn=T.drawn.length? [T.drawn.length+(T.drawn.length===1? ' object drawn' : ' objects drawn')] : [];
-          rpPage(doc, label, names.concat(drawn).join('; ')+([...new Set(failed)].length? ' — not copied: '+[...new Set(failed)].join(', ') : ''), today, out);
+          const all=names.concat(drawn);   // 10/11: eight names at most, as in the Excel (a longer line ran under the image)
+          rpPage(doc, label, all.slice(0, 8).join('; ')+(all.length>8? ' …' : '')+([...new Set(failed)].length? ' — not copied: '+[...new Set(failed)].join(', ') : ''), today, out);
           const iw=252, ih=168, ix=(RP_W-iw)/2;   // the images' proportions; room for the caption above the footer
           if(img){ doc.addImage(rpB64(img), 'JPEG', ix, RP_TOP, iw, ih); doc.setDrawColor(201, 201, 207); doc.setLineWidth(0.3); doc.rect(ix, RP_TOP, iw, ih, 'S'); }
           else { doc.setFontSize(9); doc.setTextColor(120, 120, 125); doc.text('Map not available', RP_W/2, RP_TOP+ih/2, {align:'center'}); }
           doc.setFontSize(7); doc.setTextColor(107, 107, 112);
-          doc.text(prTxt('Red: gross area · blue dashed: connection route · '+(k==='surround'? 'area + 10 km' : 'area + 1 km')+' · basemap Esri Light Gray'), ix, RP_TOP+ih+4);
+          doc.text(prTxt('Red: gross area · blue dashed: connection route · '+(k==='surround'? 'area + 10 km' : k==='grid_constr'? 'area and connection route' : 'area + 1 km')+' · basemap Esri Light Gray'), ix, RP_TOP+ih+4);
           out.maps++; } } }
     catch(e){ out.notes.push('mappe per tema non fatte: '+((e&&e.message)||e)); } }
   // ── the parcels, without the owners (D7) ──
