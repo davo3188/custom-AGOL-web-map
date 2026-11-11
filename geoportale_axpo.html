@@ -13076,6 +13076,9 @@ function rmBase(){ const all=toolsGL.graphics.toArray().filter(g=>g.geometry&&g.
 // Topography from the DTM analysed (17-slope.js keeps a grid per area analysed): inside the area analysed, the elevation, the
 // mean and the highest slope, the hectares per slope class, the aspect (where the ground goes down to) and the part over
 // the PM's limit, said «excluded» when its exclusion is in the project. One block per grid.
+// 11/11: the name of the area analysed is the one of «Pendenze da DTM» (Italian); the Description is in English
+const RM_AREA_EN=[[/^(\d+) particelle in elenco, unite$/, '$1 parcels of the list, merged'], [/^Particella in elenco$/, 'the parcel of the list'], [/^Estensione disegnata$/, 'extent drawn'], [/^Area lorda$/, 'gross area'], [/^Sito AREAS\b/, 'AREAS site']];
+function rmAreaEn(s){ s=String(s||'area'); const x=RM_AREA_EN.find(r=>r[0].test(s)); return x? s.replace(x[0], x[1]) : s; }
 function rmTopo(all){ const out=[]; let Gs=[]; try{ Gs=(typeof slpGrids!=='undefined'&&Array.isArray(slpGrids))? slpGrids : []; }catch(e){}
   Gs.forEach(G=>{ try{ const m=G.meta, g=G.g, inG=G.inG, z=G.z; if(!m||!g||!inG||!z) return;
       const cls=SLP_CLASSES.map(()=>0), asp={s:0, ew:0, n:0, flat:0}; let n=0, sum=0, top=0, z0=Infinity, z1=-Infinity;
@@ -13087,11 +13090,11 @@ function rmTopo(all){ const out=[]; let Gs=[]; try{ Gs=(typeof slpGrids!=='undef
       const cha=m.cell*m.cell/1e4, pc=v=>(Math.round(v/n*1000)/10).toFixed(1)+' %', L=G.limit||{}, st=G.st||{};
       const lt=L.maxAny!=null? 'slope > '+L.maxAny+' %' : 'slope N-S > '+L.maxNS+' % or E-W > '+L.maxEW+' %';
       const excl=(all||[]).some(x=>x.attributes&&x.attributes.sf_slope&&x.attributes.sf_slope.grid===m.id);
-      const d=['Terrain analysed ('+(m.area_name||'area')+'): '+rmHa(n*cha)+(isFinite(z0)? ', elevation '+Math.round(z0)+'–'+Math.round(z1)+' m a.s.l.' : '')+', mean slope '+(sum/n).toFixed(1)+' %, maximum '+Math.round(top)+' %',
+      const d=['Terrain analysed ('+rmAreaEn(m.area_name)+'): '+rmHa(n*cha)+(isFinite(z0)? ', elevation '+Math.round(z0)+'–'+Math.round(z1)+' m a.s.l.' : '')+', mean slope '+(sum/n).toFixed(1)+' %, maximum '+Math.round(top)+' %',
         'Slope classes: '+SLP_CLASSES.map((c, i)=>cls[i]? (c[1]===Infinity? '> '+c[0] : c[0]+'–'+c[1])+' % '+rmHa(cls[i]*cha)+' ('+pc(cls[i])+')' : '').filter(Boolean).join(', '),
         'Aspect (downhill towards): '+[['s', 'south'], ['ew', 'east or west'], ['n', 'north'], ['flat', 'flat (under 2 %)']].filter(a=>asp[a[0]]).map(a=>a[1]+' '+pc(asp[a[0]])).join(', '),
         'Over the limit ('+lt+'): '+rmHa(st.overHa||0)+' ('+(Math.round((st.pct||0)*10)/10).toFixed(1)+' %)'+((st.overHa||0)>0? (excl? ', excluded in the project' : ', not yet an exclusion of the project') : '')];
-      out.push({id:m.id, d:d, ref:'DTM '+(m.name||'Esri World Elevation')+', cell '+m.cell+' m'+(m.loadedAt? ' ('+String(m.loadedAt).slice(0, 10)+')' : '')}); }catch(e){} });
+      out.push({id:m.id, d:d, ha:n*cha, name:String(m.area_name||'area'), ref:'DTM '+(m.name||'Esri World Elevation')+', cell '+m.cell+' m'+(m.loadedAt? ' ('+String(m.loadedAt).slice(0, 10)+')' : '')}); }catch(e){} });
   return out; }
 // 10/11 (review): a parcel is of the area when at least 1 % of it (and a square metre) lies inside the gross area: a
 // neighbour that only touches is not. Without a gross area every parcel is of the area. Shared with 37 (Cadastral, PDF)
@@ -13153,6 +13156,10 @@ async function rmCalc(quiet){ if(rmBusy) return; rmBusy=true;
     // 10/11 (asked by the user): Topography is the summary of the DTM analysed (Analizza › Pendenze da DTM)
     const topo=rmTopo(all); topo.forEach(T=>{ const R=row('topo'); T.d.forEach(x=>{ R.d.push(x); fact('topo', x); }); R.e.add(T.ref); });
     const topoIds=new Set(topo.map(T=>T.id));
+    // 11/11 (seen on a real file: 31.56 ha of terrain for an area of 7.53 ha): the terrain analysed is not the area of this
+    // check — another choice in «Pendenze da DTM», or an area changed since — and the PM is told so on the row
+    const topoHa=topo.reduce((a, T)=>a+T.ha, 0);
+    if(B&&topo.length&&Math.abs(topoHa-baseHa)>Math.max(0.1, baseHa*0.1)) warn.topo='Il terreno analizzato ('+topo.map(T=>'«'+T.name+'»').join(', ')+': '+fmtHa2(topoHa)+') non è l’area di questo controllo ('+fmtHa2(baseHa)+'). Se serve, rifai «Pendenze da DTM» sull’area.';
     const near=(d, lead)=>d<1? 'on the boundary' : lead? 'nearest outside at '+rmM(d) : rmM(d)+' away';   // under a metre: on the line. 10/11: shorter words («inside», «away»)
     agg.forEach(A=>{ if(A.slope&&topoIds.has(A.slope.grid)) return;   // said by the summary of its DTM
       const R=row(A.k), lab=A.cat==='connection'? (RM_EN[A.type]||'Connection route') : (RM_EN[A.cat+':'+A.type]||RM_EN[A.type]||RM_CAT_EN[A.cat]||sfLabel(A.cat, A.type)||A.cat);
@@ -13403,12 +13410,20 @@ function rsLayerUrl(l){ const u=String((l&&l.url)||'').replace(/\/+$/, '');
   if(/\/(Feature|Map)Server$/i.test(u)&&l.layerId!=null) return u+'/'+l.layerId;
   return null; }
 function rsKind(l){ const ty=String((l&&l.type)||''); if(ty==='feature') return 'fl'; if(ty==='map-image'&&l.url) return 'ms'; return 'vis'; }
+// the addresses of the national layers (EU-Hydro: its nine layers too), lower case
+function rsNatUrls(){ const s=new Set(); RS_NAT.forEach(n=>{ const u=String(n.u||'').toLowerCase().replace(/\/+$/, ''); if(!u) return; s.add(u); if(n.sp==='water') RS_WATER_IDS.forEach(id=>s.add(u+'/'+id)); }); return s; }
+// 11/11 (seen on «Check Vincoli · Lombardia»: ISPRA's lithological map read twice): a map service of the map whose layers
+// are all national ones is read once, as national
+function rsMsDup(l, natU){ try{ const b=String((l&&l.url)||'').replace(/\/+$/, '').toLowerCase(), subs=l&&l.allSublayers, a=subs&&subs.toArray? subs.toArray() : Array.isArray(subs)? subs : [];
+    const lv=a.filter(x=>!(x.sublayers&&x.sublayers.length)); return !!b&&lv.length>0&&lv.every(x=>natU.has(b+'/'+x.id)); }catch(e){ return false; } }
 function rsSources(){ const map=wmCurrentId()||'', ov=rsOv(map), ovN=rsOv('*'), out=[], L=rmState.lay, src=(L&&Array.isArray(L.src))? L.src : [];
   // 10/11: without a choice in this browser, the theme saved with the results (the project opened on another PC)
   const rec=(k, ok)=>{ if(!ok) return null; const e=src.find(x=>x.k===k||x.pk===k); if(!e) return null; const t=e.pk? e.pth : e.th; return t!=null? t : null; };
   RS_NAT.forEach(n=>{ const k='nat:'+n.id, r=rec(k, true); out.push({k:k, n:n.t, ty:'nat', th:ovN[k]!=null? ovN[k] : r!=null? r : n.th, g0:n.th, why:ovN[k]!=null? 'pm' : (r!=null&&r!==n.th)? 'rec' : 'nat', nat:n}); });
-  const natU=new Set(RS_NAT.map(n=>String(n.u).toLowerCase()));   // 10/11: a layer of the map that is one of the national ones is read once (as national)
-  rsMapList().forEach(it=>{ const l=it.l, k='map:'+lcKey(l), u=rsKind(l)==='fl'? String(rsLayerUrl(l)||'').toLowerCase() : '', gs=(u&&natU.has(u))? {t:'out', why:'dup'} : rsGuess(it.path, l.title), r=rec(k, !!L&&L.map===map);
+  const natU=rsNatUrls();   // 10/11: a layer of the map that is one of the national ones is read once (as national)
+  rsMapList().forEach(it=>{ const l=it.l, k='map:'+lcKey(l), kd=rsKind(l), u=kd==='fl'? String(rsLayerUrl(l)||'').toLowerCase() : '';
+    const dup=(u&&natU.has(u))||(kd==='ms'&&(rsMsDup(l, natU)||(!!L&&L.map===map&&src.some(x=>x.k===k&&x.dup))));   // 11/11: a map service too (now, or as the last check found it)
+    const gs=dup? {t:'out', why:'dup'} : rsGuess(it.path, l.title), r=rec(k, !!L&&L.map===map);
     out.push({k:k, n:String(l.title||'Layer'), path:it.path||[], ty:rsKind(l), th:ov[k]!=null? ov[k] : r!=null? r : gs.t, g0:gs.t, why:ov[k]!=null? 'pm' : (r!=null&&r!==gs.t)? 'rec' : gs.why, int:gs.why==='int', l:l}); });
   return out; }
 // an object of a file that has a role in the project (10/11): it stays with its category, the file's theme does not measure it
@@ -13511,11 +13526,21 @@ async function rsReq(url, query, type){ if(window.rsReqStub) return rsLate(Promi
     const j=await rsLate(rsJsonp(url, query)); if(j&&j.error) throw new Error((j.error.message||'errore')+(j.error.code? ' ['+j.error.code+']' : '')); return j; }
   const rq=await rsReqMod(); const r=await rsLate(rq(url, {query:query, responseType:type||'json', authMode:'no-prompt', timeout:rsWaitNow}));
   const d=r&&r.data; if(d&&d.error) throw new Error((d.error.message||'errore')+(d.error.code? ' ['+d.error.code+']' : '')); return d; }
+// 11/11 (seen on Lombardia's server: with several requests at once, one in ten falls at once and the next goes through):
+// a request that the network drops within three seconds is asked again, twice at most, after a pause. A server that
+// keeps silent is not, nor one that never answered in this run (rsDown: quick failures in a row, by host)
+const rsDown=new Map();
+async function rsReqQ(url, query, type){ const h=String(url).split('/').slice(0, 3).join('/');
+  for(let n=0; ; n++){ const t0=Date.now();
+    try{ const r=await rsReq(url, query, type); rsDown.delete(h); return r; }
+    catch(err){ const quick=Date.now()-t0<3000&&/failed to fetch|network|load failed/i.test(String((err&&err.message)||err)), k=(rsDown.get(h)||0)+1; rsDown.set(h, k);
+      if(!quick||n>=2||k>6) throw err; await new Promise(r=>setTimeout(r, 400+n*800)); } } }
 function rsErr(e){ const s=String((e&&e.message)||e||'errore'); return /token|49[89]|40[13]|not authori/i.test(s)? 'richiede un accesso' : /failed to fetch|network|cors/i.test(s)? 'bloccato dal browser o server fermo' : s.slice(0, 80); }
 function rsF(D, name){ const n=String(name||'').toLowerCase(); return ((D&&D.fields)||[]).find(x=>String(x.name).toLowerCase()===n)||null; }
 function rsAt(at, name){ if(!at||!name) return null; if(name in at) return at[name]; const n=String(name).toLowerCase(), k=Object.keys(at).find(x=>x.toLowerCase()===n); return k? at[k] : null; }
 // the class of a feature: a field (with its coded values) or the layer's legend (unique values, class breaks)
-function rsClassOf(D, rend, cl){ const none={fields:[], val:()=>''}, cut=s=>String(s).slice(0, 60);
+function rsCut(s, n){ s=String(s); return s.length>n? s.slice(0, n-1)+'…' : s; }   // 11/11: a text cut says so
+function rsClassOf(D, rend, cl){ const none={fields:[], val:()=>''}, cut=s=>rsCut(s, 60);
   if(cl==='-') return none;
   if(cl&&cl!=='@'){ const F=rsF(D, cl); if(!F) return none; const dom=new Map(((F.domain&&F.domain.codedValues)||[]).map(x=>[String(x.code), x.name]));
     return {fields:[F.name], val:at=>{ const v=rsAt(at, F.name); return v==null||v===''? '' : cut(dom.get(String(v))||v); }}; }
@@ -13546,7 +13571,7 @@ async function rsAsk(s, c, desc){ const e={k:s.k, n:s.n, ty:s.ty, g0:s.g0, th:s.
     // still cut is «partial» (never a «nothing» by a cut answer)
     const canPage=!!oid&&!!(D.advancedQueryCapabilities&&D.advancedQueryCapabilities.supportsPagination);
     let Q=null, feats=[], part=false;
-    for(let pg=0; pg<RS_PAGES; pg++){ Q=await rsReq(s.url+'/query', canPage? Object.assign({}, q0, {orderByFields:oid, resultOffset:String(feats.length)}) : q0);
+    for(let pg=0; pg<RS_PAGES; pg++){ Q=await rsReqQ(s.url+'/query', canPage? Object.assign({}, q0, {orderByFields:oid, resultOffset:String(feats.length)}) : q0);
       const F=(Q&&Q.features)||[]; feats=feats.concat(F);
       if(!(Q&&Q.exceededTransferLimit)) break;
       if(!canPage||!F.length||pg===RS_PAGES-1){ part=true; break; } }
@@ -13554,7 +13579,7 @@ async function rsAsk(s, c, desc){ const e={k:s.k, n:s.n, ty:s.ty, g0:s.g0, th:s.
     feats.forEach(ft=>{ if(!ft||!ft.geometry) return; let g=geoGeom(Object.assign({type:gt, spatialReference:{wkid:c.wkid}}, ft.geometry)); if(!g) return;
       if(gt==='polygon'||gt==='polyline'){ try{ const k=GE.clip(g, E); if(!k) return; g=k; }catch(err){} }   // a huge polygon: only the part around the area is projected
       let X=null; try{ X=geoClean(c.f.toLocal(g)); }catch(err){} if(!X||!geoFinite(X)) return;
-      const at=ft.attributes||{}, nm=nf.map(x=>rsAt(at, x)).filter(v=>v!=null&&v!=='').join(' ').slice(0, 80);
+      const at=ft.attributes||{}, nm=rsCut(nf.map(x=>rsAt(at, x)).filter(v=>v!=null&&v!=='').join(' '), 80);
       rsAddFeat(A, c, X, cls.val(at), nm, R, s.sp? at : null); });
     if(part) e.part=1; e.gt=gt; e.ins=A.n; if(gt==='polyline'&&RS_WC.test(String(s.n).toLowerCase().replace(/_/g, ' '))) e.wc=1;
     if(s.A) return e;   // measured into a shared sum (rsWater): the lines are written there
@@ -13596,7 +13621,9 @@ async function rsIngv(s, c){ const e={k:s.k, n:s.n, ty:'nat', g0:s.g0, th:s.th, 
 // of a map service whose query fails is measured on its own image. The service draws the layer over the area and its
 // radius; the pixels drawn (widened by one, for hatched fills) are counted inside the gross area — hectares, to about
 // 1 % — and, with nothing inside, the nearest one gives the distance. No classes, no names: the line says «map image»
-function rsCanImage(s, prev){ return !s.sp&&/\/MapServer\/\d+$/i.test(String(s.url||''))&&!RS_JSONP.test(String(s.url||''))&&!(prev&&prev.gt&&prev.gt!=='polygon'); }
+// 11/11: only a layer known to be of polygons — by its description, else by the list of the service (gt0). Points
+// and lines measured on a picture gave a «nothing» that was not true (seen on Lombardia's PTCP)
+function rsCanImage(s, prev){ const gt=(prev&&prev.gt)||s.gt0; return !s.sp&&/\/MapServer\/\d+$/i.test(String(s.url||''))&&!RS_JSONP.test(String(s.url||''))&&gt==='polygon'; }
 async function rsImage(s, c){ const m=/^(.*\/MapServer)\/(\d+)$/i.exec(String(s.url||'')); if(!m) return null;
   const GE=esriMods.geometryEngine, R=s.r||(s.th==='surround'? RS_R10 : RS_R), BV=c.f.toView(c.B); if(!BV||!BV.extent) return null;
   // one image of the layer over an extent (in the view's system), its pixels drawn widened by one, and the area in the same pixels
@@ -13629,10 +13656,20 @@ async function rsWater(s, c, desc){ const e={k:s.k, n:s.n, ty:'nat', g0:s.g0, th
   if(bad===RS_WATER_IDS.length){ e.err='bloccato dal browser o server fermo'; return e; }
   const L=rsLines(A, s.n, c.baseHa, RS_R, c.RT); e.d=L.d; e.g=L.g; e.ins=A.n; if(part||bad) e.part=1; return e; }
 // a map service: its layers with geometry (not the groups), with the path of their groups; the base ones out
+// the scales at which a layer of a map service is drawn, with its groups: lo = the closest (maxScale; 0 = no limit),
+// hi = the farthest (minScale; none = Infinity)
+function rsScaleOf(x, by){ let lo=0, hi=Infinity, q=x, n=0;
+  while(q&&n++<20){ const mn=+q.minScale||0, mx=+q.maxScale||0; if(mn>0&&mn<hi) hi=mn; if(mx>lo) lo=mx; q=(q.parentLayerId!=null&&q.parentLayerId>=0)? by.get(q.parentLayerId) : null; }
+  return {lo:lo, hi:hi}; }
 async function rsLeaves(s, desc){ const D=await desc(s.url), L=(D&&D.layers)||[], by=new Map(L.map(x=>[x.id, x]));
   const path=x=>{ const p=[]; let q=x, n=0; while(q&&q.parentLayerId!=null&&q.parentLayerId>=0&&n++<20){ q=by.get(q.parentLayerId); if(q) p.unshift(q.name); } return p; };
-  return L.filter(x=>!(x.subLayerIds&&x.subLayerIds.length)&&(!x.type||/feature/i.test(x.type))).map(x=>({id:x.id, name:String(x.name||x.id), path:path(x)}))
-    .filter(x=>{ const n=x.name.toLowerCase().replace(/_/g, ' '); return !RS_OUT.test(n)&&!RS_INT.test(n); }); }
+  const all=L.filter(x=>!(x.subLayerIds&&x.subLayerIds.length)&&(!x.type||/feature/i.test(x.type)))
+    .map(x=>({id:x.id, name:String(x.name||x.id), path:path(x), gt:rsGt(x.geometryType), sc:rsScaleOf(x, by), fam:String(x.name||x.id).toLowerCase().replace(/_/g, ' ').replace(/\s+/g, ' ').trim()+'|'+(x.geometryType||'')}))
+    .filter(x=>{ const n=x.name.toLowerCase().replace(/_/g, ' '); return !RS_OUT.test(n)&&!RS_INT.test(n); });
+  // 11/11 (seen on Lombardia's PTCP: every layer three times, «Fino a 300.000», «Da 300.000 a 100.000», «Da 100.000»): a
+  // service that repeats a layer for ranges of scales that do not meet — same name, same kind of geometry — is read in
+  // its most detailed copy alone (the one drawn at the closest scales); the others would say the same thing again
+  return all.filter(x=>!all.some(y=>y!==x&&y.fam===x.fam&&x.sc.lo*1.001+1>=y.sc.hi)); }
 function rsSubOf(l, id){ try{ return (l.allSublayers&&l.allSublayers.find(x=>x.id===id))||null; }catch(e){ return null; } }
 function rsRendOf(o){ try{ return o&&o.renderer&&o.renderer.toJSON? o.renderer.toJSON() : null; }catch(e){ return null; } }
 
@@ -13643,7 +13680,8 @@ async function rsRun(){ if(rsBusy) return; rsBusy=true; rsProg='Preparo…'; rsR
     if(!b.B){ toolMsg('rmMsg', 'Per il controllo serve un’area lorda (o delle particelle con la geometria).', 'err'); return; }
     const c={f:b.f, B:b.B, baseHa:b.baseHa, RT:rsRoute(b.f), wkid:(view.spatialReference&&view.spatialReference.wkid)||102100};
     const map=wmCurrentId()||'', S=rsSources().filter(s=>s.th&&s.th!=='out'), out=[], cache=new Map();
-    const desc=u=>{ if(!cache.has(u)) cache.set(u, rsReq(u, {f:'json'}).catch(err=>{ cache.delete(u); throw err; })); return cache.get(u); };
+    rsDown.clear();
+    const desc=u=>{ if(!cache.has(u)) cache.set(u, rsReqQ(u, {f:'json'}).catch(err=>{ cache.delete(u); throw err; })); return cache.get(u); };
     const jobs=[];
     S.forEach(s=>{ const base={k:s.k, n:s.n, ty:s.ty==='nat'? 'nat' : 'map', g0:s.g0, th:s.th};
       if(s.ty==='vis'){ out.push({k:s.k, n:s.n, ty:'vis', g0:s.g0, th:s.th}); return; }
@@ -13655,13 +13693,14 @@ async function rsRun(){ if(rsBusy) return; rsBusy=true; rsProg='Preparo…'; rsR
     // the map services first: their layers become jobs
     const ms=jobs.filter(j=>j.ms), plain=jobs.filter(j=>!j.ms); let i=0;
     rsProg='Leggo i servizi della mappa…'; rsStatus();
-    const late=[], leaves=async(j, last)=>{ const add=[]; try{ const L=await rsLeaves(j, desc);
+    const natU=rsNatUrls();
+    const late=[], leaves=async(j, last)=>{ const add=[]; try{ const L0=await rsLeaves(j, desc), L=j.own? L0 : L0.filter(x=>!natU.has((j.url+'/'+x.id).toLowerCase()));   // 11/11: a layer that is a national one is read once
         // 10/11 (review): a sublayer has the theme of its own name (a service «Forme di tutela» holds Natura 2000, fires,
         // archaeology…); the theme the PM chose for the service wins for all of them
         L.forEach(x=>{ const sl=rsSubOf(j.l, x.id), gl=j.own? null : rsGuess(x.path, x.name), lt=(gl&&gl.why==='kw')? gl.t : j.th;
           add.push({k:j.k+'#'+x.id, pk:j.k, pth:j.th, t:(x.path.length? x.path.slice(-1).concat(x.name).join(' › ') : x.name), n:j.n+' › '+(x.path.length? x.path.concat(x.name).join(' › ') : x.name), ty:'map', g0:j.g0, th:lt,
-          url:j.url+'/'+x.id, where:(sl&&sl.definitionExpression)||'', rend:rsRendOf(sl), noNames:j.noNames, cl:'@'}); });
-        if(!L.length) out.push({k:j.k, n:j.n, ty:'map', g0:j.g0, th:j.th, d:[], g:[], err:'nessun layer interrogabile'}); }
+          url:j.url+'/'+x.id, gt0:x.gt, where:(sl&&sl.definitionExpression)||'', rend:rsRendOf(sl), noNames:j.noNames, cl:'@'}); });
+        if(!L.length) out.push(L0.length? {k:j.k, n:j.n, ty:'map', g0:j.g0, th:'out', dup:1, d:[], g:[]} : {k:j.k, n:j.n, ty:'map', g0:j.g0, th:j.th, d:[], g:[], err:'nessun layer interrogabile'}); }
       catch(err){ if(last) out.push({k:j.k, n:j.n, ty:'map', g0:j.g0, th:j.th, d:[], g:[], err:rsErr(err)}); else late.push(j); }
       return add; };
     await rsPool(ms.map(j=>async()=>{ (await leaves(j, false)).forEach(x=>plain.push(x)); }));
@@ -13678,9 +13717,14 @@ async function rsRun(){ if(rsBusy) return; rsBusy=true; rsProg='Preparo…'; rsR
     const mute=e=>!!e&&((!!e.err&&/nessuna risposta|bloccato|timeout|error performing|query operation|\[5\d\d\]/i.test(e.err))||(e.k==='nat:water'&&!!e.part));
     const again=plain.filter(j=>mute(out.find(x=>x.k===j.k)));
     if(again.length){ rsProg='Riprovo '+again.length+' layer…'; rsStatus(); rsWaitNow=RS_RETRY;
-      try{ await rsPool(again.map(j=>async()=>{ const n=out.findIndex(x=>x.k===j.k); let e=null;
-          if(rsCanImage(j, out[n])){ try{ e=await rsImage(j, c); }catch(err){ e=null; } }   // a map service that cannot send its shapes: its image
-          if(!e) e=await one(j); if(n>=0&&e&&!mute(e)) out[n]=e; })); }finally{ rsWaitNow=RS_WAIT; } }
+      // 11/11: the image at once only for a layer whose description came and whose shapes did not (a server that cannot
+      // send them, or keeps silent); a request that fell at once is asked again first, and the image is the last resort
+      const cant=e=>!!e&&!!e.err&&/nessuna risposta|timeout|error performing|query operation|\[5\d\d\]/i.test(e.err);
+      try{ await rsPool(again.map(j=>async()=>{ const n=out.findIndex(x=>x.k===j.k), prev=out[n]; let e=null;
+          const img=async p=>{ if(!rsCanImage(j, p)) return null; try{ return await rsImage(j, c); }catch(err){ return null; } };   // a map service that cannot send its shapes: its image
+          if(cant(prev)) e=await img(prev);
+          if(!e){ e=await one(j); if(mute(e)){ const im=await img(e.gt? e : prev); if(im) e=im; } }
+          if(n>=0&&e&&!mute(e)) out[n]=e; })); }finally{ rsWaitNow=RS_WAIT; } }
     const order=new Map(S.map((s, n)=>[s.k, n])); out.sort((a, b)=>(order.get(a.pk||a.k)||0)-(order.get(b.pk||b.k)||0)||String(a.k).localeCompare(String(b.k), undefined, {numeric:true}));
     const ing=out.find(e=>e.box);
     rmState.lay={v:1, at:new Date().toISOString(), map:map, mapT:wmLabel(map||null), sig:rsSig(b), rsig:rsRouteSig(c.RT), src:out.map(e=>Object.assign({}, e))};   // 10/11: with the theme (th), it travels with the project
@@ -13688,7 +13732,7 @@ async function rsRun(){ if(rsBusy) return; rsBusy=true; rsProg='Preparo…'; rsR
     rsBusy=false; rsProg='';
     for(let k=0; k<100&&rmBusy; k++) await new Promise(r=>setTimeout(r, 100));   // a draft already under way (the module just shown) would skip this one
     await rmCalc(true);
-    const hit=out.filter(e=>(e.d&&e.d.length)||(e.g&&e.g.length)).length, bad=out.filter(e=>e.err&&e.err!=='login').length, lg=out.filter(e=>e.err==='login').length, vis=out.filter(e=>e.ty==='vis').length;
+    const hit=out.filter(e=>(e.d&&e.d.length)||(e.g&&e.g.length)).length, bad=out.filter(e=>e.err&&e.err!=='login').length, lg=out.filter(e=>e.err==='login').length, vis=out.filter(e=>e.ty==='vis'||e.dup).length;
     toolMsg('rmMsg', 'Controllo fatto: '+(out.length-vis-lg)+' layer letti, '+hit+' con qualcosa vicino all’area'+(bad? '; non letti: '+bad : '')+(lg? '; '+lg+' nazionali richiedono l’accesso ad AGOL' : '')
       +(vis? '; '+vis+' da guardare sulla mappa (immagini)' : '')+'. Le righe sono nella bozza.', bad? '' : 'ok');
   }catch(e){ console.warn('[risk matrix, layers]', e); toolMsg('rmMsg', 'Il controllo non è riuscito: '+((e&&e.message)||e)+'.', 'err'); }
@@ -13711,15 +13755,18 @@ function rsMerge(c){ rsStale='';
   if(L.box){ if(!c.D.box.muni&&L.box.muni) c.D.box.muni=L.box.muni; if(!c.D.box.region&&L.box.region) c.D.box.region=L.box.region; }
   const rtNow=rsRoute(c.f), rtOk=/^\d*$/.test(String(L.rsig||''))? String(L.rsig||'')===rsRouteLen(rtNow) : L.rsig===rsRouteSig(rtNow);   // a result of before 10/11 has the length alone
   if(!rtOk) rsStale='route';   // 10/11: also a route drawn after the run (its surroundings were never asked)
-  const per=new Map(), P=t=>{ if(!per.has(t)) per.set(t, {hit:0, miss:[], vis:[], err:[], login:[], part:[], ref:new Set(), mh:[], mm:0, ln:0, lnIn:0}); return per.get(t); };
-  L.src.forEach(e=>{ const t=rsThemeNow(e, L); if(!t||t==='out') return; const p=P(t);
+  const per=new Map(), P=t=>{ if(!per.has(t)) per.set(t, {hit:0, miss:[], vis:[], err:[], login:[], part:[], ref:new Set(), mh:[], mm:0, ln:0, lnIn:0, said:new Set()}); return per.get(t); };
+  // the layers of the map that inform a row, gathered by row and written at the end under one line (see below)
+  const refs=new Map(), MR=k=>{ if(!refs.has(k)) refs.set(k, {ml:[], mm:null, vis:[]}); return refs.get(k); }, mAdd=(k, n)=>{ const m=MR(k); if(m.ml.indexOf(n)<0) m.ml.push(n); };
+  L.src.forEach(e=>{ const t=rsThemeNow(e, L); if(!t||t==='out'||e.dup) return; const p=P(t);
     if(e.ty==='vis'){ p.vis.push(e.n); return; }
     if(e.err){ (e.err==='login'? p.login : p.err).push(e); return; }
     if(e.gt==='polyline'&&e.wc){ p.ln++; if(e.ins>0) p.lnIn++; }   // a line layer of watercourses (not the roads at risk of a PAI)
-    if(e.d&&e.d.length){ p.hit++; e.d.forEach(x=>{ const y=x+(e.part? RS_PART : ''); c.row(t).d.push(y); c.fact(t, y); }); if(e.ty==='nat') p.ref.add(e.ref); else p.mh.push(e.n); }
+    // 11/11: two layers that say the same thing in the same words (a result of before, with the copies by scale) say it once
+    if(e.d&&e.d.length){ p.hit++; e.d.forEach(x=>{ const y=x+(e.part? RS_PART : ''); if(p.said.has(y)) return; p.said.add(y); c.row(t).d.push(y); c.fact(t, y); }); if(e.ty==='nat') p.ref.add(e.ref); else p.mh.push(e.n); }
     else if(e.part) p.part.push(e);   // cut by the server and nothing in the part received: not a «nothing»
     else { p.miss.push(e); if(e.ty==='nat') p.ref.add(e.ref); else p.mm++; }
-    if(rtOk&&RS_G5.has(t)&&e.g&&e.g.length){ e.g.forEach(x=>{ c.row('grid_constr').d.push(x); c.fact('grid_constr', x); }); c.row('grid_constr').e.add(e.ty==='nat'? e.ref : 'Map «'+L.mapT+'»: '+e.n); }
+    if(rtOk&&RS_G5.has(t)&&e.g&&e.g.length){ e.g.forEach(x=>{ c.row('grid_constr').d.push(x); c.fact('grid_constr', x); }); if(e.ty==='nat') c.row('grid_constr').e.add(e.ref); else mAdd('grid_constr', e.n); }
     (e.x||[]).forEach(o=>{ (o.d||[]).forEach(x=>{ c.row(o.k).d.push(x); c.fact(o.k, x); }); if(e.ref) c.row(o.k).e.add(e.ref); }); });
   per.forEach((p, t)=>{ const R=c.row(t);
     // nothing found: with the radius that was asked (10/11); Hydrography names every layer, also beside a finding (asked by the user)
@@ -13737,14 +13784,20 @@ function rsMerge(c){ rsStale='';
       R.d.push('Not checked:\n'+[...why].map(x=>{ const a=x[0].split('|'); return '- '+a[0]+(x[1]>1? ' ('+x[1]+' layers)' : '')+': '+a[1]; }).join('\n'));
       if(c.warn) c.warn(t, 'Layer non letti: '+un.map(e=>e.n).join(', ')); }
     p.ref.forEach(x=>R.e.add(x));
-    p.mh.forEach(x=>R.e.add('Map «'+L.mapT+'»: '+x)); if(p.mh.length&&p.mm) R.e.add('Map «'+L.mapT+'»: '+p.mm+(p.mm===1? ' other layer' : ' other layers')+' with nothing '+rad);
-    if(!p.mh.length&&p.mm) R.e.add('Map «'+L.mapT+'»: '+p.mm+(p.mm===1? ' layer' : ' layers')+' checked, nothing '+rad);
-    p.vis.forEach(x=>R.e.add('To check on the map: '+x));
+    p.mh.forEach(x=>mAdd(t, x)); if(p.mm) MR(t).mm={n:p.mm, rad:rad};
+    p.vis.forEach(x=>MR(t).vis.push(x));
     if(p.miss.length) c.fact(t, 'Niente vicino all’area ('+rr.map(r=>rmM(r)).join(', ')+'): '+p.miss.map(e=>e.n).join(', '));
     if(p.vis.length) c.fact(t, 'Da guardare sulla mappa (immagini, non si interrogano): '+p.vis.join(', '));
     if(p.err.length) c.fact(t, 'Non raggiunti: '+p.err.map(e=>e.n+' ('+e.err+')').join(', '));
     if(p.part.length) c.fact(t, 'Risposta parziale (limite del server): '+p.part.map(e=>e.n).join(', '));
-    if(p.login.length) c.fact(t, 'Serve l’accesso ad AGOL: '+p.login.map(e=>e.n).join(', ')); }); }
+    if(p.login.length) c.fact(t, 'Serve l’accesso ad AGOL: '+p.login.map(e=>e.n).join(', ')); });
+  // 11/11 (asked by the user): the name of the map once — «Map «…»:» — and under it a layer per line with a dash, the
+  // layers with nothing last and counted; a row whose layers found nothing keeps its single line. After the national
+  // sources, before the images to look at
+  refs.forEach((m, k)=>{ const R=c.row(k), o=m.mm;
+    if(m.ml.length){ R.e.add('Map «'+L.mapT+'»:'); m.ml.forEach(x=>R.e.add('- '+x)); if(o) R.e.add('- '+o.n+(o.n===1? ' other layer' : ' other layers')+' with nothing '+o.rad); }
+    else if(o) R.e.add('Map «'+L.mapT+'»: '+o.n+(o.n===1? ' layer' : ' layers')+' checked, nothing '+o.rad);
+    m.vis.forEach(x=>R.e.add('To check on the map: '+x)); }); }
 
 // ── U8 (11/11, approved by the user): «Vedi sulla mappa» — only the layers of a row on the map, the area framed ──
 // The layers of the open map that the last check gave to the row (with something found, or images to look at) go on, with
@@ -13752,7 +13805,11 @@ function rsMerge(c){ rsStale='';
 // layers with findings are added for the time being. The same button, another row, leaving the module, another map or
 // another project put everything back (visibility, the layers added, the viewpoint). While it lasts the project is saved
 // with the visibility of before (rsSeeVis, used by projCaptureLayers)
-let rsSeen=null;
+let rsSeen=null, rsHeld=[];   // rsHeld: [object, its visibility of before] while the picture of a theme is made (37-risk-images.js)
+// of a map service only the layers `ids` on, with their groups; `set` notes what it changes
+function rsSubsOnly(l, ids, set){ const subs=l&&l.allSublayers; if(!subs||!subs.forEach) return;
+  subs.forEach(sl=>{ if(sl.sublayers&&sl.sublayers.length) return; set(sl, ids.indexOf(sl.id)>=0); });
+  subs.forEach(sl=>{ if(ids.indexOf(sl.id)<0) return; let p=sl.parent, n=0; while(p&&p!==l&&n++<10){ set(p, true); p=p.parent; } }); }
 function rsSeeParts(k){ const L=rmState.lay, map=wmCurrentId()||'', out={map:new Map(), vis:[], nat:[]}; if(!L||!Array.isArray(L.src)) return out; const S=rsSources();
   L.src.forEach(e=>{ if(rsThemeNow(e, L)!==k) return; const hit=(e.d&&e.d.length)||(e.g&&e.g.length);
     if(e.ty==='nat'){ if(hit){ const n=RS_NAT.find(x=>'nat:'+x.id===e.k); if(n&&n.sp!=='ingv'&&!RS_JSONP.test(n.u)) out.nat.push(n); } return; }
@@ -13761,7 +13818,7 @@ function rsSeeParts(k){ const L=rmState.lay, map=wmCurrentId()||'', out={map:new
     if(hit){ if(!out.map.has(s.l)) out.map.set(s.l, []); if(e.pk) out.map.get(s.l).push(+String(e.k).split('#').pop()); } });
   return out; }
 function rsSeeCan(k){ const P=rsSeeParts(k); return !!(P.map.size||P.vis.length||P.nat.length); }
-function rsSeeVis(o){ if(rsSeen){ const x=rsSeen.keep.find(y=>y[0]===o); if(x) return x[1]; } return o.visible; }
+function rsSeeVis(o){ const x=(rsSeen? rsSeen.keep : []).concat(rsHeld).find(y=>y[0]===o); return x? x[1] : o.visible; }
 function rsSeeOff(quiet){ const S=rsSeen; if(!S) return; rsSeen=null;
   for(let i=S.keep.length-1; i>=0; i--){ try{ S.keep[i][0].visible=S.keep[i][1]; }catch(e){} }
   S.temp.forEach(l=>{ try{ view.map.remove(l); }catch(e){} });
@@ -13773,9 +13830,7 @@ async function rsSee(k){ if(rsSeen){ const was=rsSeen.k; rsSeeOff(true); if(was=
   let vp=null; try{ vp=view.viewpoint.clone(); }catch(e){}
   rsMapList().forEach(it=>{ const l=it.l; if(want.has(l)){ let p=l, n=0; while(p&&p!==view.map&&n++<10){ set(p, true); p=p.parent; } } else set(l, false); });
   for(const [l, ids] of P.map){ if(!ids.length) continue; try{ if(l.load&&!l.loaded) await Promise.race([l.load(), new Promise(r=>setTimeout(r, 5000))]); }catch(e){}
-    const subs=l.allSublayers; if(!subs||!subs.forEach) continue;
-    subs.forEach(sl=>{ if(sl.sublayers&&sl.sublayers.length) return; set(sl, ids.indexOf(sl.id)>=0); });
-    subs.forEach(sl=>{ if(ids.indexOf(sl.id)<0) return; let p=sl.parent, n=0; while(p&&p!==l&&n++<10){ set(p, true); p=p.parent; } }); }
+    rsSubsOnly(l, ids, set); }
   if(!window.rsMapStub) P.nat.forEach(n=>{ (n.sp==='water'? RS_WATER_IDS.map(id=>n.u+'/'+id) : [n.u]).forEach(u=>{ try{ const fl=new esriMods.FeatureLayer({url:u, title:n.t, opacity:0.75, listMode:'hide'}); view.map.add(fl); temp.push(fl); }catch(e){} }); });
   rsSeen={k:k, keep:keep, temp:temp, vp:vp};
   try{ const GE=esriMods.geometryEngine, RT=k==='grid_constr'? rsRoute(b.f) : null, G=RT? GE.union([GE.buffer(b.B, 300, 'meters'), GE.buffer(RT, 300, 'meters')]) : GE.buffer(b.B, k==='surround'? RS_R10 : RS_R, 'meters'), V=G&&b.f.toView(G);
@@ -13803,7 +13858,7 @@ function rsOpt(cur, extra){ return (extra||[]).concat([['', 'Nessun tema']], RS_
 // 10/11 (asked by the user): what the last check says of a source — «in» something inside the area, «near» something within
 // the radius, «miss» read and nothing, «err» not read, «login» needs the sign-in, «vis» an image that cannot be read. A
 // service read in part has its mark and, beside it, the cross of the layers not read (x)
-function rsResOf(k){ const L=rmState.lay; if(!L||!Array.isArray(L.src)) return null; const es=L.src.filter(e=>e.k===k||e.pk===k); if(!es.length) return null;
+function rsResOf(k){ const L=rmState.lay; if(!L||!Array.isArray(L.src)) return null; const es=L.src.filter(e=>(e.k===k||e.pk===k)&&!e.dup); if(!es.length) return null;
   const hit=es.filter(e=>(e.d&&e.d.length)||(e.g&&e.g.length)), err=es.filter(e=>e.err||e.part), x=!err.length? '' : err.some(e=>e.err!=='login')? 'err' : 'login';
   const txt=hit.map(e=>e.d.concat(e.g).join('\n')).concat(err.map(e=>e.n+': '+(e.err==='login'? 'serve l’accesso ad AGOL' : e.err||'risposta parziale'))).join('\n');
   if(hit.length) return {c:hit.some(e=>e.ins>0||/ inside/.test((e.d||[]).join(' ')))? 'in' : 'near', x:x, t:txt};
@@ -14220,7 +14275,16 @@ async function riThemeImage(b, t, T, M, failed){ const RT=typeof rsRoute==='func
   const s1=await riShot(new esriMods.Map({basemap:riBase('gray', M), layers:nat}), ext, {fmt:'jpg', white:true, failed:failed});
   // the app's map with only this theme's layers, switched on in that view alone
   let s2=null; const want=new Set(T.map.concat(T.vis).map(s=>s.l)), show=l=>!!l&&(want.has(l)||(l.type==='group'&&l.allLayers&&l.allLayers.some(x=>want.has(x))));
-  if(want.size) s2=await riShot(view.map, ext, {fmt:'png', show:show, failed:failed});
+  // 11/11 (seen on a real file: Archaeological and Landscape, both of Lombardia's PTCP, had the same picture): of a map
+  // service only the layers that gave this theme something are on while the shot is taken, then as they were; meanwhile
+  // the project is saved with the visibility of before (rsHeld, read by rsSeeVis)
+  if(want.size){ const held=[], set=(o, v)=>{ if(!o||o.visible===v) return; held.push([o, o.visible]); o.visible=v; };
+    try{ if(typeof rsSeeParts==='function'){ for(const [l, ids] of rsSeeParts(t).map){ if(!ids.length||!want.has(l)) continue;
+          try{ if(l.load&&!l.loaded) await Promise.race([l.load(), new Promise(r=>setTimeout(r, 5000))]); }catch(e){}
+          rsSubsOnly(l, ids, set); }
+        rsHeld=rsHeld.concat(held); }
+      s2=await riShot(view.map, ext, {fmt:'png', show:show, failed:failed}); }
+    finally{ for(let i=held.length-1; i>=0; i--){ try{ held[i][0].visible=held[i][1]; }catch(e){} } if(held.length) rsHeld=rsHeld.filter(x=>held.indexOf(x)<0); } }
   return riCompose([s1&&s1.url, s2&&s2.url], ext, g=>{
     T.drawn.forEach(d=>{ let c=(d.attributes&&d.attributes.color)||sfColor(d.attributes.sf_cat)||'#c00000'; if(!/^#[0-9a-f]{6}$/i.test(c)) c='#c00000'; riDraw(g, ext, riGeomView(d.geometry), {stroke:c, w:2, fill:c+'40'}); });
     if(b.base) riDraw(g, ext, b.base, {stroke:'#c00000', w:3}); if(RT) riDraw(g, ext, b.f.toView(RT), {stroke:'#3945cf', w:3, dash:[10, 6]}); }); }
