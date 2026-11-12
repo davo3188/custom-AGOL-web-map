@@ -12839,6 +12839,7 @@ async function prShot(map, ext, pw, ph, o){ const div=document.createElement('di
     v.extent=ext; await new Promise(res=>setTimeout(res, 500));
     for(let i=0; i<(o.waits||120)&&v.updating; i++) await new Promise(res=>setTimeout(res, 500));   // half a second at a time (one long timer would jump ahead under virtual time)
     slow=v.updating; await new Promise(res=>setTimeout(res, 300));
+    if(o.check){ try{ await o.check(v); }catch(e){} }   // 11/11 (Risk Matrix): what the view holds when the picture is taken
     const shot=await v.takeScreenshot({format:o.fmt||'jpg', quality:88}), D=shot.data&&shot.data.data; let empty=false;
     if(D){ let a=0, a2=0, n=0; for(let i=0; i<D.length; i+=64){ const l=(D[i]+D[i+1]+D[i+2])/3*D[i+3]/255; a+=l; a2+=l*l; n++; }
       const mu=a/n; empty=Math.sqrt(Math.max(0, a2/n-mu*mu))<1.5; }
@@ -13326,6 +13327,15 @@ document.addEventListener('DOMContentLoaded', function(){
 const RS_R=1000, RS_R10=10000, RS_RSUB=20000, RS_ROUTE=100, RS_CONC=4, RS_WAIT=30000, RS_PAGES=25;
 const RS_RETRY=12000;   // the wait of the second attempt, in milliseconds
 const RS_PART=' (partial answer: the server returned only a part, the figures may be higher)';
+// 12/11 (decided by the user: «keep them, and say so»): a feature that its layer's own legend does not draw — a value
+// without a symbol, in a legend with no symbol for the other values — is counted like the others, and its line says so
+// (seen on Lombardia's PTCP: «Polarità» 0 is the whole comune, «Pavese», «Corsi d'acqua» have no symbol). RS_ND: the mark
+// such a class carries from rsAsk to rsLines, never written
+const RS_NODRAW='not drawn by the layer’s legend', RS_ND='\u0001';
+function rsNd(k){ return String(k).slice(-1)===RS_ND; }
+function rsNdName(k){ k=String(k==null? '' : k); return rsNd(k)? k.slice(0, -1) : k; }
+// a result whose lines all end with the notice: nothing of what it found is on the map (the names and the legend of a picture)
+function rsAllNd(e){ const T=((e&&e.d)||[]).concat((e&&e.g)||[]); return T.length>0&&T.every(x=>String(x).slice(-RS_NODRAW.length)===RS_NODRAW); }
 // the rows a source can inform, with short names for the menus (the template's names are longer)
 const RS_TH=[['zoning','Urban zoning'],['flora','Flora/fauna'],['archaeo','Archaeological / historical'],['landscape','Landscape'],['topo','Topography'],
   ['utility','Utility infrastructure'],['hydro','Hydrography'],['soil','Soil type'],['fire','Fire risk'],['surround','Surrounding area'],['others','Others'],
@@ -13458,7 +13468,7 @@ function rsEnv(c, R){ const GE=esriMods.geometryEngine; let ext=null;
   try{ add(GE.buffer(c.B, R, 'meters')); }catch(e){}
   if(c.RT){ try{ add(GE.buffer(c.RT, RS_ROUTE, 'meters')); }catch(e){} }
   return ext? {xmin:ext.xmin, ymin:ext.ymin, xmax:ext.xmax, ymax:ext.ymax, spatialReference:{wkid:c.wkid}} : null; }
-function rsAggNew(){ return {n:0, cnt:0, parts:[], m:0, pts:0, near:null, nearC:'', nearN:'', nearAt:null, cls:new Map(), names:[], rtPolys:[], rtN:0, rtCls:new Map(), recs:[]}; }
+function rsAggNew(){ return {n:0, cnt:0, nd:0, parts:[], m:0, pts:0, near:null, nearC:'', nearN:'', nearAt:null, cls:new Map(), names:[], rtPolys:[], rtN:0, rtCls:new Map(), recs:[]}; }
 function rsCls(map, cl){ if(!map.has(cl)) map.set(cl, {parts:[], m:0, n:0, polys:[]}); return map.get(cl); }
 // one feature (X, in the local frame) against the route c.RT (G5, at any distance from the area) and the base c.B;
 // R: how far from the base it still counts
@@ -13473,26 +13483,33 @@ function rsAddFeat(A, c, X, cl, nm, R, at){ const GE=esriMods.geometryEngine, B=
   if(inside){ A.n++; A.cnt++; if(nm&&A.names.indexOf(nm)<0) A.names.push(nm); }
   else { d=Infinity; try{ d=Math.abs(GE.distance(B, X, 'meters')); }catch(e){} if(!(d<=R)) return false;
     A.cnt++; if(A.near==null||d<A.near){ A.near=d; A.nearC=cl; A.nearN=nm||''; } }
+  if(rsNd(cl)) A.nd++;
   if(at) A.recs.push({at:at, d:d});
   return true; }
 // the lines of the draft for one source (English, like the template): inside (one class: named first; more: «classes:»
 // with hectares and %), else the nearest; within 10 km: how many; the route
-function rsLines(A, title, baseHa, R, RT){ const GE=esriMods.geometryEngine, d=[], g=[];
+function rsLines(A, title, baseHa, R, RT){ const GE=esriMods.geometryEngine, d=[], g=[], ND=' — '+RS_NODRAW;
   const rtLen=ps=>{ if(!RT||!ps||!ps.length) return 0; try{ const U=ps.length>1? GE.union(ps) : ps[0], I=U&&GE.intersect(RT, U); return I&&I.paths? Math.abs(GE.planarLength(I, 'meters')||0) : 0; }catch(e){ return 0; } };
   const area=ps=>{ if(!ps.length) return 0; try{ const U=ps.length>1? GE.union(ps) : ps[0]; return U? Math.abs(GE.planarArea(U, 'square-meters')||0)/1e4 : 0; }catch(e){ return 0; } };
-  const list=(map, fn)=>[...map].map(x=>[x[0], fn(x[1])]).filter(x=>x[0]!==''&&x[1]>0).sort((a, b)=>b[1]-a[1]);
+  // the classes with something, the largest first. 12/11: the ones the legend does not draw (RS_ND) — when a line speaks
+  // only of them it ends with the notice (all) and they keep their bare names; among classes that are drawn each of them
+  // says so, and one without a name is «other values». one: a single class, named before the measure
+  const list=(map, fn)=>{ const W=[...map].map(x=>[x[0], fn(x[1])]).filter(x=>x[1]>0), all=W.length>0&&W.every(x=>rsNd(x[0])), some=W.some(x=>rsNd(x[0]));
+    const L=W.map(x=>[!rsNd(x[0])? x[0] : all? rsNdName(x[0]) : (rsNdName(x[0])||'other values')+' ('+RS_NODRAW+')', x[1]]).filter(x=>x[0]!=='').sort((a, b)=>b[1]-a[1]);
+    return {L:L, all:all, one:L.length===1&&(all||!some)}; };
   const many=(L, fmt)=>' — '+L.slice(0, 6).map(fmt).join(', ')+(L.length>6? ' (+'+(L.length-6)+' more)' : '');
   const names=()=>A.names.length? ' — '+A.names.slice(0, 3).join('; ')+(A.names.length>3? ' (+'+(A.names.length-3)+')' : '') : '';
-  if(R>RS_R){ if(A.cnt) d.push(title+': '+A.cnt+' within '+rsKm(R)+(A.n? ' ('+A.n+' inside)' : '')+(A.near!=null? ', the nearest '+rmM(A.near)+' away' : '')); }
-  else if(A.parts.length||A.m>0||A.pts>0){ let p, L, fmt;
-    if(A.parts.length){ const ha=area(A.parts); p=rmHa(ha)+' inside ('+rmPct(ha, baseHa)+')'; L=list(A.cls, v=>area(v.parts)); fmt=x=>x[0]+' '+rmHa(x[1]); }
-    else if(A.m>0){ p=rmM(A.m)+' inside'; L=list(A.cls, v=>v.m); fmt=x=>x[0]+' '+rmM(x[1]); }
-    else { p=A.pts+' inside'; L=list(A.cls, v=>v.n); fmt=x=>x[0]+' '+x[1]; }
-    d.push(title+': '+(L.length===1? L[0][0]+', '+p+names() : p+(L.length? many(L, fmt) : names()))); }   // the names only without a list of classes
-  else if(A.near!=null){ const w=[A.nearN, A.nearC].filter(Boolean); d.push(title+': '+rmM(A.near)+' away'+(w.length? ' ('+w.join(', ')+')' : '')); }
+  if(R>RS_R){ if(A.cnt) d.push(title+': '+A.cnt+' within '+rsKm(R)+(A.n? ' ('+A.n+' inside)' : '')+(A.near!=null? ', the nearest '+rmM(A.near)+' away' : '')+(A.nd>=A.cnt? ND : A.nd? ' ('+A.nd+' '+RS_NODRAW+')' : '')); }
+  else if(A.parts.length||A.m>0||A.pts>0){ let p, S, fmt;
+    if(A.parts.length){ const ha=area(A.parts); p=rmHa(ha)+' inside ('+rmPct(ha, baseHa)+')'; S=list(A.cls, v=>area(v.parts)); fmt=x=>x[0]+' '+rmHa(x[1]); }
+    else if(A.m>0){ p=rmM(A.m)+' inside'; S=list(A.cls, v=>v.m); fmt=x=>x[0]+' '+rmM(x[1]); }
+    else { p=A.pts+' inside'; S=list(A.cls, v=>v.n); fmt=x=>x[0]+' '+x[1]; }
+    const L=S.L; d.push(title+': '+(S.one? L[0][0]+', '+p+names() : p+(L.length? many(L, fmt) : names()))+(S.all? ND : '')); }   // the names only without a list of classes
+  else if(A.near!=null){ const w=[A.nearN, rsNdName(A.nearC)].filter(Boolean); d.push(title+': '+rmM(A.near)+' away'+(w.length? ' ('+w.join(', ')+')' : '')+(rsNd(A.nearC)? ND : '')); }
   const rtM=rtLen(A.rtPolys);
-  if(rtM>0){ const L=list(A.rtCls, v=>rtLen(v.polys)); g.push('Connection route crosses '+title+': '+rmM(rtM)+(L.length? ' ('+L.slice(0, 6).map(x=>x[0]+' '+rmM(x[1])).join(', ')+')' : '')); }
-  if(A.rtN>0) g.push('Connection route crosses '+title+(A.rtN>1? ' ('+A.rtN+' features)' : ''));
+  // 11/11 (E): one class is named alone (its length is the whole crossing, said just before)
+  if(rtM>0){ const S=list(A.rtCls, v=>rtLen(v.polys)), L=S.L; g.push('Connection route crosses '+title+': '+rmM(rtM)+(S.one? ' ('+L[0][0]+')' : L.length? ' ('+L.slice(0, 6).map(x=>x[0]+' '+rmM(x[1])).join(', ')+')' : '')+(S.all? ND : '')); }
+  if(A.rtN>0) g.push('Connection route crosses '+title+(A.rtN>1? ' ('+A.rtN+' features)' : '')+(list(A.rtCls, v=>v.n).all? ND : ''));
   return {d:d, g:g}; }
 
 // ── the requests (never a sign-in prompt), described once per run ──
@@ -13540,18 +13557,24 @@ function rsF(D, name){ const n=String(name||'').toLowerCase(); return ((D&&D.fie
 function rsAt(at, name){ if(!at||!name) return null; if(name in at) return at[name]; const n=String(name).toLowerCase(), k=Object.keys(at).find(x=>x.toLowerCase()===n); return k? at[k] : null; }
 // the class of a feature: a field (with its coded values) or the layer's legend (unique values, class breaks)
 function rsCut(s, n){ s=String(s); return s.length>n? s.slice(0, n-1)+'…' : s; }   // 11/11: a text cut says so
-function rsClassOf(D, rend, cl){ const none={fields:[], val:()=>''}, cut=s=>rsCut(s, 60);
+// 12/11: nd(attributes) — the legend has no symbol for this feature (its value is not among the classes, and there is no
+// symbol for the other values): the layer does not draw it. Only where the legend is read by its fields
+function rsClassOf(D, rend, cl){ const none={fields:[], val:()=>'', nd:()=>false}, cut=s=>rsCut(s, 60);
   if(cl==='-') return none;
   if(cl&&cl!=='@'){ const F=rsF(D, cl); if(!F) return none; const dom=new Map(((F.domain&&F.domain.codedValues)||[]).map(x=>[String(x.code), x.name]));
-    return {fields:[F.name], val:at=>{ const v=rsAt(at, F.name); return v==null||v===''? '' : cut(dom.get(String(v))||v); }}; }
+    return {fields:[F.name], val:at=>{ const v=rsAt(at, F.name); return v==null||v===''? '' : cut(dom.get(String(v))||v); }, nd:()=>false}; }
   const r=rend||((D&&D.drawingInfo)||{}).renderer; if(!r) return none;
   if(r.type==='uniqueValue'){ const fs=[r.field1, r.field2, r.field3].filter(Boolean).map(x=>rsF(D, x)); if(!fs.length||fs.some(x=>!x)) return none;
     const del=r.fieldDelimiter||',', lab=new Map();
     (r.uniqueValueInfos||[]).forEach(x=>lab.set(String(x.value).toLowerCase(), x.label||String(x.value)));
     (r.uniqueValueGroups||[]).forEach(G=>(G.classes||[]).forEach(C=>(C.values||[]).forEach(v=>lab.set([].concat(v).join(del).toLowerCase(), C.label||[].concat(v).join(del)))));
-    return {fields:fs.map(x=>x.name), val:at=>{ const key=fs.map(x=>{ const v=rsAt(at, x.name); return v==null? '' : String(v); }).join(del); return cut(lab.get(key.toLowerCase())||r.defaultLabel||key); }}; }
+    const keyOf=(at, nul)=>fs.map(x=>{ const v=rsAt(at, x.name); return v==null? nul : String(v); }).join(del);
+    return {fields:fs.map(x=>x.name), val:at=>{ const key=keyOf(at, ''); return cut(lab.get(key.toLowerCase())||r.defaultLabel||(/[A-Za-zÀ-ÿ]/.test(key)? key : '')); },   // 11/11 (E): a value the legend does not name is said when it is words («Pavese»), not when it is a bare number (it read «Polarità: 0», «(0 1.2 km)»)
+      nd:at=>!r.defaultSymbol&&!lab.has(keyOf(at, '').toLowerCase())&&!lab.has(keyOf(at, '<Null>').toLowerCase())}; }
   if(r.type==='classBreaks'&&r.field){ const F=rsF(D, r.field); if(!F) return none; const br=(r.classBreakInfos||[]).slice().sort((a, b)=>a.classMaxValue-b.classMaxValue);
-    return {fields:[F.name], val:at=>{ const v=+rsAt(at, F.name); if(!isFinite(v)) return ''; const b=br.find(x=>v<=x.classMaxValue); return cut(b? (b.label||'≤ '+b.classMaxValue) : r.defaultLabel||''); }}; }
+    const plain=!r.defaultSymbol&&!r.normalizationType&&!r.normalizationField, lo=r.minValue!=null&&isFinite(+r.minValue)? +r.minValue : -Infinity;   // a normalised value is not the field's: not judged
+    return {fields:[F.name], val:at=>{ const v=+rsAt(at, F.name); if(!isFinite(v)) return ''; const b=br.find(x=>v<=x.classMaxValue); return cut(b? (b.label||'≤ '+b.classMaxValue) : r.defaultLabel||''); },
+      nd:at=>{ if(!plain) return false; const w=rsAt(at, F.name), v=+w; return w==null||w===''||!isFinite(v)||v<lo||!br.some(x=>v<=x.classMaxValue); }}; }
   return none; }
 // the name of a feature: the fields given, else the layer's display field when it is text and cannot be a person
 function rsNameFields(D, s, cls){ if(s.nm) return s.nm.map(x=>rsF(D, x)).filter(Boolean).map(x=>x.name); if(s.noNames) return [];
@@ -13580,7 +13603,7 @@ async function rsAsk(s, c, desc){ const e={k:s.k, n:s.n, ty:s.ty, g0:s.g0, th:s.
       if(gt==='polygon'||gt==='polyline'){ try{ const k=GE.clip(g, E); if(!k) return; g=k; }catch(err){} }   // a huge polygon: only the part around the area is projected
       let X=null; try{ X=geoClean(c.f.toLocal(g)); }catch(err){} if(!X||!geoFinite(X)) return;
       const at=ft.attributes||{}, nm=rsCut(nf.map(x=>rsAt(at, x)).filter(v=>v!=null&&v!=='').join(' '), 80);
-      rsAddFeat(A, c, X, cls.val(at), nm, R, s.sp? at : null); });
+      rsAddFeat(A, c, X, cls.val(at)+(s.cl==='@'&&cls.nd(at)? RS_ND : ''), nm, R, s.sp? at : null); });   // 12/11: «@» = the class is the legend's (the layers of the map, Corine), drawn with that legend
     if(part) e.part=1; e.gt=gt; e.ins=A.n; if(gt==='polyline'&&RS_WC.test(String(s.n).toLowerCase().replace(/_/g, ' '))) e.wc=1;
     if(s.A) return e;   // measured into a shared sum (rsWater): the lines are written there
     if(s.sp==='pv') rsPv(e, A, s);
@@ -14203,6 +14226,7 @@ document.addEventListener('DOMContentLoaded', function(){
 // go below what the sheet already has (nothing is removed): a drawing part with one anchor per image, its relations, the
 // media and the content types — the rest of the workbook stays as it is.
 const RI_W=1063, RI_H=709, RI_CM=[18, 12], RI_EMU=360000, RI_MAX=10;
+const RI_SOFT=0.55, RI_LEG_MAX=14, RI_LEG_CLS=5, riLegP=new Map();   // 11/11: the layers of the map over a covered picture; the legend's rows, a layer's classes, the legends asked
 const RI_XDR='http://schemas.openxmlformats.org/drawingml/2006/spreadsheetDrawing', RI_A='http://schemas.openxmlformats.org/drawingml/2006/main';
 const RI_R='http://schemas.openxmlformats.org/officeDocument/2006/relationships', RI_PKG='http://schemas.openxmlformats.org/package/2006/relationships';
 const RI_CT='http://schemas.openxmlformats.org/package/2006/content-types';
@@ -14219,22 +14243,29 @@ function riExt(f, locals, pad){ const GE=esriMods.geometryEngine; let e=null;
   let x0=Math.min(pts[0].x, pts[1].x), x1=Math.max(pts[0].x, pts[1].x), y0=Math.min(pts[0].y, pts[1].y), y1=Math.max(pts[0].y, pts[1].y);
   const cx=(x0+x1)/2, cy=(y0+y1)/2, r=RI_W/RI_H; let w=x1-x0, h=y1-y0; if(w/h<r) w=h*r; else h=w/r;
   return {xmin:cx-w/2, xmax:cx+w/2, ymin:cy-h/2, ymax:cy+h/2, spatialReference:view.spatialReference.toJSON? view.spatialReference.toJSON() : {wkid:102100}}; }
-async function riShot(map, ext, o){ if(window.riShotStub) return window.riShotStub(map, ext, o); return prShot(map, ext, RI_W, RI_H, Object.assign({waits:40}, o)); }
+// 11/11 (C, asked by the user: the pictures of the PDF were soft, 107 dpi on the page): o.z, the size of the picture (1 =
+// 1063 × 709, the Excel; the PDF asks for 1.5). A larger view of the same extent shows a finer level of the basemap; what
+// is drawn over it (riDraw, riText, the legend) follows the canvas
+async function riShot(map, ext, o){ if(window.riShotStub) return window.riShotStub(map, ext, o); const z=(o&&o.z)||1; return prShot(map, ext, Math.round(RI_W*z), Math.round(RI_H*z), Object.assign({waits:40}, o)); }
 function riImg(url){ return new Promise((res, rej)=>{ const im=new Image(); im.onload=()=>res(im); im.onerror=()=>rej(new Error('immagine non leggibile')); im.src=url; }); }
 // the vectors over the image: geometries of the view's system to pixels
-function riDraw(g, ext, geom, st){ if(!geom) return; const W=RI_W, H=RI_H, X=p=>[(p[0]-ext.xmin)/(ext.xmax-ext.xmin)*W, (ext.ymax-p[1])/(ext.ymax-ext.ymin)*H];
-  g.save(); g.lineWidth=st.w||2; g.strokeStyle=st.stroke||'#c00000'; g.setLineDash(st.dash||[]);
+function riDraw(g, ext, geom, st){ if(!geom) return; const W=g.canvas.width, H=g.canvas.height, k=W/RI_W, X=p=>[(p[0]-ext.xmin)/(ext.xmax-ext.xmin)*W, (ext.ymax-p[1])/(ext.ymax-ext.ymin)*H];
+  g.save(); g.lineWidth=(st.w||2)*k; g.strokeStyle=st.stroke||'#c00000'; g.setLineDash((st.dash||[]).map(x=>x*k));
   if(geom.type==='polygon'){ g.beginPath(); (geom.rings||[]).forEach(r=>r.forEach((p, i)=>{ const q=X(p); if(i) g.lineTo(q[0], q[1]); else g.moveTo(q[0], q[1]); }));
     if(st.fill){ g.fillStyle=st.fill; g.fill('evenodd'); } g.stroke(); }
   else if(geom.type==='polyline'){ g.beginPath(); (geom.paths||[]).forEach(r=>r.forEach((p, i)=>{ const q=X(p); if(i) g.lineTo(q[0], q[1]); else g.moveTo(q[0], q[1]); })); g.stroke(); }
-  else if(geom.type==='point'){ const q=X([geom.x, geom.y]); g.beginPath(); g.arc(q[0], q[1], st.r||5, 0, 2*Math.PI); g.fillStyle=st.stroke||'#c00000'; g.fill(); }
+  else if(geom.type==='point'){ const q=X([geom.x, geom.y]); g.beginPath(); g.arc(q[0], q[1], (st.r||5)*k, 0, 2*Math.PI); g.fillStyle=st.stroke||'#c00000'; g.fill(); }
   g.restore(); }
-function riText(g, ext, pt, txt){ const q=[(pt.x-ext.xmin)/(ext.xmax-ext.xmin)*RI_W, (ext.ymax-pt.y)/(ext.ymax-ext.ymin)*RI_H];
-  g.save(); g.font='bold 15px Arial, sans-serif'; g.textAlign='center'; g.textBaseline='middle'; g.lineWidth=3; g.strokeStyle='rgba(0,0,0,.75)'; g.strokeText(txt, q[0], q[1]); g.fillStyle='#ffffff'; g.fillText(txt, q[0], q[1]); g.restore(); }
-// the image: the shots one over the other, then the vectors; JPEG bytes
-async function riCompose(urls, ext, vectors){ const c=document.createElement('canvas'); c.width=RI_W; c.height=RI_H; const g=c.getContext('2d');
-  g.fillStyle='#ffffff'; g.fillRect(0, 0, RI_W, RI_H);
-  for(const u of urls){ if(!u) continue; try{ g.drawImage(await riImg(u), 0, 0, RI_W, RI_H); }catch(e){} }
+function riText(g, ext, pt, txt){ const W=g.canvas.width, H=g.canvas.height, k=W/RI_W, q=[(pt.x-ext.xmin)/(ext.xmax-ext.xmin)*W, (ext.ymax-pt.y)/(ext.ymax-ext.ymin)*H];
+  g.save(); g.font='bold '+Math.round(15*k)+'px Arial, sans-serif'; g.textAlign='center'; g.textBaseline='middle'; g.lineWidth=3*k; g.strokeStyle='rgba(0,0,0,.75)'; g.strokeText(txt, q[0], q[1]); g.fillStyle='#ffffff'; g.fillText(txt, q[0], q[1]); g.restore(); }
+// 11/11 (D, asked by the user: in Landscape one polygon as wide as the picture hid the basemap): the layers of the map —
+// a shot given as {u, soft:true} — let the basemap through when they cover most of the picture
+function riSoft(im){ try{ const c=document.createElement('canvas'); c.width=64; c.height=43; const g=c.getContext('2d'); g.drawImage(im, 0, 0, 64, 43);
+    const D=g.getImageData(0, 0, 64, 43).data; let n=0; for(let i=3; i<D.length; i+=4){ if(D[i]>40) n++; } return n/(64*43)>0.5? RI_SOFT : 1; }catch(e){ return 1; } }
+// the image: the shots one over the other, then the vectors; JPEG bytes; z: its size (riShot)
+async function riCompose(urls, ext, vectors, z){ const W=Math.round(RI_W*(z||1)), H=Math.round(RI_H*(z||1)), c=document.createElement('canvas'); c.width=W; c.height=H; const g=c.getContext('2d');
+  g.fillStyle='#ffffff'; g.fillRect(0, 0, W, H);
+  for(const x of urls){ const u=x&&x.u? x.u : x; if(!u||typeof u!=='string') continue; try{ const im=await riImg(u); g.globalAlpha=x.soft? riSoft(im) : 1; g.drawImage(im, 0, 0, W, H); }catch(e){} g.globalAlpha=1; }
   try{ vectors(g); }catch(e){ console.warn('[risk matrix, images]', e); }
   const b64=c.toDataURL('image/jpeg', 0.86).split(',')[1], bin=atob(b64), out=new Uint8Array(bin.length); for(let i=0; i<bin.length; i++) out[i]=bin.charCodeAt(i); return out; }
 function riGeomView(g){ try{ return geoProject(geoGeom(g), view.spatialReference); }catch(e){ return null; } }   // parcels come in WGS 84
@@ -14250,10 +14281,10 @@ function riParcels(b){ const GE=esriMods.geometryEngine, all=toolsGL.graphics.to
     ha:isFinite(+s.area_ha)? +s.area_ha : 0, o:String((g.attributes.own&&g.attributes.own.t)||''), g:g.geometry}; });
   const n=v=>parseInt(v, 10)||0; rows.sort((a, z)=>a.c.localeCompare(z.c)||n(a.f)-n(z.f)||n(a.p)-n(z.p)||a.p.localeCompare(z.p)); return rows; }
 // the rows with findings: layers asked by «Interroga» (with the themes of now) and objects drawn
-function riThemes(all){ const L=rmState.lay, map=wmCurrentId()||'', out=new Map(), add=(t, k, v)=>{ if(!t||t==='out'||t==='grid_tech') return; if(!out.has(t)) out.set(t, {map:[], nat:[], drawn:[], vis:[]}); out.get(t)[k].push(v); };
+function riThemes(all){ const L=rmState.lay, map=wmCurrentId()||'', out=new Map(), add=(t, k, v)=>{ if(!t||t==='out'||t==='grid_tech') return; if(!out.has(t)) out.set(t, {map:[], nat:[], drawn:[], vis:[], near:[]}); out.get(t)[k].push(v); };
   if(L&&Array.isArray(L.src)&&typeof rsThemeNow==='function'){ const S=rsSources();
     L.src.forEach(e=>{ const t=rsThemeNow(e, L), hit=(e.d&&e.d.length)||(e.g&&e.g.length); if(!t||t==='out') return;
-      if(e.ty==='nat'&&hit){ const n=RS_NAT.find(x=>'nat:'+x.id===e.k); if(n&&n.sp!=='ingv') add(t, 'nat', n); }
+      if(e.ty==='nat'&&hit){ const n=RS_NAT.find(x=>'nat:'+x.id===e.k); if(n&&n.sp!=='ingv'){ add(t, 'nat', n); if(e.d&&e.d.length) add(t, 'near', n.id); } }   // near: found by the area (not along the route alone), so it must be in the picture
       else if(e.ty==='map'&&hit&&L.map===map){ const s=S.find(x=>x.k===(e.pk||e.k)); if(s&&s.l){ const T=out.get(t); if(!T||T.map.indexOf(s)<0) add(t, 'map', s); } }
       else if(e.ty==='vis'&&L.map===map){ const s=S.find(x=>x.k===e.k); if(s&&s.l) add(t, 'vis', s); } }); }
   toolsGL.graphics.toArray().forEach(g=>{ const a=g.attributes; if(!a||!g.geometry||ownIs(g)||a.sf_auto) return; const t=rmRowOf(a.sf_cat, a.sf_type); if(t) add(t, 'drawn', g); });
@@ -14267,27 +14298,129 @@ async function riCadImage(b, rows, M){ const RT=typeof rsRoute==='function'? rsR
   return riCompose([s&&s.url], ext, g=>{ rows.forEach(r=>{ const v=riGeomView(r.g); riDraw(g, ext, v, {stroke:'#F5A623', w:2});
       try{ const c=v&&(v.centroid||v.extent.center); if(c&&r.p) riText(g, ext, c, r.p); }catch(e){} });
     if(b.base) riDraw(g, ext, b.base, {stroke:'#ffffff', w:3}); if(RT) riDraw(g, ext, b.f.toView(RT), {stroke:'#ffffff', w:2, dash:[8, 6]}); }); }
-async function riThemeImage(b, t, T, M, failed){ const RT=typeof rsRoute==='function'? rsRoute(b.f) : null, pad=t==='surround'? RS_R10 : (t==='grid_constr'? 300 : RS_R);
+// 11/11 (seen on a real PDF: Hydrography without its watercourses — EU-Hydro was slow, or dropped its answers, and nothing
+// said so). The national layers of a theme's picture, a group per source: EU-Hydro is nine layers (10/11), a source read as
+// JSONP has none (a browser cannot draw it: no request, no error in the console). riNatSeen: how many features of a group
+// the view holds when the picture is taken. riNatMissing: the sources to name as «not copied» — the ones that cannot be
+// drawn, and the ones found by the area that the view does not hold (seen = null: not looked at, as with a stubbed shot)
+function riNatLayers(T, z){ const W={type:'simple', symbol:{type:'simple-line', color:[0, 150, 225, 1], width:1.4*(z||1)}};   // 11/11: EU-Hydro's own line is a hair; drawn wider, by the picture's size
+  return T.nat.map(n=>({n:n, ls:RS_JSONP.test(n.u)? [] : n.sp==='water'? RS_WATER_IDS.map(id=>new esriMods.FeatureLayer({url:n.u+'/'+id, title:n.t, opacity:0.8, renderer:W})) : [new esriMods.FeatureLayer({url:n.u, title:n.t, opacity:0.6})]})); }
+async function riNatSeen(v, ls){ const lim=(p, ms, d)=>Promise.race([p, new Promise(r=>setTimeout(()=>r(d), ms))]); let k=0;
+  for(const l of ls){ try{ const lv=await lim(v.whenLayerView(l), 1500, null); if(lv){ const c=await lim(lv.queryFeatureCount(), 3000, 0); if(c>0) k+=c; } }catch(e){} }
+  return k; }
+function riNatMissing(NL, near, seen){ return NL.filter((g, i)=>!g.ls.length||(!!seen&&(near||[]).indexOf(g.n.id)>=0&&!(seen[i]>0))).map(g=>g.n.t); }
+// 11/11 (A, asked by the user: the caption named the map service, not what the picture shows): the names of a theme's
+// picture — the national sources, of a map service the layers that gave this theme something (as its row says them: the
+// last group › the layer), the images to look at, the objects drawn. riSubs: those layers of a source, with their lines
+// 12/11: a layer whose findings its own legend does not draw (rsAllNd: its lines say so) is not in the picture — not
+// among its names, not in its legend (riNd); `all` gives those too
+function riSubs(t, s, all){ const L=rmState.lay; if(!L||!Array.isArray(L.src)||typeof rsThemeNow!=='function') return [];
+  return L.src.filter(e=>e.pk===s.k&&!e.dup&&rsThemeNow(e, L)===t&&((e.d&&e.d.length)||(e.g&&e.g.length))&&(all||!rsAllNd(e))).map(e=>{ const n=String(e.n), r=n.indexOf(s.n+' › ')===0? n.slice(s.n.length+3) : n;
+    const t2=r.split(' › ').slice(-2).join(' › ');   // txt: the lines without the layer's own name (a class called like its layer is not a class found)
+    return {id:+String(e.k).split('#').pop(), t:t2, txt:(e.d||[]).concat(e.g||[]).map(x=>String(x).split(t2).join('')).join('\n')}; }); }
+function riNd(t, s){ const L=rmState.lay, e=L&&Array.isArray(L.src)? L.src.find(x=>x.k===s.k) : null; return (!!e&&rsAllNd(e))||(!riSubs(t, s).length&&riSubs(t, s, true).length>0); }
+function riNames(t, T){ const out=T.nat.map(n=>n.t), add=x=>{ if(out.indexOf(x)<0) out.push(x); };
+  T.map.forEach(s=>{ const S=riSubs(t, s); if(S.length) S.forEach(x=>add(x.t)); else if(!riNd(t, s)) add(s.n); }); T.vis.forEach(s=>add(s.n));
+  if(T.drawn.length) out.push(T.drawn.length+(T.drawn.length===1? ' object drawn' : ' objects drawn')); return out; }
+// 11/11 (B, asked by the user): the legend, in the picture's top-left corner (the Excel and the PDF share the picture).
+// A row is {sw:[swatches], t}; a swatch is {kind:'poly'|'line'|'pt', f, o, ow, hatch, dash, sq}, or {data} (an image: a
+// picture symbol, a symbol of a map service's legend), loaded into {im} before the drawing. A layer with one symbol has
+// one row; of a layer with classes, the ones in the picture — a feature layer: the classes of the features the view
+// holds; a layer of a map service: the classes its lines name — five at most; classes not known: three symbols and
+// their number
+function riCol(c){ return Array.isArray(c)&&c.length>=3? 'rgba('+c[0]+','+c[1]+','+c[2]+','+Math.round((c.length>3? c[3] : 255)/255*100)/100+')' : null; }
+function riSymSpec(s){ if(!s) return null; const t=s.type, o=s.outline||{}, line=o.style==='esriSLSNull'? null : riCol(o.color);
+  if(t==='esriSFS'){ const solid=!s.style||s.style==='esriSFSSolid', none=s.style==='esriSFSNull'; return {kind:'poly', f:solid? riCol(s.color) : null, hatch:!solid&&!none? riCol(s.color) : null, o:line, ow:+o.width||1}; }
+  if(t==='esriSLS') return s.style==='esriSLSNull'? null : {kind:'line', o:riCol(s.color), ow:+s.width||1, dash:!!s.style&&s.style!=='esriSLSSolid'};
+  if(t==='esriSMS') return {kind:'pt', f:riCol(s.color), o:line, ow:+o.width||1, sq:s.style==='esriSMSSquare'};
+  if((t==='esriPMS'||t==='esriPFS')&&s.imageData) return {data:'data:'+(s.contentType||'image/png')+';base64,'+s.imageData};
+  return null; }
+function riRendSyms(r){ if(!r) return [];
+  if(r.type==='simple') return r.symbol? [{s:r.symbol, l:r.label||''}] : [];
+  if(r.type==='uniqueValue'){ const out=(r.uniqueValueInfos||[]).filter(x=>x.symbol).map(x=>({s:x.symbol, l:x.label||String(x.value)}));
+    if(!out.length) (r.uniqueValueGroups||[]).forEach(G=>(G.classes||[]).forEach(C=>{ if(C.symbol) out.push({s:C.symbol, l:C.label||[].concat((C.values||[])[0]||'').join(',')}); }));
+    return out; }
+  if(r.type==='classBreaks') return (r.classBreakInfos||[]).filter(x=>x.symbol).map(x=>({s:x.symbol, l:x.label||'≤ '+x.classMaxValue}));
+  return []; }
+// the rows of a layer with the symbols S ([{s | imageData, l}]): one symbol; the classes in the picture (P); else three and how many
+function riLegRows(title, S, P, sp){ sp=sp||(x=>riSymSpec(x.s)); if(!S.length) return [];
+  if(S.length===1) return [{sw:[sp(S[0])], t:title}];
+  // classes that read the same once cut (as the rows cut them, at 60) share a row, three symbols at most
+  if(P&&P.length){ const G=[]; P.forEach(x=>{ const l=rsCut(x.l, 60), o=G.find(y=>y.l===l); if(!o) G.push({l:l, sw:[sp(x)]}); else if(o.sw.length<3) o.sw.push(sp(x)); });
+    const out=G.slice(0, RI_LEG_CLS).map(x=>({sw:x.sw, t:title+' — '+x.l})); if(G.length>RI_LEG_CLS) out.push({sw:[], t:title+': '+(G.length-RI_LEG_CLS)+' more classes'}); return out; }
+  return [{sw:S.slice(0, 3).map(x=>sp(x)), t:title+' ('+S.length+' classes)'}]; }
+// a feature layer in the view v: its classes among the features inside the picture; first the ones its lines name (txt:
+// the lines by the area, then the ones along the route)
+async function riFlLeg(v, l, title, txt){ const lim=(p, ms, d)=>Promise.race([p, new Promise(r=>setTimeout(()=>r(d), ms))]), rj=rsRendOf(l), S=riRendSyms(rj); let P=null;
+  if(S.length>1){ try{ const lv=await lim(v.whenLayerView(l), 1500, null), fs=lv? await lim(lv.queryFeatures({geometry:v.extent, spatialRelationship:'intersects', returnGeometry:false, outFields:['*']}), 4000, null) : null;
+      if(fs&&fs.features){ const cls=rsClassOf({fields:(l.fields||[]).map(f=>({name:f.name}))}, rj, '@'), seen=new Set(fs.features.map(f=>cls.val(f.attributes||{})));
+        P=S.filter(x=>seen.has(rsCut(x.l, 60))).sort((a, z)=>riRank(a.l, txt)-riRank(z.l, txt)); } }catch(e){} }
+  return riLegRows(title, S, P); }
+function riRank(l, txt){ const T=[].concat(txt||[]), c=rsCut(l, 60); for(let i=0; i<T.length; i++){ if(String(T[i]).indexOf(c)>=0) return i; } return T.length; }
+function riNatTxt(n){ const L=rmState.lay, e=L&&Array.isArray(L.src)? L.src.find(x=>x.k==='nat:'+n.id) : null; return e? [(e.d||[]).join('\n'), (e.g||[]).join('\n')] : []; }
+function riLegOf(url){ const u=String(url||'').replace(/\/+$/, ''); if(!riLegP.has(u)) riLegP.set(u, rsReqQ(u+'/legend', {f:'json'}).catch(()=>{ riLegP.delete(u); return null; })); return riLegP.get(u); }
+async function riMsLeg(t, s, ids){ const J=await riLegOf(s.l.url), out=[]; if(!J||!Array.isArray(J.layers)) return out;
+  const sp=y=>y.imageData? {data:'data:'+(y.contentType||'image/png')+';base64,'+y.imageData} : null;
+  riSubs(t, s).forEach(x=>{ if(ids.indexOf(x.id)<0) return; const G=J.layers.find(y=>y.layerId===x.id), S=((G&&G.legend)||[]).map(y=>({l:String(y.label||''), imageData:y.imageData, contentType:y.contentType}));
+    riLegRows(x.t, S, S.filter(y=>/[A-Za-zÀ-ÿ]{3}/.test(y.l)&&x.txt.indexOf(rsCut(y.l, 60))>=0), sp).forEach(r=>out.push(r)); });
+  return out; }
+function riDrawnCol(d){ const a=d.attributes||{}, c=a.color||sfColor(a.sf_cat)||'#c00000'; return /^#[0-9a-f]{6}$/i.test(c)? c : '#c00000'; }
+function riDrawnLab(a){ return a.sf_cat==='connection'? (RM_EN[a.sf_type]||'Connection route') : (RM_EN[a.sf_cat+':'+a.sf_type]||RM_EN[a.sf_type]||RM_CAT_EN[a.sf_cat]||sfLabel(a.sf_cat, a.sf_type)||a.sf_cat||'Object'); }
+function riSwatch(g, s, x, y, w, h, k){ if(!s) return; g.save();
+  if(s.im){ const r=Math.min(w/s.im.width, h/s.im.height, 1.3*k), iw=s.im.width*r, ih=s.im.height*r; g.drawImage(s.im, x+(w-iw)/2, y+(h-ih)/2, iw, ih); }
+  else if(s.kind==='line'){ g.strokeStyle=s.o||'#6e6e73'; g.lineWidth=Math.min(4, Math.max(1.3, (s.ow||1)*1.33))*k; if(s.dash) g.setLineDash([5*k, 3*k]); g.beginPath(); g.moveTo(x, y+h/2); g.lineTo(x+w, y+h/2); g.stroke(); }
+  else if(s.kind==='pt'){ const r=Math.min(h/2-0.5, 4.5*k); g.beginPath(); if(s.sq) g.rect(x+w/2-r, y+h/2-r, 2*r, 2*r); else g.arc(x+w/2, y+h/2, r, 0, 2*Math.PI);
+    if(s.f){ g.fillStyle=s.f; g.fill(); } if(s.o){ g.strokeStyle=s.o; g.lineWidth=Math.max(1, k); g.stroke(); } }
+  else { if(s.f){ g.fillStyle=s.f; g.fillRect(x, y, w, h); }
+    if(s.hatch){ g.save(); g.beginPath(); g.rect(x, y, w, h); g.clip(); g.strokeStyle=s.hatch; g.lineWidth=Math.max(1, k); g.beginPath(); for(let d=-h; d<w; d+=4*k){ g.moveTo(x+d, y+h); g.lineTo(x+d+h, y); } g.stroke(); g.restore(); }
+    if(s.o||!s.f){ g.strokeStyle=s.o||'#6e6e73'; g.lineWidth=Math.min(3, Math.max(1, (s.ow||1)*1.33))*k; g.strokeRect(x+0.5, y+0.5, w-1, h-1); } }
+  g.restore(); }
+function riLegDraw(g, rows){ rows=(rows||[]).filter(r=>r&&r.t); if(!rows.length) return;
+  const k=g.canvas.width/RI_W, fs=Math.round(12*k), lh=Math.round(19*k), sw=Math.round(24*k), sh=Math.round(12*k), pad=Math.round(7*k), gap=Math.round(6*k), maxW=Math.round(g.canvas.width*0.46);
+  const R=rows.length>RI_LEG_MAX? rows.slice(0, RI_LEG_MAX-1).concat([{sw:[], t:'… '+(rows.length-RI_LEG_MAX+1)+' more'}]) : rows;
+  g.save(); g.font=fs+'px Arial, sans-serif'; g.textBaseline='middle'; g.textAlign='left';
+  const lim=maxW-2*pad-sw-gap, fit=t=>{ let s=String(t); if(g.measureText(s).width<=lim) return s; while(s.length>4&&g.measureText(s+'…').width>lim) s=s.slice(0, -1); return s+'…'; };
+  const T=R.map(r=>fit(r.t)), w=Math.ceil(2*pad+sw+gap+Math.max(...T.map(t=>g.measureText(t).width))), h=2*pad+R.length*lh, x0=Math.round(10*k), y0=Math.round(10*k);
+  g.fillStyle='rgba(255,255,255,.9)'; g.fillRect(x0, y0, w, h); g.strokeStyle='#b4b4ba'; g.lineWidth=Math.max(1, k); g.strokeRect(x0+0.5, y0+0.5, w, h);
+  R.forEach((r, i)=>{ const y=y0+pad+i*lh, S=(r.sw||[]).filter(Boolean), n=S.length; S.forEach((x, j)=>riSwatch(g, x, x0+pad+j*sw/n, y+(lh-sh)/2, sw/n-(n>1? Math.max(1, k) : 0), sh, k));
+    g.fillStyle='#1d1d1f'; g.fillText(T[i], x0+pad+sw+gap, y+lh/2); });
+  g.restore(); }
+// o.z: the picture's size (riShot)
+async function riThemeImage(b, t, T, M, failed, o){ const z=(o&&o.z)||1, RT=typeof rsRoute==='function'? rsRoute(b.f) : null, pad=t==='surround'? RS_R10 : (t==='grid_constr'? 300 : RS_R);
   const locals=[b.B]; if(t==='grid_constr'&&RT) locals.push(RT);
   const ext=riExt(b.f, locals, pad); if(!ext) return null;
-  // the basemap with the national layers that found something
-  const nat=[].concat(...T.nat.map(n=>n.sp==='water'? RS_WATER_IDS.map(id=>new esriMods.FeatureLayer({url:n.u+'/'+id, title:n.t, opacity:0.8})) : [new esriMods.FeatureLayer({url:n.u, title:n.t, opacity:0.6})]));   // 10/11: EU-Hydro is nine layers
-  const s1=await riShot(new esriMods.Map({basemap:riBase('gray', M), layers:nat}), ext, {fmt:'jpg', white:true, failed:failed});
+  // the basemap with the national layers that found something; a layer that did not come is asked once more, then named
+  let s1=null, miss=[], natLeg=[];
+  for(let a=0; a<2; a++){ const NL=riNatLayers(T, z), seen=[], f1=[];
+    s1=await riShot(new esriMods.Map({basemap:riBase('gray', M), layers:[].concat(...NL.map(g=>g.ls))}), ext, {fmt:'jpg', white:true, failed:f1, z:z, check:async v=>{
+      for(const g of NL){ seen.push(g.ls.length? await riNatSeen(v, g.ls) : 0); if(g.ls.length){ try{ g.leg=await riFlLeg(v, g.ls[0], g.n.t, riNatTxt(g.n)); }catch(e){} } } }});
+    miss=riNatMissing(NL, T.near, seen.length? seen : null).concat(f1); natLeg=[].concat(...NL.filter(g=>g.leg&&miss.indexOf(g.n.t)<0).map(g=>g.leg));
+    if(!miss.some(x=>NL.some(g=>g.ls.length&&g.n.t===x))) break; }   // only what cannot be drawn is missing: no second try
+  if(failed){ miss.forEach(x=>failed.push(x)); if(s1&&s1.empty) failed.push('basemap'); }   // a white picture says why
   // the app's map with only this theme's layers, switched on in that view alone
-  let s2=null; const want=new Set(T.map.concat(T.vis).map(s=>s.l)), show=l=>!!l&&(want.has(l)||(l.type==='group'&&l.allLayers&&l.allLayers.some(x=>want.has(x))));
+  let s2=null, mapLeg=[]; const want=new Set(T.map.concat(T.vis).map(s=>s.l)), show=l=>!!l&&(want.has(l)||(l.type==='group'&&l.allLayers&&l.allLayers.some(x=>want.has(x))));
   // 11/11 (seen on a real file: Archaeological and Landscape, both of Lombardia's PTCP, had the same picture): of a map
   // service only the layers that gave this theme something are on while the shot is taken, then as they were; meanwhile
   // the project is saved with the visibility of before (rsHeld, read by rsSeeVis)
-  if(want.size){ const held=[], set=(o, v)=>{ if(!o||o.visible===v) return; held.push([o, o.visible]); o.visible=v; };
-    try{ if(typeof rsSeeParts==='function'){ for(const [l, ids] of rsSeeParts(t).map){ if(!ids.length||!want.has(l)) continue;
-          try{ if(l.load&&!l.loaded) await Promise.race([l.load(), new Promise(r=>setTimeout(r, 5000))]); }catch(e){}
-          rsSubsOnly(l, ids, set); }
-        rsHeld=rsHeld.concat(held); }
-      s2=await riShot(view.map, ext, {fmt:'png', show:show, failed:failed}); }
-    finally{ for(let i=held.length-1; i>=0; i--){ try{ held[i][0].visible=held[i][1]; }catch(e){} } if(held.length) rsHeld=rsHeld.filter(x=>held.indexOf(x)<0); } }
-  return riCompose([s1&&s1.url, s2&&s2.url], ext, g=>{
-    T.drawn.forEach(d=>{ let c=(d.attributes&&d.attributes.color)||sfColor(d.attributes.sf_cat)||'#c00000'; if(!/^#[0-9a-f]{6}$/i.test(c)) c='#c00000'; riDraw(g, ext, riGeomView(d.geometry), {stroke:c, w:2, fill:c+'40'}); });
-    if(b.base) riDraw(g, ext, b.base, {stroke:'#c00000', w:3}); if(RT) riDraw(g, ext, b.f.toView(RT), {stroke:'#3945cf', w:3, dash:[10, 6]}); }); }
+  if(want.size){ const held=[], set=(x, v)=>{ if(!x||x.visible===v) return; held.push([x, x.visible]); x.visible=v; }, P=typeof rsSeeParts==='function'? rsSeeParts(t).map : new Map(), fl=new Map();
+    try{ for(const [l, ids] of P){ if(!ids.length||!want.has(l)) continue;
+        try{ if(l.load&&!l.loaded) await Promise.race([l.load(), new Promise(r=>setTimeout(r, 5000))]); }catch(e){}
+        rsSubsOnly(l, ids, set); }
+      rsHeld=rsHeld.concat(held);
+      s2=await riShot(view.map, ext, {fmt:'png', show:show, failed:failed, z:z, check:async v=>{ for(const s of T.map){ if(s.l&&s.l.type==='feature'){ try{ fl.set(s, await riFlLeg(v, s.l, s.n)); }catch(e){} } } }});
+      if(s2&&s2.slow&&failed) failed.push('layers of the map still loading after 20 s'); }   // 11/11: a picture taken before its layers came says so
+    finally{ for(let i=held.length-1; i>=0; i--){ try{ held[i][0].visible=held[i][1]; }catch(e){} } if(held.length) rsHeld=rsHeld.filter(x=>held.indexOf(x)<0); }
+    // the legend of the layers of the map: a feature layer's from its view, a map service's from its server (asked once)
+    for(const s of T.map){ if(riNd(t, s)) continue; const ids=P.get(s.l)||[]; try{ if(fl.has(s)) mapLeg=mapLeg.concat(fl.get(s)); else if(ids.length&&/\/MapServer$/i.test(String(s.l.url||'').replace(/\/+$/, ''))) mapLeg=mapLeg.concat(await riMsLeg(t, s, ids)); }catch(e){} } }
+  const leg=[{sw:[{kind:'poly', o:'#c00000', ow:2.4}], t:'Gross area'}]; if(RT) leg.push({sw:[{kind:'line', o:'#3945cf', ow:2.4, dash:true}], t:'Connection route'});
+  T.drawn.forEach(d=>{ const c=riDrawnCol(d), ty=d.geometry&&d.geometry.type, lab=riDrawnLab(d.attributes||{})+' (drawn)';
+    if(!leg.some(r=>r.t===lab)) leg.push({sw:[ty==='polyline'? {kind:'line', o:c, ow:2} : ty==='point'? {kind:'pt', f:c} : {kind:'poly', f:c+'40', o:c, ow:1.5}], t:lab}); });
+  natLeg.concat(mapLeg).forEach(r=>leg.push(r));
+  for(const r of leg){ for(let i=0; i<r.sw.length; i++){ const x=r.sw[i]; if(x&&x.data){ try{ r.sw[i]={im:await riImg(x.data)}; }catch(e){ r.sw[i]=null; } } } }
+  return riCompose([s1&&s1.url, s2&&s2.url&&{u:s2.url, soft:true}], ext, g=>{
+    T.drawn.forEach(d=>{ const c=riDrawnCol(d); riDraw(g, ext, riGeomView(d.geometry), {stroke:c, w:2, fill:c+'40'}); });
+    if(b.base) riDraw(g, ext, b.base, {stroke:'#c00000', w:3}); if(RT) riDraw(g, ext, b.f.toView(RT), {stroke:'#3945cf', w:3, dash:[10, 6]});
+    riLegDraw(g, leg); }, z); }
 
 // ── into the workbook: cells, a drawing with one anchor per image ──
 async function riPart(X, p){ const f=X.zip.file(p); return f? await f.async('string') : null; }
@@ -14386,8 +14519,8 @@ async function riRun(X, say){ const rep={cad:null, con:null, notes:[]}; if(!riOp
       if(th.more) rep.notes.push((th.more===1? 'un altro tema' : 'altri '+th.more+' temi')+' senza mappa (al massimo '+RI_MAX+')');
       for(const [k, label, T] of th){ i++; say('Immagini dei vincoli '+i+'/'+th.length+'…'); const failed=[];
         let img=null; try{ img=await riThemeImage(b, k, T, M, failed); }catch(e){ failed.push('immagine non fatta'); }
-        const names=T.nat.map(n=>n.t).concat(T.map.map(s=>s.n), T.vis.map(s=>s.n)), drawn=T.drawn.length? [T.drawn.length+(T.drawn.length===1? ' object drawn' : ' objects drawn')] : [];
-        blocks.push({title:label+' — '+names.concat(drawn).slice(0, 8).join('; ')+(names.length+drawn.length>8? ' …' : '')+([...new Set(failed)].length? ' (not copied: '+[...new Set(failed)].join(', ')+')' : '')}, img? {img:img} : {}); }
+        const names=riNames(k, T);   // 11/11 (A): the layers of the theme, not the name of their service
+        blocks.push({title:label+' — '+names.slice(0, 8).join('; ')+(names.length>8? ' …' : '')+([...new Set(failed)].length? ' (not copied: '+[...new Set(failed)].join(', ')+')' : '')}, img? {img:img} : {}); }
       const res=th.length? await riWriteSheet(X, /constraint/i, blocks) : {images:0};
       rep.con=res.missing? 'foglio Constraints non trovato' : th.length? res.images+(res.images===1? ' mappa' : ' mappe') : 'nessun tema con risultati'; }
     catch(e){ console.warn('[risk matrix, Constraints]', e); rep.notes.push('Constraints non scritto: '+((e&&e.message)||e)); } }
@@ -14411,6 +14544,7 @@ document.addEventListener('DOMContentLoaded', function(){ const root=$('modRisk'
 const RP_W=297, RP_H=210, RP_M=12, RP_TOP=24, RP_BOT=196;
 const RP_SHORT=[['g', 'no restrictions'], ['lg', 'minor restrictions'], ['y', 'can be mitigated'], ['o', 'not possible or ongoing'], ['r', 'redhibitory'], ['na', 'not applicable']];
 const RP_COLS=[52, 9, 104, 60, 48];   // Row, colour, Description, References, Comments: 273 mm
+const RP_Z=1.5;   // 11/11 (C): the pictures of the themes at 1.5 × (1595 × 1064 px: 160 dpi on the page; they were 107)
 function rpRgb(c){ const x=RM_RISK.find(r=>r[0]===c); return x&&x[1]? prRgb(x[1]) : null; }
 function rpB64(u8){ let s=''; for(let i=0; i<u8.length; i+=0x8000) s+=String.fromCharCode.apply(null, u8.subarray(i, i+0x8000)); return 'data:image/jpeg;base64,'+btoa(s); }
 function rpPage(doc, title, sub, today, out){ doc.addPage('a4', 'landscape'); out.pages++;
@@ -14460,15 +14594,18 @@ async function rpPages(doc, o){ const out={pages:0, rows:0, maps:0, notes:[]}, t
       else { const M=await riMods(), th=riThemes(); if(!th.length) out.notes.push('nessuna riga con risultati da mettere in mappa');
         if(th.more) out.notes.push((th.more===1? 'un altro tema' : 'altri '+th.more+' temi')+' senza mappa (al massimo '+RI_MAX+')');
         for(const t of th){ const k=t[0], label=t[1], T=t[2], failed=[]; let img=null;
-          try{ img=await riThemeImage(b, k, T, M, failed); }catch(e){ failed.push('immagine non fatta'); }
-          const names=T.nat.map(x=>x.t).concat(T.map.map(x=>x.n), T.vis.map(x=>x.n)), drawn=T.drawn.length? [T.drawn.length+(T.drawn.length===1? ' object drawn' : ' objects drawn')] : [];
-          const all=names.concat(drawn);   // 10/11: eight names at most, as in the Excel (a longer line ran under the image)
-          rpPage(doc, label, all.slice(0, 8).join('; ')+(all.length>8? ' …' : '')+([...new Set(failed)].length? ' — not copied: '+[...new Set(failed)].join(', ') : ''), today, out);
+          try{ img=await riThemeImage(b, k, T, M, failed, {z:RP_Z}); }catch(e){ failed.push('immagine non fatta'); }
+          // 10/11: eight names at most, as in the Excel (a longer line ran under the image). 11/11 (A): the names are the
+          // layers of the theme (riNames), as many as two lines hold; what was not copied is never cut
+          const all=riNames(k, T), miss=[...new Set(failed)], note=miss.length? ' — not copied: '+miss.join(', ') : ''; let sub='';
+          doc.setFont('helvetica', 'normal'); doc.setFontSize(8);
+          for(let n=Math.min(8, all.length); n>=0; n--){ sub=all.slice(0, n).join('; ')+(all.length>n? ' …' : '')+note; if(!n||doc.splitTextToSize(prTxt(sub), RP_W-2*RP_M).length<=2) break; }
+          rpPage(doc, label, sub, today, out);
           const iw=252, ih=168, ix=(RP_W-iw)/2;   // the images' proportions; room for the caption above the footer
           if(img){ doc.addImage(rpB64(img), 'JPEG', ix, RP_TOP, iw, ih); doc.setDrawColor(201, 201, 207); doc.setLineWidth(0.3); doc.rect(ix, RP_TOP, iw, ih, 'S'); }
           else { doc.setFontSize(9); doc.setTextColor(120, 120, 125); doc.text('Map not available', RP_W/2, RP_TOP+ih/2, {align:'center'}); }
           doc.setFontSize(7); doc.setTextColor(107, 107, 112);
-          doc.text(prTxt('Red: gross area · blue dashed: connection route · '+(k==='surround'? 'area + 10 km' : k==='grid_constr'? 'area and connection route' : 'area + 1 km')+' · basemap Esri Light Gray'), ix, RP_TOP+ih+4);
+          doc.text(prTxt((k==='surround'? 'Area + 10 km' : k==='grid_constr'? 'Area and connection route' : 'Area + 1 km')+' · basemap Esri Light Gray'), ix, RP_TOP+ih+4);   // 11/11: the area and the route are in the picture's legend
           out.maps++; } } }
     catch(e){ out.notes.push('mappe per tema non fatte: '+((e&&e.message)||e)); } }
   // ── the parcels, without the owners (D7) ──
