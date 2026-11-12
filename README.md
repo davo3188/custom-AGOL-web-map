@@ -801,6 +801,26 @@ How the app works inside, by subject, with the traps to know before editing. The
   «Già letto tra i layer nazionali» (not when the PM gave it a theme: `j.own`). `rsMerge` says a line once per row
   (`said`). `rsReqQ` asks again a request dropped by the network (`rsDown`, cleared at each run); `rsCanImage` wants
   polygons known. `rsSubsOnly(l, ids, set)` and `rsHeld` serve «Vedi sulla mappa» and `riThemeImage` (37).
+- **A picture says what is missing** (2026-11-11, plan §13.6). `riThemes` gives each theme `near`, the national sources
+  found by the area; `riNatLayers(T)` the layers to draw by source (EU-Hydro nine, a source read as JSONP none);
+  `prShot` calls `o.check(v)` before the screenshot and `riNatSeen(v, ls)` counts the features the view holds;
+  `riNatMissing(NL, near, seen)` names the sources not in the picture (`seen` null: not looked at, as with
+  `riShotStub`). `riThemeImage` takes the basemap's picture once more when one is missing, then names it in `failed`,
+  with «basemap» for a white picture and a note for the layers of the map still loading after 20 s.
+- **A picture's names, legend and size** (2026-11-11, plan §13.7). `riNames(t, T)` / `riSubs(t, s)`: the names for the
+  caption, of a map service the layers of the theme. The legend: rows `{sw, t}` drawn by `riLegDraw(g, rows)` on the
+  picture's canvas; `riSymSpec` (an Esri JSON symbol to a swatch), `riRendSyms` (the symbols of a renderer),
+  `riLegRows(title, S, P)` (one symbol, the classes in the picture, or three and how many), `riFlLeg(v, l, title, txt)`
+  (a feature layer in a view, `riRank` puts first the classes its lines name), `riLegOf(url)` / `riMsLeg(t, s, ids)`
+  (a map service's `/legend`, asked once through `rsReqQ`). `riShot`, `riCompose` and `riThemeImage` take the size `z`
+  (`RP_Z` = 1.5 for the PDF); `riDraw`, `riText` and the legend follow the canvas. `riSoft(im)`: 0.55 for a shot that
+  covers more than half of the picture. `rsClassOf` keeps a value the legend does not name only when it is words.
+- **What a layer's legend does not draw** (2026-11-12, decided by the user; plan §13.8). `rsClassOf(D, rend, cl)` also
+  gives `nd(attributes)`: the legend has no symbol for the feature (unique values or class breaks, no symbol for the
+  other values). `rsAsk` marks such a class with `RS_ND` where the class is the legend's (`cl:'@'`); `rsAggNew().nd`
+  counts those features; `rsLines` writes `RS_NODRAW` («not drawn by the layer's legend») at the end of a line that
+  speaks only of them, and on each such class among classes that are drawn. `rsAllNd(e)`: all the lines of a result
+  end with the notice; `riSubs(t, s, all)` and `riNd(t, s)` leave such a layer out of a picture's names and legend.
 - **`rsSee(k)`** (2026-11-11, U8, plan §13.3): `rsSeen` = `{k, keep, temp, vp}` — the visibilities changed (layers, groups,
   sublayers) with their value of before, the national layers added, the viewpoint. `rsSeeOff()` puts them back; called by
   `modShow` when another module is shown, by `rmSetState`, dropped when the map changes. `projVis(o)` (14-state-project.js)
@@ -1738,11 +1758,15 @@ How the app works inside, by subject, with the traps to know before editing. The
     the route's crossing; only the fields needed asked; a theme changed with no request; an imported plan by zone; saved;
     stale on a new gross area. 11/11: a copy by scale and a national layer inside a map service never asked; a line said once; a
     request dropped by the network asked again; the picture only for polygons.
+    12/11: the features a legend does not draw (`nd`), their lines (`RS_NODRAW`), a layer asked by its legend and by a field.
   - `riskexcel`: the Risk Matrix's Excel on an invented template (typos, sample colours, an older row, «Risk category»):
     the template kept with its meanings; *Crea l'Excel* (cells, colours, box, title, name, only three parts changed);
     *Aggiorna…* (the file's text and colour kept where the panel has none); *Leggi una matrice nel pannello*.
   - `riskimages`: «Cadastral» and «Constraints» on an invented template with an image of the PM, shots stubbed: the table,
-    the maps under the existing image, drawing parts, relations, media, content types; nothing with the boxes off.
+    the maps under the existing image, drawing parts, relations, media, content types; nothing with the boxes off;
+    11/11: `near`, `riNatLayers`, `riNatMissing` (what a picture must hold, what its caption names as not copied); the
+    names of a picture, the swatches and the rows of the legend, the legend drawn, the picture at 1.5 ×, `riSoft`.
+    12/11: a layer whose findings its legend does not draw is not among a picture's names (`riNd`).
   - `riskpdf`: the Risk Matrix in the PDF of Stampa: the box ticked by itself; the matrix pages, two map pages (shots
     stubbed), the parcels; no owner's name; unticked, the sheet alone.
 - **Trap:** the history photographs the work 0.5 s after it settles, and every change pushes the photo back: a harness
@@ -2884,6 +2908,30 @@ References say the map once — «Map «…»:» — and under it a layer per li
 last; a row whose layers found nothing keeps its single line. `rsMerge` (`refs`, `mAdd`). Harness `risksources` extended.
 Backup: `geoportale_axpo_pre-risk-refs_2026-11-11.html` (from UBS-IT `42aaf9f`).
 
+**2026-11-11: the Risk Matrix, the pictures seen on the PDF (asked by the user; `docs/plan-risk-matrix.md` §13.6).** The
+PDF with the matrix, a map per theme and the parcels was made for real (an invented area in Lombardia, the public PTCP
+service, the national sources without sign-in) and its eleven pages looked at. One defect: Hydrography came without its
+watercourses when EU-Hydro was slow, and nothing said so. A national source found by the area and not in the view when
+the picture is taken is asked once more, then named in the caption («not copied: …»); the lithological map, which a
+browser cannot draw, is named with no request; a white picture says «basemap». `prShot` takes `check`. Harness
+`riskimages` extended. Backup: `geoportale_axpo_pre-risk-pictures_2026-11-11.html` (from UBS-IT `9c6515e`).
+
+**2026-11-11: the Risk Matrix, the pictures of the themes (A–E approved by the user; `docs/plan-risk-matrix.md` §13.7).**
+The caption names the layers of the theme, not their map service; the picture has a legend in its corner (the area,
+the route, the objects drawn, the national layers, the layers of the map with the symbols of their server), in the
+Excel and in the PDF; the pictures of the PDF are at 1.5 × (160 dpi on the page); the layers of the map that cover
+the picture let the basemap through; a class that is a bare number the legend does not name is not said («Polarità:
+0»), one class crossed by the route is named without its length. Harnesses `riskimages`, `riskpdf`, `risksources`
+extended. Backup: `geoportale_axpo_pre-risk-legend_2026-11-11.html` (from UBS-IT `5199cdd`).
+
+**2026-11-12: the Risk Matrix, what a layer's legend does not draw (decided by the user; `docs/plan-risk-matrix.md`
+§13.8).** A feature whose value has no symbol in its layer's legend (and the legend none for the other values) is on
+the server and not on the map: the check counts it as before and its line says «not drawn by the layer's legend» —
+at the end of a line that speaks only of such features, on each such class among classes that are drawn. A layer
+found only that way is left out of the names and of the legend of its theme's picture. Seen on Lombardia's PTCP,
+where it explains the layers missing from the picture of Urban zoning. Harnesses `risksources`, `riskimages`
+extended. Backup: `geoportale_axpo_pre-risk-nodraw_2026-11-12.html` (from UBS-IT `90d28c6`).
+
 ## 8. Repository contents
 
 ```
@@ -3193,3 +3241,15 @@ in §7):
   `tests/harness/risksources.py`, `riskmatrix.py`; `tests/README.md`; `docs/plan-risk-matrix.md` (§13.4); this README.
 - **The references of the map (2026-11-11).** Changed: `src/js/35-risk-sources.js` (`rsMerge`); `tests/harness/risksources.py`;
   `tests/README.md`; `docs/plan-risk-matrix.md` (§13.5); this README.
+- **The pictures seen on the PDF (2026-11-11).** Changed: `src/js/37-risk-images.js` (`riThemes`, `riNatLayers`,
+  `riNatSeen`, `riNatMissing`, `riThemeImage`), `src/js/33-print.js` (`prShot`: `check`); `tests/harness/riskimages.py`;
+  `tests/README.md`; `docs/plan-risk-matrix.md` (§13.6); this README.
+- **The pictures of the themes: names, legend, size (2026-11-11).** Changed: `src/js/37-risk-images.js` (`riShot`,
+  `riDraw`, `riText`, `riSoft`, `riCompose`, `riNatLayers`, `riSubs`, `riNames`, the legend, `riThemeImage`, `riRun`),
+  `src/js/38-risk-pdf.js` (`RP_Z`, the caption), `src/js/35-risk-sources.js` (`rsClassOf`, `rsLines`);
+  `tests/harness/riskimages.py`, `riskpdf.py`, `risksources.py`; `tests/README.md`; `docs/plan-risk-matrix.md` (§13.7);
+  this README.
+- **What a layer's legend does not draw (2026-11-12).** Changed: `src/js/35-risk-sources.js` (`RS_NODRAW`, `RS_ND`,
+  `rsNd`, `rsNdName`, `rsAllNd`, `rsAggNew`, `rsAddFeat`, `rsLines`, `rsClassOf`, `rsAsk`), `src/js/37-risk-images.js`
+  (`riSubs`, `riNd`, `riNames`, `riThemeImage`); `tests/harness/risksources.py`, `riskimages.py`; `tests/README.md`;
+  `docs/plan-risk-matrix.md` (§13.8); this README.
