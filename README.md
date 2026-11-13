@@ -80,13 +80,14 @@ Edit the sources, never the built file:
 py -3 scripts/build.py            writes geoportale_axpo.html from src/ (LF, byte for byte reproducible)
 py -3 scripts/build.py --check    exit 1 if the built file is not up to date
 py -3 scripts/make_tokens.py      writes src/css/10-tokens.css from design/tokens.json (the family's tokens); --check
-py -3 scripts/make_icons.py       writes src/html/05-icons.html, the sprite of the family icons the sources use; --check, --list
+py -3 scripts/make_icons.py       writes src/html/05-icons.html, the sprite of the icons the sources use (the family's, and the app's own in design/icons-local); --check, --list
 py -3 scripts/make_kit.py         writes src/css/12-kit.css and 13-geo-kit.css from design/kit.css and geo-kit.css (verbatim); --check
 py -3 tests/run.py                headless checks, Python + Chrome, 40 harnesses, about nine minutes (see tests/README.md)
 ```
 
 `design/` holds the design system's inputs, copied verbatim from the family (`tokens.json`, `icons/*.svg`, `kit.css`,
-`geo-kit.css`): change them there, then run the three generators. Before every pull request: `tests/run.py` green,
+`geo-kit.css`): change them there, then run the three generators. The app's own icons are in `design/icons-local/`
+(`settings`, a gear that takes the place of the family's; `camera`). Before every pull request: `tests/run.py` green,
 `build.py --check`, `make_tokens.py --check`, `make_icons.py --check` and `make_kit.py --check` ok. The plan of the refactor and its
 decisions are in `docs/plan-ribbon-refactor.md`.
 
@@ -375,22 +376,53 @@ the last message; how it works is the «i» by the panel's title.
 
 ### Annotazioni
 
-The project's notebook (2026-11-13, phase 1; `docs/plan-annotazioni.md`, decisions N1–N6 of the user). Groups
+The project's notebook (2026-11-13, phases 1 to 3; `docs/plan-annotazioni.md`, decisions N1–N6 of the user). Groups
 **Taccuino · Inserisci · Esporta le note**; one module, *Taccuino*, in the right panel (widened to 390 px while the tab
 is shown): the list of the notes, or the note open.
 
 - **A note** has a title, a label (five proposed, or one's own), the date of its last change and **blocks**: *Testo*,
-  *Da fare* (a line to tick; Invio opens another, Backspace on an empty one removes it) and *Collegamento* (title and
-  address of a document: nothing is attached, the file is sent apart). They are added from the ribbon or from the
-  foot of the note; the menu of a block moves it, turns a text into a to-do and back, deletes it; the menu of the
-  note duplicates it, copies it as text, deletes it.
+  *Da fare* (a line to tick; Invio opens another, Backspace on an empty one removes it), *Collegamento* (title and
+  address of a document: nothing is attached, the file is sent apart) and the **image**. They are added from the
+  ribbon or from the foot of the note; the menu of a block moves it, turns a text into a to-do and back, deletes it;
+  the menu of the note duplicates it, copies it as text, deletes it.
+- **Images** (phase 2): *Fotografa la mappa* puts in the note the map as it is drawn now, with the caption «Mappa 1:N»
+  and the view it was taken from — the target under the photo, «Torna a questa vista», goes back there, with the
+  basemap of then, and turns on the layers that were on; *Immagine* takes files; **Ctrl+V** in the note pastes a
+  copied picture or a screenshot (Win+Maiusc+S). Every picture is made light (a JPEG never wider than 1600 px). A
+  click opens it large; the block's menu saves it on the PC. The cadastre of the Agenzia is never in a photo of the
+  map (as in Stampa): the message says so, and a pasted screenshot is the way round.
 - **«@»** typed at the start of a word, or *Layer o oggetto*, opens a box that finds by name a layer of the map, an
   object of the Raccolta or a parcel: the name goes in the text («…») and a reference stays under the block. A click
   on the reference turns the layer on, or selects the object and zooms to it, or zooms to the parcel.
-- **Tutte le note**: the list, the newest first, with a search by word; the notes are found by Ctrl K too.
-- **Esporta le note**: *PDF delle note* and *Copia come testo* — the note open, or all of them from the list.
+- **Post-it sulla mappa** (phase 3): one click on the map, then a small box at the point for the text (200 characters)
+  and the colour. A post-it is **a point of *Nota e riferimento › Nota*** whose note is written on the map on a
+  coloured label: an object of the Raccolta as any other (moved, coloured, hidden, deleted, undone, saved, exported);
+  its text is the object's Nota, in *Proprietà*; a click on the label selects it. With a note open, the note takes a line with a reference to it, and
+  the row of the post-it in the Raccolta gains *Apri la nota del post-it*. Not in *Stampa* (as the names on the map);
+  in *Fotografa la mappa*, yes.
+- **Tutte le note**: the list, the newest first, with a search by word; under the notes, the post-its on the map (a
+  click selects one and zooms to it). The notes are found by Ctrl K too.
+- **Esporta le note**: *PDF delle note* (with the pictures) and *Copia come testo* — the note open, or all of them
+  from the list.
 - The notes are **in the project**: in the browser's automatic save and in the `.axpo`, the copy to share too (the
-  user's decision; its message says how many notes it carries). Not on the portal; outside Annulla.
+  user's decision; its message says how many notes and pictures it carries). Not on the portal; outside Annulla. The
+  pictures are entries `note/<id>.jpg` of the `.axpo`; in the browser they are kept in IndexedDB (`axpo_nb`), not in
+  the automatic save.
+- **Trap:** two tabs of the app in one browser share the pictures' store as they share the automatic save: «Svuota»
+  in one removes the pictures the other shows (until its reload they stay in its memory). The saved `.axpo` is the
+  copy that lasts.
+- **Trap:** the labels of the post-its are drawn by `nbPostRender`, called at the end of `renderGeomLabels`: what
+  changes a post-it without passing through `renderGeoms` or `refreshDl` must call it (`applyGraphicColor` does). The
+  layer `nbPostGL` goes to a new web map with `wmCarry`, and `nbPostRender` adds it again if the map lacks it.
+- **Trap:** the ribbon refreshes when something changes in the panels (a `MutationObserver` on `#side`, `#leftPanel`,
+  `#signin`) or when a file calls `window.ribbonSoon()` (exposed since 2026-11-13): a state that touches no panel —
+  a map mode armed or ended by Esc — must call it, or its button keeps the old state.
+- **Trap:** `view.hitTest` answers on a text graphic only where its letters are, not on its background: a click on
+  the label of a post-it is found by its box (`nbPostBox`, the text wrapped as the SDK does), not by `hitTest`
+  (`selPostAt` in `selClick` and in the map's right-click menu).
+- **Trap:** a blob of the panel's own window (undocked) is not `instanceof Blob` in the page: `nbImgFit` looks at
+  what the object can do. In the tests IndexedDB may not answer under virtual time: the store falls back to memory
+  (`nbImgMem`) and the harness checks the reload only when it did not.
 
 ### Salva ed esporta
 
@@ -661,7 +693,9 @@ How the app works inside, by subject, with the traps to know before editing. The
   to `29-logo.js` in one, then `30-ui-glue.js`, `31-measure-coords.js`, `32-tour.js`, `33-print.js`, `34-risk-matrix.js`,
   `35-risk-sources.js`, `36-risk-excel.js`, `37-risk-images.js` and `38-risk-pdf.js` in one each.
 - `design/` holds the family's inputs verbatim (`tokens.json`, `icons/*.svg`, `kit.css`, `geo-kit.css`); change them
-  there, then run the generators. `make_tokens.py` → `src/css/10-tokens.css` (light values on `:root`, dark values that
+  there, then run the generators. `design/icons-local/*.svg` are the app's own icons, in the family's style: one
+  with the name of a family icon takes its place in the sprite (`settings`, the gear asked on 2026-11-10: until
+  2026-11-13 it was drawn by hand in the sprite, and `make_icons.py --check` failed), another is added (`camera`). `make_tokens.py` → `src/css/10-tokens.css` (light values on `:root`, dark values that
   differ on `[data-theme="dark"]`, `{ref}` → `var(--ref)`, old names kept as aliases: `--acc`, `--on-accent`,
   `--font-ui`, `--font-head`, `--line-strong`). `make_icons.py` → `src/html/05-icons.html`, a sprite of only the icons
   the sources name (it scans `src/html` and `src/js` for `data-icon="…"`, `href="#i-…"`, `icon('…')` and
@@ -675,7 +709,7 @@ How the app works inside, by subject, with the traps to know before editing. The
 - **Trap:** edit `src/`, never the built file: the next build overwrites it, and `build.py --check` fails meanwhile.
 - **Trap:** an icon named through a variable (`TOOLS`, `SF_ICON`, the theme toggle, the phone bar) is invisible to the
   scan: list it in an `icons-used:` comment, or it renders blank while `--check` stays green. A name missing from
-  `design/icons/` stops `make_icons.py` («icona sconosciuta»).
+  `design/icons/` and from `design/icons-local/` stops `make_icons.py` («icona sconosciuta»).
 - **Trap:** the kit comes first and the app must not restyle a kit class (placement is the app's). Its global rules
   matter: `button` has no border, background or padding; `[hidden]` always hides; `body` 13/19 px, `small` 11 px,
   `.icon` 18 px. Kit names the app must not reuse: `.grp`, `.sheet`, `.menu` (a grid capped at 420 px), `.sec`.
@@ -2980,6 +3014,29 @@ project, **the copy to share too** (its message says so); only in the project. W
 Eight tabs, 29 groups, a tour of 17 steps, a guide of 16 items. Backup: `geoportale_axpo_pre-annotazioni_2026-11-13.html`
 (the build of the branch `feat/draw-ribbon-clarity`).
 
+**2026-11-13: «Annotazioni», phase 2 — images (asked by the user: «fotografa la mappa serve a incollare screen nel
+taccuino, quindi deve poter incollare immagini, anche leggere»).** A fourth block, the image, with its caption:
+*Fotografa la mappa* (the view's own picture, with the view to go back to: «Torna a questa vista»), Ctrl+V of a copied
+picture or of a screenshot, *Immagine* for files; every picture drawn again as a light JPEG (1600 px at most); a
+click opens it large; the PDF of the notes draws them. The bytes are not in the state: IndexedDB `axpo_nb` in the
+browser, `note/<id>.jpg` in the `.axpo`, the copy to share too. The cadastre of the Agenzia is not in a photo (as in
+Stampa), and the message says so. Along the way: the app's own icons moved to `design/icons-local/` (the gear of
+*Impostazioni* was drawn by hand in the sprite since 2026-11-10 and `make_icons.py --check` failed; a regeneration
+would have put the family's icon back), with the new `camera`. 40 harnesses. Backup:
+`geoportale_axpo_pre-annotazioni-2_2026-11-13.html` (UBS-IT `fb0924b`).
+
+**2026-11-13: «Annotazioni», phase 3 — post-its on the map (asked by the user with phase 2).** The user's doubt was
+that a post-it would overlap the drawings of «Nota e riferimento»: so a post-it is one of them — a point of *Nota e
+riferimento › Nota* whose note is written on the map on a coloured label (a text graphic with a background, in a
+layer of its own). *Post-it sulla mappa* arms one click, a box at the point asks text and colour; the note open
+takes a line with its reference, the row in the Raccolta gains «Apri la nota del post-it», the list of the notes
+shows the post-its. The label follows the object's note, colour, place and visibility; Annulla takes the post-it
+away. Two attributes more in the project (`postit`, `nb_note`); nothing new in the shared model or on the portal.
+Not in *Stampa*. A click on the label selects the post-it (its box is worked out: `view.hitTest` answers only on the
+letters of a text). Found on the way: `ribbonSoon` was never exposed as `window.ribbonSoon`, the name the other
+files call it by (`23b-select-edit.js` since the selection, now `39-notes.js` and `23-draw-cad.js`): the ribbon
+followed only what changed the panels, and Esc on a map mode left its button pressed. It is exposed now. Backup: `geoportale_axpo_pre-annotazioni-3_2026-11-13.html` (the build of `feat/annotazioni-2`).
+
 ## 8. Repository contents
 
 ```
@@ -2996,9 +3053,10 @@ src/js/23b-select-edit.js  Seleziona e modifica (G2-3; parcels since 2026-11-02)
 src/js/29b-commands.js     the commands (7a): the name each action gives to its Annulla; the registry and the shortcuts; the profiles (7b-2)
 src/js/29c-search.js       the search Ctrl K (7c): the objects of the Raccolta and the commands of the ribbon
 design/                    the family's design system as copied: tokens.json, icons/*.svg (143), kit.css, geo-kit.css
+design/icons-local/        the app's own icons (settings, camera): they come before the family's in the sprite
 scripts/build.py           writes geoportale_axpo.html from src/; --check says whether it is up to date
 scripts/make_tokens.py     writes src/css/10-tokens.css from design/tokens.json; --check
-scripts/make_icons.py      writes src/html/05-icons.html with the icons the sources use; --check, --list
+scripts/make_icons.py      writes src/html/05-icons.html with the icons the sources use (design/icons-local first); --check, --list
 scripts/make_kit.py        writes src/css/12-kit.css and 13-geo-kit.css from design/; --check
 scripts/make_geo_fixtures.py  writes tests/fixtures/geo_expected.json with arcpy (the ArcGIS Pro Python): the oracle of the geo harness
 tests/                     run.py and harness/*.py: headless checks, Python + Chrome (tests/README.md); fixtures/ = the expected measures, made once by scripts/make_geo_fixtures.py with arcpy (developer-only: the app and the runner never need ArcGIS Pro)
@@ -3316,3 +3374,21 @@ in §7):
   `srchGoTo`), `30-ui-glue.js` (`SHELL.note`, `nbNone`, `ribbonCtx`, `modShow`, `RIBBON_INFO`, `IMP_INFO.notes`,
   `MORE`), `32-tour.js`; `tests/harness/axpo.py`, `commands.py`, `profiles.py`, `responsive.py`, `smoke.py`, `texts.py`, `tour.py`;
   `tests/README.md`; `docs/axpo-format.md` (§3, §5.9, §6, §7); this README.
+- **«Annotazioni», phase 2: images (2026-11-13).** New: `design/icons-local/settings.svg`, `camera.svg`. Changed:
+  `src/js/39-notes.js` (the block `img` in `nbCleanBlock`, `nbCleanView`; the store `nbIdb`, `nbDb`, `nbImgPut`,
+  `nbImgGet`, `nbImgUrl`, `nbImgForget`, `nbImgDropUnused`, `nbImgSweep`; `nbImgFit`, `nbImgsIn`, `nbImgPick`,
+  `nbOnPaste`, `nbShot`, `nbViewNow`, `nbViewGo`, `nbBig`, `nbImgSave`, `nbImgFill`, `nbPicHtml`, `nbProjSave`,
+  `nbProjRestore`; the list, the block's menu, `nbText`, `nbPdf`), `src/css/95-notes.css`, `src/js/14-state-project.js`
+  (`projBuild`, `projShare`, `projOpenFile`, `resetAll`), `30-ui-glue.js` (the tools `nb-shot`, `nb-img`, the
+  icons' list, `IMP_INFO.notes`), `32-tour.js`, `src/html/30-modals.html` (the guide), `05-icons.html` (generated:
+  114 icons); `scripts/make_icons.py` (`LOCAL`); `tests/harness/notes.py`; `tests/README.md`;
+  `docs/axpo-format.md` (§1, §5.9, §6, §7), `docs/plan-annotazioni.md` (§4); this README.
+- **«Annotazioni», phase 3: post-its (2026-11-13).** Changed: `src/js/39-notes.js` (`NB_POST`, `nbPostIs`,
+  `nbPostRender`, `nbPostListHtml`, `nbPostGo`, `nbPostActs`, `nbPostStart`, `nbPostAskAt`, `nbPostDone`, `nbPostAdd`;
+  the list, the foot of the note, `nbAtItems`, `nbRefGo`), `src/css/95-notes.css`, `src/js/23-draw-cad.js`
+  (`drwModeInfo`, `drwModeClick`: the kind `post`), `22-raccolta-ui.js` (`renderGeomLabels`, `applyGraphicColor`, the
+  row's menu), `23b-select-edit.js` (`selPostAt`, `selClick`), `12-zornade.js` (the map's right-click menu),
+  `16-layers-webmap.js` (`wmCarry`), `14-state-project.js` (`serializeToolGeoms`), `30-ui-glue.js` (the
+  tool `nb-post`, `RIBBON_INFO`, `IMP_INFO.notes`, `window.ribbonSoon`), `32-tour.js`, `src/html/30-modals.html` (the guide);
+  `tests/harness/notes.py`; `tests/README.md`; `docs/axpo-format.md` (§4, §5.9), `docs/plan-annotazioni.md` (§5);
+  this README.
