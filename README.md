@@ -82,7 +82,7 @@ py -3 scripts/build.py --check    exit 1 if the built file is not up to date
 py -3 scripts/make_tokens.py      writes src/css/10-tokens.css from design/tokens.json (the family's tokens); --check
 py -3 scripts/make_icons.py       writes src/html/05-icons.html, the sprite of the family icons the sources use; --check, --list
 py -3 scripts/make_kit.py         writes src/css/12-kit.css and 13-geo-kit.css from design/kit.css and geo-kit.css (verbatim); --check
-py -3 tests/run.py                headless checks, Python + Chrome, 39 harnesses, about nine minutes (see tests/README.md)
+py -3 tests/run.py                headless checks, Python + Chrome, 40 harnesses, about nine minutes (see tests/README.md)
 ```
 
 `design/` holds the design system's inputs, copied verbatim from the family (`tokens.json`, `icons/*.svg`, `kit.css`,
@@ -148,8 +148,9 @@ site and the writes to AREAS COLLECTION and IT - Site Features. This section fol
 
 ### Tabs and ribbon
 
-- Seven tabs by name only, in the order of the work (arrow keys move between them): *Ricerca particelle · Analizza ·
-  Disegna · Modifica · Geoprocessi · Importa · Salva ed esporta* (since 2026-11-02, K1–K7: before, six, with *Terreno*
+- Eight tabs by name only, in the order of the work (arrow keys move between them): *Ricerca particelle · Analizza ·
+  Disegna · Modifica · Geoprocessi · Importa · Annotazioni · Salva ed esporta* (*Annotazioni* since 2026-11-13, with its
+  three groups; seven since 2026-11-02, K1–K7: before, six, with *Terreno*
   and *Geoprocessi e analisi* and the selection inside Disegna). The ribbon shows the active tab's groups: 25 in all,
   each closed by its name and an ⓘ (see *Help*). A tab the profile leaves without tools hides (Geoprocessi in *Base*).
 - A tool presses a panel control, flips a checkbox, shows a module in Proprietà, opens a menu (category, type, source,
@@ -249,10 +250,15 @@ or «nessuno», *Scegli ›*), then *Cosa disegni* as a row that closes (closed,
 *Cambia…* (its description is the tooltip of its name; *Le mie categorie…* is in the menu of *Cambia…*), *Tipo* and the
 attributes two by two with their label inside, *Fonte*, the note; the exact-shape box when it applies, the status line,
 and *Ultimo disegno* (J5c, 2026-11-02: the tools are the ribbon's, so the step «Con quale strumento» left the panel).
-- **Cosa disegni**: the category as a coloured card with its description; a click opens the gallery, grouped as the
-  Raccolta. Beside it only what the category uses (*Tipo*, *Buffer*, *Larghezza*, *Altezza*, *Tensione*), then *Fonte*
-  (a tavolino · sopralluogo · ufficiale) and *Esclusione da layer*. The values apply to the next drawings, the category
-  is remembered (`axpo_sf_cat`); only the tools of its geometries are enabled; a drawing takes the category's colour.
+- **Cosa disegni**: the category is **asked, not assumed** (2026-11-13, decided by the user: people drew notes without
+  knowing). Until one is chosen in the session (`sfCatChosen`) the card says «Scegli la categoria» in the accent
+  colour, its values are hidden and every tool is enabled; a tool that makes an object (the six drawing tools, the
+  two copies) opens the gallery first (`window.catAsk(fn)`) and goes on after the choice; Esc drops it. Once chosen the
+  card is a field: «Categoria» above the name, the category's colour, a boxed arrow; the description is the tooltip.
+  The gallery is grouped as the Raccolta. Beside the card only what the category uses (*Tipo*, *Buffer*, *Larghezza*,
+  *Altezza*, *Tensione*), then *Fonte* (a tavolino · sopralluogo · ufficiale). The values apply to the next drawings;
+  only the tools of the category's geometries are enabled; a drawing takes the category's colour. The last category
+  is still kept (`axpo_sf_cat`) but no longer counts as chosen. The two groups carry a step number (`n` in `SHELL`).
 - **The model** (`SF_CATS`, shared with the AGOL layer and PV Predesign via `../schemas/site_features_model.json`): the
   category is the role — *Area lorda* `gross`, *Area netta* `net`, *Percorso di connessione* `connection`, *Esclusione*
   `exclusion`, *Infrastruttura lineare* `linear`, *Ostacolo* `obstacle`, *Accesso e punto di connessione* `access`,
@@ -265,9 +271,12 @@ and *Ultimo disegno* (J5c, 2026-11-02: the tools are the ribbon's, so the step �
 - **Con quale strumento**: *Punto · Linea · Area · Rettangolo · Cerchio · A mano libera*; double click ends lines and
   areas, the tool stays armed, Esc stops. With no tool on, a click on a drawing takes it in hand (drag, rotate, scale;
   a second click edits vertices; Delete removes it).
-- **Esclusione da layer**: a click on a feature of a visible vector layer makes a drawing of it (area → *Esclusione*,
-  line → *Infrastruttura lineare*, point → *Ostacolo*; source *ufficiale*; never twice); with *Riquadro*, every feature
-  the rectangle touches in the visible feature layers (at most 200, a confirm above 20).
+- **Copia da layer** and **Copia a riquadro** (in «Con quale strumento» since 2026-11-13; it was «Esclusione da layer»
+  in «Cosa disegni», its box hidden under Modifica › Riquadro): a click on a feature of a visible vector layer copies
+  its shape into the Raccolta (source *ufficiale*; never twice); the box takes every feature it touches in the visible
+  feature layers (at most 200, a confirm above 20). The copy takes the category chosen in «Cosa disegni», with its type
+  and values, when that category is drawn with that geometry; otherwise area → *Esclusione*, line → *Infrastruttura
+  lineare*, point → *Ostacolo*, and the status line says why.
 - **Supporto al disegno** (a popover; its name says what is on): *aggancio* to vertices and edges of drawings and
   parcels and, optionally, of DWGs and visible feature, GeoJSON, WFS and CSV layers (Ctrl breaks free); *misure e
   angoli* (Tab while drawing opens *Deflezione* and *Distanza*, Enter locks, a click places; angles relative to the
@@ -363,6 +372,25 @@ the last message; how it works is the «i» by the panel's title.
   cross-origin reads work (http is tried as https); the national PCN WMS does not. A WFS the SDK refuses comes as a
   GeoJSON snapshot of up to 20,000 features. Kept by the autosave and the project.
 - **Portale** › *Layer dal portale*: the Layer tab's search of portal items by title (needs sign-in).
+
+### Annotazioni
+
+The project's notebook (2026-11-13, phase 1; `docs/plan-annotazioni.md`, decisions N1–N6 of the user). Groups
+**Taccuino · Inserisci · Esporta le note**; one module, *Taccuino*, in the right panel (widened to 390 px while the tab
+is shown): the list of the notes, or the note open.
+
+- **A note** has a title, a label (five proposed, or one's own), the date of its last change and **blocks**: *Testo*,
+  *Da fare* (a line to tick; Invio opens another, Backspace on an empty one removes it) and *Collegamento* (title and
+  address of a document: nothing is attached, the file is sent apart). They are added from the ribbon or from the
+  foot of the note; the menu of a block moves it, turns a text into a to-do and back, deletes it; the menu of the
+  note duplicates it, copies it as text, deletes it.
+- **«@»** typed at the start of a word, or *Layer o oggetto*, opens a box that finds by name a layer of the map, an
+  object of the Raccolta or a parcel: the name goes in the text («…») and a reference stays under the block. A click
+  on the reference turns the layer on, or selects the object and zooms to it, or zooms to the parcel.
+- **Tutte le note**: the list, the newest first, with a search by word; the notes are found by Ctrl K too.
+- **Esporta le note**: *PDF delle note* and *Copia come testo* — the note open, or all of them from the list.
+- The notes are **in the project**: in the browser's automatic save and in the `.axpo`, the copy to share too (the
+  user's decision; its message says how many notes it carries). Not on the portal; outside Annulla.
 
 ### Salva ed esporta
 
@@ -1338,10 +1366,12 @@ How the app works inside, by subject, with the traps to know before editing. The
   view's system. Dividi arms the cut (`gpPendingSplit`); Unisci replaces the areas with their `geoUnion` and the first
   one's attributes; Copia starts `cp2` from the centroid (a single parcel too: the copy is a drawing); Elimina
   (`selDelete`) takes the parcels and the objects the rules allow, asks, then asks again for the portal.
-- **Esclusione da layer** (`exlStart`/`exlEnd`): a click reads a complete feature of a visible vector layer
-  (`gpLayerFeatureAt`) and `exlAdd` draws it (area → *Esclusione*, line → *Infrastruttura lineare*, point →
-  *Ostacolo*; source `official`, `src_attrs`, `_srcKey` so it is added once); its Riquadro queries every visible
-  queryable layer (at most 200, a confirm over 20).
+- **Copia da layer** (`exlStart`/`exlEnd`; «Esclusione da layer» until 2026-11-13): a click reads a complete feature of
+  a visible vector layer (`gpLayerFeatureAt`) and `exlAdd` draws it (source `official`, `src_attrs`, `_srcKey` so it is
+  added once). The category: `exlOwnCat(gt)` — a category chosen (`sfCatChosen`) that accepts the geometry — leaves
+  `sfNewAttrs` its category, type and values; otherwise `exlCatFor` (area → *Esclusione*, line → *Infrastruttura
+  lineare*, point → *Ostacolo*). «Copia a riquadro» (`exlBoxStart`, tool `excl-box`) queries every visible queryable
+  layer (at most 200, a confirm over 20). Both ask for the category first (`catAsk`).
 - **Automatic strips and net area** (`sfAutoSync`, `21-legend-auto.js`, PV Predesign's `areas.js` rules). What cuts:
   `SF_CUTS` (exclusion, linear, obstacle, mitigation, agri) and custom categories with `cuts`; the distance
   (`sfCutDist`) is the buffer, half the width of a mitigation or agri line, or a custom number field `buffer`, at most
@@ -2932,6 +2962,24 @@ found only that way is left out of the names and of the legend of its theme's pi
 where it explains the layers missing from the picture of Urban zoning. Harnesses `risksources`, `riskimages`
 extended. Backup: `geoportale_axpo_pre-risk-nodraw_2026-11-12.html` (from UBS-IT `90d28c6`).
 
+**2026-11-13: Disegna asks for the category; «Copia da layer» (three small changes asked by the user after the trials
+with the PMs, who «got lost»).** (A) The category of the new drawings is asked, not assumed: the card says «Scegli la
+categoria» until one is chosen in the session, a tool that makes an object opens the gallery first and goes on after
+the choice; then the card reads as a field («Categoria», the name, a boxed arrow) and the two groups are numbered.
+(E1) «Esclusione da layer» is «Copia da layer», among the tools of «Con quale strumento», with «Copia a riquadro»
+beside it. (E2) The copy takes the category chosen when it is drawn with that geometry, otherwise the old rule.
+In Analizza › Contesto «Percorso su strada» is as large as the other two. Harnesses `layout`, `select` extended.
+Backup: `geoportale_axpo_pre-draw-clarity_2026-11-12.html` (from UBS-IT `2941335`).
+
+**2026-11-13: the tab «Annotazioni», phase 1 (asked by the user; `docs/plan-annotazioni.md`).** A notebook for the
+PMs, between Importa and Salva ed esporta: notes made of blocks (text, to-do, link), «@» to recall a layer, an object
+or a parcel by name with a reference that takes there, a list with its search, Ctrl K, a PDF and the text for the
+clipboard. Decided by the user: blocks; the right panel; no attached PDFs, only links; the notes travel with the
+project, **the copy to share too** (its message says so); only in the project. What is typed is never HTML. New:
+`src/js/39-notes.js`, `src/css/95-notes.css`, harness `notes`; the state field `notes` (`docs/axpo-format.md` §5.9).
+Eight tabs, 29 groups, a tour of 17 steps, a guide of 16 items. Backup: `geoportale_axpo_pre-annotazioni_2026-11-13.html`
+(the build of the branch `feat/draw-ribbon-clarity`).
+
 ## 8. Repository contents
 
 ```
@@ -3253,3 +3301,18 @@ in §7):
   `rsNd`, `rsNdName`, `rsAllNd`, `rsAggNew`, `rsAddFeat`, `rsLines`, `rsClassOf`, `rsAsk`), `src/js/37-risk-images.js`
   (`riSubs`, `riNd`, `riNames`, `riThemeImage`); `tests/harness/risksources.py`, `riskimages.py`; `tests/README.md`;
   `docs/plan-risk-matrix.md` (§13.8); this README.
+- **Disegna asks for the category; «Copia da layer» (2026-11-13).** Changed: `src/js/11-map-model.js` (`sfCatChosen`),
+  `13-tools-select.js` (`startDraw`, the chips), `19-undock-sitefeatures.js` (`sfRenderDrawUi`, `sfDrawBtns`),
+  `19b-custom-cats.js`, `23b-select-edit.js` (`exlOwnCat`, `exlAdd`, `exlStart`, `exlClick`, `exlBoxStart`),
+  `29b-commands.js`, `30-ui-glue.js` (`catNeed`, `catAsk`, `catPick`, `closeMenu`, `SHELL.disegno`, `SHELL.analizza`,
+  `groupHtml`, `toolBtn`, `ribbonSync`, `RIBBON_INFO`, `DRW_INFO`, the mode banner, the Escape chain);
+  `src/html/30-modals.html` (the guide); `src/css/20-shell.css`; `tests/harness/layout.py`, `select.py`, `compact.py`;
+  `tests/README.md`; this README.
+- **The tab «Annotazioni», phase 1 (2026-11-13).** New: `src/js/39-notes.js` (the state `nbGetState`/`nbSetState`/
+  `nbClean`, the notes and the blocks, `nbRender`, the «@» box `nbAt…`, `nbRefGo`, `nbText`, `nbCopy`, `nbPdf`),
+  `src/css/95-notes.css`, `tests/harness/notes.py`, `docs/plan-annotazioni.md`. Changed: `src/manifest.txt`;
+  `src/html/20-app-body.html` (the tab, its pane), `30-modals.html` (the guide); `src/js/14-state-project.js`
+  (`captureWork`, `applyWork`, `clearWork`, `projNormalize`, `projBuild`, `projShare`), `29c-search.js` (`srchItems`,
+  `srchGoTo`), `30-ui-glue.js` (`SHELL.note`, `nbNone`, `ribbonCtx`, `modShow`, `RIBBON_INFO`, `IMP_INFO.notes`,
+  `MORE`), `32-tour.js`; `tests/harness/axpo.py`, `commands.py`, `profiles.py`, `responsive.py`, `smoke.py`, `texts.py`, `tour.py`;
+  `tests/README.md`; `docs/axpo-format.md` (§3, §5.9, §6, §7); this README.

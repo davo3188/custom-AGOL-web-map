@@ -894,7 +894,16 @@ dialog.dialog::backdrop { background: rgba(11, 18, 25, .45); }
   .tool.card .card-t{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1}
   .tool.card .rlab{font-size:11.5px;font-weight:600;line-height:13px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}   /* «Accesso e punto di connessione» takes two lines */
   .tool.card .rdesc{font-size:10.5px;line-height:12px;color:var(--mut);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-  .tool.card .card-chev{width:10px;height:10px;flex:none;opacity:.6}
+  .tool.card .card-chev{width:12px;height:12px;flex:none}
+  /* 13/11 (A): the card is a field: its name above the value, a boxed arrow; until a category is chosen it asks, in the accent colour */
+  .tool.card .rcapt{font-size:10px;line-height:11px;color:var(--mut);letter-spacing:.02em}
+  .tool.card .card-go{display:flex;align-items:center;justify-content:center;flex:none;width:20px;height:24px;border:1px solid var(--line);border-radius:5px;background:var(--bg)}
+  .tool.card:hover .card-go{border-color:var(--accent)}
+  .tool.card:not(.ask) .rdesc{display:none} .tool.card.ask .rcapt{display:none}
+  #ribbon .tool.large.card.ask,#sheetTools .tool.large.card.ask{border:1.5px solid var(--accent);border-left-width:4px}
+  .tool.card.ask>.icon:first-child,.tool.card.ask .card-go{color:var(--accent)} .tool.card.ask .card-go{border-color:var(--accent)}
+  .rgroup-foot .rstep{display:inline-flex;align-items:center;justify-content:center;width:13px;height:13px;margin-right:4px;border-radius:50%;border:1px solid var(--mut);color:var(--mut);font-size:9px;font-weight:600;line-height:1;flex:none}
+  #drwStep1.catask #sfAttrs>#sfTypeBox,#drwStep1.catask #sfAttrs>[data-a]{display:none !important}
   #ribbon .rgroup.drwcat .tool.small{width:auto;padding:0 7px 0 5px;justify-content:flex-start}
   #ribbon .rgroup.drwcat .tool.small span{display:inline;max-width:180px}
   #ribbon.tight .rgroup.drwcat .tool.small.val span{max-width:150px}
@@ -1879,6 +1888,38 @@ dialog.dialog::backdrop { background: rgba(11, 18, 25, .45); }
   .thint.ok,.thint.err{color:var(--txt)}
   .thint.ok:not(#gpMsg)::before,.thint.err:not(#gpMsg)::before{content:'';display:inline-block;width:8px;height:8px;border-radius:4px;margin:0 6px 1px 0;vertical-align:middle}
   .thint.ok:not(#gpMsg)::before{background:var(--ok)} .thint.err:not(#gpMsg)::before{background:var(--err)}
+  /* 13/11 (Annotazioni, phase 1; 39-notes.js): the notebook in the right panel — the list of the notes, the note open
+     with its blocks, the «@» popover. Compact as the other panels: rows, tooltips, no text in sight but the empty state */
+  .nbtop{display:flex;gap:6px;align-items:center;margin:0 0 8px} .nbtop input{flex:1;min-width:0;width:auto;margin:0} .nbtop .btn{flex:none;display:inline-flex;align-items:center;gap:4px;margin:0}
+  .nbrows{display:flex;flex-direction:column;gap:4px}
+  .nbrow{display:flex;flex-direction:column;align-items:flex-start;gap:1px;width:100%;padding:6px 8px;border:1px solid var(--line);border-radius:var(--radius-md);background:var(--field);color:inherit;text-align:left;cursor:pointer;font:inherit}
+  .nbrow:hover,.nbrow:focus-visible{border-color:var(--accent)}
+  .nbrow b{font-size:12.5px;font-weight:600;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .nbrow small,.nbrow span{font-size:11px;color:var(--mut);max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .nbhead{display:flex;align-items:center;gap:6px;margin:0 0 6px} .nbhead .btn{margin:0;flex:none} .nbdate{flex:1;font-size:11px;color:var(--mut);text-align:right}
+  input.nbtitle{font-size:14px;font-weight:600;margin:0 0 6px}
+  #nbBlocks{display:flex;flex-direction:column;gap:3px;margin:8px 0}
+  .nbb{display:flex;align-items:flex-start;gap:4px;flex-wrap:wrap}
+  .nbb textarea{flex:1;min-width:0;width:auto;margin:0;resize:none;overflow:hidden;min-height:24px;padding:3px 6px;border:1px solid transparent;border-radius:var(--radius-sm);background:transparent;color:inherit;font:inherit;font-size:12.5px;line-height:1.4}
+  .nbb textarea:hover{border-color:var(--line)} .nbb textarea:focus{border-color:var(--accent);background:var(--field);outline:none}
+  .nbb input[type="checkbox"]{width:15px;height:15px;flex:none;margin:5px 0 0 2px;padding:0}
+  .nbb.done textarea{color:var(--mut);text-decoration:line-through}
+  .nbb .nbl{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px} .nbb .nbl input{margin:0;font-size:12px;padding:3px 6px}
+  .nbx{flex:none;display:inline-flex;align-items:center;justify-content:center;width:22px;height:24px;padding:0;border:1px solid transparent;border-radius:var(--radius-sm);background:transparent;color:var(--mut);cursor:pointer}
+  .nbx:hover,.nbx:focus-visible{border-color:var(--line);color:inherit} .nbx .icon{width:14px;height:14px}
+  .nbb .nbx[data-nb="bmenu"]{opacity:.4} .nbb:hover .nbx[data-nb="bmenu"],.nbb:focus-within .nbx[data-nb="bmenu"]{opacity:1}
+  .nbrefs{flex-basis:100%;display:flex;flex-wrap:wrap;gap:4px;padding:0 0 2px 6px}
+  .nbref{display:inline-flex;align-items:center;max-width:100%;border:1px solid var(--line);border-radius:var(--radius-pill);background:var(--field);overflow:hidden}
+  .nbref button{display:inline-flex;align-items:center;gap:4px;min-width:0;padding:1px 6px;border:0;background:transparent;color:inherit;font:inherit;font-size:11px;cursor:pointer}
+  .nbref button span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:230px} .nbref button:hover{color:var(--accent)} .nbref .icon{width:12px;height:12px;flex:none}
+  .nbref button[data-nb="refx"]{padding:1px 5px 1px 0;color:var(--mut)}
+  .nbadd{display:flex;flex-wrap:wrap;gap:5px;margin-top:4px} .nbadd .btn{display:inline-flex;align-items:center;gap:3px;margin:0} .nbadd .icon,.nbtop .icon{width:12px;height:12px}
+  .nbat{position:fixed;z-index:1250;padding:6px;border:1px solid var(--line-strong);border-radius:var(--radius-md);background:var(--panel);box-shadow:var(--shadow-menu)}
+  .nbat[hidden]{display:none} .nbat input{margin:0 0 5px}
+  .nbat #nbAtL{display:flex;flex-direction:column;gap:1px;max-height:214px;overflow:auto}
+  .nbat #nbAtL button{display:flex;align-items:baseline;gap:6px;width:100%;padding:4px 6px;border:0;border-radius:var(--radius-sm);background:transparent;color:inherit;font:inherit;font-size:12px;text-align:left;cursor:pointer}
+  .nbat #nbAtL button small{flex:none;width:58px;color:var(--mut);font-size:10.5px} .nbat #nbAtL button span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .nbat #nbAtL button[aria-selected="true"],.nbat #nbAtL button:hover{background:var(--hover)}
 </style>
 </head>
 <body>
@@ -2042,6 +2083,7 @@ dialog.dialog::backdrop { background: rgba(11, 18, 25, .45); }
   <button class="tab" role="tab" type="button" data-tab="modifica" aria-selected="false" tabindex="-1">Modifica</button>
   <button class="tab" role="tab" type="button" data-tab="geoproc" aria-selected="false" tabindex="-1">Geoprocessi</button>
   <button class="tab" role="tab" type="button" data-tab="import" aria-selected="false" tabindex="-1">Importa</button>
+  <button class="tab" role="tab" type="button" data-tab="note" aria-selected="false" tabindex="-1">Annotazioni</button>
   <button class="tab" role="tab" type="button" data-tab="export" aria-selected="false" tabindex="-1">Salva ed esporta</button>
 </nav>
 <section id="ribbon" class="ribbon" role="tabpanel" aria-label="Strumenti della scheda attiva" tabindex="-1"></section>
@@ -2589,6 +2631,15 @@ dialog.dialog::backdrop { background: rgba(11, 18, 25, .45); }
     </div></div>
 
 
+    <!-- 13/11 (Annotazioni, phase 1; docs/plan-annotazioni.md): the project's notebook. One module: the list of the notes
+         or the note open, both drawn by 39-notes.js; what the PM writes is never HTML -->
+    <div class="tabpane" data-tab="note"><div class="paneBody">
+        <div class="modbox" id="modNotes">
+          <div id="nbList"></div>
+          <div id="nbEdit" hidden></div>
+        </div>
+    </div></div>
+
     <!-- 2A-2: the fifth tab holds the two portal widgets that were right drawers; the actions (Esporta, Migra, Salva,
          Apri e Salva progetto) are ribbon tools that press the Raccolta dock and top-bar buttons -->
     <div class="tabpane" data-tab="export"><div class="paneBody">
@@ -2842,13 +2893,14 @@ dialog.dialog::backdrop { background: rgba(11, 18, 25, .45); }
     <div class="sub">Geoportale AxpoSolar Italia — dati catastali AdE via Zornade · portale ArcGIS Online interno.</div>
     <ol style="margin:0;padding-left:18px;font-size:13px;line-height:1.7">
       <li><b>Barra in alto</b> — il nome del <b>progetto</b> .axpo (un clic lo salva con un altro nome); <b data-icon="map">Mappa</b>, la web map del portale in uso: la General Map o una Check Vincoli regionale, con ricerca per nome (cambiandola restano particelle, disegni e risultati; si perdono i layer accesi e i filtri di quella mappa, te lo chiedo prima); <b data-icon="folder"></b> Apri e <b data-icon="save"></b> Salva progetto; <b data-icon="undo"></b> Annulla e <b data-icon="redo"></b> Ripeti, per ogni modifica del lavoro (<kbd>Ctrl</kbd>+<kbd>Z</kbd>, <kbd>Ctrl</kbd>+<kbd>Y</kbd>); <b>Accedi</b> ad AGOL; il tema chiaro o scuro; <b data-icon="settings"></b> Impostazioni (la chiave del catasto, i dati salvati nel browser, Svuota il lavoro); <b data-icon="help"></b> i tour e questa guida.</li>
-      <li><b>Schede e ribbon</b> — sette schede, nell'ordine del lavoro: Ricerca particelle · Analizza · Disegna · Modifica · Geoprocessi · Importa · Salva ed esporta. Sotto, il <b>ribbon</b> con gli strumenti della scheda, a gruppi: ogni gruppo ha il suo nome e una <b data-icon="info"></b> che dice cosa si fa lì, con «Di più» per la spiegazione lunga, spesso con un esempio disegnato. Uno strumento apre le sue impostazioni a destra, in <b>Proprietà</b>.</li>
+      <li><b>Schede e ribbon</b> — otto schede, nell'ordine del lavoro: Ricerca particelle · Analizza · Disegna · Modifica · Geoprocessi · Importa · Annotazioni · Salva ed esporta. Sotto, il <b>ribbon</b> con gli strumenti della scheda, a gruppi: ogni gruppo ha il suo nome e una <b data-icon="info"></b> che dice cosa si fa lì, con «Di più» per la spiegazione lunga, spesso con un esempio disegnato. Uno strumento apre le sue impostazioni a destra, in <b>Proprietà</b>.</li>
       <li><b>Ricerca particelle</b> — <b>Catasto</b> › <b>Cerca particelle</b> apre a destra i tre modi di prendere le particelle dal catasto, ognuno in una sezione che si chiude: <b>Per foglio e particella</b> (regione, provincia, comune, foglio e numeri; con una regione scelta ti propongo i suoi vincoli con un clic; all'invio la mappa inquadra le particelle appena aggiunte), <b>Dalla mappa</b> (Puntuale, Rettangolo, Poligono o Linea) e <b>Da un disegno</b> (le particelle toccate da un disegno, un buffer o un file); <b>Raccolta</b>: Crea area lorda dalle particelle, i numeri sulla mappa, lo zoom. Per scegliere sulla mappa quelle già nella Raccolta: <b>Modifica</b> › Seleziona o Riquadro, oppure il tasto destro.</li>
       <li><b>Analizza</b> — quello che legge il territorio senza cambiare la Raccolta. <b>Estensione</b>: su cosa lavorare (un'area lorda, il sito AREAS, le particelle, oppure un rettangolo o un poligono disegnato qui); <b>Modello del terreno</b>: il limite di pendenza, in ogni direzione oppure nord–sud ed est–ovest, e <b>Analizza le pendenze</b>, con le quote di Esri World Elevation (circa 10 m in Italia), e <b>Rimuovi terreno</b>; <b>Analisi terreno</b>: classi di pendenza, quote, esposizione, ombreggiatura, curve di livello e <b>Profilo altimetrico</b> lungo una linea; <b>Contesto</b>: Analisi di contesto (sottostazioni, linee AT e progetti FV intorno a un punto) e Percorso su strada, con l'accesso; <b>Coordinate</b>: in che sistema sono dei valori sconosciuti. Le zone troppo ripide diventano un'esclusione nella Raccolta.</li>
-      <li><b>Disegna</b> — <b>Cosa disegni</b>: la categoria (la scheda colorata: un clic apre l'elenco, anche con le categorie tue), con tipo, valori e fonte, ed <b>Esclusione da layer</b>; <b>Con quale strumento</b>: punto, linea, area, rettangolo, cerchio, a mano libera; <b>Supporto al disegno</b>: aggancio, misure esatte, griglia; <b>Aree automatiche</b>: l'area netta e il rientro dal confine; <b>Collega a sito AREAS</b>: il sito a cui vanno i disegni sul portale (salvando, ogni oggetto si lega da solo all'area che tocca; <b>Sito dalla mappa</b> lo sceglie con un clic).</li>
+      <li><b>Disegna</b> — <b>Cosa disegni</b>: prima la categoria (la scheda la chiede finché non la scegli; un clic apre l'elenco, anche con le categorie tue), poi tipo, valori e fonte; <b>Con quale strumento</b>: punto, linea, area, rettangolo, cerchio, a mano libera, oppure <b>Copia da layer</b> e <b>Copia a riquadro</b>, che prendono la forma da un layer acceso; <b>Supporto al disegno</b>: aggancio, misure esatte, griglia; <b>Aree automatiche</b>: l'area netta e il rientro dal confine; <b>Collega a sito AREAS</b>: il sito a cui vanno i disegni sul portale (salvando, ogni oggetto si lega da solo all'area che tocca; <b>Sito dalla mappa</b> lo sceglie con un clic).</li>
       <li><b>Modifica</b> — quello che c'è già. <b>Selezione</b>: Seleziona (clic sulla mappa, <kbd>Maiusc</kbd> aggiunge o toglie), Riquadro, Deseleziona; la selezione è la spunta della Raccolta. <b>Modifica</b>, sulla selezione: Rimodella, Sposta e ruota, Dividi, Unisci (le aree selezionate diventano una), Copia (dove clicchi, anche parallela a distanza fissa: le opzioni nella sua finestra) ed Elimina. A destra, in Proprietà, quanti sono e la scheda dell'oggetto selezionato (categoria, tipo e attributi). Le particelle si selezionano ma non si modificano.</li>
       <li><b>Geoprocessi</b> — <b>Oggetti di partenza</b>: metti gli oggetti in A con A dalla mappa, dalle righe spuntate o per categoria (B serve a Parte comune e Sottrai); <b>Geoprocessi</b>: Buffer, Unione, Parte comune, Sottrai B da A, Contorno, Semplifica, Ritaglia, poi <b>Esegui</b> a destra: il risultato è un oggetto nuovo nella Raccolta, gruppo Analisi, e quelli di partenza restano.</li>
       <li><b>Importa</b> — <b>File</b>: GeoJSON, KML, KMZ, Shapefile (.zip) e il file di <b>Estrazione intestatari</b>, colorato e raggruppato per intestatario in fondo al blocco <b>Particelle</b> della Raccolta, dove il cestino della riga «Per intestatario» lo toglie tutto (i nominativi restano fuori dal salvataggio automatico e dal portale); <b>CAD</b>: un DWG letto nel browser, con il sistema proposto, oppure allineato a mano con due punti; <b>Immagini</b>: GeoTIFF e world file si posizionano da soli, PNG, JPG e PDF con sposta, scala, ruota o punti noti; <b>Servizi web</b>: WMS, WFS e ArcGIS REST dal loro indirizzo; <b>Portale</b>: un layer cercato per titolo.</li>
+      <li><b>Annotazioni</b> — il taccuino del progetto. <b>Taccuino</b>: Nuova nota (titolo, etichetta e blocchi) e Tutte le note, l'elenco con la ricerca; <b>Inserisci</b>: Testo, Da fare (righe da spuntare), Collegamento (titolo e indirizzo di un documento: i file non si allegano) e Layer o oggetto, che richiama per nome un layer della mappa, un oggetto della Raccolta o una particella (come <b>@</b> scritto nel testo) e lascia un riferimento da cliccare; <b>Esporta le note</b>: PDF delle note e Copia come testo. Le note si salvano da sole nel browser e viaggiano nel file .axpo, anche nella copia da condividere; non vanno sul portale e Annulla non le riguarda.</li>
       <li><b>Salva ed esporta</b> — <b>Esporta</b>: GeoJSON, KML, KMZ, Shapefile (.zip) o la tabella XLSX delle particelle, con gli oggetti spuntati nella Raccolta o con tutto (il KML ha una cartella per gruppo, lo shapefile un file per gruppo; il nome del file viene da comune, data e numero di particelle); <b>Portale AGOL</b>: Migra particelle in AREAS (le spuntate o tutte, scelte anche nella sua finestra: una per particella, un'unica area dissolta o un'area per sottogruppo), Salva disegni in Site Features (categoria, tipo, attributi e sito: la seconda volta aggiorna, non duplica), Modifica AREAS COLLECTION; <b>Progetto</b>: Salva, Salva come, Apri; <b>Stampa</b>: un foglio PDF A4 o A3 con la Raccolta in scala, sfondo a scelta, dati, legenda e note (il rettangolo tratteggiato sulla mappa mostra il foglio), con la Risk Matrix allegata se la spunti; <b>Risk Matrix</b>: quattro passi per la matrice dei rischi del modello aziendale — l’area del progetto, il <b>controllo dei vincoli</b> sui layer della mappa aperta e nazionali entro 1 km dall’area (in «Layer letti» il tema di ogni layer e file), la revisione di colore, testi, fonti e commenti (il ricalcolo non tocca ciò che hai scritto), l’esportazione: <b>Crea l’Excel</b> compila il modello aziendale (scelto una volta, il browser lo ricorda), <b>Aggiorna…</b> scrive nella matrice del progetto, e una matrice già compilata si può leggere nel pannello; i fogli Cadastral e Constraints ricevono la tabella delle particelle e le mappe che scegli.</li>
       <li><b>Raccolta</b>, a sinistra — tutto quello che raccogli, ad albero come i layer di QGIS: i gruppi (Particelle, Aree di progetto, Aree di esclusione, Analisi, Altro, Immagini, e i tuoi, <b>+ Gruppo</b>), dentro i sottogruppi delle particelle, poi gli oggetti, ogni livello un po' più rientrato; numero ed ettari a destra, occhio, nomi e menu passando sopra la riga. In alto il filtro per nome e <b>Comprimi</b>. Ogni riga ha la spunta (la selezione, che usano anche geoprocessi ed esportazione; <kbd>Maiusc</kbd>+clic spunta un intervallo), il colore, il nome (le particelle per foglio e numero, poi il comune), la cifra a destra, l'occhio e il menu <b data-icon="more"></b>, anche col tasto destro: rinomina, zoom, sposta in un gruppo, Proprietà, elimina. Un clic sulla riga fa lampeggiare l'oggetto sulla mappa, un doppio clic ci fa lo zoom. <b>Trascina</b> una riga su un sottogruppo (le particelle) o su un gruppo (gli altri oggetti) per spostarla: se è spuntata, vanno con lei tutte le selezionate; sulla riga Particelle una particella esce dai sottogruppi; dove non può andare non si accende nulla e, al rilascio, ti dico perché. La riga di un sottogruppo, o di un gruppo tuo, trascinata su un'altra ne cambia l'ordine. Annulla rimette tutto. Con qualcosa selezionato (spuntato qui, o scelto sulla mappa con <b>Modifica</b> › Seleziona e Riquadro) compare in cima la <b>barra della selezione</b>: Zoom, Sottogruppo o Gruppo (anche nuovo), Togli (o il tasto <kbd>Canc</kbd>; Annulla rimette tutto) e Deseleziona; il tasto destro su una riga selezionata, o sulla mappa su un oggetto selezionato, offre le stesse azioni per tutta la selezione. Il menu di un gruppo, di un sottogruppo e di Particelle ha lo <b>Zoom</b> su tutti i loro oggetti. Il bordo destro la allarga, <b data-icon="undock"></b> la sgancia in una finestra per il secondo schermo.</li>
       <li><b>Pannello a destra</b> — tre schede. <b>Proprietà</b>: le impostazioni dello strumento aperto e, in Modifica, la scheda dell'oggetto selezionato (categoria, tipo e attributi). <b>Layer</b>: cerca un layer per nome; dal pannello di ogni layer (icona a cursori) trasparenza, popup e <b>filtro per attributo</b> (l'icona diventa un imbuto quando è attivo); i layer aggiunti da te hanno il menu <b>…</b> con Zoom e Rimuovi dalla mappa. Un clic sulla mappa apre il popup anche sui layer a <b>tasselli vettoriali</b> che portano gli attributi (es. i vincoli paesaggistici della Campania nella vista d'insieme): campi e titolo come configurati nell'item, l'elemento non si evidenzia. A ogni cambio di mappa l'app controlla quali layer si caricano: quelli di server senza CORS (o che non rispondono) qui non si vedono, mentre nel Map Viewer sì; la riga <b>«n layer non disponibili qui»</b> apre l'elenco per motivo, con <b>Apri nel Map Viewer</b> e <b>Copia elenco</b>, e vi aggiunge i layer che avevi acceso nella mappa di prima e che quella nuova non ha. Il <b>Catasto AdE</b> è l'immagine ufficiale del WMS dell'Agenzia delle Entrate: fogli da 1:25.000, particelle e fabbricati da 1:5.000, numeri da 1:2.000. <b>Legenda</b>: i layer accesi. Anche questo pannello si allarga dal bordo e si sgancia.</li>
@@ -3148,6 +3200,7 @@ const SF_FROM_SN={
     'misurazioni':['reference','measurement'], 'dpa':['exclusion','dpa']}
 };
 let sfDrawCat='reference';   // categoria scelta nella scheda Disegna: «Nota e riferimento» va bene per ogni geometria
+let sfCatChosen=false;   // 13/11 (A): the category is asked, not assumed; true once the user has picked one in this session
 let sfSite=null;             // sito AREAS: {guid, code, comune, regione, ha, geom (GeoJSON 4326)} da AREAS COLLECTION
 
 require([
@@ -3817,6 +3870,7 @@ function wireTools(){
   const startDraw=t=>{
     if(drawType===t){ if(drwMode&&drwMode.kind==='shape') drwModeEnd(true);
       drawType=null; try{sketchVM.cancel();}catch(e){} sfDrawBtns(); toolMsg('drwMsg','Disegno disattivato.'); return; }
+    if(!sfCatChosen&&typeof window.catAsk==='function'&&window.catAsk(function(){ startDraw(t); })) return;   // 13/11 (A): the category first, then the tool goes on
     const gt=(t==='rectangle'||t==='circle'||t==='freehand')? 'polygon' : t;
     if(!sfAccepts(sfDrawCat, gt)){ toolMsg('drwMsg', sfCat(sfDrawCat).l+' non si disegna come '+SF_GEOM_IT[gt]+': scegli un\'altra categoria.','err'); return; }
     try{ drwModeEnd(); grdPlaceEnd(); sfPickEnd(); }catch(e){}
@@ -3836,7 +3890,7 @@ function wireTools(){
   // categoria, tipo e attributi dei disegni nuovi; sito AREAS (modello Site Features)
   try{ const c=localStorage.getItem('axpo_sf_cat'); if(c&&sfCat(c)) sfDrawCat=c; }catch(e){}
   $('sfCats').onclick=e=>{ const b=e.target.closest('button[data-c]'); if(!b) return;
-    sfDrawCat=b.dataset.c; sfRenderDrawUi(); try{ localStorage.setItem('axpo_sf_cat', sfDrawCat); }catch(x){} };
+    sfDrawCat=b.dataset.c; sfCatChosen=true; sfRenderDrawUi(); try{ localStorage.setItem('axpo_sf_cat', sfDrawCat); }catch(x){} };
   $('sfType').onchange=sfSyncAttrUi;
   $('sfSitePick').onclick=sfPickStart;
   $('sfSiteFind').onclick=sfFindByCode;
@@ -4139,6 +4193,7 @@ function captureWork(noOwn){   // noOwn: senza le particelle con gli intestatari
     groups: (typeof grpGetState==='function')? grpGetState() : [],
     parcelGroups: (typeof pgrpGetState==='function')? pgrpGetState() : [],
     riskMatrix: (typeof rmGetState==='function')? rmGetState(noOwn) : null,   // 5/11 (R1): the Risk Matrix; without the owners' fields in the browser
+    notes: (typeof nbGetState==='function')? nbGetState() : null,   // 13/11 (Annotazioni): the notebook; it travels with the project, the copy to share too (decided by the user)
     customCats: (typeof catGetState==='function')? catGetState() : [] };   // G2-5b: the custom categories (PV Predesign ignores them)   // G2-4b: the parcel subgroups (the parcels carry `sub`)   // G2-4a: the custom groups of the Raccolta (PV Predesign ignores them)   // 22/10 (T3): the drawn extent of the terrain analysis
   let geoms=[]; try{ geoms=serializeToolGeoms(noOwn); }catch(e){}
   return {base:base, toolGeoms:geoms};
@@ -4186,6 +4241,7 @@ function applyWork(st){
     try{ if(typeof pgrpSetState==='function') pgrpSetState(st.parcelGroups); }catch(e){}   // G2-4b: before the parcels are drawn
     try{ if(typeof catSetState==='function') catSetState(st.customCats); }catch(e){}   // G2-5b: before the objects are drawn
     try{ if(typeof rmSetState==='function') rmSetState(st.riskMatrix); }catch(e){}   // 5/11 (R1)
+    try{ if(typeof nbSetState==='function') nbSetState(st.notes); }catch(e){}   // 13/11 (Annotazioni)
     sfSite=(st.site&&st.site.guid)? st.site : null;   // sito AREAS salvato (i progetti vecchi non l'hanno)
     try{ sfShowSite(false); sfRenderSite(); }catch(e){}
     try{ if(typeof slpExtentSet==='function') slpExtentSet(st.terrainExtent? geojsonToEsri(st.terrainExtent) : null, true); }catch(e){}   // 22/10 (T3)
@@ -4239,6 +4295,7 @@ function clearWork(){
   sfSite=null; sfEditOpen=null; try{ sfPickEnd(); sfShowSite(false); sfRenderSite(); }catch(e){}   // anche il sito AREAS
   try{ gpSlots.A=[]; gpSlots.B=[]; }catch(e){}
   try{ if(typeof rmSetState==='function') rmSetState(null); }catch(e){}   // 5/11 (R1): the Risk Matrix goes with the work
+  try{ if(typeof nbSetState==='function') nbSetState(null); }catch(e){}   // 13/11 (Annotazioni): the notes too
   render(); renderGeoms(); refreshDl();
   try{ localStorage.removeItem('cat_state'); }catch(e){}
   try{ drwModeEnd(); grdPlaceEnd(); histReset(); }catch(e){}   // dopo «Svuota» Annulla non riporta disegni senza DWG e immagini
@@ -4374,7 +4431,7 @@ async function projBuild(name, opts){ const share=!!(opts&&opts.share);   // 9 (
     if(typeof rmGetState==='function') st.riskMatrix=rmGetState(true); }   // 5/11 (R1): the Risk Matrix without the fields drafted from the owners' file
   zip.file('progetto.json', JSON.stringify(st));
   const blob=await zip.generateAsync({type:'blob', compression:'DEFLATE', compressionOptions:{level:6}, mimeType:'application/octet-stream'});
-  return {blob:blob, miss:miss, own:own}; }
+  return {blob:blob, miss:miss, own:own, notes:(st.notes&&Array.isArray(st.notes.notes))? st.notes.notes.length : 0}; }   // 13/11: the notes go in the copy to share too, and the message says so
 function projDownload(blob, name){
   const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name;
   document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href), 60000); }
@@ -4424,6 +4481,7 @@ async function projShare(){
     else projDownload(r.blob, name+PROJ_EXT);
     msg('Copia da condividere «'+name+'» salvata'+(handle? '' : ' nei Download')+' ('+projSize(r.blob.size)+'): '
       +(r.own? 'senza i dati degli intestatari di '+r.own+(r.own===1? ' particella' : ' particelle')+' e ' : '')+'senza il tuo nome utente.'
+      +(r.notes? ' Le annotazioni ci sono ('+r.notes+(r.notes===1? ' nota' : ' note')+'): controlla che non contengano dati personali.' : '')
       +(r.miss.length? ' Senza il file di: '+r.miss.join(', ')+'.' : ''), r.miss.length? 'err' : 'ok');
   }catch(e){ console.warn('[progetto]',e); msg('Copia non salvata: '+((e&&e.message)||e),'err'); }
   finally{ projBusy=false; projUi(); } }
@@ -4436,6 +4494,7 @@ function projNormalize(st, warn){ const A=v=>Array.isArray(v)? v : [], O=v=>(v&&
   ['layers','images','dwg','terrain','parcels','addedItems','services','groups','parcelGroups','customCats','toolGeoms'].forEach(k=>{ st[k]=A(st[k]); });
   st.order=O(st.order)||{}; st.webmap=O(st.webmap); st.site=O(st.site); st.viewpoint=O(st.viewpoint); st.terrainExtent=O(st.terrainExtent);
   st.riskMatrix=O(st.riskMatrix);   // 5/11 (R1): null = no Risk Matrix yet
+  st.notes=O(st.notes);   // 13/11 (Annotazioni): null = no notes
   if(typeof st.basemap!=='string') st.basemap=null;
   st.netAuto=(st.netAuto!==false); st.netSetback=(+st.netSetback>0)? +st.netSetback : 0;
   const mine=new Set(st.customCats.map(c=>c&&(c.c||c.id)).filter(Boolean)); let unk=0;
@@ -6325,8 +6384,10 @@ function sfRenderDrawUi(){ const box=$('sfCats'); if(!box) return;
   if(!box.childElementCount) box.innerHTML=catAll().map(c=>`<button type="button" role="radio" data-c="${c.c}" style="--c:${c.col}" title="${esc(c.h)}">${esc(c.l)}</button>`).join('');
   box.querySelectorAll('button').forEach(b=>{ const on=b.dataset.c===sfDrawCat; b.classList.toggle('active',on); b.setAttribute('aria-checked', on?'true':'false'); });
   const c=sfCat(sfDrawCat), ts=$('sfType');
-  const cn=$('sfCatNow'); if(cn){ cn.innerHTML=c? '<i class="cdot" style="--c:'+esc(c.col)+'"></i><b>'+esc(c.l)+'</b>' : '<b>Nessuna categoria</b>'; cn.title=c? c.l+': '+(c.h||'') : ''; }   // R3-1 (I13): the ribbon chooses, the panel shows; 2/11 (J5c): the description is the tooltip
-  const ws=$('drwWhatSum'); if(ws) ws.textContent=c? c.l : '';   // J5c: «Cosa disegni», closed, says the category
+  const ask=!sfCatChosen, st=$('drwStep1'), cb=$('sfCatChange');   // 13/11 (A): until a category is chosen the panel asks for it too, and hides the values of the one not chosen yet
+  if(st) st.classList.toggle('catask', ask); if(cb) cb.textContent=ask? 'Scegli…' : 'Cambia…';
+  const cn=$('sfCatNow'); if(cn){ cn.innerHTML=ask? '<b>Scegli la categoria</b>' : c? '<i class="cdot" style="--c:'+esc(c.col)+'"></i><b>'+esc(c.l)+'</b>' : '<b>Nessuna categoria</b>'; cn.title=(c&&!ask)? c.l+': '+(c.h||'') : ''; }   // R3-1 (I13): the ribbon chooses, the panel shows; 2/11 (J5c): the description is the tooltip
+  const ws=$('drwWhatSum'); if(ws) ws.textContent=ask? 'da scegliere' : c? c.l : '';   // J5c: «Cosa disegni», closed, says the category
   $('sfTypeBox').hidden=!(c&&c.t.length);
   if(c&&ts.dataset.c!==c.c){ ts.innerHTML=c.t.map(t=>`<option value="${t[0]}">${esc(t[1])}</option>`).join(''); ts.dataset.c=c.c; }
   sfSyncAttrUi(); sfDrawBtns(); }
@@ -6334,7 +6395,7 @@ function sfSyncAttrUi(){ const s=sfDrawState(), c=sfCat(s.cat), keys=new Set();
   if(c) c.g.forEach(gt=>sfAttrKeys(s.cat, s.type, gt).forEach(k=>keys.add(k)));
   const box=$('sfAttrs'); if(box) box.querySelectorAll(':scope>[data-a]').forEach(d=>{ d.hidden=!keys.has(d.dataset.a); }); }
 // strumenti attivi solo per le geometrie della categoria; mentre si disegna, il colore della categoria
-function sfDrawBtns(){ const c=sfCat(sfDrawCat);
+function sfDrawBtns(){ const c=sfCatChosen? sfCat(sfDrawCat) : null;   // 13/11 (A): no category chosen yet, every tool is on (it asks)
   [['drwPoint','point','point'],['drwLine','polyline','polyline'],['drwArea','polygon','polygon'],['drwRect','rectangle','polygon'],['drwCircle','circle','polygon'],['drwFree','freehand','polygon']].forEach(p=>{
     const b=$(p[0]); if(!b) return; const ok=!c||c.g.indexOf(p[2])>=0;
     b.disabled=!ok; b.title=ok? '' : c.l+' non si disegna come '+SF_GEOM_IT[p[2]]; b.classList.toggle('active', drawType===p[1]); b.setAttribute('aria-pressed', drawType===p[1]? 'true' : 'false'); });
@@ -6763,7 +6824,7 @@ function catFormRead(){ const name=String($('catFName').value||'').trim(); if(!n
   if(fields.length>CAT_MAX_FIELDS){ msg('Al massimo '+CAT_MAX_FIELDS+' campi.','err'); return null; }
   return {c:catEditCode||undefined, l:name, col:$('catFColor').dataset.hex||'#2FB6E6', g:g, cuts:$('catFCuts').checked, group:$('catFGroup').value, fields:fields}; }
 function catFormSave(){ const d=catFormRead(); if(!d) return; const isNew=!catEditCode; const id=catUpsert(d); if(!id) return;
-  if(isNew){ sfDrawCat=id; try{ localStorage.setItem('axpo_sf_cat', id); }catch(e){} try{ sfRenderDrawUi(); }catch(e){} }
+  if(isNew){ sfDrawCat=id; sfCatChosen=true; try{ localStorage.setItem('axpo_sf_cat', id); }catch(e){} try{ sfRenderDrawUi(); }catch(e){} }
   catListRender(); catFormHide(); msg('Categoria «'+d.l+'» '+(isNew? 'creata: è quella scelta per i disegni nuovi.' : 'aggiornata.'),'ok'); }
 function catFormDelete(){ const c=catCustom(catEditCode); if(!c) return; const n=catUse(c.c);
   if(!confirm('Eliminare la categoria «'+c.l+'»?'+(n==='nessun oggetto'? '' : ' I suoi oggetti ('+n+') diventano «Non classificato», i valori dei campi restano.'))) return;
@@ -8754,18 +8815,24 @@ function selKeyDel(e){ if(e.key!=='Delete'||e.ctrlKey||e.altKey||e.metaKey) retu
   if(Array.prototype.some.call(document.querySelectorAll('[id$="Modal"]'), m=>m.style.display==='flex')) return;
   if(!selTotal()) return; e.preventDefault(); selDelete(); }
 try{ docOn('keydown', selKeyDel); }catch(e){ document.addEventListener('keydown', selKeyDel); }
-// ── «Esclusione da layer» (W7): un elemento di un layer vettoriale acceso diventa un disegno ──────────────────────
+// ── «Copia da layer» (W7; 13/11: it was «Esclusione da layer»): un elemento di un layer vettoriale acceso diventa un disegno ──
+// 13/11 (E2): the copy takes the category chosen in «Cosa disegni», with its type and values, when that category is drawn
+// with that geometry; otherwise (and with no category chosen) the rule of W7
 function exlCatFor(gt){ return gt==='polygon'? 'exclusion' : gt==='polyline'? 'linear' : 'obstacle'; }   // area → esclusione; linea → infrastruttura lineare; punto → ostacolo
+function exlOwnCat(gt){ return !!sfCatChosen&&sfAccepts(sfDrawCat, gt); }
 function exlAdd(got){ const geom=got.geometry; if(!geom) return null; const key=got.key||null;
   const ex=key? toolsGL.graphics.find(g=>g.attributes&&g.attributes._srcKey===key&&g.attributes._kind==='drawing') : null; if(ex) return ex;
   const src={}; let n=0; Object.keys(got.attrs||{}).forEach(k=>{ const v=got.attrs[k]; if(n>=80||/^(shape|__)/i.test(k)) return; if(v==null||['string','number','boolean'].indexOf(typeof v)>=0){ src[k]=v; n++; } });
-  const cat=exlCatFor(geom.type), nome=String((got.name||'Elemento')+' · '+(got.layerTitle||'layer')).slice(0,120);
-  return drwAddGraphic(geom, {nome:nome, sf_cat:cat, sf_type:null, categoria:sfLabel(cat, null), color:sfColor(cat), sf_src:'official', _srcKey:key, src_attrs:src, note:'da layer «'+(got.layerTitle||'')+'»'}); }
-function exlStart(){ if(exlMd){ exlEnd(); toolMsg('drwMsg','Esclusione da layer: finito'+(exlMd0? ', '+exlMd0+' aggiunt'+(exlMd0>1?'e':'a') : '')+'.'); return; }
+  const nome=String((got.name||'Elemento')+' · '+(got.layerTitle||'layer')).slice(0,120), extra={nome:nome, sf_src:'official', _srcKey:key, src_attrs:src, note:'da layer «'+(got.layerTitle||'')+'»'};
+  if(!exlOwnCat(geom.type)){ const cat=exlCatFor(sfGk(geom.type)||geom.type); Object.assign(extra, {sf_cat:cat, sf_type:null, categoria:sfLabel(cat, null), color:sfColor(cat)}); }
+  return drwAddGraphic(geom, extra); }
+function exlStart(){ if(exlMd){ exlEnd(); toolMsg('drwMsg','Copia da layer: finito'+(exlMd0? ', '+exlMd0+' aggiunt'+(exlMd0>1?'i':'o') : '')+'.'); return; }
+  if(!sfCatChosen&&typeof window.catAsk==='function'&&window.catAsk(exlStart)) return;   // 13/11 (A): the category first
   try{ cadModesOff(); gpPickEnd(); }catch(e){} selEnd();
   exlMd={popup:view.popupEnabled, cursor:view.container.style.cursor, sk:sketchClickPause(), h:view.on('click', exlClick), n:0};
   view.popupEnabled=false; view.container.style.cursor='crosshair'; try{ if(window.ribbonSoon) window.ribbonSoon(); }catch(e){}
-  toolMsg('drwMsg','Clicca un elemento di un layer vettoriale acceso: diventa un\'esclusione (una linea un\'infrastruttura lineare, un punto un ostacolo). «Riquadro» ne prende tanti. Esc per finire.'); }
+  const c=sfCatChosen? sfCat(sfDrawCat) : null;
+  toolMsg('drwMsg','Clicca un elemento di un layer vettoriale acceso: la sua forma va nella Raccolta'+(c? ' come «'+c.l+'»' : '')+'. «Copia a riquadro» ne prende tanti. Esc per finire.'); }
 let exlMd0=0;
 function exlEnd(){ if(!exlMd) return; const m=exlMd; exlMd0=m.n||0; exlMd=null; try{ m.h.remove(); }catch(e){} sketchClickResume(m.sk);
   try{ view.popupEnabled=m.popup; view.container.style.cursor=m.cursor||''; }catch(e){} try{ if(window.ribbonSoon) window.ribbonSoon(); }catch(e){} }
@@ -8774,9 +8841,10 @@ async function exlClick(e){ if(!exlMd) return; e.stopPropagation(); try{ if(sket
   try{ got=await gpLayerFeatureAt(e); }catch(err){ console.warn('[esclusione da layer]', err); got={err:'Elemento non leggibile ('+((err&&err.message)||err)+').'}; }
   if(!exlMd) return; if(got&&got.err){ toolMsg('drwMsg', got.err, 'err'); return; }
   if(!got){ const wms=view.map.allLayers.some(l=>l.type==='wms'&&l.visible); toolMsg('drwMsg','Nessun elemento lì.'+(wms? ' I WMS sono solo immagini: serve il feature layer o il WFS dello stesso dato.' : ' Accendi un layer vettoriale e clicca un suo elemento.'),'err'); return; }
-  const g=exlAdd(got); if(!g) return; exlMd.n++; selSet([g], 'only');
-  toolMsg('drwMsg','«'+esc(g.attributes.nome)+'» → '+esc(g.attributes.categoria)+' ('+exlMd.n+'). Clicca un altro elemento, o Esc.','ok'); }
+  const g=exlAdd(got); if(!g) return; exlMd.n++; selSet([g], 'only'); const c=sfCatChosen? sfCat(sfDrawCat) : null, other=!!c&&g.attributes.sf_cat!==c.c;
+  toolMsg('drwMsg','«'+esc(g.attributes.nome)+'» → '+esc(g.attributes.categoria)+(other? ' («'+esc(c.l)+'» non si disegna come '+SF_GEOM_IT[sfGk(g.geometry.type)]+')' : '')+' ('+exlMd.n+'). Clicca un altro elemento, o Esc.','ok'); }
 function exlBoxStart(){ if(exlBoxOn()){ try{ sketchVM.cancel(); }catch(e){} sketchPurpose=null; return; }
+  if(!sfCatChosen&&typeof window.catAsk==='function'&&window.catAsk(exlBoxStart)) return;   // 13/11 (A)
   if(!exlMd) exlStart(); sketchPurpose='excl-box'; try{ sketchVM.cancel(); }catch(e){} sketchVM.create('rectangle');
   toolMsg('drwMsg','Clicca e trascina il riquadro: ogni elemento dei feature layer accesi che tocca diventa un disegno (fino a 200).'); }
 async function exlBoxDone(rect){ sketchPurpose=null; const CAP=200, ASK=20;
@@ -8790,7 +8858,7 @@ async function exlBoxDone(rect){ sketchPurpose=null; const CAP=200, ASK=20;
         got.push({key:base+'#'+oid, geometry:f.geometry, attrs:f.attributes, layerTitle:l.title||'layer', name:gpFeatName(f.attributes, l.displayField, l.fields, oid)}); }); }
     catch(e){ console.warn('[esclusione da layer] riquadro', l.title, e); } }
   if(!got.length){ toolMsg('drwMsg','Nessun elemento dei layer accesi nel riquadro.',''); return; }
-  if(got.length>ASK&&!confirm(got.length+' elementi nel riquadro'+(got.length>=CAP? ' (tetto raggiunto)' : '')+': aggiungerli tutti alla Raccolta come esclusioni?')){ toolMsg('drwMsg','Annullato.'); return; }
+  if(got.length>ASK&&!confirm(got.length+' elementi nel riquadro'+(got.length>=CAP? ' (tetto raggiunto)' : '')+': copiarli tutti nella Raccolta?')){ toolMsg('drwMsg','Annullato.'); return; }
   const H=(typeof drwHist!=='undefined')? drwHist : null; if(H) H.busy=true; const made=[];
   try{ got.forEach(x=>{ const g=exlAdd(x); if(g) made.push(g); }); } finally{ if(H) H.busy=false; }
   refreshDl(); selSet(made, 'only'); if(exlMd) exlMd.n+=made.length;
@@ -11031,7 +11099,7 @@ function baseGroundSet(){
   N('selMerge', function(){ return 'Unisci '+((typeof selAreas==='function')? selAreas()+' aree' : 'aree'); });
   N('selCopy', 'Copia');
   N('selDelete', function(){ const n=(typeof selCount==='function')? selCount() : 0, nP=(typeof selParcels==='function')? selParcels().length : 0; return 'Togli '+selWhat(nP, n); });   // 2/11 (M5): the parcels too
-  N('exlAdd', 'Esclusione da layer');
+  N('exlAdd', 'Copia da layer');
   N('rowRename', 'Rinomina');
   N('sectionDelete', function(id){ return 'Elimina gli oggetti di '+q((typeof grpName==='function')? grpName(id) : id); });
   // geoprocesses and automatic areas
@@ -11156,6 +11224,9 @@ function srchItems(){ const out=[];
     out.push({kind:'object', ok:k, ref:g, name:name, sub:[cat||SRCH_KIND[k], grp].filter(Boolean).join(' · '),
       hay:[name, cat, SRCH_KIND[k], grp, k==='owner'? '' : (a.categoria||'')].join(' '),   /* never the owners’ data (own, src_attrs) */
       colour:graphicColorHex(g)||'', fig:rcFig(g), hidden:g.visible===false}); });
+  try{ (typeof nbNotes!=='undefined'? nbNotes : []).forEach(n=>{ const td=nbTodo(n);   // 13/11 (Annotazioni): the notes of the notebook, by title and text
+    out.push({kind:'object', ok:'note', ref:n, name:nbTitle(n), sub:['Nota', n.lab].filter(Boolean).join(' · '), hay:('nota annotazione '+n.lab+' '+n.b.map(b=>b.x).join(' ')).slice(0, 4000),
+      colour:'#7B8A99', fig:td? td+' da fare' : '', hidden:false}); }); }catch(e){}
   const S=window.SHELL||{};
   Object.keys(cmdList()).forEach(id=>{ const c=cmdList()[id]; if(c.kind==='value') return; if(typeof profHides==='function'&&profHides(c.group, c.tool)) return;
     let t=null; ((S[c.tab]||{}).groups||[]).forEach(g=>{ if(g.label===c.group) g.tools.forEach(x=>{ if(x.id===c.tool) t=x; }); });
@@ -11209,7 +11280,8 @@ function srchActiveSync(){ const inp=byId('objSearchIn'), L=byId('objSearchRes')
 function srchPick(i){ const it=srchShown[i]; if(!it) return; srchClose(); if(it.kind==='command') srchRunCmd(it.ref); else srchGoTo(it); }
 
 // X6: an object as its row (the tick, the zoom, the row shown); a parcel: the zoom and its row; a command as its button
-function srchGoTo(it){ try{ if(window.openPanel) window.openPanel('elenco'); }catch(e){}
+function srchGoTo(it){ if(it.ok==='note'){ nbShow(it.ref.id); return; }   // 13/11 (Annotazioni): a note opens in its tab
+  try{ if(window.openPanel) window.openPanel('elenco'); }catch(e){}
   if(it.ok==='parcel') zoomParcelList([it.ref]);
   else { selSet([it.ref], 'only'); zoomGraphics([it.ref]); }
   setTimeout(()=>srchShowRow(it.ref), 60); }
@@ -11297,7 +11369,14 @@ function srchShowRow(obj, soft){ const root=byId('drawerElenco'); if(!root) retu
      shown as a small tool with its value (G3 A: the field stays in the panel, the tool focuses it); the site; slot A */
   var SF_ICON={gross:'area-gross', net:'area-net', connection:'cable', exclusion:'exclude', linear:'polyline', obstacle:'box', access:'gate', mitigation:'fence', agri:'terrain', reference:'pin', unclassified:'help'};
   function catCur(){ try{ return sfCat(sfDrawCat); }catch(e){ return null; } }
-  function catHas(k){ var c=catCur(); if(!c) return false; var s=$g('sfType'), box=$g('sfTypeBox'), ty=(s&&box&&!box.hidden&&s.value)||null;   // R3-1 (Q2): the numbers the category has
+  /* 13/11 (A): the category is asked, not assumed. Until one is chosen in this session the card says «Scegli la categoria»,
+     its values are not shown, and a tool that makes an object opens the gallery first and goes on after the choice */
+  var catThen=null, catThenOld=null;
+  function catNeed(){ try{ return !sfCatChosen; }catch(e){ return false; } }
+  window.catAsk=function(fn){ if(!catNeed()) return false; var d=tabTool('disegno', 'cat'), b=document.querySelector('#ribbon [data-tool="cat"], #sheetTools [data-tool="cat"]')||$g('sfCatChange'); if(!d||!b) return false;
+    setTimeout(function(){ if(menuBtn===b) closeMenu(); openMenu(b, d); catThen=fn||null; }, 0);   // after the click that asked: still on its way up, it would close the menu as a click elsewhere
+    try{ toolMsg('drwMsg','Scegli prima la categoria: che cosa stai per disegnare?'); }catch(e){} return true; };
+  function catHas(k){ var c=catCur(); if(!c||catNeed()) return false; var s=$g('sfType'), box=$g('sfTypeBox'), ty=(s&&box&&!box.hidden&&s.value)||null;   // R3-1 (Q2): the numbers the category has
     try{ return c.g.some(function(gt){ return sfAttrKeys(c.c, ty, gt).indexOf(k)>=0; }); }catch(e){ return false; } }
   function selText(id){ var s=$g(id); return (s&&s.selectedOptions&&s.selectedOptions[0])? s.selectedOptions[0].text : ''; }
   function numVal(id, unit){ var f=$g(id); return (f&&f.value!=='')? f.value+' '+unit : '—'; }
@@ -11306,19 +11385,20 @@ function srchShowRow(obj, soft){ const root=byId('drawerElenco'); if(!root) retu
   function siteLabel(){ var s=siteCur(); return s? 'Sito '+(s.code||'senza codice') : 'Collega a sito AREAS'; }   // G2-1 (22/10): the group's name until a site is linked
   function siteOpen(){ var b=$g('sfRowBody'), t=$g('sfRowToggle'); if(b&&b.hidden&&t) t.click(); try{ $g('sfWrap').scrollIntoView({block:'start', behavior:'smooth'}); }catch(e){} }
   function loginOff(){ return (typeof signedIn!=='undefined'&&signedIn)? null : 'Serve l\'accesso ad AGOL'; }
+  function nbNone(){ try{ return nbNotes.length? null : 'Nessuna nota ancora'; }catch(e){ return 'Nessuna nota ancora'; } }   // 13/11 (Annotazioni)
   function slotACount(){ try{ return gpSlots.A.length; }catch(e){ return 0; } }
   function aLabel(){ var n=slotACount(); return 'A · '+n+' oggett'+(n===1? 'o' : 'i'); }
   function elencoField(id){ openPanel('elenco'); setTimeout(function(){ try{ var f=$g(id); f.scrollIntoView({block:'nearest'}); f.focus(); }catch(e){} }, 60); }
   function scrollTo(id){ try{ $g(id).scrollIntoView({block:'start', behavior:'smooth'}); }catch(e){} }
   /* 22/10: menus in the ribbon (a tool with menu() lists its options, pick(v) applies one), inline numbers (num: the field they
      mirror), «Esegui» and the context analysis armed from the ribbon */
-  function catMenu(){ var all=catAll(), out=[], it=function(c){ return {v:c.c, t:c.l, col:c.col, on:c.c===sfDrawCat, h:c.h||''}; };   // R3-1 (Q2): a gallery by Raccolta group, with the descriptions
+  function catMenu(){ var all=catAll(), out=[], it=function(c){ return {v:c.c, t:c.l, col:c.col, on:!catNeed()&&c.c===sfDrawCat, h:c.h||''}; };   // R3-1 (Q2): a gallery by Raccolta group, with the descriptions
     [['project','Aree di progetto'],['exclusion','Esclusioni'],['other','Altro']].forEach(function(p){ var L=all.filter(function(c){ return !c.custom&&(((typeof GRP_BY_CAT!=='undefined')&&GRP_BY_CAT[c.c])||'other')===p[0]; });
       if(L.length){ out.push({sec:p[1]}); L.forEach(function(c){ out.push(it(c)); }); } });
     out.push({sec:'Le mie categorie'}); all.filter(function(c){ return c.custom; }).forEach(function(c){ out.push(it(c)); });   // G2-5b: the custom categories and their editor
     return out.concat([{v:'__new', t:'Nuova categoria…', h:'Nome, colore, geometrie e campi tuoi'}, {v:'__manage', t:'Le mie categorie…', h:'Modifica o elimina le categorie personali'}]); }
-  function catPick(v){ if(v==='__new'){ catModalOpen(null); return; } if(v==='__manage'){ catModalOpen(); return; }
-    var b=qAny('#sfCats [data-c="'+v+'"]'); if(b) b.click(); }
+  function catPick(v){ var th=catThenOld; catThenOld=null; if(v==='__new'){ catModalOpen(null); return; } if(v==='__manage'){ catModalOpen(); return; }
+    var b=qAny('#sfCats [data-c="'+v+'"]'); if(b) b.click(); if(th&&!catNeed()) setTimeout(th, 0); }   // 13/11 (A): the tool that asked goes on
   function selMenu(id, skipEmpty){ var s=$g(id); return Array.prototype.filter.call(s? s.options : [], function(o){ return !(skipEmpty&&!o.value); }).map(function(o){ return {v:o.value, t:o.text, on:o.selected}; }); }
   function selSet(id, v){ var s=$g(id); if(!s) return; s.value=v; s.dispatchEvent(new Event('change', {bubbles:true})); }
   /* 22/10: the terrain ribbon (as the Terrain tab of PV Predesign) while the module «Pendenze da DTM» is open */
@@ -11422,29 +11502,31 @@ function srchShowRow(obj, soft){ const root=byId('drawerElenco'); if(!root) retu
         {id:'slp-ct', t:'Curve di livello', i:'contour', size:'small', mod:'slope', toggle:'#slpContours', stack:'ct', off:slpNoGrid, s:'Le curve di livello della griglia; ogni quinta è più spessa'},
         {id:'slp-ctstep', t:'Passo', size:'small', sel:'#slpContourStep', w:76, stack:'ct', off:slpNoGrid, s:'Il passo delle curve, in metri'},
         {id:'elev', t:'Profilo altimetrico', i:'profile', size:'large', after:true, mod:'elev', s:'La quota del terreno lungo una linea che disegni'}]},   // K5: it was the group «Profilo»
-      {label:'Contesto', more:'ctx', tools:[{id:'ctx', t:'Analisi di contesto', i:'context', size:'large', mod:'ctx', press:'#subToggle', off:loginOff}, {id:'rte', t:'Percorso su strada', i:'route', size:'small', mod:'rte', off:loginOff}]},
+      {label:'Contesto', more:'ctx', tools:[{id:'ctx', t:'Analisi di contesto', i:'context', size:'large', mod:'ctx', press:'#subToggle', off:loginOff}, {id:'rte', t:'Percorso su strada', i:'route', size:'large', mod:'rte', off:loginOff}]},   // 12/11: large as the other two (the small one went unseen)
       {label:'Coordinate', more:'sr', tools:[{id:'sr', t:'Coordinate sconosciute', i:'coord-unknown', size:'large', mod:'sr'}]}]},   // R3-2 (Q4): the measures are on the map, under the lens
     disegno:{name:'Disegna', mods:[
       {id:'draw', t:'Disegna', s:'Proprietà dei nuovi disegni e sito AREAS', i:'draw', roots:['#sfWrap','#drwStep1','#drwStep2','#drwLast'], info:'drwAll'}],   // 2/11 (K2): the selection card is in Modifica   // 2/11 (J5a): every module has its «i» by the title   // R3-1 (Q3): the drawing aids are a popover of the ribbon
      groups:[
-      {label:'Cosa disegni', more:'drwDraw', cls:'drwcat', tools:[   // R3-1 (Q2): the category as a card with its description; beside it only what the category has
-        {id:'cat', i:'pin', size:'large', card:true, mod:'draw', label:function(){ var c=catCur(); return c? c.l : 'Categoria'; }, desc:function(){ var c=catCur(); return c? (c.h||'') : 'Scegli il ruolo dei nuovi disegni'; },
-          tip:function(){ var c=catCur(); return c? c.l+' — '+(c.h||'')+' · clic per cambiare categoria' : 'Scegli la categoria dei nuovi disegni'; },
-          icon:function(){ var c=catCur(); return (c&&(c.custom? 'pen' : SF_ICON[c.c]))||'pin'; }, color:function(){ var c=catCur(); return c? c.col : ''; }, menu:catMenu, pick:catPick},
-        {id:'sf-type', i:'list', size:'small', stack:'p', mod:'draw', label:function(){ return (window.innerWidth<1280? '' : 'Tipo · ')+(selText('sfType')||'—'); }, menu:function(){ return selMenu('sfType'); }, pick:function(v){ selSet('sfType', v); }, show:function(){ var c=catCur(); return !!(c&&c.t&&c.t.length); }},
+      {label:'Cosa disegni', n:1, more:'drwDraw', cls:'drwcat', tools:[   // R3-1 (Q2): the category as a card with its description; beside it only what the category has
+        {id:'cat', i:'pin', size:'large', card:true, mod:'draw', cap:'Categoria', ask:catNeed,   // 13/11 (A): asked until chosen; then a field with its name («Categoria») and its arrow
+          label:function(){ var c=catCur(); return catNeed()? 'Scegli la categoria' : c? c.l : 'Categoria'; }, desc:function(){ return catNeed()? 'Che cosa stai per disegnare?' : ''; },
+          tip:function(){ var c=catCur(); return (c&&!catNeed())? c.l+' — '+(c.h||'')+' · clic per cambiare categoria' : 'Scegli la categoria dei nuovi disegni: area di progetto, esclusione, connessione, nota…'; },
+          icon:function(){ var c=catCur(); return catNeed()? 'help' : (c&&(c.custom? 'pen' : SF_ICON[c.c]))||'pin'; }, color:function(){ var c=catCur(); return (c&&!catNeed())? c.col : ''; }, menu:catMenu, pick:catPick},
+        {id:'sf-type', i:'list', size:'small', stack:'p', mod:'draw', label:function(){ return (window.innerWidth<1280? '' : 'Tipo · ')+(selText('sfType')||'—'); }, menu:function(){ return selMenu('sfType'); }, pick:function(v){ selSet('sfType', v); }, show:function(){ var c=catCur(); return !!(c&&!catNeed()&&c.t&&c.t.length); }},
         {id:'sf-buffer', t:'Buffer', i:'buffer', size:'small', stack:'p', mod:'draw', num:'#sfBuffer', unit:'m', min:0, step:'any', show:function(){ return catHas('buffer'); }, s:'La fascia da escludere intorno all\'oggetto, in metri'},
         {id:'sf-width', t:'Larghezza', i:'dimension', size:'small', stack:'p', mod:'draw', num:'#sfWidth', unit:'m', min:0, step:'any', show:function(){ return catHas('width'); }, s:'La larghezza di una siepe o di una fascia disegnata come linea, in metri'},
         {id:'sf-height', t:'Altezza', i:'height', size:'small', stack:'p', mod:'draw', num:'#sfHeight', unit:'m', min:0, step:'any', show:function(){ return catHas('height'); }, s:'L\'altezza dell\'ostacolo, per l\'ombra, in metri'},
         {id:'sf-voltage', t:'Tensione', i:'bolt', size:'small', stack:'p', mod:'draw', num:'#sfVoltage', unit:'kV', min:0, step:'any', show:function(){ return catHas('voltage'); }, s:'La tensione dell\'elettrodotto, in kV'},
-        {id:'sf-src', i:'clipboard', size:'small', stack:'s', mod:'draw', label:function(){ var s=$g('sfSrc'), v=s? s.value : ''; return 'Fonte · '+({desk:'a tavolino', survey:'sopralluogo', official:'ufficiale'}[v]||selText('sfSrc')||'—'); }, menu:function(){ return selMenu('sfSrc'); }, pick:function(v){ selSet('sfSrc', v); }},
-        {id:'excl-layer', i:'layers', size:'small', stack:'s', mod:'draw', label:function(){ return 'Esclusione da layer'; }, fn:function(){ exlStart(); }, on:function(){ return typeof exlOn==='function'&&exlOn(); }, s:'Clicca un elemento di un layer vettoriale acceso: diventa un disegno di esclusione (una linea un\'infrastruttura lineare, un punto un ostacolo); con «Riquadro» ne prendi tanti'}]},   // G2-3 (W7)
-      {label:'Con quale strumento', more:'drwDraw', tools:[   // 23/10: six medium tools in two rows and three columns (the user's request after G2-4a)
+        {id:'sf-src', i:'clipboard', size:'small', stack:'s', mod:'draw', label:function(){ var s=$g('sfSrc'), v=s? s.value : ''; return 'Fonte · '+({desk:'a tavolino', survey:'sopralluogo', official:'ufficiale'}[v]||selText('sfSrc')||'—'); }, menu:function(){ return selMenu('sfSrc'); }, pick:function(v){ selSet('sfSrc', v); }}]},   // 13/11 (E1): «Esclusione da layer» is «Copia da layer», among the tools
+      {label:'Con quale strumento', n:2, more:'drwDraw', tools:[   // 23/10: six medium tools in two rows and three columns (the user's request after G2-4a)
         {id:'d-point', t:'Punto', i:'point', size:'medium', stack:'c1', mod:'draw', press:'#drwPoint'},
         {id:'d-line', t:'Linea', i:'polyline', size:'medium', stack:'c2', mod:'draw', press:'#drwLine'},
         {id:'d-area', t:'Area', i:'polygon', size:'medium', stack:'c3', mod:'draw', press:'#drwArea'},
         {id:'d-rect', t:'Rettangolo', i:'rectangle', size:'medium', stack:'c1', mod:'draw', press:'#drwRect'},
         {id:'d-circle', t:'Cerchio', i:'circle', size:'medium', stack:'c2', mod:'draw', press:'#drwCircle'},
-        {id:'d-free', t:'A mano libera', i:'freehand', size:'medium', stack:'c3', mod:'draw', press:'#drwFree'}]},
+        {id:'d-free', t:'A mano libera', i:'freehand', size:'medium', stack:'c3', mod:'draw', press:'#drwFree'},
+        {id:'excl-layer', t:'Copia da layer', i:'layers', size:'medium', stack:'c4', mod:'draw', fn:function(){ exlStart(); }, on:function(){ return typeof exlOn==='function'&&exlOn()&&!exlBoxOn(); }, s:'Invece di disegnare, copia: clicca un elemento di un layer vettoriale acceso e la sua forma va nella Raccolta, con la categoria scelta in «Cosa disegni»'},   // 13/11 (E1, E2); G2-3 (W7)
+        {id:'excl-box', t:'Copia a riquadro', i:'sel-rect', size:'medium', stack:'c4', mod:'draw', fn:function(){ exlBoxStart(); }, on:function(){ return typeof exlBoxOn==='function'&&exlBoxOn(); }, s:'Un rettangolo copia nella Raccolta tutti gli elementi dei feature layer accesi che tocca (fino a 200)'}]},
       {label:'Supporto al disegno', more:'drwAid', tools:[   // R3-1 (Q3): one tool, the settings in a popover as «Modello del terreno»
         {id:'aid', i:'snap', size:'large', wide:true, pop:aidForm, label:aidLabel, s:'Aggancio, misure e angoli, misure esatte e griglia: clic per le impostazioni'}]},
       {label:'Aree automatiche', tools:[{id:'net-auto', i:'area-net', size:'large', wide:true, pop:netForm, label:netLabel, on:function(){ var c=$g('netAuto'); return !!(c&&c.checked); }, s:'Area netta automatica e rientro dal confine: clic per le impostazioni'}]},   // R3-1: one tool with a popover, to give «Cosa disegni» its room
@@ -11461,7 +11543,7 @@ function srchShowRow(obj, soft){ const root=byId('drawerElenco'); if(!root) retu
      groups:[
       {label:'Selezione', more:'drwSel', tools:[
         {id:'sel', t:'Seleziona', i:'cursor', size:'large', mod:'msel', fn:function(){ selStart(); }, on:function(){ return typeof selOn==='function'&&selOn(); }, s:'Clicca una particella o un oggetto della Raccolta per selezionarlo; Maiusc+clic aggiunge o toglie; di nuovo nello stesso punto prende quello sotto; clic nel vuoto svuota'},
-        {id:'sel-box', t:'Riquadro', i:'sel-rect', size:'large', mod:'msel', fn:function(){ if(typeof exlOn==='function'&&exlOn()) exlBoxStart(); else selBoxStart(); }, on:function(){ return typeof selBoxOn==='function'&&(selBoxOn()||exlBoxOn()); }, s:'Un rettangolo seleziona ogni particella e oggetto che tocca (Maiusc aggiunge); con «Esclusione da layer» acceso prende gli elementi dei feature layer'},
+        {id:'sel-box', t:'Riquadro', i:'sel-rect', size:'large', mod:'msel', fn:function(){ if(typeof exlOn==='function'&&exlOn()) exlBoxStart(); else selBoxStart(); }, on:function(){ return typeof selBoxOn==='function'&&(selBoxOn()||exlBoxOn()); }, s:'Un rettangolo seleziona ogni particella e oggetto che tocca (Maiusc aggiunge); con «Copia da layer» acceso copia gli elementi dei feature layer'},
         {id:'sel-none', t:'Deseleziona', i:'close', size:'large', mod:'msel', fn:function(){ selClear(); }, off:selNone, s:'Svuota la selezione: le spunte della Raccolta si tolgono'}]},
       {label:'Modifica', more:'drwSel', tools:[
         {id:'sel-reshape', t:'Rimodella', i:'reshape', size:'small', stack:'ed1', mod:'msel', fn:function(){ selReshape(); }, off:function(){ return selCount()===1? null : 'Seleziona un oggetto solo'; }, s:'Sposta i vertici dell\'oggetto selezionato (un punto si sposta)'},
@@ -11500,6 +11582,19 @@ function srchShowRow(obj, soft){ const root=byId('drawerElenco'); if(!root) retu
       {label:'Servizi web', more:'svc', tools:[{id:'svc', t:'WMS · WFS · REST', i:'service', size:'large', mod:'svc'}]},
       {label:'Portale', tools:[{id:'portal', t:'Layer dal portale', i:'database', size:'large', fn:function(){ openPanel('layers'); setTimeout(function(){ try{ $g('itemQ').focus(); }catch(e){} }, 60); },
         off:function(){ var q=$g('itemQ'); return (q&&q.disabled)? 'Serve l\'accesso ad AGOL' : null; }}]}]},
+    // 13/11 (Annotazioni, phase 1; docs/plan-annotazioni.md): the project's notebook; the panel is drawn by 39-notes.js
+    note:{name:'Annotazioni', mods:[
+      {id:'notes', t:'Taccuino', s:'Gli appunti del progetto: stanno nel file .axpo', i:'clipboard', roots:['#modNotes'], info:'notes'}],
+     groups:[
+      {label:'Taccuino', more:'notes', tools:[{id:'nb-new', t:'Nuova nota', i:'plus', size:'large', primary:true, mod:'notes', fn:function(){ nbNew(); }, s:'Apre una nota nuova a destra: titolo, etichetta e blocchi'},
+        {id:'nb-all', t:'Tutte le note', i:'list', size:'large', mod:'notes', fn:function(){ nbBack(); }, s:'L’elenco delle note del progetto, con la ricerca'}]},
+      {label:'Inserisci', more:'notes', tools:[
+        {id:'nb-text', t:'Testo', i:'pen', size:'medium', stack:'n1', mod:'notes', fn:function(){ nbAdd('p'); }, s:'Un blocco di testo nella nota aperta (o in una nota nuova)'},
+        {id:'nb-todo', t:'Da fare', i:'check', size:'medium', stack:'n1', mod:'notes', fn:function(){ nbAdd('todo'); }, s:'Una riga da spuntare; Invio ne apre un’altra'},
+        {id:'nb-ref', t:'Layer o oggetto', i:'layers', size:'medium', stack:'n2', mod:'notes', fn:function(){ nbRefTool(); }, s:'Richiama per nome un layer della mappa, un oggetto della Raccolta o una particella: come @ scritto nel testo'},
+        {id:'nb-link', t:'Collegamento', i:'link', size:'medium', stack:'n2', mod:'notes', fn:function(){ nbAdd('link'); }, s:'Il titolo e l’indirizzo di un documento (SharePoint, un sito): i file non si allegano'}]},
+      {label:'Esporta le note', more:'notes', tools:[{id:'nb-pdf', t:'PDF delle note', i:'print', size:'large', mod:'notes', fn:function(){ nbPdf(); }, off:nbNone, s:'Un PDF con la nota aperta, o con tutte se sei nell’elenco'},
+        {id:'nb-copy', t:'Copia come testo', i:'copy', size:'small', mod:'notes', fn:function(){ nbCopy(); }, off:nbNone, s:'Negli appunti la nota aperta, o tutte dall’elenco: da incollare in una mail o in Teams'}]}]},
     export:{name:'Salva ed esporta', mods:[
       {id:'proj', t:'Progetto', s:'Nome, salvataggio e apertura del file .axpo', i:'save', roots:['#modProj'], info:'proj'},   // R3-1 (I4): the default module of the tab
       {id:'edit', t:'Modifica AREAS COLLECTION', s:"L'editor del portale (serve l'accesso)", i:'pen', roots:['#modEdit']},
@@ -11526,10 +11621,10 @@ function srchShowRow(obj, soft){ const root=byId('drawerElenco'); if(!root) retu
     'Catasto':"Cerca particelle apre a destra, in Proprietà, i tre modi di prenderle dal catasto: per regione, comune, foglio e numeri; dalla mappa (Puntuale, Rettangolo, Poligono o Linea); da un disegno, un buffer o un file. Le particelle trovate vanno nella Raccolta, gruppo Particelle.",
     'Raccolta':"Dalle particelle della Raccolta: Crea area lorda la mette nel gruppo Aree di progetto (dalle selezionate, o da tutte); Etichette sulla mappa accende i numeri; Zoom sulle particelle le inquadra. Per sceglierle sulla mappa: Modifica › Seleziona o Riquadro, oppure il tasto destro su una particella.",
     'Collega a sito AREAS':"Il sito di AREAS COLLECTION a cui vanno i disegni sul portale; è facoltativo, perché salvando ogni oggetto prende da solo l'area che tocca. Sito dalla mappa lo sceglie con un clic, Carica elementi porta nella Raccolta quelli già salvati, Togli il sito lo toglie. Serve l'accesso.",
-    'Cosa disegni':"La categoria dei nuovi disegni: la scheda colorata ne dice nome e descrizione, un clic apre l'elenco, diviso come la Raccolta, con «Non classificato» e le categorie tue. Accanto solo i valori di quella categoria (tipo; buffer, larghezza, altezza o tensione) e la Fonte. Esclusione da layer fa di un elemento di un layer acceso un'esclusione.",
+    'Cosa disegni':"Prima la categoria dei nuovi disegni: finché non la scegli la scheda dice Scegli la categoria e, se parti da uno strumento, l'elenco si apre da solo. L'elenco è diviso come la Raccolta, con «Non classificato» e le categorie tue. Dopo la scelta, accanto ci sono solo i valori di quella categoria (tipo; buffer, larghezza, altezza o tensione) e la Fonte.",
     'Selezione':"Seleziona (clic sulla mappa; Maiusc aggiunge o toglie; un secondo clic nello stesso punto prende quello sotto) o Riquadro sceglie le particelle e gli oggetti; Deseleziona svuota la selezione. Gli stessi tre stanno anche sulla mappa, sotto le Misure, in ogni scheda. La selezione è la spunta della Raccolta: in cima alla Raccolta la sua barra, a destra in Proprietà quanti sono e la scheda dell'oggetto selezionato.",
     'Modifica':"Sulla selezione: Rimodella (i vertici di un oggetto), Sposta e ruota, Dividi (una linea taglia le aree), Unisci (le aree selezionate diventano una), Copia (dove clicchi, anche parallela a distanza fissa) ed Elimina (anche col tasto Canc). Le particelle non si modificano. Annulla e Ripeti, in alto, valgono per ogni modifica.",
-    'Con quale strumento':"Punto, Linea, Area, Rettangolo, Cerchio o A mano libera: scegli e disegna sulla mappa (linee e aree finiscono con un doppio clic). Il disegno prende la categoria di Cosa disegni e va nella Raccolta; Esc smette.",
+    'Con quale strumento':"Punto, Linea, Area, Rettangolo, Cerchio o A mano libera: scegli e disegna sulla mappa (linee e aree finiscono con un doppio clic). Copia da layer e Copia a riquadro non disegnano: copiano nella Raccolta la forma di un elemento di un layer acceso, uno per clic o tutti quelli nel rettangolo. Il disegno e la copia prendono la categoria di Cosa disegni e vanno nella Raccolta; Esc smette.",
     'Supporto al disegno':"Un pulsante apre le impostazioni: aggancio ai vertici e ai bordi, misure e angoli mentre disegni, misure esatte di rettangolo e cerchio (anche parallele a un lato), griglia (passo, allinea a un lato, raddrizza). Il nome del pulsante dice cosa è acceso.",
     'Aree automatiche':"Un pulsante apre le impostazioni dell'area netta: automatica (l'area lorda meno esclusioni, fasce, ostacoli, siepi e zone agricole, ricalcolata da sola) oppure congelata, e il rientro dal confine in metri. Il nome del pulsante dice com'è; l'area netta va nel gruppo Aree di progetto.",
     'Oggetti di partenza':"Gli oggetti su cui lavora il geoprocesso vanno in A: A dalla mappa (clic sugli oggetti, anche dei layer della mappa), Spuntati (le righe spuntate nella Raccolta) o Per categoria. B si riempie a destra e serve solo a Parte comune e Sottrai B da A.",
@@ -11544,6 +11639,9 @@ function srchShowRow(obj, soft){ const root=byId('drawerElenco'); if(!root) retu
     'Immagini':"Immagine sulla mappa: il GeoTIFF e le immagini con world file si posizionano da soli; PNG, JPG e PDF con Posiziona (sposta, scala, ruota o punti noti). Vanno nella Raccolta, blocco Immagini.",
     'Servizi web':"WMS · WFS · REST: incolli l'indirizzo di un servizio, scegli i suoi layer e li aggiungi alla mappa (scheda Layer, a destra). Si leggono solo servizi https che permettono la lettura da altri siti.",
     'Portale':"Layer dal portale: apre la scheda Layer a destra, con la ricerca per titolo dei layer del portale. Serve l'accesso.",
+    'Taccuino':"Nuova nota apre a destra una nota vuota: un titolo, un’etichetta se serve, e i blocchi. Tutte le note torna all’elenco, con la ricerca. Le note stanno nel progetto: si salvano da sole in questo browser e viaggiano nel file .axpo, anche nella copia da condividere.",
+    'Inserisci':"Nella nota aperta, o in una nuova: Testo è un blocco in cui scrivere; Da fare una riga da spuntare (Invio ne apre un’altra); Layer o oggetto richiama per nome un layer della mappa, un oggetto della Raccolta o una particella, come @ scritto nel testo, e lascia sotto un riferimento da cliccare; Collegamento è il titolo e l’indirizzo di un documento. I file non si allegano.",
+    'Esporta le note':"PDF delle note salva in un PDF la nota aperta, o tutte se sei nell’elenco. Copia come testo le mette negli appunti, da incollare in una mail o in Teams.",
     'Esporta':"Esporta scarica la Raccolta: GeoJSON · KML · KMZ, Shapefile (.zip) o Tabella XLSX delle particelle. Esporta gli oggetti spuntati, o tutto se non ne spunti; il KML ha una cartella per gruppo, lo shapefile un file per gruppo.",
     'Portale AGOL':"Scritture sul portale, ognuna confermata in una finestra: Migra particelle in AREAS (le particelle spuntate, o tutte, diventano aree di AREAS COLLECTION: una per particella, un'unica area o un'area per sottogruppo), Salva disegni in Site Features (la seconda volta aggiorna, non duplica) e Modifica AREAS COLLECTION con l'editor del portale. Serve l'accesso.",
     'Progetto':"Il progetto .axpo con tutto il lavoro: Salva progetto (Ctrl+S), Salva come… e Apri progetto… (Ctrl+O); a destra, in Proprietà, anche la copia da condividere senza dati personali. Il lavoro resta anche nel browser; lo stesso file si apre in PV Predesign.",
@@ -11553,12 +11651,12 @@ function srchShowRow(obj, soft){ const root=byId('drawerElenco'); if(!root) retu
   function tabMod(tab, id){ var t=SHELL[tab]; return t? ((t.mods||[]).filter(function(m){ return m.id===id; })[0]||null) : null; }
   function tabTool(tab, id){ var t=SHELL[tab], out=null; (t&&t.groups||[]).forEach(function(g){ g.tools.forEach(function(x){ if(x.id===id) out=x; }); }); return out; }
   function toolHtml(attr, m, on, cls){ return '<button class="tool large'+(cls||'')+'" type="button" data-'+attr+'="'+m.id+'" aria-pressed="'+(on? 'true' : 'false')+'" title="'+escH(m.s||m.t)+'">'+icon(m.i)+'<span>'+escH(m.t)+'</span></button>'; }
-  function groupHtml(label, tools, more, cls){ return '<div class="rgroup'+(cls? ' '+cls : '')+'" role="group" aria-label="'+escH(label)+'"><div class="rgroup-tools">'+tools+'</div><div class="rgroup-foot"><span class="rgroup-label">'+escH(label)+'</span>'
+  function groupHtml(label, tools, more, cls, n){ return '<div class="rgroup'+(cls? ' '+cls : '')+'" role="group" aria-label="'+escH(label)+'"><div class="rgroup-tools">'+tools+'</div><div class="rgroup-foot">'+(n? '<span class="rstep" aria-hidden="true">'+n+'</span>' : '')+'<span class="rgroup-label">'+escH(label)+'</span>'
     +(RIBBON_INFO[label]? '<button class="rinfo" type="button" data-info="'+escH(label)+'"'+(more? ' data-more="'+more+'"' : '')+' aria-expanded="false" aria-label="Cosa si fa qui: '+escH(label)+'" title="Cosa si fa qui">'+icon('info')+'</button>' : '')+'</div></div>'; }
   function toolBtn(t){ var lab=t.label? t.label() : t.t, ck=(typeof cmdKeyText==='function')? cmdKeyText(t.id) : '', tip=(t.s||lab)+(ck? ' ('+ck+')' : ''), cls='tool '+(t.size||'large')+(t.primary? ' primary' : '')+(t.wide? ' wide' : '')+((t.label||t.num||t.sel)? ' val' : ''), ic=t.i? icon(t.i) : '';   // val: the name carries a value, it stays readable when the ribbon is tight
     if(t.num) return '<div class="'+cls+' rnum" data-tool="'+t.id+'" title="'+escH(tip)+'">'+ic+'<span>'+escH(lab)+'</span><input type="number" class="rsel sm" aria-label="'+escH(lab)+'"'+(t.min!=null? ' min="'+t.min+'"' : '')+(t.max!=null? ' max="'+t.max+'"' : '')+(t.step? ' step="'+t.step+'"' : '')+'><em>'+escH(t.unit||'')+'</em></div>';
     if(t.sel) return '<div class="'+cls+' rsel-tool'+(t.stacked? ' stacked' : '')+'" data-tool="'+t.id+'" title="'+escH(tip)+'">'+ic+'<span class="rcap">'+escH(lab)+'</span><select class="rsel" aria-label="'+escH(lab)+'"'+(t.w? ' style="width:'+t.w+'px"' : '')+'></select></div>';   // 22/10: a select mirroring a field
-    if(t.card) return '<button class="'+cls+' card" type="button" data-tool="'+t.id+'" aria-pressed="false" aria-haspopup="menu" aria-expanded="false" title="'+escH(tip)+'">'+ic+'<span class="card-t"><span class="rlab">'+escH(lab)+'</span><small class="rdesc">'+escH(t.desc? t.desc() : '')+'</small></span>'+icon('chevron-down', 'card-chev')+'</button>';   // R3-1 (Q2): the category as a card
+    if(t.card) return '<button class="'+cls+' card" type="button" data-tool="'+t.id+'" aria-pressed="false" aria-haspopup="menu" aria-expanded="false" title="'+escH(tip)+'">'+ic+'<span class="card-t">'+(t.cap? '<small class="rcapt">'+escH(t.cap)+'</small>' : '')+'<span class="rlab">'+escH(lab)+'</span><small class="rdesc">'+escH(t.desc? t.desc() : '')+'</small></span><span class="card-go">'+icon('chevron-down', 'card-chev')+'</span></button>';   // R3-1 (Q2): the category as a card
     return '<button class="'+cls+'" type="button" data-tool="'+t.id+'" aria-pressed="false"'+(t.menu? ' aria-haspopup="menu" aria-expanded="false"' : t.pop? ' aria-haspopup="dialog" aria-expanded="false"' : '')+' title="'+escH(tip)+'">'+ic+'<span>'+escH(lab)+'</span></button>'; }
   /* 22/10: a group may have when() (shown only while it is true: the terrain ribbon while the slope module is open) and end (at
      the right end); a small tool may name its stack, otherwise the small tools go in stacks of three */
@@ -11569,7 +11667,7 @@ function srchShowRow(obj, soft){ const root=byId('drawerElenco'); if(!root) retu
       else { if(!chunk||chunk.length===3){ chunk=[]; st.push(chunk); } chunk.push(x); } }); return st; }
   function groupsHtml(t){ return groupsOf(t).map(function(g){ var L=g.tools.filter(function(x){ return x.size!=='small'&&x.size!=='medium'; }), S=g.tools.filter(function(x){ return x.size==='small'||x.size==='medium'; });   // 23/10: medium tools stack too (two per column)
     var L1=L.filter(function(x){ return !x.after; }), L2=L.filter(function(x){ return x.after; });   // after: a large tool drawn after the small stacks (the view of the slopes, as PV Predesign)
-    return groupHtml(g.label, L1.map(toolBtn).join('')+stacksOf(S).map(function(s){ return '<div class="tool-stack'+(s[0]&&s[0].size==='medium'? ' md' : '')+'">'+s.map(toolBtn).join('')+'</div>'; }).join('')+L2.map(toolBtn).join(''), g.more, (g.end? 'end' : '')+(g.cls? ' '+g.cls : '')); }).join(''); }
+    return groupHtml(g.label, L1.map(toolBtn).join('')+stacksOf(S).map(function(s){ return '<div class="tool-stack'+(s[0]&&s[0].size==='medium'? ' md' : '')+'">'+s.map(toolBtn).join('')+'</div>'; }).join('')+L2.map(toolBtn).join(''), g.more, (g.end? 'end' : '')+(g.cls? ' '+g.cls : ''), g.n); }).join(''); }
   function ribbonRender(tab){ var r=$g('ribbon'), t=SHELL[tab]; if(!r||!t) return; var h='';
     if(t.groups) h+=groupsHtml(t);
     else if(t.mods&&t.mods.length) h+=groupHtml('Moduli', t.mods.map(function(m){ return toolHtml('mod', m, curMod[tab]===m.id); }).join(''));
@@ -11586,7 +11684,8 @@ function srchShowRow(obj, soft){ const root=byId('drawerElenco'); if(!root) retu
       b.setAttribute('aria-pressed', on? 'true' : 'false');
       var why=d.off? d.off() : null; if(!why&&src&&(d.press||d.offOf)&&src.disabled) why=src.title||'Non disponibile';
       var lab=d.label? d.label() : d.t; var sp=b.querySelector('.rlab')||b.querySelector('span'); if(sp&&sp.textContent!==lab) sp.textContent=lab;
-      if(d.desc){ var dsc=b.querySelector('.rdesc'), dv=d.desc()||''; if(dsc&&dsc.textContent!==dv) dsc.textContent=dv; }   // R3-1 (Q2): the card's description
+      if(d.desc){ var dsc=b.querySelector('.rdesc'), dv=d.desc()||''; if(dsc&&dsc.textContent!==dv) dsc.textContent=dv; }
+      if(d.ask) b.classList.toggle('ask', !!d.ask());   // 13/11 (A): the card that asks   // R3-1 (Q2): the card's description
       if(d.num){ var inp=b.querySelector('input'), ns=qAny(d.num); if(inp){ inp.disabled=!!why; if(ns&&document.activeElement!==inp&&inp.value!==ns.value) inp.value=ns.value; } b.classList.toggle('off', !!why); }
       else if(d.sel){ var sl=b.querySelector('select'), ss=qAny(d.sel); if(sl&&ss){ sl.disabled=!!why;
           var sig=Array.prototype.map.call(ss.options, function(o){ return o.value+'\u0001'+o.text; }).join('\u0002');
@@ -11615,6 +11714,7 @@ function srchShowRow(obj, soft){ const root=byId('drawerElenco'); if(!root) retu
     else if(tab==='import'){ var ni=kindCount('import')+((window.cadFiles||[]).length)+((window.importedImages||[]).length)+((window.addedServices||[]).length)+((window.addedPortalItems||[]).length); k='Importati'; v=String(ni); s=ni===1? 'oggetto o layer' : 'oggetti e layer'; }
     else if(tab==='modifica'){ var sn=(typeof selTotal==='function')? selTotal() : 0; k='Selezione'; v=String(sn); s=sn? selSummary().text : 'niente selezionato'; }   // K2
     else if(tab==='analizza'){ if(typeof slpCur!=='undefined'&&slpCur){ k='Oltre il limite'; v=fmtHa(slpCur.st.overHa); s=slpCur.meta.area_name; } else { k='Terreno'; v='—'; s='nessun modello'; } }
+    else if(tab==='note'){ var nn=0, td=0; try{ nn=nbNotes.length; td=nbTodoAll(); }catch(e){} k='Note'; v=String(nn); s=td? td+' da fare' : (nn? 'nel progetto' : 'nessuna ancora'); }   // 13/11 (Annotazioni)
     else if(tab==='export'){ k='Progetto'; v=(typeof projCur!=='undefined'&&projCur)||'Senza nome'; s='salvataggio automatico nel browser'; }
     }catch(e){}
     el.innerHTML=k? '<span>'+escH(k)+'</span><strong>'+escH(v)+'</strong><span>'+escH(s)+'</span>' : ''; }
@@ -11630,7 +11730,7 @@ function srchShowRow(obj, soft){ const root=byId('drawerElenco'); if(!root) retu
   /* 22/10: one kit .menu popover for the ribbon menus (radio items: the category with its colour, the type, the source, the A
      categories) and for the Raccolta row menu (actions); under its button, or at the pointer for a right-click */
   var menuBtn=null, menuDef=null, menuActs=null;
-  function closeMenu(){ var p=$g('rmenuPop'); if(p) p.hidden=true; if(menuBtn&&menuBtn.setAttribute) menuBtn.setAttribute('aria-expanded', 'false'); menuBtn=null; menuDef=null; menuActs=null; }
+  function closeMenu(){ catThenOld=catThen; catThen=null; var p=$g('rmenuPop'); if(p) p.hidden=true; if(menuBtn&&menuBtn.setAttribute) menuBtn.setAttribute('aria-expanded', 'false'); menuBtn=null; menuDef=null; menuActs=null; }
   /* R3-3b: a popover opens in the window of the element that opens it (the page, or an undocked panel) and places itself in it */
   function popHome(pop, el){ var d=(el&&el.ownerDocument)||document; if(pop&&pop.ownerDocument!==d){ try{ d.body.appendChild(d.adoptNode(pop)); }catch(e){} } }
   function menuPlace(pop, x, y){ var W=(pop.ownerDocument&&pop.ownerDocument.defaultView)||window, w=pop.offsetWidth, h=pop.offsetHeight; if(y+h>W.innerHeight-8) y=Math.max(8, W.innerHeight-8-h); pop.style.top=Math.round(y)+'px'; pop.style.left=Math.round(Math.max(8, Math.min(W.innerWidth-w-8, x)))+'px'; }
@@ -11686,13 +11786,14 @@ function srchShowRow(obj, soft){ const root=byId('drawerElenco'); if(!root) retu
       var sc=$g('sideContent'); if(sc) sc.scrollTop=0; }
     if(m.id==='proj'&&window.projModRender) window.projModRender();   // R3-1 (I4)
     if(m.id==='print'&&tab===curTab()&&window.prSync) window.prSync(true);   // 3/11 (S3): the lists, and the sheet's rectangle on the map
+    if(m.id==='notes'&&tab===curTab()&&window.nbSync) window.nbSync();   // 13/11 (Annotazioni): the list or the note open, drawn again in sight
     if(m.id==='risk'&&tab===curTab()&&window.rmSync) window.rmSync();   // 5/11 (R1): the draft again from the project (what the PM wrote stays)
     // 10/11 (U5): the rows of the Risk Matrix need room for their names: the panel is widened while the module is shown
     // (not saved, not on a phone, not when undocked) and goes back to the PM's width on leaving
-    if(tab===curTab()){ var rk=(tab==='export'&&m.id==='risk');
+    if(tab===curTab()){ var rk=(tab==='export'&&m.id==='risk')||tab==='note';   // 13/11: the notebook too needs room to write
       if(rk&&!modShow.wide&&!isPhone()&&!(typeof sideUndocked==='function'&&sideUndocked())){ var sd=$g('side'), sw=sd? sd.getBoundingClientRect().width : 0; if(sw&&sw<390){ try{ pwSet('right', 390, false); modShow.wide=true; }catch(x){} } }
       else if(!rk&&modShow.wide){ modShow.wide=false; try{ pwApply(); }catch(x){} }
-      if(!rk&&typeof rsSeeOff==='function'){ try{ rsSeeOff(); }catch(x){} } }
+      if(!(tab==='export'&&m.id==='risk')&&typeof rsSeeOff==='function'){ try{ rsSeeOff(); }catch(x){} } }
     if((tab==='geoproc'||tab==='analizza')&&window.toolSync) window.toolSync(m.id);   // 2B-2: the tool shown is the current one, the previous one's map mode goes off
     if(was!==m.id&&tab===curTab()&&(t.groups||[]).some(function(g){ return !!g.when; })){ ribbonRender(tab); sheetToolsRender(tab); }   // 22/10: the groups that depend on the module
     ribbonSoon(); }
@@ -11822,7 +11923,7 @@ function srchShowRow(obj, soft){ const root=byId('drawerElenco'); if(!root) retu
      press the tabs and openPanel, so every handler stays in one place. */
   var mbar=$g('mbar'), mbarRaf=null, moreMenu=$g('moreMenu');
   var MBAR=[['ricerca','Cerca','parcels'],['analizza','Analizza','terrain'],['disegno','Disegna','draw'],['raccolta','Raccolta','raccolta'],['altro','Altro','more']];   // icons-used: more, help, terrain (T5: the terrain on site, the geoprocesses under Altro)
-  var MORE=[['modifica','Modifica','cursor'],['geoproc','Geoprocessi','geoproc'],['import','Importa','import'],['export','Salva ed esporta','export'],['layers','Layer','layers'],['legend','Legenda','legend'],['basemaps','Mappa di base','basemap'],['bookmarks','Luoghi (segnalibri)','bookmark'],['settings','Impostazioni','settings'],['guide','Guida rapida','help']];   // J5g: on a phone the ⚙ of the top bar is here
+  var MORE=[['modifica','Modifica','cursor'],['geoproc','Geoprocessi','geoproc'],['import','Importa','import'],['note','Annotazioni','clipboard'],['export','Salva ed esporta','export'],['layers','Layer','layers'],['legend','Legenda','legend'],['basemaps','Mappa di base','basemap'],['bookmarks','Luoghi (segnalibri)','bookmark'],['settings','Impostazioni','settings'],['guide','Guida rapida','help']];   // J5g: on a phone the ⚙ of the top bar is here
   function mbarBuild(){ if(!mbar||mbar.children.length) return;
     mbar.innerHTML=MBAR.map(function(d){ return '<button type="button" data-m="'+d[0]+'" aria-selected="false">'+icon(d[2])+escH(d[1])+(d[0]==='raccolta'? '<span class="badge" id="mbRcBadge" hidden>0</span>' : '')+'</button>'; }).join('');
     if(moreMenu) moreMenu.innerHTML=MORE.map(function(d){ return '<button type="button" role="menuitem" data-go="'+d[0]+'">'+icon(d[2])+escH(d[1])+'</button>'; }).join('')+'<p class="hint">Modifica AREAS COLLECTION resta sul computer.</p>';
@@ -12060,6 +12161,15 @@ function srchShowRow(obj, soft){ const root=byId('drawerElenco'); if(!root) retu
       +'<li>Un file esportato da qui torna al suo posto: le particelle nel gruppo Particelle, nel loro sottogruppo (quelle già nella Raccolta si saltano), i disegni nella loro categoria e nel loro gruppo. Le fasce e l’area netta automatiche non si reimportano: rinascono dai loro disegni.</li>'
       +'<li>Un .dwg scelto qui passa a <b>Disegni CAD</b>.</li>'
       +'<li>Il file viene letto sul tuo PC: non viene caricato da nessuna parte.</li></ul>'},
+    notes:{t:'Annotazioni', s:'Il taccuino del progetto: appunti, cose da fare, collegamenti ai documenti.', h:   // 13/11 (phase 1), docs/plan-annotazioni.md
+      '<h3>Come si usa</h3><ul>'
+      +'<li><b>Nuova nota</b> apre una nota: il titolo, un’etichetta (Sopralluogo, Autorizzazioni… o una tua) e i <b>blocchi</b>. In fondo alla nota, o dal ribbon: <b>Testo</b>, <b>Da fare</b> (una riga da spuntare; <kbd>Invio</kbd> ne apre un’altra), <b>Collegamento</b> (titolo e indirizzo di un documento).</li>'
+      +'<li>Scrivendo <b>@</b> in un testo, o con <b>Layer o oggetto</b>, richiami per nome un layer della mappa, un oggetto della Raccolta o una particella: il nome entra nel testo e sotto resta un <b>riferimento</b>. Un clic sul riferimento accende il layer, o fa lo zoom sull’oggetto e sulla particella.</li>'
+      +'<li>Il menu '+icon('more')+' di un blocco lo sposta, lo trasforma o lo elimina; quello in cima alla nota la duplica, la copia come testo o la elimina. <b>Tutte le note</b> torna all’elenco, dove cerchi per parola; le note si trovano anche con <kbd>Ctrl</kbd>+<kbd>K</kbd>.</li></ul>'
+      +'<h3>Da sapere</h3><ul>'
+      +'<li>Le note <b>stanno nel progetto</b>: si salvano da sole in questo browser e viaggiano nel file .axpo, <b>anche nella copia da condividere</b>. Non scriverci i dati personali degli intestatari, se il file esce dal gruppo di lavoro.</li>'
+      +'<li>I documenti <b>non si allegano</b>: si mette il collegamento (SharePoint, un sito) e il file si manda a parte.</li>'
+      +'<li><b>Annulla</b> non riguarda le note: in un campo di testo vale il <kbd>Ctrl</kbd>+<kbd>Z</kbd> del campo. Le note non vanno sul portale.</li></ul>'},
     proj:{t:'Progetto', s:'Il file .axpo: tutto il lavoro in un file, da riaprire o passare ai colleghi.', h:
       '<h3>Come si usa</h3><ul>'
       +'<li><b>'+icon('save')+' Salva</b> scrive il progetto nel file .axpo (<kbd>Ctrl</kbd>+<kbd>S</kbd>), <b>Salva come…</b> con un altro nome (<kbd>Ctrl</kbd>+<kbd>Maiusc</kbd>+<kbd>S</kbd>), <b>'+icon('folder')+' Apri…</b> riapre un progetto (<kbd>Ctrl</kbd>+<kbd>O</kbd>). Apri e Salva sono anche nella barra in alto.</li>'
@@ -12379,7 +12489,7 @@ function srchShowRow(obj, soft){ const root=byId('drawerElenco'); if(!root) retu
       +'<li><b>Copia</b>: una copia dell\'oggetto selezionato dove clicchi, o di uno che scegli sulla mappa; anche parallela, a distanza fissa (lo spiega la finestra «Copia»).</li>'
       +'<li><b>Elimina</b> (o il tasto <kbd>Canc</kbd>): toglie dalla Raccolta le particelle e gli oggetti selezionati. Chiede conferma e, per quelli salvati sul portale, se toglierli anche da lì.</li>'
       +'<li><b>'+icon('undo')+' Annulla</b> e <b>'+icon('redo')+' Ripeti</b>, nella barra in alto (<kbd>Ctrl</kbd>+<kbd>Z</kbd>, <kbd>Ctrl</kbd>+<kbd>Y</kbd>), valgono per ogni modifica, anche per Elimina.</li></ul>'
-      +'<h3>Esclusione da layer</h3><p>In <b>Cosa disegni</b>, <b>Esclusione da layer</b>: clicca un elemento di un layer vettoriale acceso (un vincolo, un servizio aggiunto) e diventa un disegno di esclusione nella Raccolta; con <b>Riquadro</b> prendi tutti quelli che tocca.</p>'
+      +'<h3>Copia da layer</h3><p>In <b>Con quale strumento</b>, <b>Copia da layer</b>: clicca un elemento di un layer vettoriale acceso (un vincolo, una strada, un servizio aggiunto) e la sua forma va nella Raccolta con la categoria scelta in <b>Cosa disegni</b>; se quella categoria non si disegna con quella forma, un’area diventa un’esclusione, una linea un’infrastruttura lineare, un punto un ostacolo. Con <b>Copia a riquadro</b> prendi tutti gli elementi che il rettangolo tocca.</p>'
       +'<h3>Da sapere</h3><ul><li>Le particelle non si modificano: per cambiarle, fanne una copia o un\'area lorda.</li>'
       +'<li>Le fasce dei buffer e l\'area netta automatica non si toccano: rinascono da sole quando cambi gli oggetti da cui vengono.</li>'
       +'<li>Selezionare non è modificare: ogni strumento lavora su ciò che può cambiare e dice quanti elementi ha lasciato fuori. Copia vale anche per una particella sola: la copia è un disegno.</li>'
@@ -12461,7 +12571,7 @@ function srchShowRow(obj, soft){ const root=byId('drawerElenco'); if(!root) retu
       if(typeof selBoxOn==='function'&&selBoxOn()) return 'Riquadro di <b>selezione</b>: clicca e trascina; ogni oggetto toccato si seleziona (Maiusc aggiunge). <kbd>Esc</kbd> per finire.';   // G2-3
       if(typeof exlBoxOn==='function'&&exlBoxOn()) return 'Riquadro: ogni elemento dei <b>feature layer</b> accesi che tocca diventa un disegno. <kbd>Esc</kbd> per annullare.';
       if(typeof selOn==='function'&&selOn()) return '<b>Seleziona</b>: clicca un disegno, un risultato o un importato; Maiusc+clic aggiunge; clic nel vuoto svuota. <kbd>Esc</kbd> per finire.';
-      if(typeof exlOn==='function'&&exlOn()) return '<b>Esclusione da layer</b>: clicca un elemento di un layer vettoriale acceso. <kbd>Esc</kbd> per finire.';
+      if(typeof exlOn==='function'&&exlOn()) return '<b>Copia da layer</b>: clicca un elemento di un layer vettoriale acceso. <kbd>Esc</kbd> per finire.';
       if(typeof measureOn==='function'&&measureOn()) return 'Misura: clicca i punti sulla mappa, doppio clic per finire. <kbd>Esc</kbd> per smettere.';   // giro 2
       if(typeof elevCreating==='function'&&elevCreating()) return 'Profilo altimetrico: disegna la linea sulla mappa, doppio clic per finire. <kbd>Esc</kbd> per annullare.';   // P4
       if(typeof selRunning==='function'&&selRunning()) return 'Cerco le particelle nell\'area… <kbd>Esc</kbd> per interrompere.';
@@ -12515,7 +12625,7 @@ function srchShowRow(obj, soft){ const root=byId('drawerElenco'); if(!root) retu
     if(typeof sketchPurpose!=='undefined'&&sketchPurpose==='terrain-extent'&&sketchVM&&sketchVM.state==='active'){ try{ sketchVM.cancel(); }catch(x){} sketchPurpose=null; slpExtKind=null; try{ toolMsg('slpMsg','Disegno dell\'estensione annullato.'); }catch(x){} ribbonSoon(); return; }   // 22/10 (T3)
     if(typeof selBoxOn==='function'&&(selBoxOn()||exlBoxOn())){ try{ sketchVM.cancel(); }catch(x){} sketchPurpose=null; toolMsg('drwMsg','Riquadro annullato.'); return; }   // G2-3
     if(typeof selOn==='function'&&selOn()){ selEnd(); toolMsg('drwMsg','Selezione sulla mappa: finito.'); return; }
-    if(typeof exlOn==='function'&&exlOn()){ exlEnd(); toolMsg('drwMsg','Esclusione da layer: finito.'); return; }
+    if(typeof exlOn==='function'&&exlOn()){ exlEnd(); toolMsg('drwMsg','Copia da layer: finito.'); return; }
     if(typeof sketchVM!=='undefined'&&sketchVM&&sketchVM.state==='active'&&sketchVM.updateGraphics&&sketchVM.updateGraphics.length){ try{ sketchVM.cancel(); }catch(x){} toolMsg('drwMsg','Modifica annullata: la forma resta com\'era.'); return; }   // G2-3: Rimodella / Sposta e ruota from the ribbon (the SDK sees Esc only when the map has the focus)
     if(typeof gpPickOn==='function'&&gpPickOn()){ gpPickEnd(); return; }               // scelta oggetti per A/B
     if(typeof drwModeOn==='function'&&drwModeOn()){ var dk=drwMode.kind; drwModeEnd(); if(dk==='angle') shpSync(); return; }   // forma con misure (spegne anche lo strumento), lato, copia
@@ -12632,13 +12742,14 @@ function srchShowRow(obj, soft){ const root=byId('drawerElenco'); if(!root) retu
     {title:'Pronto!', body:"Questo è il flusso base. I tour si riaprono dal "+icon('help')+" in alto a destra; per gli strumenti avanzati prova <i>Tutti gli strumenti</i>. Ogni gruppo del ribbon ha la sua "+icon('info')+", con «Di più» per la spiegazione lunga."}
   ];
   var TOUR_ALL=[   // 5a (F3): one step per tab, then the panels, the map controls, the status bar, the portal map
-    {sel:'#tabs', title:'Le sette schede', body:"Le schede seguono il lavoro: <b>Ricerca particelle</b>, <b>Analizza</b>, <b>Disegna</b>, <b>Modifica</b>, <b>Geoprocessi</b>, <b>Importa</b>, <b>Salva ed esporta</b>. Sotto, il ribbon con gli strumenti della scheda, a gruppi; la "+icon('info')+" di ogni gruppo dice cosa si fa lì.", placement:'below'},
+    {sel:'#tabs', title:'Le otto schede', body:"Le schede seguono il lavoro: <b>Ricerca particelle</b>, <b>Analizza</b>, <b>Disegna</b>, <b>Modifica</b>, <b>Geoprocessi</b>, <b>Importa</b>, <b>Annotazioni</b>, <b>Salva ed esporta</b>. Sotto, il ribbon con gli strumenti della scheda, a gruppi; la "+icon('info')+" di ogni gruppo dice cosa si fa lì.", placement:'below'},
     {sel:'#ribbon', title:'Ricerca particelle', body:"<b>Cerca particelle</b> apre a destra i tre modi di prenderle dal catasto: per comune, foglio e numero; dalla mappa, con un clic, un rettangolo, un poligono o una linea; da un disegno o da un buffer. <b>Raccolta</b> crea l'area lorda dalle particelle, accende i numeri e fa lo zoom.", open:function(){ openTab('ricerca'); }, placement:'below'},
     {sel:'#ribbon', title:'Analizza', body:"Quello che legge il territorio senza cambiare la Raccolta. <b>Estensione</b>: su cosa (un'area lorda, il sito AREAS, le particelle, o un rettangolo o poligono disegnato qui); <b>Modello del terreno</b>: il limite di pendenza e <b>Analizza le pendenze</b>, con le quote di Esri World Elevation; <b>Analisi terreno</b>: classi di pendenza, quote, esposizione, ombreggiatura, curve di livello e il profilo lungo una linea; <b>Contesto</b>: sottostazioni, linee AT e progetti FV intorno a un punto, e il percorso su strada (serve l'accesso); <b>Coordinate</b>: in che sistema sono dei valori sconosciuti.", open:function(){ openTab('analizza'); }, placement:'below'},
     {sel:'#ribbon', title:'Disegna', body:"<b>Cosa disegni</b> e <b>Con quale strumento</b> per i disegni nuovi; <b>Supporto al disegno</b>: aggancio, misure esatte, griglia; <b>Aree automatiche</b>: area netta e rientro dal confine; <b>Collega a sito AREAS</b>: il sito a cui vanno i disegni sul portale.", open:function(){ openTab('disegno'); }, placement:'below'},
     {sel:'#ribbon', title:'Modifica', body:"Quello che c'è già. <b>Selezione</b>: Seleziona (clic sulla mappa), Riquadro, Deseleziona; la selezione è la spunta della Raccolta. <b>Modifica</b>, sulla selezione: rimodella, sposta e ruota, dividi, unisci, copia (anche parallela, a distanza fissa) ed elimina. A destra quanti sono e la scheda dell'oggetto selezionato.", open:function(){ openTab('modifica'); }, placement:'below'},
     {sel:'#ribbon', title:'Geoprocessi', body:"Metti gli oggetti in <b>A</b> (A dalla mappa, gli spuntati o per categoria; B serve a Parte comune e Sottrai), scegli l'operazione in <b>Geoprocessi</b> e premi <b>Esegui</b> a destra: il risultato è un oggetto nuovo nella Raccolta, gruppo Analisi.", open:function(){ openTab('geoproc'); }, placement:'below'},
     {sel:'#ribbon', title:'Importa', body:"<b>File</b>: GeoJSON, KML, KMZ, Shapefile e il file degli intestatari; <b>CAD</b>: un DWG letto nel browser, senza uscire dal PC, con il sistema stimato o allineato con due punti; <b>Immagini</b>: il GeoTIFF da solo, foto, planimetrie e PDF con punti noti; <b>Servizi web</b>: WMS, WFS e ArcGIS REST dal loro indirizzo; <b>Portale</b>: un layer cercato per titolo.", open:function(){ openTab('import'); }, placement:'below'},
+    {sel:'#ribbon', title:'Annotazioni', body:"Il taccuino del progetto. <b>Taccuino</b>: Nuova nota e l’elenco di tutte; <b>Inserisci</b>: testo, righe da fare, un collegamento a un documento, e <b>Layer o oggetto</b> (o <b>@</b> nel testo) per richiamare per nome un layer, un oggetto della Raccolta o una particella; <b>Esporta le note</b>: in PDF o come testo. Le note viaggiano nel file .axpo.", open:function(){ openTab('note'); }, placement:'below'},
     {sel:'#ribbon', title:'Salva ed esporta', body:"<b>Esporta</b> in GeoJSON, KML, KMZ, Shapefile o XLSX; <b>Portale AGOL</b>: Migra particelle in AREAS, Salva disegni in Site Features, Modifica AREAS COLLECTION; <b>Progetto</b>: salva e apri il file .axpo; <b>Stampa</b> un foglio PDF con la Raccolta in scala, su uno sfondo a scelta; <b>Risk Matrix</b>: la matrice dei rischi del progetto, con una bozza dal GIS e dai layer della mappa che correggi tu, e il file Excel aziendale compilato.", open:function(){ openTab('export'); }, placement:'below'},
     {sel:'#leftPanel', title:'La Raccolta', body:"In gruppi: Particelle, Aree di progetto, Aree di esclusione, Analisi, Altro, Immagini, e i tuoi con <b>+ Gruppo</b>. In alto il filtro per nome e <b>Comprimi</b>; ogni riga ha la cifra a destra, l'occhio e il menu "+icon('more')+". La spunta è la selezione: la usano anche i geoprocessi e l'esportazione.", open:function(){ openDrawer('elenco'); }, placement:'right'},
     {sel:'#sideTabs', title:'Proprietà, Layer, Legenda', body:"A destra: <b>Proprietà</b> dello strumento aperto o dell'oggetto selezionato; <b>Layer</b> della mappa, con la ricerca nel portale e il <b>filtro per attributo</b>; <b>Legenda</b> dei layer accesi.", open:function(){ if(window.spanelSet) window.spanelSet('layers'); }, placement:'left'},
@@ -14624,6 +14735,211 @@ function rpSum(){ const s=$('prRiskSum'), c=$('prRisk'); if(s) s.textContent=c&&
   ['prRiskMaps', 'prRiskParcels'].forEach(id=>{ const e=$(id); if(e) e.disabled=!(c&&c.checked); }); }
 document.addEventListener('DOMContentLoaded', function(){ const c=$('prRisk'); if(!c) return;
   c.addEventListener('change', ()=>{ c.dataset.set='1'; rpSum(); }); rpSum(); });
+</script>
+<script>
+// ── Annotazioni (13/11/2026, phase 1): the project's notebook ──────────────────────────────────────────────────────
+// Decided by the user (docs/plan-annotazioni.md): notes made of blocks, no free HTML (N1); in the right panel, which
+// undocks (N2); the notes travel with the project, the copy to share too (N5); documents are links, never attachments
+// (N4); only in the project, not on the portal (N6). Phase 1: text, to-do, link; «@» recalls a layer of the map, an
+// object of the Raccolta or a parcel; search; text and PDF. What the PM types is written with esc() or as a value,
+// never as HTML. The notes are outside Annulla (as the Risk Matrix): a text field has its own Ctrl+Z.
+const NB_MAX={notes:300, blocks:400, text:20000, title:160, refs:12};
+const NB_LABELS=['Sopralluogo', 'Autorizzazioni', 'Connessione', 'Proprietà', 'Da fare'];
+const NB_REF={layer:'Layer', obj:'Oggetto', parcel:'Particella'};
+let nbNotes=[], nbCur=null, nbQ='', nbAt=null;
+
+// ── the state: {v:1, notes:[{id, t, lab, d, m, b:[{k:'p'|'todo'|'link', x, on, u, refs:[{r, k, t}]}]}]} ──
+function nbStr(v, n){ return (typeof v==='string'? v : '').slice(0, n); }
+function nbNow(){ return new Date().toISOString(); }
+function nbNewId(){ return 'n'+Date.now().toString(36)+Math.random().toString(36).slice(2, 6); }
+function nbCleanBlock(b){ if(!b||typeof b!=='object') return null; const k=(b.k==='todo'||b.k==='link')? b.k : 'p', o={k:k, x:nbStr(b.x, NB_MAX.text)};
+  if(k==='todo') o.on=!!b.on;
+  if(k==='link') o.u=nbStr(b.u, 2000);
+  if(k==='p'&&Array.isArray(b.refs)){ const R=b.refs.filter(r=>r&&NB_REF[r.r]&&typeof r.t==='string').slice(0, NB_MAX.refs).map(r=>({r:r.r, k:nbStr(r.k, 600), t:nbStr(r.t, 300)})); if(R.length) o.refs=R; }
+  return o; }
+function nbClean(st){ const L=(st&&Array.isArray(st.notes))? st.notes : [], seen=new Set();
+  return L.filter(n=>n&&typeof n==='object').slice(0, NB_MAX.notes).map(n=>{ let id=nbStr(n.id, 40); if(!id||seen.has(id)) id=nbNewId()+seen.size; seen.add(id);
+    const d=nbStr(n.d, 30)||nbNow(), b=(Array.isArray(n.b)? n.b : []).map(nbCleanBlock).filter(Boolean).slice(0, NB_MAX.blocks);
+    return {id:id, t:nbStr(n.t, NB_MAX.title), lab:nbStr(n.lab, 40), d:d, m:nbStr(n.m, 30)||d, b:b.length? b : [{k:'p', x:''}]}; }); }
+function nbGetState(){ return nbNotes.length? {v:1, notes:JSON.parse(JSON.stringify(nbNotes))} : null; }
+function nbSetState(st){ nbAtClose(); nbNotes=nbClean(st); nbCur=null; nbQ=''; const q=$('nbQ'); if(q) q.value=''; nbRender(); }
+
+function nbNote(id){ return nbNotes.find(n=>n.id===id)||null; }
+function nbOpenNote(){ return nbCur? nbNote(nbCur) : null; }
+function nbSorted(){ return nbNotes.slice().sort((a, b)=>(b.m||'').localeCompare(a.m||'')); }
+function nbTodo(n){ return (n? n.b : []).filter(b=>b.k==='todo'&&!b.on&&b.x.trim()).length; }
+function nbTodoAll(){ return nbNotes.reduce((a, n)=>a+nbTodo(n), 0); }
+function nbTitle(n){ if(n.t.trim()) return n.t.trim(); const b=n.b.find(x=>x.x&&x.x.trim()); return b? b.x.trim().split('\n')[0].slice(0, 60) : 'Nota senza titolo'; }
+function nbDate(iso){ try{ const d=new Date(iso); return isNaN(d)? '' : prItaDate(d); }catch(e){ return ''; } }
+function nbSaved(n){ if(n) n.m=nbNow(); try{ saveStateDebounced(); }catch(e){} try{ if(window.ribbonSoon) window.ribbonSoon(); }catch(e){} }
+function nbRoot(){ return $('modNotes'); }
+function nbFocus(sel){ setTimeout(()=>{ try{ const el=nbRoot().querySelector(sel); if(!el) return; el.focus(); if(el.tagName==='TEXTAREA'||el.type==='text') el.setSelectionRange(el.value.length, el.value.length); }catch(e){} }, 30); }
+
+// ── the notes: new, open, back to the list, duplicate, delete ──
+function nbShow(id){ const tb=document.querySelector('#tabs .tab[data-tab="note"]'); if(tb) tb.click(); nbAtClose(); nbCur=(id&&nbNote(id))? id : null; nbRender(); }   // from elsewhere (Ctrl K): the tab, the panel, the note
+function nbBack(){ nbAtClose(); nbCur=null; nbRender(); }
+function nbNew(){ if(nbNotes.length>=NB_MAX.notes){ msg('Troppe note in questo progetto: eliminane qualcuna.', 'err'); return null; }
+  const n={id:nbNewId(), t:'', lab:'', d:nbNow(), m:nbNow(), b:[{k:'p', x:''}]}; nbNotes.push(n); nbCur=n.id; nbSaved(null); nbRender(); nbFocus('#nbTitle'); return n; }
+function nbDup(n){ if(nbNotes.length>=NB_MAX.notes) return; const c=JSON.parse(JSON.stringify(n)); c.id=nbNewId(); c.t=(nbTitle(n)+' (copia)').slice(0, NB_MAX.title); c.d=c.m=nbNow();
+  nbNotes.push(c); nbCur=c.id; nbSaved(null); nbRender(); }
+function nbDel(n){ if(!confirm('Eliminare la nota «'+nbTitle(n)+'»? Non si può annullare.')) return; nbNotes=nbNotes.filter(x=>x!==n); nbCur=null; nbSaved(null); nbRender(); msg('Nota eliminata.', 'ok'); }
+
+// ── the blocks ──
+function nbAdd(k){ const n=nbOpenNote()||nbNew(); if(!n) return; if(n.b.length>=NB_MAX.blocks){ msg('Questa nota è piena: aprine un’altra.', 'err'); return; }
+  const last=n.b[n.b.length-1], blank=!!last&&last.k==='p'&&!last.x.trim()&&!(last.refs&&last.refs.length);
+  if(blank&&k==='p'){ nbRenderEdit(); nbFocus('.nbb[data-i="'+(n.b.length-1)+'"] textarea'); return; }   // an empty text is already there: it takes the cursor
+  if(blank) n.b.pop();   // an empty paragraph left at the end gives way
+  n.b.push(k==='todo'? {k:'todo', x:'', on:false} : k==='link'? {k:'link', x:'', u:''} : {k:'p', x:''}); nbSaved(n); nbRenderEdit();
+  nbFocus('.nbb[data-i="'+(n.b.length-1)+'"] textarea, .nbb[data-i="'+(n.b.length-1)+'"] input[type="text"]'); }
+function nbMove(i, d){ const n=nbOpenNote(); if(!n) return; const j=i+d; if(j<0||j>=n.b.length) return; const x=n.b.splice(i, 1)[0]; n.b.splice(j, 0, x); nbSaved(n); nbRenderEdit(); }
+function nbTurn(i, k){ const n=nbOpenNote(), b=n&&n.b[i]; if(!b) return; n.b[i]=k==='todo'? {k:'todo', x:b.x, on:false} : {k:'p', x:b.x}; nbSaved(n); nbRenderEdit(); }
+function nbBlockDel(i){ const n=nbOpenNote(); if(!n) return; n.b.splice(i, 1); if(!n.b.length) n.b.push({k:'p', x:''}); nbSaved(n); nbRenderEdit(); }
+function nbUrl(u){ u=String(u||'').trim(); return /^https?:\/\/[^\s]+$/i.test(u)? u : ''; }
+function nbLinkOpen(b){ const u=nbUrl(b.u); if(!u){ msg('Scrivi l’indirizzo completo del documento: comincia con https://', 'err'); return; } window.open(u, '_blank', 'noopener'); }
+
+// ── drawing: the list of the notes, or the note open ──
+function nbMatch(n, q){ const W=srchFold(q).split(/\s+/).filter(Boolean); if(!W.length) return true;
+  const h=srchFold([n.t, n.lab].concat(n.b.map(b=>b.x+' '+(b.u||'')+' '+(b.refs||[]).map(r=>r.t).join(' '))).join(' ')); return W.every(w=>h.indexOf(w)>=0); }
+function nbRenderList(){ const box=$('nbList'); if(!box) return;
+  if(!box.querySelector('#nbQ')) box.innerHTML='<div class="nbtop"><input id="nbQ" type="search" placeholder="Cerca nelle note" aria-label="Cerca nelle note"><button type="button" class="btn sm primary" data-nb="new" title="Apre una nota nuova">'+icon('plus')+'Nuova</button></div><div class="nbrows" id="nbRows"></div>';
+  const rows=nbSorted().filter(n=>nbMatch(n, nbQ)).map(n=>{ const td=nbTodo(n), sub=[nbDate(n.m), n.lab, td? td+' da fare' : ''].filter(Boolean).join(' · ');
+    const pv=n.t.trim()? n.b.map(b=>b.x.trim()).filter(Boolean).join(' · ').slice(0, 90) : '';
+    return '<button type="button" class="nbrow" data-id="'+esc(n.id)+'"><b>'+esc(nbTitle(n))+'</b><small>'+esc(sub)+'</small>'+(pv? '<span>'+esc(pv)+'</span>' : '')+'</button>'; }).join('');
+  box.querySelector('#nbRows').innerHTML=rows||'<p class="thint">'+(nbNotes.length? 'Nessuna nota con «'+esc(nbQ)+'».' : 'Nessuna nota ancora. Con <b>Nuova</b> ne apri una: testo, cose da fare, collegamenti; <b>@</b> richiama un layer, un oggetto o una particella.')+'</p>'; }
+function nbBlockHtml(b, i){   // icons-used: more, external, close, plus, layers, parcels, pin, copy, clipboard, trash
+  const mv='<button type="button" class="nbx" data-nb="bmenu" aria-label="Sposta o elimina il blocco" title="Sposta, trasforma o elimina il blocco">'+icon('more')+'</button>';
+  if(b.k==='todo') return '<div class="nbb todo'+(b.on? ' done' : '')+'" data-i="'+i+'"><input type="checkbox" data-f="on" aria-label="Fatto"'+(b.on? ' checked' : '')+'><textarea rows="1" data-f="x" placeholder="Da fare" aria-label="Da fare">'+esc(b.x)+'</textarea>'+mv+'</div>';
+  if(b.k==='link') return '<div class="nbb link" data-i="'+i+'"><div class="nbl"><input type="text" data-f="x" placeholder="Titolo del documento" aria-label="Titolo del documento" value="'+esc(b.x)+'"><input type="url" data-f="u" placeholder="https://… (SharePoint, un sito)" aria-label="Indirizzo del documento" value="'+esc(b.u||'')+'"></div>'
+    +'<button type="button" class="nbx" data-nb="open" aria-label="Apri il collegamento" title="Apre il collegamento in un’altra scheda del browser">'+icon('external')+'</button>'+mv+'</div>';
+  return '<div class="nbb p" data-i="'+i+'"><textarea rows="1" data-f="x" placeholder="Scrivi… (@ richiama un layer, un oggetto o una particella)" aria-label="Testo">'+esc(b.x)+'</textarea>'+mv
+    +((b.refs&&b.refs.length)? '<div class="nbrefs">'+b.refs.map((r, j)=>'<span class="nbref"><button type="button" data-nb="ref" data-j="'+j+'" title="'+esc(NB_REF[r.r]+': '+r.t)+' · un clic lo mostra sulla mappa">'+icon(r.r==='layer'? 'layers' : r.r==='parcel'? 'parcels' : 'pin')+'<span>'+esc(r.t)+'</span></button>'
+      +'<button type="button" data-nb="refx" data-j="'+j+'" aria-label="Togli il riferimento" title="Togli il riferimento">'+icon('close')+'</button></span>').join('')+'</div>' : '')+'</div>'; }
+function nbLabels(){ const s=new Set(NB_LABELS); nbNotes.forEach(n=>{ if(n.lab) s.add(n.lab); }); return [...s]; }
+function nbGrow(ta){ ta.style.height='auto'; ta.style.height=Math.max(24, ta.scrollHeight+2)+'px'; }
+function nbRenderEdit(){ const box=$('nbEdit'), n=nbOpenNote(); if(!box||!n) return;
+  box.innerHTML='<div class="nbhead"><button type="button" class="btn sm" data-nb="back" title="Torna all’elenco delle note">‹ Note</button><span class="nbdate">'+esc(nbDate(n.m))+'</span>'
+    +'<button type="button" class="nbx" data-nb="nmenu" aria-label="Azioni sulla nota" title="Duplica, copia come testo o elimina la nota">'+icon('more')+'</button></div>'
+    +'<input type="text" id="nbTitle" class="nbtitle" maxlength="'+NB_MAX.title+'" placeholder="Titolo della nota" aria-label="Titolo della nota" value="'+esc(n.t)+'">'
+    +'<div class="kv"><label for="nbLab">Etichetta</label><input type="text" id="nbLab" list="nbLabs" maxlength="40" placeholder="facoltativa" value="'+esc(n.lab)+'"><datalist id="nbLabs">'+nbLabels().map(l=>'<option value="'+esc(l)+'">').join('')+'</datalist></div>'
+    +'<div id="nbBlocks">'+n.b.map(nbBlockHtml).join('')+'</div>'
+    +'<div class="nbadd"><button type="button" class="btn sm" data-nb="add-p">'+icon('plus')+'Testo</button><button type="button" class="btn sm" data-nb="add-todo">'+icon('plus')+'Da fare</button><button type="button" class="btn sm" data-nb="add-link">'+icon('plus')+'Collegamento</button></div>';
+  box.querySelectorAll('textarea').forEach(nbGrow); }
+function nbRender(){ const L=$('nbList'), E=$('nbEdit'); if(!L||!E) return; const n=nbOpenNote(); if(!n) nbCur=null;
+  L.hidden=!!n; E.hidden=!n; if(n) nbRenderEdit(); else { E.innerHTML=''; nbRenderList(); }
+  try{ if(window.ribbonSoon) window.ribbonSoon(); }catch(e){} }
+
+// ── what the PM does in the panel ──
+function nbBlockOf(el){ const d=el.closest('.nbb'), n=nbOpenNote(); if(!d||!n) return null; const i=+d.dataset.i; return n.b[i]? {n:n, b:n.b[i], i:i, el:d} : null; }
+function nbOnInput(e){ const t=e.target; if(!t||!t.matches) return;
+  if(t.id==='nbQ'){ nbQ=t.value; nbRenderList(); return; }
+  const n=nbOpenNote(); if(!n) return;
+  if(t.id==='nbTitle'){ n.t=t.value.slice(0, NB_MAX.title); nbSaved(n); return; }
+  if(t.id==='nbLab'){ n.lab=t.value.slice(0, 40); nbSaved(n); return; }
+  const B=nbBlockOf(t), f=t.dataset.f; if(!B||!f) return;
+  if(f==='on'){ B.b.on=!!t.checked; B.el.classList.toggle('done', B.b.on); nbSaved(n); return; }
+  B.b[f]=t.value.slice(0, f==='u'? 2000 : NB_MAX.text); if(t.tagName==='TEXTAREA') nbGrow(t); nbSaved(n);
+  if(B.b.k==='p'&&f==='x'&&e.data==='@'){ const p=t.selectionStart, pre=t.value.slice(0, p-1); if(!pre||/\s$/.test(pre)) nbAtOpen(t, B.i, p); } }   // «@» at the start of a word
+function nbOnKey(e){ const t=e.target; if(!t||t.tagName!=='TEXTAREA') return; const B=nbBlockOf(t); if(!B) return;
+  if(e.key==='Enter'&&!e.shiftKey&&B.b.k==='todo'){ e.preventDefault(); if(!t.value.trim()) return;   // Invio: another line to tick
+    B.n.b.splice(B.i+1, 0, {k:'todo', x:'', on:false}); nbSaved(B.n); nbRenderEdit(); nbFocus('.nbb[data-i="'+(B.i+1)+'"] textarea'); }
+  else if(e.key==='Backspace'&&!t.value&&B.n.b.length>1&&!(B.b.refs&&B.b.refs.length)){ e.preventDefault();   // an empty block goes
+    B.n.b.splice(B.i, 1); nbSaved(B.n); nbRenderEdit(); nbFocus('.nbb[data-i="'+Math.max(0, B.i-1)+'"] textarea'); } }
+function nbOnClick(e){ const row=e.target.closest('.nbrow'); if(row){ nbCur=row.dataset.id; nbRender(); return; }
+  const b=e.target.closest('[data-nb]'); if(!b) return; const a=b.dataset.nb, n=nbOpenNote();
+  if(a==='new'){ nbNew(); return; }
+  if(a==='back'){ nbBack(); return; }
+  if(a==='add-p'||a==='add-todo'||a==='add-link'){ nbAdd(a.slice(4)); return; }
+  if(a==='nmenu'&&n){ window.rowMenu(b, [{t:'Duplica la nota', i:'copy', fn:function(){ nbDup(n); }}, {t:'Copia come testo', i:'clipboard', fn:function(){ nbCopy([n]); }}, {t:'Elimina la nota', i:'trash', fn:function(){ nbDel(n); }}]); return; }
+  const B=nbBlockOf(b); if(!B) return;
+  if(a==='bmenu'){ window.rowMenu(b, [{t:'Sposta su', dis:B.i===0, fn:function(){ nbMove(B.i, -1); }}, {t:'Sposta giù', dis:B.i===B.n.b.length-1, fn:function(){ nbMove(B.i, 1); }},
+      B.b.k==='p'? {t:'Trasforma in «Da fare»', fn:function(){ nbTurn(B.i, 'todo'); }} : B.b.k==='todo'? {t:'Trasforma in testo', fn:function(){ nbTurn(B.i, 'p'); }} : null,
+      {t:'Elimina il blocco', fn:function(){ nbBlockDel(B.i); }}].filter(Boolean)); return; }
+  if(a==='open'){ nbLinkOpen(B.b); return; }
+  if(a==='ref'){ nbRefGo((B.b.refs||[])[+b.dataset.j]); return; }
+  if(a==='refx'){ (B.b.refs||[]).splice(+b.dataset.j, 1); if(B.b.refs&&!B.b.refs.length) delete B.b.refs; nbSaved(B.n); nbRenderEdit(); } }
+
+// ── «@»: a layer of the map, an object of the Raccolta or a parcel, by name. The choice writes the name in the text and
+// leaves a reference under the block; a click on the reference shows it on the map ──
+function nbParcelKey(p){ return [p.comune||'', p.foglio!=null? p.foglio : '', p.particella!=null? p.particella : ''].join('|'); }
+function nbAtItems(){ const out=[];
+  try{ lcLayers(view.map).forEach(it=>out.push({r:'layer', k:lcKey(it.l), t:lcName(it)})); }catch(e){}
+  try{ toolsGL.graphics.forEach(g=>{ const a=g.attributes||{}, k=a._kind? objKind(g) : null; if(!k||k==='owner') return; out.push({r:'obj', k:a.sf_gid||'', t:String(a.nome||geomDefName(g))}); }); }catch(e){}   // never the owners’ parcels
+  try{ (parcels||[]).forEach(p=>out.push({r:'parcel', k:nbParcelKey(p), t:parcelRowName(p, true)})); }catch(e){}
+  return out; }
+function nbAtEl(doc){ let el=doc.getElementById('nbAt'); if(el) return el;
+  el=doc.createElement('div'); el.id='nbAt'; el.className='nbat'; el.hidden=true; el.setAttribute('role', 'dialog'); el.setAttribute('aria-label', 'Richiama un layer, un oggetto o una particella');
+  el.innerHTML='<input type="search" id="nbAtQ" placeholder="Nome del layer, dell’oggetto o della particella" aria-label="Cerca per nome"><div id="nbAtL" role="listbox"></div>'; doc.body.appendChild(el);
+  el.addEventListener('input', function(){ if(nbAt) nbAt.act=0; nbAtDraw(); }); el.addEventListener('keydown', nbAtKey);
+  el.addEventListener('click', function(e){ const b=e.target.closest('[data-j]'); if(b) nbAtPick(+b.dataset.j); });
+  return el; }
+function nbAtOpen(ta, i, pos){ nbAtClose(); const doc=ta.ownerDocument, el=nbAtEl(doc), r=ta.getBoundingClientRect(), W=doc.defaultView||window;
+  nbAt={i:i, pos:pos, all:nbAtItems(), shown:[], act:0, doc:doc}; el.hidden=false; const q=el.querySelector('#nbAtQ'); q.value='';
+  const w=Math.min(340, W.innerWidth-16); el.style.width=w+'px'; el.style.left=Math.round(Math.max(8, Math.min(W.innerWidth-w-8, r.left)))+'px';
+  nbAtDraw(); const h=el.offsetHeight||260; el.style.top=Math.round((r.bottom+4+h<=W.innerHeight-8)? r.bottom+4 : Math.max(8, r.top-4-h))+'px';   // under the text, or above it when there is no room
+  q.focus(); }
+function nbAtClose(){ if(!nbAt) return; try{ const el=nbAt.doc.getElementById('nbAt'); if(el) el.hidden=true; }catch(e){} nbAt=null; }
+function nbAtDraw(){ if(!nbAt) return; const el=nbAt.doc.getElementById('nbAt'), W=srchFold(el.querySelector('#nbAtQ').value).split(/\s+/).filter(Boolean);
+  const hit=nbAt.all.filter(x=>{ const h=srchFold(NB_REF[x.r]+' '+x.t); return W.every(w=>h.indexOf(w)>=0); }); nbAt.shown=hit.slice(0, 12); nbAt.act=Math.min(nbAt.act, Math.max(0, nbAt.shown.length-1));
+  el.querySelector('#nbAtL').innerHTML=nbAt.shown.length? nbAt.shown.map((x, j)=>'<button type="button" role="option" data-j="'+j+'" aria-selected="'+(j===nbAt.act? 'true' : 'false')+'"><small>'+NB_REF[x.r]+'</small><span>'+esc(x.t)+'</span></button>').join('')
+      +(hit.length>12? '<p class="thint">e altri '+(hit.length-12)+': scrivi per restringere</p>' : '')
+    : '<p class="thint">'+(nbAt.all.length? 'Niente con questo nome.' : 'Nessun layer, oggetto o particella nel progetto.')+'</p>'; }
+function nbAtKey(e){ if(!nbAt) return;
+  if(e.key==='Escape'){ e.preventDefault(); e.stopPropagation(); const i=nbAt.i; nbAtClose(); nbFocus('.nbb[data-i="'+i+'"] textarea'); }
+  else if(e.key==='ArrowDown'||e.key==='ArrowUp'){ e.preventDefault(); const n=nbAt.shown.length; if(n){ nbAt.act=(nbAt.act+(e.key==='ArrowDown'? 1 : n-1))%n; nbAtDraw(); } }
+  else if(e.key==='Enter'){ e.preventDefault(); nbAtPick(nbAt.act); } }
+function nbAtPick(j){ const A=nbAt, x=A&&A.shown[j], n=nbOpenNote(), b=n&&A&&n.b[A.i]; if(!x||!b||b.k!=='p'){ nbAtClose(); return; }
+  const has=A.pos>0&&b.x[A.pos-1]==='@', pre=b.x.slice(0, has? A.pos-1 : A.pos), sep=(pre&&!/\s$/.test(pre))? ' ' : '';   // the «@» typed gives way to the name
+  b.x=(pre+sep+'«'+x.t+'»'+b.x.slice(A.pos)).slice(0, NB_MAX.text);
+  b.refs=b.refs||[]; if(!b.refs.some(r=>r.r===x.r&&r.k===x.k&&r.t===x.t)&&b.refs.length<NB_MAX.refs) b.refs.push({r:x.r, k:x.k, t:x.t});
+  const i=A.i; nbAtClose(); nbSaved(n); nbRenderEdit(); nbFocus('.nbb[data-i="'+i+'"] textarea'); }
+function nbRefTool(){ const n=nbOpenNote()||nbNew(); if(!n) return; let i=n.b.length-1;   // the ribbon's «Layer o oggetto»: at the end of the last text block
+  if(i<0||n.b[i].k!=='p'){ if(n.b.length>=NB_MAX.blocks) return; n.b.push({k:'p', x:''}); i=n.b.length-1; nbSaved(n); }
+  nbRenderEdit(); setTimeout(function(){ try{ const ta=nbRoot().querySelector('.nbb[data-i="'+i+'"] textarea'); if(ta) nbAtOpen(ta, i, n.b[i].x.length); }catch(e){} }, 60); }
+function nbRefGo(r){ if(!r) return;
+  try{
+    if(r.r==='layer'){ const L=lcLayers(view.map), it=L.find(x=>lcKey(x.l)===r.k)||L.find(x=>lcName(x)===r.t); if(!it){ msg('Il layer «'+r.t+'» non è in questa mappa.', 'err'); return; }
+      let was=true, guard=0; for(let p=it.l; p&&p!==view.map&&guard<12; p=p.parent, guard++){ if(p.visible===false){ was=false; p.visible=true; } }
+      msg('Layer «'+r.t+'» '+(was? 'già acceso.' : 'acceso.'), 'ok'); return; }
+    if(r.r==='obj'){ const G=toolsGL.graphics.toArray(), g=(r.k&&G.find(x=>x.attributes&&x.attributes.sf_gid===r.k))||G.find(x=>x.attributes&&x.attributes._kind&&String(x.attributes.nome||geomDefName(x))===r.t);
+      if(!g){ msg('«'+r.t+'» non è più nella Raccolta.', 'err'); return; } selSet([g], 'only'); zoomGraphics([g]); return; }
+    if(r.r==='parcel'){ const p=(parcels||[]).find(x=>nbParcelKey(x)===r.k); if(!p){ msg('La particella «'+r.t+'» non è più nella Raccolta.', 'err'); return; } zoomParcelList([p]); }
+  }catch(e){ console.warn('[annotazioni] riferimento', e); } }
+
+// ── out of the app: plain text (the clipboard) and a PDF; the note open, or all of them from the list ──
+function nbExportList(){ const n=nbOpenNote(); return n? [n] : nbSorted(); }
+function nbText(L){ return L.map(n=>{ const body=n.b.map(b=>b.k==='todo'? (b.x.trim()? (b.on? '[x] ' : '[ ] ')+b.x : '') : b.k==='link'? ((b.x.trim()||b.u.trim())? (b.x.trim()||'Collegamento')+(b.u.trim()? ': '+b.u.trim() : '') : '') : b.x).filter(s=>s.trim()).join('\n');
+    return nbTitle(n)+'\n'+[nbDate(n.m), n.lab].filter(Boolean).join(' · ')+'\n\n'+body; }).join('\n\n— — —\n\n'); }
+function nbCopy(L){ L=L||nbExportList(); if(!L.length){ msg('Nessuna nota da copiare.', 'err'); return; }
+  const done=function(){ msg((L.length===1? 'Nota copiata' : L.length+' note copiate')+' negli appunti: incollala dove serve.', 'ok'); }, fail=function(){ msg('Il browser non lascia copiare negli appunti.', 'err'); };
+  try{ navigator.clipboard.writeText(nbText(L)).then(done, fail); }catch(e){ fail(); } }
+async function nbPdf(){ const L=nbExportList(); if(!L.length){ msg('Nessuna nota da mettere nel PDF.', 'err'); return null; }
+  try{ msg('Preparo il PDF delle note…'); const J=await prLib(), doc=new J({orientation:'portrait', unit:'mm', format:'a4'}), W=210, H=297, M=16, TW=W-2*M; let y=M;
+    const proj=(typeof projCur!=='undefined'&&projCur)||'Senza nome', today=prItaDate(new Date());
+    const dress=function(){ doc.setFillColor(PR_BLUE[0], PR_BLUE[1], PR_BLUE[2]); doc.rect(0, 0, W, 3, 'F'); doc.setFont('helvetica', 'normal'); doc.setFontSize(7.5); doc.setTextColor(142, 142, 147);
+      doc.text(prTxt('Geoportale AxpoSolar Italia · '+today+' · Annotazioni · '+proj), M, H-8); doc.text(String(doc.getNumberOfPages()), W-M, H-8, {align:'right'}); y=M; };
+    const need=function(h){ if(y+h>H-14){ doc.addPage('a4', 'portrait'); dress(); } };
+    const para=function(txt, size, style, rgb, ind){ const lh=size*0.42, x=M+(ind||0); doc.setFont('helvetica', style); doc.setFontSize(size);
+      doc.splitTextToSize(prTxt(txt), TW-(ind||0)).forEach(function(line){ need(lh); doc.setFont('helvetica', style); doc.setFontSize(size); doc.setTextColor(rgb[0], rgb[1], rgb[2]); doc.text(line, x, y+lh*0.8); y+=lh; }); };
+    dress();
+    L.forEach(function(n, k){ if(k){ y+=5; need(24); doc.setDrawColor(210, 210, 215); doc.setLineWidth(0.2); doc.line(M, y, W-M, y); y+=5; }
+      para(nbTitle(n), 13, 'bold', [29, 29, 31]); y+=1; para([nbDate(n.m), n.lab].filter(Boolean).join(' · '), 8, 'normal', [107, 107, 112]); y+=3;
+      n.b.forEach(function(b){ if(!(b.x||'').trim()&&!(b.u||'').trim()) return;
+        if(b.k==='todo'){ need(5); doc.setDrawColor(90, 90, 95); doc.setLineWidth(0.25); doc.rect(M, y+0.7, 2.8, 2.8, 'S'); if(b.on){ doc.line(M+0.6, y+2.2, M+1.3, y+2.9); doc.line(M+1.3, y+2.9, M+2.4, y+1.2); }
+          para(b.x, 9.5, 'normal', b.on? [120, 120, 125] : [29, 29, 31], 5); y+=1.2; }
+        else if(b.k==='link'){ para(b.x.trim()||'Collegamento', 9.5, 'bold', [29, 29, 31]); if(b.u.trim()) para(b.u.trim(), 8, 'normal', [57, 69, 207]); y+=1.5; }
+        else { b.x.split('\n').forEach(function(t){ if(t.trim()) para(t, 9.5, 'normal', [29, 29, 31]); else y+=2; });
+          if(b.refs&&b.refs.length) para('Riferimenti: '+b.refs.map(r=>NB_REF[r.r]+' «'+r.t+'»').join('; '), 7.5, 'normal', [107, 107, 112]); y+=2; } }); });
+    const name=(projSafe(proj)||'Progetto')+' - annotazioni.pdf', pages=doc.getNumberOfPages(); projDownload(doc.output('blob'), name);
+    msg('PDF delle note salvato nei Download: '+name+' ('+pages+(pages===1? ' pagina' : ' pagine')+').', 'ok'); return {name:name, pages:pages, notes:L.length};
+  }catch(e){ console.warn('[annotazioni] pdf', e); msg('Il PDF delle note non si fa: '+((e&&e.message)||e)+'.', 'err'); return null; } }
+
+// ── wiring: one listener per kind on the module (it follows the panel when it is undocked) ──
+window.nbSync=function(){ nbRender(); };   // 30-ui-glue.js: the module is in sight again (the text areas take their height)
+(function(){ const root=byId('modNotes'); if(!root) return;
+  root.addEventListener('input', nbOnInput); root.addEventListener('keydown', nbOnKey); root.addEventListener('click', nbOnClick);
+  const out=function(e){ if(nbAt&&!(e.target&&e.target.closest&&e.target.closest('#nbAt'))) nbAtClose(); };
+  try{ docOn('mousedown', out); }catch(e){ document.addEventListener('mousedown', out); }
+  nbRender(); })();
 </script>
 </body>
 </html>
