@@ -453,9 +453,20 @@ whose tooltip and the «i» say what the copy leaves out).
   scale bar and the north) and *Note*; the footer «scouting, non per costruzione» with the scale and the basemap. *Nella
   mappa* ticks the groups of the Raccolta (the parcels with their numbers or not; the owners' parcels off, printed without
   names) and *Layer accesi della mappa*; *Sfondo* is *Nessuno*, a basemap of the gallery or the one in use. The Raccolta
-  is drawn as vectors, the basemap and the layers as images. While the module is in sight a dashed rectangle on the map
+  is drawn as vectors, the basemap and the layers as images at 150 dpi (a layer whose detail stops before the sheet's
+  scale, as tiles and orthophotos do at 1:2.257, comes coarser and the message says which; since 2026-11-18 it no longer
+  lowers the others: an imported picture keeps its 150 dpi). While the module is in sight a dashed rectangle on the map
   shows the sheet; *Inquadra* brings the map to it. The cadastre of the Agenzia does not print (its server gives no CORS):
-  the parcels of the Raccolta carry their numbers instead.
+  the parcels of the Raccolta carry their numbers instead. *Avanzate* (since 2026-11-18, S7–S10; closed, its choices
+  stay in the browser): *Qualità* — 150, 220 or 300 dpi for the photograph, the layers and the imported pictures (a
+  drawn basemap stays at 150: its writing would shrink); *Simboli dei layer* — *Come a schermo* (the layers' writing
+  and symbols as large as on the screen, at any quality) or *Più piccoli, più dettaglio* (as before 18/11: more detail
+  in the layers made of images); *Nomi* — the names of the Raccolta's objects on the sheet: *Come sulla mappa* (the
+  groups with their names switched on), *Di tutti gli oggetti*, *Nessuno*, also *con la misura* (hectares, metres); a
+  name that would cover another is left out and the message says how many; an owner's name is never written;
+  *Post-it* — the post-its as coloured boxes (off at first: the sheet may go to a landowner); *Testo* — three sizes
+  for names, parcel numbers and post-its; *Legenda* — *Per categoria* (as before) or *Per oggetto* (one entry a name,
+  with an area, a line or a point for its mark), and *Nomi dei layer in mappa* under it.
 - **Risk Matrix** (since 2026-11-05, R1 of `docs/plan-risk-matrix.md`, on the computer and on a phone): the 28 rows of the
   company template IT_RISK_MATRIX_2025 in five sections (Conformity with Group Strategy, Compliance check, Site
   assessment, Land rights, Grid connection) and the project's box (code, name, coordinates, region, municipality,
@@ -793,7 +804,28 @@ How the app works inside, by subject, with the traps to know before editing. The
   while the module is in sight (`prSync` from `modShow`, `prWant` from `ribbonSync` and the 350 ms loop: a tab change or
   the panel closed take it away). `prBuild(o, {dpi})` returns `{doc, name, info}` (the test reads it; `prGo` saves): the
   background, then the Raccolta as jsPDF paths in the frame's metres, clipped to the frame, then the scale bar and north,
-  the header, the column, the footer. Standard PDF fonts are Latin-1: `prTxt` turns ’ – → … into ASCII.
+  the header, the column, the footer. Standard PDF fonts are Latin-1: `prTxt` turns ’ – → … into ASCII. The images come
+  from MapViews out of sight (`prShot`): at d dpi such a view stands at 1:N·96/d, so past a layer's `maxScale` it would
+  not draw and `prDpiFor` lowers the dpi to the layer's detail (`prMaxScale`: with its groups). The basemap is one JPEG.
+  The layers switched on (`prOpLeaves`: the operational ones that draw, bottom to top, no drawings) go in **runs of the
+  same dpi** (`prLayerRuns`), one transparent PNG a run, laid in the map's order; more than `PR_RUNS` (4) runs: the
+  nearest neighbours are joined. **Trap (2026-11-18):** they were one image at the lowest dpi of them all, so a single
+  layer with a scale limit brought an imported picture (a MediaLayer, no limit) to 21 dpi on a sheet at 1:500.
+  `info.runs` = `[{dpi, out, n, px, drawn}]`; a run under 60 % of the dpi asked is named in the message.
+  **«Avanzate» (2026-11-18, S7–S10).** `prOpts` adds `dpi` (`PR_QUAL`), `sym`, `names`, `meas`, `posts`, `txt`, `legBy`,
+  `legLayers`; the controls are kept in `localStorage` (`axpo_print_adv`, `prAdvLoad`, `prAdvSave`). *S8:* `prLayerRuns(leaves,
+  N, d, vd)` — `vd` is the dpi the view stands at (`dpi` of a run), `d` the dpi of its image (`out`): with `vd` = 96 the
+  view is at the sheet's own scale, so writing and symbols are as on the screen, and `prShot` asks the picture larger
+  (`o.out` → `takeScreenshot({width, height})`: **probed, the SDK draws the vectors again at that size**, it does not
+  stretch the bitmap; tiles and WMS stay at the screen's level and are stretched). A layer limited below `vd` keeps its
+  own dpi for both. *S7:* a basemap whose title is not a photograph stays at 150; the reference layers of a photograph
+  (the hybrid's roads and names) are taken apart at 150 and laid over it (`baseRef`). `takeScreenshot` has a timeout of
+  90 s. *S9:* the names are jsPDF texts with a halo (`prHalo`: the same text stroked, then filled), at `prAnchor` (the
+  centroid of an area, the middle of a line along its longest path, **of the part inside the sheet**:
+  `geometryEngine.intersect` with the frame); the parcels' numbers are all written, then the post-its (boxes), then the
+  names where a box is free (five places tried each; `info.namesOut` counts those left out). A name that already holds
+  its measure does not repeat it. *S10:* `prLegObj` — one entry a name, colour and kind; the parcels and the owners'
+  parcels stay one entry each. `bg.titles`: the layers drawn, without those hidden from the list.
 - **The Risk Matrix** (2026-11-05, R1; `34-risk-matrix.js`, plan `docs/plan-risk-matrix.md`). `rmState = {v, at, box,
   rows}`; a field is `{v, a, m, o, n}` (text, last draft, written by the PM, from the owners' file, newer draft aside).
   `rmCalc` measures in the local metric frame (16b): the base is the union of the gross areas (or of the parcels), each
@@ -3037,6 +3069,29 @@ letters of a text). Found on the way: `ribbonSoon` was never exposed as `window.
 files call it by (`23b-select-edit.js` since the selection, now `39-notes.js` and `23-draw-cad.js`): the ribbon
 followed only what changed the panels, and Esc on a map mode left its button pressed. It is exposed now. Backup: `geoportale_axpo_pre-annotazioni-3_2026-11-13.html` (the build of `feat/annotazioni-2`).
 
+**2026-11-18: the print, the layers switched on at their own resolution (found by the user: «sembra che sia impostata
+una stampa a bassa risoluzione», a sheet at 1:500 with imported, georeferenced pictures).** In the user's PDF the image
+of the layers was 146 × 139 px on 178 × 170 mm: 21 dpi. *Layer accesi della mappa* was one image for all the layers,
+taken at the lowest dpi among them, and one layer with a scale limit of 1:2.257 was on: 500 · 96 / 2.257 = 21. Now the
+layers go in runs of the same dpi, bottom to top, each with its own image laid in the map's order: the pictures at
+150 dpi (1.051 × 1.004 px on that sheet), the limited layer as before, named in the message («a bassa risoluzione (il
+loro dettaglio si ferma prima di 1:500): …»). A group switched off takes its layers with it; a group's scale limit
+counts for its layers. Tried for real with `scripts/geoportale_stampa_layer_prova.mjs` (before: 146 × 139; after:
+1.051 × 1.004 and 146 × 139). Backup: `geoportale_axpo_pre-stampa-risoluzione_2026-11-18.html` (UBS-IT `4b492f8`).
+
+**2026-11-18: Stampa › «Avanzate» (S7–S10, asked by the user: «un'opzione Avanzate, per gestire meglio le etichette,
+i nomi dei layer in mappa»; S11 and S12 refused).** A closed section of the module, eight controls, kept in the
+browser. *Qualità* 150 / 220 / 300 dpi. *Simboli dei layer*: «Come a schermo» is the new default (before, the
+layers' writing and symbols came at two thirds of their size on the screen, and at 300 dpi they would be a third):
+the view out of sight stands at 96 dpi and its picture is asked larger; «Più piccoli, più dettaglio» is the behaviour
+of before. *Nomi* of the Raccolta's objects on the sheet («Come sulla mappa» is the default, so a sheet changes only
+where the PM switched the names on), with the measure, with a halo, left out where they would cover another; the
+*Post-it* (off at first); three sizes of *Testo*; *Legenda* by category (the default, as asked) or by object, and the
+names of the layers of the map. The parcels' numbers gain the halo. Tried in a real Chrome
+(`scripts/geoportale_stampa_layer_prova.mjs` with its JSON of options): A4 at 220 and 300 dpi in 5–8 s, A3 at 300 dpi
+with the hybrid satellite in 11 s (2.973 × 2.840 px), the imported picture sharp at each. Not tried with the real
+login and web-map layers. Backup: `geoportale_axpo_pre-stampa-avanzate_2026-11-18.html` (UBS-IT `999185c`).
+
 ## 8. Repository contents
 
 ```
@@ -3392,3 +3447,14 @@ in §7):
   tool `nb-post`, `RIBBON_INFO`, `IMP_INFO.notes`, `window.ribbonSoon`), `32-tour.js`, `src/html/30-modals.html` (the guide);
   `tests/harness/notes.py`; `tests/README.md`; `docs/axpo-format.md` (§4, §5.9), `docs/plan-annotazioni.md` (§5);
   this README.
+- **The print, the layers at their own resolution (2026-11-18).** Changed: `src/js/33-print.js` (`prMaxScale`,
+  `prDpiFor`, `PR_RUNS`, `prLayerRuns`, `prOpLeaves`, `prBackground`: `layers` is a list, `runs`, `coarse`; `prBuild`:
+  `info.runs`, the note); `tests/harness/print.py`; `tests/README.md`; this README (§4, §5, §7, §8). Outside `tools/`:
+  `scripts/geoportale_stampa_layer_prova.mjs` (the trial in a real Chrome).
+- **Stampa › «Avanzate» (2026-11-18, S7–S10).** Changed: `src/js/33-print.js` (`PR_QUAL`, `PR_TXT`, `PR_ADV`, `prOpts`,
+  `prAdvLoad`, `prAdvSave`, `prAdvUi`, `prShot`: `o.out` and the timeout, `prLayerRuns`: `vd` and `out`, `prBackground`:
+  the basemap past 150 dpi, `baseRef`, `titles`; `prAnchor`, `prMeasOf`, `prClip`, `prHalo`, `prLegObj`; `prBuild`: the
+  names, the post-its, the legend; `prGo`: the names left out), `src/html/20-app-body.html` (`#prAdv`),
+  `src/css/60-tour.css`, `src/js/30-ui-glue.js` (`IMP_INFO.print`), `src/html/30-modals.html` (the guide);
+  `tests/harness/print.py`; `tests/README.md`; this README (§4, §5, §7, §8). Outside `tools/`:
+  `scripts/geoportale_stampa_layer_prova.mjs` (the options as JSON, a time limit).

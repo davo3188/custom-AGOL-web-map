@@ -1436,6 +1436,7 @@ dialog.dialog::backdrop { background: rgba(11, 18, 25, .45); }
   .rsres{flex:none;width:8px;height:8px;border-radius:50%;border:1px solid var(--line-strong)}
   /* 6/11 (R3a): the line «Excel», its two buttons and the link to read a matrix (36-risk-excel.js) */
   .j5row.rxrow{align-items:center} .rxrow .btn{flex:none} .rxbtns{margin:0 0 4px} .rxread{padding:0 2px 6px;font-size:11px}
+  #prAdv label.prsub{margin-top:0;padding-left:20px} #prAdv label.prsub:has(input:disabled){opacity:.5} #prAdv .im-body>label.chk{margin:0 0 6px}   /* 18/11 (S7–S10) */
   #prRiskSec label.rpsub{margin-top:5px;padding-left:20px} #prRiskSec label.rpsub:has(input:disabled){opacity:.5}   /* 6/11 (R4) */
   .rxopts{display:flex;gap:14px;padding:2px 2px 4px;font-size:12px} .rxopts label{display:flex;align-items:center;gap:5px;margin:0;font-weight:400;text-transform:none;letter-spacing:0;color:var(--txt)} .rxopts input{width:auto;margin:0}   /* 6/11 (R3b) */
   .rsres.hit{background:var(--accent);border-color:var(--accent)} .rsres.err{background:var(--err);border-color:var(--err)} .rsres.miss{background:var(--hover)} .rsres.vis{border-style:dashed} .rsres.login{background:var(--mut);border-color:var(--mut)}
@@ -2706,6 +2707,20 @@ dialog.dialog::backdrop { background: rgba(11, 18, 25, .45); }
             <label for="prNotes" class="sr-only">Note</label><textarea id="prNotes" rows="3" placeholder="Note sul foglio (facoltative)"></textarea>
           </div>
         </details>
+        <!-- 2026-11-18 (S7–S10, asked by the user): the finer choices of the sheet; they stay in this browser (axpo_print_adv) -->
+        <details class="imod flat" id="prAdv">
+          <summary><span class="im-t"><b>Avanzate</b></span><span class="im-n im-txt">qualità, nomi, legenda</span></summary>
+          <div class="im-body">
+            <div class="kv" title="La risoluzione delle immagini sul foglio: sfondo fotografico, layer accesi, immagini importate. Più alta: file più pesante e stampa più lenta. Uno sfondo disegnato (Topografica) resta a 150 dpi: le sue scritte rimpicciolirebbero"><label for="prQual">Qualità</label><select id="prQual"><option value="n">Normale · 150 dpi</option><option value="h">Alta · 220 dpi</option><option value="x">Massima · 300 dpi</option></select></div>
+            <div class="kv" title="Le scritte e i simboli dei layer accesi: grandi come li vedi a schermo, oppure più piccoli con più dettaglio nei layer fatti di immagini (WMS, tessere)"><label for="prSym">Simboli dei layer</label><select id="prSym"><option value="screen">Come a schermo</option><option value="detail">Più piccoli, più dettaglio</option></select></div>
+            <div class="kv" title="I nomi degli oggetti della Raccolta scritti sul foglio: dei gruppi che hanno i nomi accesi sulla mappa, di tutti, o di nessuno. Chi si sovrapporrebbe a un altro non si scrive; gli intestatari mai"><label for="prNames">Nomi</label><select id="prNames"><option value="map">Come sulla mappa</option><option value="all">Di tutti gli oggetti</option><option value="none">Nessuno</option></select></div>
+            <label class="chk prsub" title="Sotto il nome: gli ettari di un’area, i metri di una linea"><input type="checkbox" id="prMeas"> con la misura</label>
+            <label class="chk" title="I post-it dei gruppi spuntati, con il loro testo e il loro colore. Spento di partenza: il foglio può finire a un proprietario"><input type="checkbox" id="prPosts"> Post-it</label>
+            <div class="kv" title="La grandezza di nomi, numeri delle particelle e post-it"><label for="prTxtSize">Testo</label><select id="prTxtSize"><option value="s">Piccolo</option><option value="n" selected>Normale</option><option value="l">Grande</option></select></div>
+            <div class="kv" title="Una voce per categoria (Area lorda, Esclusione…) oppure una per oggetto, con il suo nome"><label for="prLegBy">Legenda</label><select id="prLegBy"><option value="cat">Per categoria</option><option value="obj">Per oggetto</option></select></div>
+            <label class="chk" title="Sotto la legenda, i nomi dei layer accesi stampati e delle immagini importate"><input type="checkbox" id="prLegLayers"> Nomi dei layer in mappa</label>
+          </div>
+        </details>
         <!-- 2026-11-06 (R4): the Risk Matrix attached to the PDF (38-risk-pdf.js) -->
         <details class="imod flat" id="prRiskSec">
           <summary><span class="im-t"><b>Risk Matrix</b></span><span class="im-n im-txt" id="prRiskSum"></span></summary>
@@ -2925,7 +2940,7 @@ dialog.dialog::backdrop { background: rgba(11, 18, 25, .45); }
       <li><b>Geoprocessi</b> — <b>Oggetti di partenza</b>: metti gli oggetti in A con A dalla mappa, dalle righe spuntate o per categoria (B serve a Parte comune e Sottrai); <b>Geoprocessi</b>: Buffer, Unione, Parte comune, Sottrai B da A, Contorno, Semplifica, Ritaglia, poi <b>Esegui</b> a destra: il risultato è un oggetto nuovo nella Raccolta, gruppo Analisi, e quelli di partenza restano.</li>
       <li><b>Importa</b> — <b>File</b>: GeoJSON, KML, KMZ, Shapefile (.zip) e il file di <b>Estrazione intestatari</b>, colorato e raggruppato per intestatario in fondo al blocco <b>Particelle</b> della Raccolta, dove il cestino della riga «Per intestatario» lo toglie tutto (i nominativi restano fuori dal salvataggio automatico e dal portale); <b>CAD</b>: un DWG letto nel browser, con il sistema proposto, oppure allineato a mano con due punti; <b>Immagini</b>: GeoTIFF e world file si posizionano da soli, PNG, JPG e PDF con sposta, scala, ruota o punti noti; <b>Servizi web</b>: WMS, WFS e ArcGIS REST dal loro indirizzo; <b>Portale</b>: un layer cercato per titolo.</li>
       <li><b>Annotazioni</b> — il taccuino del progetto. <b>Taccuino</b>: Nuova nota (titolo, etichetta e blocchi) e Tutte le note, l'elenco con la ricerca; <b>Inserisci</b>: Testo, Da fare (righe da spuntare), Collegamento (titolo e indirizzo di un documento: i file non si allegano), Layer o oggetto, che richiama per nome un layer della mappa, un oggetto della Raccolta o una particella (come <b>@</b> scritto nel testo) e lascia un riferimento da cliccare, <b>Fotografa la mappa</b> (la mappa com'è ora, con il mirino che torna a quella vista), Immagine (un file; una copiata o una schermata si incolla con Ctrl+V) e <b>Post-it sulla mappa</b> (una nota breve appuntata in un punto: è un punto di «Nota e riferimento», nella Raccolta, con il testo scritto sulla mappa); <b>Esporta le note</b>: PDF delle note e Copia come testo. Le note, con le loro immagini, si salvano da sole nel browser e viaggiano nel file .axpo, anche nella copia da condividere; non vanno sul portale e Annulla non le riguarda.</li>
-      <li><b>Salva ed esporta</b> — <b>Esporta</b>: GeoJSON, KML, KMZ, Shapefile (.zip) o la tabella XLSX delle particelle, con gli oggetti spuntati nella Raccolta o con tutto (il KML ha una cartella per gruppo, lo shapefile un file per gruppo; il nome del file viene da comune, data e numero di particelle); <b>Portale AGOL</b>: Migra particelle in AREAS (le spuntate o tutte, scelte anche nella sua finestra: una per particella, un'unica area dissolta o un'area per sottogruppo), Salva disegni in Site Features (categoria, tipo, attributi e sito: la seconda volta aggiorna, non duplica), Modifica AREAS COLLECTION; <b>Progetto</b>: Salva, Salva come, Apri; <b>Stampa</b>: un foglio PDF A4 o A3 con la Raccolta in scala, sfondo a scelta, dati, legenda e note (il rettangolo tratteggiato sulla mappa mostra il foglio), con la Risk Matrix allegata se la spunti; <b>Risk Matrix</b>: quattro passi per la matrice dei rischi del modello aziendale — l’area del progetto, il <b>controllo dei vincoli</b> sui layer della mappa aperta e nazionali entro 1 km dall’area (in «Layer letti» il tema di ogni layer e file), la revisione di colore, testi, fonti e commenti (il ricalcolo non tocca ciò che hai scritto), l’esportazione: <b>Crea l’Excel</b> compila il modello aziendale (scelto una volta, il browser lo ricorda), <b>Aggiorna…</b> scrive nella matrice del progetto, e una matrice già compilata si può leggere nel pannello; i fogli Cadastral e Constraints ricevono la tabella delle particelle e le mappe che scegli.</li>
+      <li><b>Salva ed esporta</b> — <b>Esporta</b>: GeoJSON, KML, KMZ, Shapefile (.zip) o la tabella XLSX delle particelle, con gli oggetti spuntati nella Raccolta o con tutto (il KML ha una cartella per gruppo, lo shapefile un file per gruppo; il nome del file viene da comune, data e numero di particelle); <b>Portale AGOL</b>: Migra particelle in AREAS (le spuntate o tutte, scelte anche nella sua finestra: una per particella, un'unica area dissolta o un'area per sottogruppo), Salva disegni in Site Features (categoria, tipo, attributi e sito: la seconda volta aggiorna, non duplica), Modifica AREAS COLLECTION; <b>Progetto</b>: Salva, Salva come, Apri; <b>Stampa</b>: un foglio PDF A4 o A3 con la Raccolta in scala, sfondo a scelta, dati, legenda e note (il rettangolo tratteggiato sulla mappa mostra il foglio), con la Risk Matrix allegata se la spunti; in Avanzate la qualità delle immagini, i nomi degli oggetti e la legenda per oggetto; <b>Risk Matrix</b>: quattro passi per la matrice dei rischi del modello aziendale — l’area del progetto, il <b>controllo dei vincoli</b> sui layer della mappa aperta e nazionali entro 1 km dall’area (in «Layer letti» il tema di ogni layer e file), la revisione di colore, testi, fonti e commenti (il ricalcolo non tocca ciò che hai scritto), l’esportazione: <b>Crea l’Excel</b> compila il modello aziendale (scelto una volta, il browser lo ricorda), <b>Aggiorna…</b> scrive nella matrice del progetto, e una matrice già compilata si può leggere nel pannello; i fogli Cadastral e Constraints ricevono la tabella delle particelle e le mappe che scegli.</li>
       <li><b>Raccolta</b>, a sinistra — tutto quello che raccogli, ad albero come i layer di QGIS: i gruppi (Particelle, Aree di progetto, Aree di esclusione, Analisi, Altro, Immagini, e i tuoi, <b>+ Gruppo</b>), dentro i sottogruppi delle particelle, poi gli oggetti, ogni livello un po' più rientrato; numero ed ettari a destra, occhio, nomi e menu passando sopra la riga. In alto il filtro per nome e <b>Comprimi</b>. Ogni riga ha la spunta (la selezione, che usano anche geoprocessi ed esportazione; <kbd>Maiusc</kbd>+clic spunta un intervallo), il colore, il nome (le particelle per foglio e numero, poi il comune), la cifra a destra, l'occhio e il menu <b data-icon="more"></b>, anche col tasto destro: rinomina, zoom, sposta in un gruppo, Proprietà, elimina. Un clic sulla riga fa lampeggiare l'oggetto sulla mappa, un doppio clic ci fa lo zoom. <b>Trascina</b> una riga su un sottogruppo (le particelle) o su un gruppo (gli altri oggetti) per spostarla: se è spuntata, vanno con lei tutte le selezionate; sulla riga Particelle una particella esce dai sottogruppi; dove non può andare non si accende nulla e, al rilascio, ti dico perché. La riga di un sottogruppo, o di un gruppo tuo, trascinata su un'altra ne cambia l'ordine. Annulla rimette tutto. Con qualcosa selezionato (spuntato qui, o scelto sulla mappa con <b>Modifica</b> › Seleziona e Riquadro) compare in cima la <b>barra della selezione</b>: Zoom, Sottogruppo o Gruppo (anche nuovo), Togli (o il tasto <kbd>Canc</kbd>; Annulla rimette tutto) e Deseleziona; il tasto destro su una riga selezionata, o sulla mappa su un oggetto selezionato, offre le stesse azioni per tutta la selezione. Il menu di un gruppo, di un sottogruppo e di Particelle ha lo <b>Zoom</b> su tutti i loro oggetti. Il bordo destro la allarga, <b data-icon="undock"></b> la sgancia in una finestra per il secondo schermo.</li>
       <li><b>Pannello a destra</b> — tre schede. <b>Proprietà</b>: le impostazioni dello strumento aperto e, in Modifica, la scheda dell'oggetto selezionato (categoria, tipo e attributi). <b>Layer</b>: cerca un layer per nome; dal pannello di ogni layer (icona a cursori) trasparenza, popup e <b>filtro per attributo</b> (l'icona diventa un imbuto quando è attivo); i layer aggiunti da te hanno il menu <b>…</b> con Zoom e Rimuovi dalla mappa. Un clic sulla mappa apre il popup anche sui layer a <b>tasselli vettoriali</b> che portano gli attributi (es. i vincoli paesaggistici della Campania nella vista d'insieme): campi e titolo come configurati nell'item, l'elemento non si evidenzia. A ogni cambio di mappa l'app controlla quali layer si caricano: quelli di server senza CORS (o che non rispondono) qui non si vedono, mentre nel Map Viewer sì; la riga <b>«n layer non disponibili qui»</b> apre l'elenco per motivo, con <b>Apri nel Map Viewer</b> e <b>Copia elenco</b>, e vi aggiunge i layer che avevi acceso nella mappa di prima e che quella nuova non ha. Il <b>Catasto AdE</b> è l'immagine ufficiale del WMS dell'Agenzia delle Entrate: fogli da 1:25.000, particelle e fabbricati da 1:5.000, numeri da 1:2.000. <b>Legenda</b>: i layer accesi. Anche questo pannello si allarga dal bordo e si sgancia.</li>
       <li><b>Sulla mappa</b> — in alto a destra la lente della <b>ricerca</b> (indirizzi, lat lon, oppure X Y in Gauss-Boaga o UTM, di cui indovina il sistema) e, sotto, <b data-icon="measure"></b> le <b>misure</b>: lineare, area, Pulisci (non si salvano); più sotto <b data-icon="cursor"></b> la <b>selezione</b>: Seleziona, Riquadro, Deseleziona, da qualsiasi scheda (le modifiche stanno nel tasto destro sulla selezione). In alto a sinistra zoom, bussola, posizione GPS, <b>Zoom sulla Raccolta</b> e <b>Luoghi</b>, i segnalibri; in basso a destra la <b>mappa di base</b>, con l'opacità; in basso al centro lo scalimetro. Col tasto destro: aggiungi la particella qui, analisi di contesto qui, buffer qui, copia le coordinate, apri in Google Maps, centra qui.</li>
@@ -12226,6 +12241,7 @@ function srchShowRow(obj, soft){ const root=byId('drawerElenco'); if(!root) retu
       +'<li>Scegli il <b>foglio</b> (A4 o A3, orizzontale o verticale), la <b>scala</b> e lo <b>sfondo</b>. Il rettangolo tratteggiato sulla mappa mostra cosa entra nel foglio; <b>'+icon('target')+' Inquadra</b> porta la mappa lì.</li>'
       +'<li>In <b>Nella mappa</b> spunta i gruppi della Raccolta da disegnare (le particelle anche con i numeri) e, se servono, i layer accesi della mappa.</li>'
       +'<li>In <b>Sul foglio</b> scegli dati, legenda con scala e nord, e scrivi le note.</li>'
+      +'<li>In <b>Avanzate</b>: la <b>qualità</b> delle immagini (150, 220 o 300 dpi: più alta, file più pesante e stampa più lenta); i <b>simboli dei layer</b> grandi come a schermo, o più piccoli con più dettaglio; i <b>nomi</b> degli oggetti della Raccolta (dei gruppi con i nomi accesi sulla mappa, di tutti o di nessuno), anche <b>con la misura</b>; i <b>post-it</b>; la grandezza del <b>testo</b>; la <b>legenda</b> per categoria o per oggetto e i <b>nomi dei layer in mappa</b>. Le scelte restano in questo browser.</li>'
       +'<li>In <b>Risk Matrix</b>, <b>Allega la Risk Matrix</b> aggiunge dopo il foglio le pagine A4 orizzontali della matrice (spuntata da sola quando la matrice ha qualcosa di scritto); <b>Una mappa per tema</b> e <b>Tabella delle particelle</b> aggiungono le mappe del foglio Constraints e le particelle dell’area, senza intestatari.</li>'
       +'<li>Premi <b>'+icon('print')+' Salva PDF</b>.</li></ol>'
       +'<h3>La scala</h3><ul>'
@@ -12236,6 +12252,7 @@ function srchShowRow(obj, soft){ const root=byId('drawerElenco'); if(!root) retu
       +'<li>Il <b>catasto dell’Agenzia</b> non va in stampa: il suo server non permette di copiarne l’immagine. Le particelle della Raccolta si disegnano con i loro numeri.</li>'
       +'<li>Le particelle degli intestatari partono spente e si stampano <b>senza nomi</b>.</li>'
       +'<li>Un layer acceso il cui server non permette la copia resta fuori: il foglio si fa lo stesso e lo dice.</li>'
+      +'<li>Un nome che si sovrapporrebbe a un altro non si scrive: il messaggio dice quanti. Un layer il cui dettaglio si ferma prima della scala del foglio (ortofoto, tessere) esce a bassa risoluzione, senza abbassare gli altri.</li>'
       +'<li>Il foglio porta la scritta «scouting, non per costruzione»: è un documento di lavoro.</li></ul>'},
     risk:{t:'Risk Matrix', s:'La matrice dei rischi del progetto, con le righe del modello aziendale 2025.', h:   // 5/11 (R1), docs/plan-risk-matrix.md
       '<h3>Come si usa: quattro passi</h3><ol>'
@@ -12889,6 +12906,9 @@ function srchShowRow(obj, soft){ const root=byId('drawerElenco'); if(!root) retu
 const PR_JSPDF='https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
 const PR_DPI=150, PR_SCALES=[250,500,1000,1500,2000,2500,3000,4000,5000,7500,10000,15000,20000,25000,50000,100000,250000,500000];
 const PR_BLUE=[57,69,207], PR_PARCEL='#F5A623';
+// 18/11 (S7–S10, «Avanzate»): the dpi of the images, the size of the texts on the map, the choices kept in this browser
+const PR_QUAL={n:150, h:220, x:300}, PR_TXT={s:0.82, n:1, l:1.3}, PR_ADV_KEY='axpo_print_adv';
+const PR_ADV=['prQual', 'prSym', 'prNames', 'prMeas', 'prPosts', 'prTxtSize', 'prLegBy', 'prLegLayers'];
 let prOn=false, prT=0, prLibP=null, prNumsOn=true, prLayersOn=false;
 const prSel=new Map();   // the groups ticked in the panel, kept while it is redrawn
 // jsPDF, fetched at the first print and run with no AMD `define` in sight (the SDK's loader would take it as a module)
@@ -12943,7 +12963,13 @@ function prBaseTitle(v){ if(v==='none'||v==null||v==='') return ''; if(v==='cur'
 function prOpts(){ const v=id=>{ const e=$(id); return e? e.value : ''; }, c=id=>{ const e=$(id); return !!(e&&e.checked); }, box=$('prGroups');
   return {title:v('prTitle').trim(), paper:v('prPaper')||'a4', orient:v('prOrient')||'l', scale:v('prScale')||'fit', base:v('prBase')||'none', layers:c('prLayers'),
     groups:box? [...box.querySelectorAll('input[data-g]:checked')].map(x=>x.dataset.g) : [], nums:c('prNums'), legend:c('prLegend'), data:c('prData'), notes:v('prNotes').trim(),
-    risk:c('prRisk'), riskMaps:c('prRiskMaps'), riskParcels:c('prRiskParcels')}; }   // 6/11 (R4): the Risk Matrix attached (38-risk-pdf.js)
+    risk:c('prRisk'), riskMaps:c('prRiskMaps'), riskParcels:c('prRiskParcels'),   // 6/11 (R4): the Risk Matrix attached (38-risk-pdf.js)
+    dpi:PR_QUAL[v('prQual')]||PR_DPI, sym:v('prSym')==='detail'? 'detail' : 'screen', names:v('prNames')||'map', meas:c('prMeas'), posts:c('prPosts'),
+    txt:v('prTxtSize')||'n', legBy:v('prLegBy')==='obj'? 'obj' : 'cat', legLayers:c('prLegLayers')}; }   // 18/11 (S7–S10): «Avanzate»
+function prAdvLoad(){ let s=null; try{ s=JSON.parse(localStorage.getItem(PR_ADV_KEY)||'null'); }catch(e){} if(!s||typeof s!=='object') return;
+  PR_ADV.forEach(id=>{ const e=$(id); if(!e||!(id in s)) return; if(e.type==='checkbox') e.checked=!!s[id]; else if([...e.options].some(x=>x.value===s[id])) e.value=s[id]; }); }
+function prAdvSave(){ const s={}; PR_ADV.forEach(id=>{ const e=$(id); if(e) s[id]= e.type==='checkbox'? e.checked : e.value; }); try{ localStorage.setItem(PR_ADV_KEY, JSON.stringify(s)); }catch(e){} }
+function prAdvUi(){ const n=$('prNames'), ms=$('prMeas'); if(n&&ms) ms.disabled=n.value==='none'; }
 
 // ── the sheet: the page and the map's frame in millimetres ──
 function prLayout(o){ const k=o.paper==='a3'? Math.SQRT2 : 1, land=o.orient!=='p', W=(land? 297 : 210)*k, H=(land? 210 : 297)*k, M=12*k;
@@ -12994,7 +13020,8 @@ async function prShot(map, ext, pw, ph, o){ const div=document.createElement('di
     for(let i=0; i<(o.waits||120)&&v.updating; i++) await new Promise(res=>setTimeout(res, 500));   // half a second at a time (one long timer would jump ahead under virtual time)
     slow=v.updating; await new Promise(res=>setTimeout(res, 300));
     if(o.check){ try{ await o.check(v); }catch(e){} }   // 11/11 (Risk Matrix): what the view holds when the picture is taken
-    const shot=await v.takeScreenshot({format:o.fmt||'jpg', quality:88}), D=shot.data&&shot.data.data; let empty=false;
+    // 18/11 (S8): o.out — the picture larger than the view; a picture that never comes back must not hold the sheet
+    const shot=await prTimeout(v.takeScreenshot(Object.assign({format:o.fmt||'jpg', quality:88}, o.out? {width:o.out[0], height:o.out[1]} : {})), 90000, 'la fotografia della mappa non arriva'), D=shot.data&&shot.data.data; let empty=false;
     if(D){ let a=0, a2=0, n=0; for(let i=0; i<D.length; i+=64){ const l=(D[i]+D[i+1]+D[i+2])/3*D[i+3]/255; a+=l; a2+=l*l; n++; }
       const mu=a/n; empty=Math.sqrt(Math.max(0, a2/n-mu*mu))<1.5; }
     return {url:shot.dataUrl, slow:slow, empty:empty};
@@ -13003,8 +13030,27 @@ async function prShot(map, ext, pw, ph, o){ const div=document.createElement('di
 // with a clear background, laid over it); an empty image is left out; {base, layers, failed, slow, empty}. At d dpi the view
 // out of sight stands at 1:N·96/d for the SDK (1:1.000 on paper is 1:640 at 150 dpi): past a layer's maxScale it would not
 // draw (the AGEA orthophotos stop at 1:2.257), so such a layer lowers the dpi of its image to its own detail
-function prDpiFor(layers, N, d){ return layers.reduce((x, l)=>(l&&l.maxScale>0)? Math.min(x, N*96/l.maxScale*0.98) : x, d); }
-async function prBackground(fr, o, dpi){ const m=fr.L.map, d=dpi||PR_DPI, out={base:null, layers:null, failed:[], slow:false, empty:false};
+function prMaxScale(l){ let s=0, n=0; for(let q=l; q&&q.type&&n++<12; q=q.parent) if(q.maxScale>s) s=q.maxScale; return s; }   // with its groups (0 = no limit)
+function prDpiFor(layers, N, d){ return layers.reduce((x, l)=>{ const s=l? prMaxScale(l) : 0; return s>0? Math.min(x, N*96/s*0.98) : x; }, d); }
+// 18/11: the layers switched on, bottom to top, in runs of the same dpi: one image a run, laid in the map's order. Before,
+// they were one image at the lowest dpi of them all: a single layer with a scale limit (tiles down to 1:2.257) brought an
+// imported picture to 21 dpi on a sheet at 1:500. More than PR_RUNS runs: the two nearest neighbours are joined
+// 18/11 (S8): d is the dpi of the image, vd the dpi the view stands at (`dpi` of a run; `out` is its image's). vd = 96:
+// the view is at the sheet's own scale, so the layers' writing and symbols are as large as on the screen, and the picture is
+// taken larger than the view (takeScreenshot draws the vectors again at the size asked: probed on 18/11, a line three times
+// as wide and as sharp). vd = d: as before, smaller symbols and more detail in the layers made of images. A layer limited
+// below vd keeps its own dpi, for the view and for the image
+const PR_RUNS=4;
+function prLayerRuns(leaves, N, d, vd){ const runs=[]; vd=vd||d; const outOf=q=>q<vd? q : d;
+  leaves.forEach(l=>{ const q=Math.round(prDpiFor([l], N, vd)*10)/10, last=runs[runs.length-1]; if(last&&last.dpi===q) last.layers.push(l); else runs.push({dpi:q, out:outOf(q), layers:[l]}); });
+  while(runs.length>PR_RUNS){ let k=0, best=Infinity; for(let i=0; i<runs.length-1; i++){ const r=Math.abs(Math.log(runs[i].dpi/runs[i+1].dpi)); if(r<best){ best=r; k=i; } }
+    const q=Math.min(runs[k].dpi, runs[k+1].dpi); runs.splice(k, 2, {dpi:q, out:outOf(q), layers:runs[k].layers.concat(runs[k+1].layers)}); }
+  return runs; }
+// the operational layers that draw (a group off takes its layers with it), bottom to top; no drawings, no ground
+function prOpLeaves(M){ const out=[], walk=c=>c.forEach(l=>{ if(!l||l.visible===false) return; if(l.type==='group'){ if(l.layers) walk(l.layers); return; }
+    if(l.type!=='graphics'&&l.type!=='elevation') out.push(l); });
+  try{ if(M&&M.layers) walk(M.layers); }catch(e){} return out; }
+async function prBackground(fr, o, dpi){ const m=fr.L.map, d=dpi||o.dpi||PR_DPI, out={base:null, baseRef:null, basePx:null, layers:[], runs:[], titles:[], coarse:[], failed:[], slow:false, empty:false};
   const px=q=>[Math.max(16, Math.round(m.w/25.4*q)), Math.max(16, Math.round(m.h/25.4*q))];
   // the extent in the view's reference: the centre and the spans of the frame's edges (the frame is a true rectangle on the ground)
   const P=(x, y)=>fr.f.toView(new esriMods.Graphic({geometry:{type:'point', x:x, y:y, spatialReference:fr.f.sr}}).geometry);
@@ -13012,11 +13058,19 @@ async function prBackground(fr, o, dpi){ const m=fr.L.map, d=dpi||PR_DPI, out={b
   const ext={xmin:c.x-(r.x-l.x)/2, xmax:c.x+(r.x-l.x)/2, ymin:c.y-(t.y-b.y)/2, ymax:c.y+(t.y-b.y)/2, spatialReference:view.spatialReference};
   const base=prBaseOf(o.base);
   const take=s=>{ if(s.slow) out.slow=true; return s.empty? null : s.url; };
-  if(base){ const z=px(prDpiFor(base.baseLayers.toArray().concat(base.referenceLayers.toArray()), fr.N, d));
-    const s=await prShot(new esriMods.Map({basemap:base}), ext, z[0], z[1], {fmt:'jpg', white:true}); out.empty=s.empty; out.base=take(s); }
-  const M=view.map, ops=o.layers&&M? M.allLayers.toArray().filter(x=>x.visible&&x.type!=='graphics'&&x.type!=='elevation'&&!(M.basemap&&(M.basemap.baseLayers.includes(x)||M.basemap.referenceLayers.includes(x)))) : [];
-  if(ops.length){ const inBase=x=>!!(M.basemap&&(M.basemap.baseLayers.includes(x)||M.basemap.referenceLayers.includes(x)));
-    const z=px(prDpiFor(ops, fr.N, d)); out.layers=take(await prShot(M, ext, z[0], z[1], {fmt:'png', hide:x=>x.type==='graphics'||inBase(x), failed:out.failed})); }
+  // 18/11 (S7): past 150 dpi only a photograph gains (a deeper level of its tiles). A drawn basemap would come with smaller
+  // writing, so it stays at 150; and so do the labels over a photograph (its reference layers), taken apart and laid over it
+  if(base){ const bl=base.baseLayers.toArray(), rl=base.referenceLayers.toArray(), photo=/satellit|ortofoto|imagery/i.test(prBaseTitle(o.base));
+    const q=photo? d : Math.min(d, PR_DPI), apart=rl.length>0&&q>PR_DPI, z=px(prDpiFor(apart? bl : bl.concat(rl), fr.N, q));
+    const s=await prShot(new esriMods.Map({basemap:base}), ext, z[0], z[1], Object.assign({fmt:'jpg', white:true}, apart? {show:x=>bl.includes(x)} : {})); out.empty=s.empty; out.base=take(s); out.basePx=z;
+    if(apart&&out.base){ const zr=px(prDpiFor(rl, fr.N, PR_DPI)); out.baseRef=take(await prShot(new esriMods.Map({basemap:base}), ext, zr[0], zr[1], {fmt:'png', show:x=>rl.includes(x)})); } }
+  const M=view.map, vd=o.sym==='detail'? d : Math.min(96, d), runs=o.layers? prLayerRuns(prOpLeaves(M), fr.N, d, vd) : [];
+  for(const r of runs){ const set=new Set(r.layers), has=g=>!!(g.layers&&g.layers.some(c=>set.has(c)||has(c))), z=px(r.dpi), zo=px(r.out);   // a group stays on for its layers
+    const u=take(await prShot(M, ext, z[0], z[1], {fmt:'png', out:r.out>r.dpi? zo : null, show:x=>set.has(x)||(x.type==='group'&&has(x)), failed:out.failed}));
+    if(u){ out.layers.push(u); r.layers.forEach(l=>{ if(l.listMode!=='hide') out.titles.push(l.title||'layer'); }); }
+    out.runs.push({dpi:r.dpi, out:r.out, n:r.layers.length, px:zo, drawn:!!u});
+    if(u&&r.out<d*0.6) r.layers.forEach(l=>out.coarse.push(l.title||'layer')); }
+  out.titles=[...new Set(out.titles)].filter(t=>!out.failed.includes(t));
   return out; }
 
 // ── the drawing ──
@@ -13032,32 +13086,93 @@ function prLabelOf(x){ const a=x.attributes;
   if(!a) return 'Particelle'; if(ownIs(x)) return 'Particelle degli intestatari';
   const c=a.sf_cat&&sfCat(a.sf_cat); if(c) return c.l; return a._kind==='import'? 'Importati' : a._sub==='geoproc'? 'Analisi' : 'Disegni'; }
 function prHaOf(g){ try{ return Math.abs(esriMods.geometryEngine.geodesicArea(g, 'hectares'))||0; }catch(e){ return 0; } }
+// ── 18/11 (S9, S10): the names on the sheet and the legend by object ──
+// where a name goes, in the frame's metres: the centroid of an area, the middle of a line along its longest path, the point
+// itself; {p:[x, y], w: its size, for the order}. Only the part inside the sheet counts (rect: the frame), so a line that
+// crosses the sheet has its name on it
+function prAnchor(l, rect){ try{ let g=l;
+    if(rect&&(l.type==='polygon'||l.type==='polyline')){ try{ g=esriMods.geometryEngine.intersect(l, rect); }catch(e){ g=l; } if(!g) return null; }
+    if(g.type==='point') return {p:[g.x, g.y], w:0};
+    if(g.type==='multipoint') return g.points&&g.points.length? {p:g.points[0], w:0} : null;
+    if(g.type==='polygon'){ const c=g.centroid||(g.extent&&g.extent.center), e=g.extent; return c? {p:[c.x, c.y], w:e? Math.hypot(e.width, e.height) : 1} : null; }
+    if(g.type==='polyline'){ let best=null, bl=-1; const len=p=>{ let s=0; for(let i=1; i<p.length; i++) s+=Math.hypot(p[i][0]-p[i-1][0], p[i][1]-p[i-1][1]); return s; };
+      (g.paths||[]).forEach(p=>{ const s=len(p); if(s>bl){ bl=s; best=p; } }); if(!best||!best.length) return null;
+      let h=bl/2; for(let i=1; i<best.length; i++){ const d=Math.hypot(best[i][0]-best[i-1][0], best[i][1]-best[i-1][1]);
+        if(d>0&&h<=d){ const t=h/d; return {p:[best[i-1][0]+(best[i][0]-best[i-1][0])*t, best[i-1][1]+(best[i][1]-best[i-1][1])*t], w:bl||1}; } h-=d; }
+      return {p:best[0], w:bl||1}; }
+  }catch(e){} return null; }
+function prMeasOf(x){ try{ const g=x.geometry; if(g.type==='polygon') return fmtHa2(prHaOf(g));
+    if(g.type==='polyline'){ const v=Math.abs(esriMods.geometryEngine.geodesicLength(g, 'meters'))||0; return typeof fmtLen==='function'? fmtLen(v) : Math.round(v)+' m'; } }catch(e){} return ''; }
+function prClip(doc, s, w){ if(doc.getTextWidth(s)<=w) return s; let t=s; while(t.length>1&&doc.getTextWidth(t+'...')>w) t=t.slice(0, -1); return t.replace(/\s+$/, '')+'...'; }   // with the font in use
+// a text with a halo, centred on its point: it reads over a photograph, a picture or the drawings (inv: light on dark)
+function prHalo(doc, s, x, y, fs, bold, inv){ const ink=inv? 255 : 30, hl=inv? 25 : 255, op={align:'center', baseline:'middle'};
+  doc.setFont('helvetica', bold? 'bold' : 'normal'); doc.setFontSize(fs); doc.setLineJoin('round'); doc.setLineWidth(fs*0.3528*0.28); doc.setDrawColor(hl, hl, hl); doc.setTextColor(ink, ink, ink);
+  doc.text(s, x, y, Object.assign({renderingMode:'stroke'}, op)); doc.text(s, x, y, Object.assign({renderingMode:'fill'}, op)); }
+// the legend by object: one entry a name, colour and kind (a: area, l: line, p: point); the parcels and the owners' parcels
+// stay one entry each (an owner's name is never written)
+function prLegObj(L, x, lab, hex, type){ let t=lab; const a=x.attributes;
+  try{ if(a&&!ownIs(x)) t=(typeof nbPostIs==='function'&&nbPostIs(x))? 'Post-it' : String(a.nome||geomDefName(x)||lab); }catch(e){}
+  const kind=type==='polyline'? 'l' : (type==='point'||type==='multipoint')? 'p' : 'a', key=t+'|'+hex+'|'+kind; if(!L.some(e=>e.key===key)) L.push({t:t, c:hex, k:kind, key:key}); }
 // the PDF: returns {doc, name, info}; nothing is saved here (prGo saves, the test reads)
 async function prBuild(o, opt){ opt=opt||{};
   const JsPDF=await prLib(); await geoFrameLoad(); const fr=prFrame(o); if(!fr) throw new Error('la mappa non è ancora pronta');
   const L=fr.L, k=L.k, m=L.map, doc=new JsPDF({orientation:L.land? 'landscape' : 'portrait', unit:'mm', format:o.paper==='a3'? 'a3' : 'a4'});
-  const info={N:fr.N, bg:false, bgNote:'', legend:[], figures:{}, labels:0};
+  const info={N:fr.N, bg:false, bgNote:'', legend:[], figures:{}, labels:0, names:0, namesOut:0, posts:0, legLayers:[], dpi:opt.dpi||o.dpi||PR_DPI};
   // the background (an error does not stop the sheet: it goes without, and says why)
-  let bg=null; if(o.base!=='none'||o.layers){ try{ bg=await prBackground(fr, o, opt.dpi); }catch(e){ info.bgNote='sfondo non disponibile ('+((e&&e.message)||e)+')'; } }
-  if(bg&&bg.base){ doc.addImage(bg.base, 'JPEG', m.x, m.y, m.w, m.h); info.bg=true; }
-  if(bg&&bg.layers){ doc.addImage(bg.layers, 'PNG', m.x, m.y, m.w, m.h, undefined, 'FAST'); info.layers=true; }   // deflated: raw it is 4 bytes a pixel
+  let bg=null; if(o.base!=='none'||o.layers){ try{ bg=await prBackground(fr, o, info.dpi); }catch(e){ info.bgNote='sfondo non disponibile ('+((e&&e.message)||e)+')'; } }
+  if(bg&&bg.base){ doc.addImage(bg.base, 'JPEG', m.x, m.y, m.w, m.h); info.bg=true; info.basePx=bg.basePx; }
+  if(bg&&bg.baseRef){ doc.addImage(bg.baseRef, 'PNG', m.x, m.y, m.w, m.h, undefined, 'FAST'); info.baseRef=true; }   // 18/11 (S7): the labels over a photograph, at 150 dpi
+  if(bg&&bg.layers.length){ bg.layers.forEach(u=>doc.addImage(u, 'PNG', m.x, m.y, m.w, m.h, undefined, 'FAST')); info.layers=true; }   // deflated: raw it is 4 bytes a pixel
+  if(bg) info.runs=bg.runs;
   if(bg&&bg.failed.length) info.bgNote='non stampati (il loro server non lo permette): '+[...new Set(bg.failed)].slice(0, 3).join(', ');
   else if(bg&&bg.empty&&bg.slow) info.bgNote='lo sfondo non si è caricato in un minuto: il foglio esce senza';
   else if(bg&&bg.empty) info.bgNote='lo sfondo «'+prBaseTitle(o.base)+'» è vuoto qui (fuori copertura o senza dettagli a questa scala): il foglio esce senza';
   else if(bg&&bg.slow) info.bgNote='lo sfondo era ancora in caricamento dopo un minuto: potrebbe mancare qualche tessera';
+  if(bg&&bg.coarse.length) info.bgNote=(info.bgNote? info.bgNote+'; ' : '')+'a bassa risoluzione (il loro dettaglio si ferma prima di 1:'+prN(fr.N)+'): '+[...new Set(bg.coarse)].slice(0, 3).join(', ');
   // the Raccolta, clipped to the frame
-  const X=p=>[m.x+(p[0]-fr.x0)*fr.s, m.y+(fr.y1-p[1])*fr.s], seen=new Map(), dark=info.bg&&/satellit|ortofoto|imagery/i.test(prBaseTitle(o.base));
-  const P=[], parcelsIn=[];
+  const X=p=>[m.x+(p[0]-fr.x0)*fr.s, m.y+(fr.y1-p[1])*fr.s], seen=new Map(), byObj=[], dark=info.bg&&/satellit|ortofoto|imagery/i.test(prBaseTitle(o.base));
+  const P=[], NM=[], PQ=[], parcelsIn=[];   // the parcels' numbers, the names to write, the post-its
+  // 18/11 (S9): whose name goes on the sheet — «come sulla mappa» the groups with their names switched on, all, or none
+  const named= o.names==='all'? ()=>true : o.names==='none'? ()=>false : x=>{ try{ return x.visible!==false&&!!LBL[grpOf(x)]; }catch(e){ return false; } };
+  const isPost=x=>{ try{ return typeof nbPostIs==='function'&&nbPostIs(x); }catch(e){ return false; } };
+  const rectL=new esriMods.Graphic({geometry:{type:'polygon', rings:[[[fr.x0, fr.y1], [fr.x0+fr.gw, fr.y1], [fr.x0+fr.gw, fr.y1-fr.gh], [fr.x0, fr.y1-fr.gh], [fr.x0, fr.y1]]], spatialReference:fr.f.sr}}).geometry;
+  const inside=q=>q[0]>m.x&&q[0]<m.x+m.w&&q[1]>m.y&&q[1]<m.y+m.h;
   doc.saveGraphicsState(); doc.rect(m.x, m.y, m.w, m.h, null); doc.clip(); doc.discardPath();
   o.groups.forEach(id=>prItems(id).forEach(x=>{ const g=x.attributes? x.geometry : geojsonToEsri(x.geometry); if(!g) return; let l=null; try{ l=fr.f.toLocal(g); }catch(e){} if(!l) return;
-    const hex= x.attributes? (graphicColorHex(x)||'#2FB6E6') : PR_PARCEL, lab=prLabelOf(x);
-    if(prDraw(doc, l, X, hex, k)&&!seen.has(lab)) seen.set(lab, hex);
-    if(!x.attributes){ parcelsIn.push(x); if(o.nums&&l.type==='polygon'){ try{ const c=l.centroid; if(c) P.push([X([c.x, c.y]), String(x.particella||'')]); }catch(e){} } } }));
-  if(P.length){ doc.setFont('helvetica', 'bold'); doc.setFontSize(6.5*Math.sqrt(k)); doc.setTextColor(dark? 255 : 40, dark? 255 : 40, dark? 255 : 40);
-    P.forEach(t=>{ if(t[1]){ doc.text(prTxt(t[1]), t[0][0], t[0][1], {align:'center', baseline:'middle'}); info.labels++; } }); }
+    const hex= x.attributes? (graphicColorHex(x)||'#2FB6E6') : PR_PARCEL, lab=prLabelOf(x), drawn=prDraw(doc, l, X, hex, k);
+    if(drawn){ if(!seen.has(lab)) seen.set(lab, hex); prLegObj(byObj, x, lab, hex, l.type); }
+    if(!x.attributes){ parcelsIn.push(x); if(o.nums&&l.type==='polygon'){ try{ const c=l.centroid; if(c) P.push([X([c.x, c.y]), String(x.particella||'')]); }catch(e){} } return; }
+    if(!drawn||ownIs(x)) return;   // an owner's parcel never carries its name
+    const post=o.posts&&isPost(x); if(!post&&!named(x)) return;
+    const a=prAnchor(l, rectL), q=a&&X(a.p); if(!q||!inside(q)) return;
+    if(post) PQ.push({q:q, t:nbPostText(x), col:nbPostHex(x.attributes.color)});
+    else { const t=String(x.attributes.nome||geomDefName(x)||'').trim(), sub=o.meas? prMeasOf(x) : '';   // a name that already says its measure (the automatic net area) does not repeat it
+      NM.push({q:q, pt:l.type==='point'||l.type==='multipoint', w:a.w, t:t, sub:sub&&t.indexOf(sub)<0? sub : ''}); } }));
+  // the writing on the map: the parcels' numbers (all of them, as before), the post-its, then the names where there is room
+  const tk=(PR_TXT[o.txt]||1)*Math.sqrt(k), mmOf=pt=>pt*0.3528, boxes=[], free=b=>!boxes.some(a=>b[0]<a[2]&&b[2]>a[0]&&b[1]<a[3]&&b[3]>a[1]);
+  const clampX=(cx, w)=>Math.max(m.x+0.4+w/2, Math.min(cx, m.x+m.w-0.4-w/2)), clampY=(cy, h)=>Math.max(m.y+0.4+h/2, Math.min(cy, m.y+m.h-0.4-h/2));
+  if(P.length){ const fs=6.5*tk, h=mmOf(fs);
+    P.forEach(t=>{ if(!t[1]) return; const s=prTxt(t[1]); prHalo(doc, s, t[0][0], t[0][1], fs, true, dark); const w=doc.getTextWidth(s);
+      boxes.push([t[0][0]-w/2-0.3, t[0][1]-h/2-0.2, t[0][0]+w/2+0.3, t[0][1]+h/2+0.2]); info.labels++; }); }
+  if(PQ.length){ const fs=7*tk, lh1=mmOf(fs)*1.2, pad=1.1*Math.sqrt(k), maxW=40*k;   // a coloured box above and to the right of its point, as on the map
+    PQ.forEach(p=>{ doc.setFont('helvetica', 'normal'); doc.setFontSize(fs); let T=doc.splitTextToSize(prTxt(p.t)||'Post-it', maxW-2*pad); if(T.length>6){ T=T.slice(0, 6); T[5]=prClip(doc, T[5]+'...', maxW-2*pad); }
+      const w=Math.max.apply(null, T.map(s=>doc.getTextWidth(s)))+2*pad, h=T.length*lh1+2*pad-0.4, cx=clampX(p.q[0]+1.2*k+w/2, w), cy=clampY(p.q[1]-1.2*k-h/2, h), c=prRgb(p.col), ink=prRgb(nbPostInk(p.col));
+      doc.setFillColor(c[0], c[1], c[2]); doc.setDrawColor(70, 70, 70); doc.setLineWidth(0.2); doc.rect(cx-w/2, cy-h/2, w, h, 'FD');
+      doc.setTextColor(ink[0], ink[1], ink[2]); T.forEach((s, i)=>doc.text(s, cx-w/2+pad, cy-h/2+pad+lh1*(i+0.74), {renderingMode:'fill'}));
+      boxes.push([cx-w/2, cy-h/2, cx+w/2, cy+h/2]); info.posts++; }); }
+  if(NM.length){ const fs=7.5*tk, fs2=6.3*tk, h1=mmOf(fs), h2=mmOf(fs2);
+    NM.sort((a, b)=>(b.pt-a.pt)||(b.w-a.w));   // the points first (their name has few places), then the largest
+    NM.forEach(n=>{ if(!n.t) return; doc.setFont('helvetica', 'bold'); doc.setFontSize(fs); const s=prClip(doc, prTxt(n.t), 60*k), w1=doc.getTextWidth(s); let s2='', w2=0;
+      if(n.sub){ doc.setFont('helvetica', 'normal'); doc.setFontSize(fs2); s2=prTxt(n.sub); w2=doc.getTextWidth(s2); }
+      const w=Math.max(w1, w2)+0.8, h=(s2? h1+h2*1.2 : h1)+0.6, st=h+0.3, off=1.5*k+h/2;
+      const tries= n.pt? [[0, -off], [0, off], [w/2+1.8*k, 0], [-(w/2+1.8*k), 0], [0, -off-st]] : [[0, 0], [0, -st], [0, st], [0, -2*st], [0, 2*st]];
+      let put=null; for(const t of tries){ const cx=clampX(n.q[0]+t[0], w), cy=clampY(n.q[1]+t[1], h), b=[cx-w/2, cy-h/2, cx+w/2, cy+h/2]; if(free(b)){ put={cx:cx, cy:cy, b:b}; break; } }
+      if(!put){ info.namesOut++; return; }   // no room: left out, and the message says how many
+      const y1=s2? put.cy-h/2+0.3+h1/2 : put.cy; prHalo(doc, s, put.cx, y1, fs, true, dark); if(s2) prHalo(doc, s2, put.cx, y1+h1/2+h2*0.7, fs2, false, dark);
+      boxes.push(put.b); info.names++; }); }
   doc.restoreGraphicsState();
   doc.setDrawColor(201, 201, 207); doc.setLineWidth(0.3); doc.rect(m.x, m.y, m.w, m.h, 'S');
-  info.legend=[...seen.entries()].map(e=>({t:e[0], c:e[1]}));
+  info.legend= o.legBy==='obj'? byObj.map(e=>({t:e.t, c:e.c, k:e.k})) : [...seen.entries()].map(e=>({t:e[0], c:e[1]}));   // 18/11 (S10): by object when asked, by category as before
   // scale bar and north arrow, on white, inside the frame
   if(o.legend){ const len=prNice(fr.gw/4), bw=len*fr.s, bx=m.x+4*k, by=m.y+m.h-6*k;
     doc.setFillColor(255, 255, 255); doc.setGState(new doc.GState({opacity:0.85})); doc.rect(bx-2*k, by-5*k, bw+10*k, 9*k, 'F'); doc.setGState(new doc.GState({opacity:1}));
@@ -13083,9 +13198,21 @@ async function prBuild(o, opt){ opt=opt||{};
     if(comuni.length) F.comuni=comuni.slice(0, 3).join(', ')+(comuni.length>3? '…' : '');
     if(Object.keys(F).length&&head('Dati')){ if(F.parcels) row('Particelle', F.parcels); if(F.gross) row('Area lorda', F.gross); if(F.net) row('Area netta', F.net);
       if(F.comuni) row(comuni.length===1? 'Comune' : 'Comuni', F.comuni); y+=lh*0.6; } }
-  if(o.legend&&info.legend.length&&head('Legenda')){ info.legend.forEach(e=>{ if(y>bottom) return; const c=prRgb(e.c); doc.setFillColor(c[0], c[1], c[2]); doc.setGState(new doc.GState({opacity:0.35}));
-      doc.rect(C.x, y-2.6*k, 5*k, 3.2*k, 'F'); doc.setGState(new doc.GState({opacity:1})); doc.setDrawColor(c[0], c[1], c[2]); doc.setLineWidth(0.35*k); doc.rect(C.x, y-2.6*k, 5*k, 3.2*k, 'S');
-      doc.setFont('helvetica', 'normal'); doc.setFontSize(8.2*Math.sqrt(k)); doc.setTextColor(58, 58, 60); doc.text(prTxt(e.t), C.x+7*k, y); y+=lh; }); y+=lh*0.6; }
+  // the entries that fit: the last row says how many are left out (by object they can be many)
+  const fitRows=(E, keep)=>{ const room=Math.max(1, Math.floor((bottom-y)/lh)+1-(keep||0)); return E.length>room? {show:E.slice(0, Math.max(1, room-1)), more:E.length-Math.max(1, room-1)} : {show:E, more:0}; };
+  const legText=(t, x)=>{ doc.setFont('helvetica', 'normal'); doc.setFontSize(8.2*Math.sqrt(k)); doc.setTextColor(58, 58, 60); doc.text(prClip(doc, prTxt(t), C.x+C.w-x), x, y); };
+  const layT=(o.legend&&o.legLayers&&bg)? bg.titles.slice().reverse() : [];   // 18/11 (S10): the layers of the map by name, the topmost first
+  if(o.legend&&info.legend.length&&head('Legenda')){ const F=fitRows(info.legend, layT.length? 3 : 0);
+    F.show.forEach(e=>{ if(y>bottom) return; const c=prRgb(e.c);
+      if(e.k==='l'){ doc.setDrawColor(c[0], c[1], c[2]); doc.setLineWidth(0.6*k); doc.line(C.x, y-1*k, C.x+5*k, y-1*k); }
+      else if(e.k==='p'){ doc.setFillColor(c[0], c[1], c[2]); doc.circle(C.x+2.5*k, y-1*k, 1.1*k, 'F'); }
+      else { doc.setFillColor(c[0], c[1], c[2]); doc.setGState(new doc.GState({opacity:0.35})); doc.rect(C.x, y-2.6*k, 5*k, 3.2*k, 'F'); doc.setGState(new doc.GState({opacity:1}));
+        doc.setDrawColor(c[0], c[1], c[2]); doc.setLineWidth(0.35*k); doc.rect(C.x, y-2.6*k, 5*k, 3.2*k, 'S'); }
+      legText(e.t, C.x+7*k); y+=lh; });
+    if(F.more&&y<=bottom){ legText('... e altri '+F.more, C.x+7*k); y+=lh; } y+=lh*0.6; }
+  if(layT.length&&head('Layer in mappa')){ const F=fitRows(layT, 0);
+    F.show.forEach(t=>{ if(y>bottom) return; doc.setFillColor(142, 142, 147); doc.rect(C.x+0.4*k, y-2.1*k, 1.7*k, 1.7*k, 'F'); legText(t, C.x+4*k); info.legLayers.push(t); y+=lh; });
+    if(F.more&&y<=bottom){ legText('... e altri '+F.more, C.x+4*k); y+=lh; } y+=lh*0.6; }
   if(o.notes&&head('Note')){ doc.setFont('helvetica', 'normal'); doc.setFontSize(8.2*Math.sqrt(k)); doc.setTextColor(58, 58, 60);
     doc.splitTextToSize(prTxt(o.notes), C.w).forEach(l=>{ if(y<=bottom){ doc.text(l, C.x, y); y+=lh; } }); }
   // the footer
@@ -13101,7 +13228,8 @@ async function prGo(){ const b=$('prGo'); if(b&&b.disabled) return; if(b){ b.dis
   try{ const r=await prBuild(prOpts()); const url=URL.createObjectURL(r.doc.output('blob')), a=document.createElement('a'); a.href=url; a.download=r.name;
     document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url), 4000);
     const rk=r.info.risk, rkT=rk? (rk.pages? '; Risk Matrix: '+rk.pages+(rk.pages===1? ' pagina' : ' pagine')+(rk.maps? ', '+rk.maps+(rk.maps===1? ' mappa' : ' mappe') : '') : '')+((rk.notes||[]).length? ' ('+rk.notes.join('; ')+')' : '') : '';
-    toolMsg('prMsg', 'PDF salvato: '+r.name+(r.info.bgNote? ' — '+r.info.bgNote : '')+rkT+'.', r.info.bgNote||(rk&&(rk.notes||[]).length)? '' : 'ok');
+    const no=r.info.namesOut, noT=no? ' — '+no+(no===1? ' nome non scritto: si sovrapponeva a un altro' : ' nomi non scritti: si sovrapponevano ad altri') : '';   // 18/11 (S9)
+    toolMsg('prMsg', 'PDF salvato: '+r.name+(r.info.bgNote? ' — '+r.info.bgNote : '')+noT+rkT+'.', r.info.bgNote||(rk&&(rk.notes||[]).length)? '' : 'ok');
   }catch(e){ toolMsg('prMsg', 'Il foglio non si fa: '+((e&&e.message)||e)+'.', 'err'); console.warn('[stampa]', e); }
   finally{ if(b) b.disabled=false; } }
 window.prSync=prSync;
@@ -13112,6 +13240,7 @@ document.addEventListener('DOMContentLoaded', function(){
   ['prPaper', 'prOrient', 'prScale', 'prBase'].forEach(id=>{ const s=$(id); if(s) s.addEventListener('change', ()=>{ if(id==='prBase') s.dataset.set='1'; prFrameSoon(); }); });
   const fb=$('prFrame'); if(fb) fb.onclick=()=>{ let fr=null; try{ fr=prFrame(prOpts()); }catch(e){} if(fr&&fr.rectView&&view) view.goTo(fr.rectView.extent.clone().expand(1.15)).catch(()=>{}); };
   const go=$('prGo'); if(go) go.onclick=prGo;
+  const adv=$('prAdv'); if(adv){ prAdvLoad(); prAdvUi(); adv.addEventListener('change', ()=>{ prAdvUi(); prAdvSave(); }); }   // 18/11 (S7–S10): the choices stay in this browser
   window.addEventListener('axpo-view', ()=>{ try{ esriMods.reactiveUtils.when(()=>view.stationary, ()=>{ if(prOn) prFrameSoon(); }); }catch(e){} });
 });
 </script>
