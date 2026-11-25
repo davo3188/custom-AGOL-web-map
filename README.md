@@ -82,7 +82,7 @@ py -3 scripts/build.py --check    exit 1 if the built file is not up to date
 py -3 scripts/make_tokens.py      writes src/css/10-tokens.css from design/tokens.json (the family's tokens); --check
 py -3 scripts/make_icons.py       writes src/html/05-icons.html, the sprite of the icons the sources use (the family's, and the app's own in design/icons-local); --check, --list
 py -3 scripts/make_kit.py         writes src/css/12-kit.css and 13-geo-kit.css from design/kit.css and geo-kit.css (verbatim); --check
-py -3 tests/run.py                headless checks, Python + Chrome, 40 harnesses, about nine minutes (see tests/README.md)
+py -3 tests/run.py                headless checks, Python + Chrome, 42 harnesses, about nine minutes (see tests/README.md)
 ```
 
 `design/` holds the design system's inputs, copied verbatim from the family (`tokens.json`, `icons/*.svg`, `kit.css`,
@@ -142,7 +142,9 @@ site and the writes to AREAS COLLECTION and IT - Site Features. This section fol
   filters would be lost (`wmHasStateToLose`).
 - On the right: **Apri progetto** (Ctrl+O), **Salva progetto** (Ctrl+S; Shift+click or Ctrl+Shift+S saves as),
   **Annulla** and **Ripeti** (Ctrl+Z, Ctrl+Y; since 2026-11-02, J5h: they serve every change of the work, so they sit
-  by the project instead of Disegna › Seleziona e modifica; the tooltip names the command), **Accedi / Esci** (one
+  by the project instead of Disegna › Seleziona e modifica; the tooltip names the command), **Svuota il lavoro** (since
+  2026-11-25, Z1: a red bin between two rules, in sight from every tab; it asks first and says that Annulla does not
+  bring the work back; on a phone a red entry of «Altro»), **Accedi / Esci** (one
   button, grey or green dot, the user's name in the tooltip; OAuth with the organisation account), the light or dark
   theme (`axpo_theme`), **⚙ Impostazioni** (J5g: the window `#setModal` with the Zornade key, what the browser keeps,
   *Svuota il lavoro*, *Ripristina tutto*; on a phone an entry of «Altro»), **?** for help.
@@ -341,9 +343,11 @@ every operation are in the «i», `GP_INFO.gpAll`). Distances and tolerances are
   Above 5,000 vertices the buffer simplifies first (said in the message and the name); the others warn above 20,000.
 ### Importa
 
-Groups **File · CAD · Immagini · Servizi web · Portale**; one module at a time in Proprietà: its button (*Scegli uno o
-più file…*, *Scegli un disegno DWG…*, *Scegli un'immagine…*, J5b) or the service's address, then what it has loaded and
-the last message; how it works is the «i» by the panel's title.
+Groups **Progetto salvato · File · CAD · Immagini · Servizi web · Portale**; one module at a time in Proprietà: its
+button (*Scegli uno o più file…*, *Scegli un disegno DWG…*, *Scegli un'immagine…*, J5b) or the service's address, then
+what it has loaded and the last message; how it works is the «i» by the panel's title.
+- **Progetto salvato** (since 2026-11-25, Z2): *Progetto .axpo* opens a saved project. It is the same command as *Apri
+  progetto…* (Ctrl+O, the folder of the top bar): it replaces the work, after a confirmation. The users looked for it here.
 - **File**: GeoJSON, KML, KMZ, Shapefile (.zip), into the group *Altro*; a file exported from here comes back to its
   place (since 2026-11-03, B2): the parcels to Particelle in their subgroup (those already there skipped), the drawings
   to their category and their own group; the automatic strips and net area are left out (they come back from their
@@ -533,6 +537,11 @@ The left panel, *Raccolta*, with a count badge (parcels and objects); one scroll
 - **Group header**: tick all, name, count, total area, eye, names on the map, ⋯ (*Zoom sul gruppo*, *Spunta tutti*, *Togli le spunte*,
   *Sposta qui i selezionati*, *Elimina tutti gli oggetti*; personal groups also *Rinomina*, *Sposta su / giù*, *Elimina
   il gruppo*). Open or collapsed is remembered (`axpo_grp_open`).
+- **The hectares of a group** (since 2026-11-25, Z4): *Aree di progetto* says the gross area alone (it added gross and
+  net, which are the same land); *Aree di esclusione* says what its areas take from the gross area, an overlap counted
+  once, so that gross − exclusions = net when there is no setback; without a gross area, the land they cover. The
+  tooltip says which figure it is and gives the sum of the areas drawn. The other groups add their areas up; a row
+  keeps the whole area of its object.
 - **Particelle**: «12 · 15,30 ha» in its row (the cadastral area; the tooltip says how many have none); ⋯ with *Zoom sulle
   particelle*, *Nuovo sottogruppo*, *Colore di tutte le particelle…* and *Togli tutte le particelle* (until 2026-11-02 two
   icons of the header); the **subgroups** (one level, same
@@ -547,7 +556,9 @@ The left panel, *Raccolta*, with a count badge (parcels and objects); one scroll
   is the automation's. Past 30 rows: *Mostra altre n* (`RC_LIMIT`). A parcel's row reads «Fg 10 · 100 · Comune» (sheet and
   number first: the narrow panel cuts the end). A click on a row makes its object flash on the map (brought into view
   when out of it), a double click zooms on it; Shift+click on a tick ticks every row up to the last one ticked.
-- **The selection bar** (since 2026-11-02): while something is ticked, on top of the Raccolta, «4 selezionate · 4,00 ha»
+- **The selection bar** (since 2026-11-02): while something is ticked, on the bottom edge of the panel, over the list
+  (since 2026-11-25, Z3: on top it pushed every row down at the first tick, and the next click fell on another row),
+  «4 selezionate · 4,00 ha»
   with *Zoom*, *Sottogruppo* (or *Gruppo*: the moves of the whole selection, also into a new one), *Togli* (also the
   Canc key; asks; Annulla restores) and *Deseleziona*. The right-click on a selected row, or on the map on a selected
   object, offers the same for the whole selection; on a row not selected, that row's own menu (the selection stays);
@@ -680,8 +691,9 @@ bar.
 ### The phone
 
 - Up to 768 px the tabs, ribbon, strips and status bar hide; a bar at the foot has *Cerca · Analizza · Disegna ·
-  Raccolta* (with the count) *· Altro* (Modifica, Geoprocessi, Importa, Salva ed esporta, Layer, Legenda, Mappa di base,
-  Luoghi, Impostazioni, Guida rapida). The top bar keeps Apri, Salva, Annulla and Ripeti. Modifica AREAS COLLECTION and the tours stay on the computer (Stampa goes on the phone since 2026-11-03); **?** opens the guide,
+  Raccolta* (with the count) *· Altro* (Modifica, Geoprocessi, Importa, Annotazioni, Salva ed esporta, Layer, Legenda,
+  Mappa di base, Luoghi, Svuota il lavoro in red, Impostazioni, Guida rapida). The top bar keeps Apri, Salva, Annulla and
+  Ripeti. Modifica AREAS COLLECTION and the tours stay on the computer (Stampa goes on the phone since 2026-11-03); **?** opens the guide,
   with the profile at its foot.
 - The panels are sheets over the map, one at a time: 31 % of the screen at rest, 84 % with the handle, × to close. A
   tab's sheet shows its ribbon tools first, group by group, then the module. A map mode drops the sheet to rest and
@@ -1004,6 +1016,13 @@ How the app works inside, by subject, with the traps to know before editing. The
 - **Trap:** `#rformPop` is a kit `.menu` (a grid capped at 420 px), so it is `display:block` with a 620 px cap. The
   wide-panel card grid needs `.paneBody .gpcards`, or the later base rule wins.
 - **Trap:** «i» buttons are wired by `.im-info`, not `.imod .im-info`: those outside modules would be mute.
+- **«Svuota il lavoro» in the top bar (Z1, 2026-11-25).** `#workClearBtn` (`10-topbar.html`, red in `20-shell.css`)
+  runs `resetWork` like the button of Impostazioni, which stays; `projUi` switches it off while a project is being saved
+  or opened. It is a command of the top bar (`CMD_BAR`, `work-clear`, group «Lavoro»: an entry of `CMD_BAR` may name its
+  group with `g`), so Ctrl K finds it. On a phone the button is hidden and `MORE` has the entry `clear`, red.
+- **A saved project from Importa (Z2, 2026-11-25).** The group «Progetto salvato» of `SHELL.import` has one tool,
+  `imp-proj`, that presses `#projOpenBtn`: one code path for the three ways in. **Trap:** `RIBBON_INFO` and the `texts`
+  harness go by the group's label, and «Progetto» is the group of Salva ed esporta: a second group needs its own label.
 - **Trap:** the hidden `#drwDock` keeps old module titles (the `texts` harness skips it). A control moved into a
   popover must stay reachable from it, like «Da un lato» (`#shpRotPick`) through a `data-press` button of `aidForm`.
 
@@ -1297,6 +1316,23 @@ How the app works inside, by subject, with the traps to know before editing. The
 - **Trap:** `.grp` is the kit's toolbar, so a group block is `.ggrp`; `.gsub` is the row subtitle, so a subgroup block
   is `.psub` (narrow: `.psubN` stacks the name above the figures).
 - **Trap:** the automatic net area makes «Aree di progetto» a mixed group: switch it off before testing category lines.
+- **The hectares of a group (Z4, 2026-11-25).** `grpFigure(G, arr)` in `22a-groups.js` gives the header its figure
+  and its tooltip. *Aree di progetto*: the gross areas of the group (one: its own figure, so header and row agree;
+  more: their union), never gross + net; with no gross area, the plain sum. *Aree di esclusione*: the union of the
+  group's areas (`geoUnion`) cut on the union of every gross area of the work (`grpGrossAll`, the filter of
+  `sfAutoSync`; `geoIntersect`), in geodesic hectares; without a gross area the union alone. Every polygon of the group
+  counts, whatever its category: the header says what the group holds. `grpUnionHa` remembers the result by the
+  signatures of the geometries (`sfGeomSig`), because `renderGeoms` runs at every change. While the metric frame is
+  loading the header shows the plain sum and redraws once it is there (`grpFigWait`). The other groups, and the selection
+  bar, still add up.
+- **Trap:** the figure of *Aree di esclusione* is not the sum of its rows, by design: the tooltip gives both.
+- **The selection bar at the bottom (Z3, 2026-11-25).** `#rcSelBar` is the last child of `#drawerElenco` and
+  `position:sticky; bottom:0`: shown, it adds its height after the list, so no row moves. `#drawerElenco.open` is a flex
+  column with `min-height:100%` and the bar has `margin-top:auto`, so with a short list it sits on the bottom edge too.
+  `#leftBody` has `scroll-padding-bottom`, so that a row brought into view (`srchShowRow`, `block:'nearest'`) stops above
+  the bar. It moves with the panel into the undocked window.
+- **Trap:** in a flex column the margins of the blocks do not collapse: the blocks of the Raccolta use bottom margins
+  only, so nothing moved (measured before and after). A block given a top margin would shift.
 - **Trap:** the section helpers (`sectionGraphics`, `setSectionSel`, `sectionDelete`, `wireSectionTools`…) take a group
   id and still accept the origin keys `draw`, `geo`, `import`, `images`. `wireSectionTools` runs after every redraw and
   also refreshes the names on the map and the terrain's list of gross areas.
@@ -3092,6 +3128,19 @@ names of the layers of the map. The parcels' numbers gain the halo. Tried in a r
 with the hybrid satellite in 11 s (2.973 × 2.840 px), the imported picture sharp at each. Not tried with the real
 login and web-map layers. Backup: `geoportale_axpo_pre-stampa-avanzate_2026-11-18.html` (UBS-IT `999185c`).
 
+**2026-11-25: four changes asked by the user (Z1–Z4, «ok su tutto»).** *Z1*: «Svuota il lavoro» was only in
+Impostazioni; it is now a red bin in the top bar, in sight from every tab (on a phone a red entry of «Altro»), and its
+question names the notes and the Risk Matrix and says that Annulla does not bring the work back. *Z2*: the tab Importa
+opens with «Progetto salvato › Progetto .axpo», the same command as *Apri progetto…* (it replaces the work after a
+confirmation; adding a project to the work in progress was offered and not chosen). *Z3*: the selection bar of the
+Raccolta appeared on top of the list and pushed every row down by 68 px at the first tick, so the next click fell on
+another row; it now sits on the bottom edge of the panel and no row moves (measured: 0 px, with a short list and with
+a long one). *Z4*: the header of *Aree di progetto* added the gross and the net area (2,00 + 1,65 = «3,65 ha» in the
+trial) and now says the gross area alone; the header of *Aree di esclusione* added every area drawn (0,50 ha, one of
+them half outside) and now says what they take from the gross area, an overlap counted once (0,35 ha: gross −
+exclusions = net); the tooltip explains the figure. The rows are unchanged. Two new harnesses, `figures` and
+`clearwork` (42). Backup: `geoportale_axpo_pre-z1-z4_2026-11-25.html` (UBS-IT `9820b68`).
+
 ## 8. Repository contents
 
 ```
@@ -3458,3 +3507,12 @@ in §7):
   `src/css/60-tour.css`, `src/js/30-ui-glue.js` (`IMP_INFO.print`), `src/html/30-modals.html` (the guide);
   `tests/harness/print.py`; `tests/README.md`; this README (§4, §5, §7, §8). Outside `tools/`:
   `scripts/geoportale_stampa_layer_prova.mjs` (the options as JSON, a time limit).
+- **Four changes asked by the user (2026-11-25, Z1–Z4).** Changed: `src/html/10-topbar.html` (`#workClearBtn`),
+  `src/html/20-app-body.html` (`#rcSelBar` last in `#drawerElenco`), `src/html/30-modals.html` (the guide, the hint of
+  Impostazioni); `src/css/20-shell.css` (the red button), `src/css/50-panels.css` (`.rcselbar`, `#drawerElenco.open`,
+  `#leftBody`), `src/css/85-status-phone.css`; `src/js/13-tools-select.js` (the wiring), `src/js/14-state-project.js`
+  (`resetWork`, `projUi`), `src/js/22a-groups.js` (`grpFigure`, `grpUnionHa`, `grpGrossAll`, `grpBlock`),
+  `src/js/29b-commands.js` (`CMD_BAR`, `CMD_RUN`), `src/js/30-ui-glue.js` (`SHELL.import`, `RIBBON_INFO`, `MORE`, the
+  guide of Progetto), `src/js/31-measure-coords.js`, `src/js/32-tour.js`. New: `tests/harness/figures.py`,
+  `tests/harness/clearwork.py`. Changed tests: `geo.py` (the header of Aree di progetto), `texts.py` (30 groups);
+  `tests/README.md`; this README (§3, §4, §5, §7, §8).
