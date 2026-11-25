@@ -754,6 +754,10 @@ dialog.dialog::backdrop { background: rgba(11, 18, 25, .45); }
   #topbar h1{font-size:15px;margin:0;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .topbar-right{margin-left:auto;display:flex;align-items:center;gap:10px}
   #projName{font-size:13px;color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:280px}
+  /* 25/11 (Z1): «Svuota il lavoro» in the top bar, red, in sight from every tab (it was only in Impostazioni) */
+  #workClearBtn{color:var(--err);border-color:color-mix(in srgb,var(--err) 55%,var(--line));background:color-mix(in srgb,var(--err) 10%,transparent)}
+  #workClearBtn:hover{background:color-mix(in srgb,var(--err) 22%,transparent)}
+  #workClearBtn:disabled{opacity:.5}
   @media (max-width:1180px){ .wmsel .k{display:none} #projName{max-width:140px} .divider,.project{display:none} }   /* the map selector sits in the middle: no room for the project name */
 
   /* ══ SHELL (phase 2A-2, 2026-10-21): the family's rows — top bar · tabs · ribbon · workspace — with the panels docked.
@@ -1180,8 +1184,12 @@ dialog.dialog::backdrop { background: rgba(11, 18, 25, .45); }
   #list{max-height:none;overflow:visible;min-height:0;border:0;margin-top:2px}
   .rctool{display:flex;align-items:center;gap:6px;margin:0 0 8px} .rctool input{flex:1;min-width:0;height:28px;font-size:12px;padding:0 8px;margin:0}
   .rcfn{font-size:11px;color:var(--mut);white-space:nowrap} .rctool .btn.sm{flex:none;margin:0}
-  /* 2/11 (M4): the selection bar, on top of the Raccolta while something is selected; in a narrow panel the words take the first line */
-  .rcselbar{position:sticky;top:0;z-index:3;display:flex;flex-wrap:wrap;align-items:center;gap:4px;margin:0 0 8px;padding:5px 6px 5px 10px;border:1px solid color-mix(in srgb,var(--accent) 45%,var(--line));border-radius:var(--radius-md);background:color-mix(in srgb,var(--accent) 10%,var(--panel))}
+  /* 2/11 (M4): the selection bar of the Raccolta, shown while something is selected; in a narrow panel the words take the first line.
+     25/11 (Z3): at the bottom of the panel, over the list: on top it pushed every row down at the first tick. The Raccolta is a
+     column as tall as its panel so that the bar sits on the bottom edge with a short list too; a row brought into view stops above it */
+  #drawerElenco.open{display:flex;flex-direction:column;min-height:100%}
+  #leftBody{scroll-padding-bottom:76px}
+  .rcselbar{position:sticky;bottom:0;z-index:3;display:flex;flex-wrap:wrap;align-items:center;gap:4px;margin:auto 0 0;padding:5px 6px 5px 10px;border:1px solid color-mix(in srgb,var(--accent) 45%,var(--line));border-radius:var(--radius-md);background:color-mix(in srgb,var(--accent) 10%,var(--panel))}
   .rcselbar[hidden]{display:none}
   .rcseln{flex:1 1 140px;min-width:0;font-size:12px;font-weight:600}
   .rcselacts{flex:none;display:flex;align-items:center;gap:4px;margin-left:auto}
@@ -1805,6 +1813,7 @@ dialog.dialog::backdrop { background: rgba(11, 18, 25, .45); }
   #moreMenu{position:fixed;left:8px;right:8px;z-index:46;width:auto}
   #moreMenu [role="menuitem"]{width:100%;text-align:left}
   #moreMenu .hint{margin:6px 10px 4px}
+  #moreMenu [data-go="clear"]{color:var(--err)}
   @media (max-width:768px){
     #topbar{gap:8px;padding:0 8px}
     #topbar .brand{gap:6px} #topbar .brand h1{display:none} #projName{display:none}
@@ -1813,7 +1822,7 @@ dialog.dialog::backdrop { background: rgba(11, 18, 25, .45); }
     #wmMenu{left:8px;right:8px;transform:none;width:auto}
     .topbar-right{flex:1;min-width:0;gap:4px}
     #signin{padding:0 8px} #signin .nm{display:none}
-    #themeToggle,#setBtn{display:none}   /* H8: the mockup's top bar keeps the brand mark, the map, the project, the sign-in and «?»; 2/11 (J5): Annulla and Ripeti too, the ⚙ is in «Altro» */
+    #themeToggle,#setBtn,#workClearBtn{display:none}   /* H8: the mockup's top bar keeps the brand mark, the map, the project, the sign-in and «?»; 2/11 (J5): Annulla and Ripeti too, the ⚙ is in «Altro»; 25/11 (Z1): «Svuota il lavoro» too, in red */
     #tabs,#ribbon,.strip,#sideUndock,#leftUndock,#sideToggle .icon,#leftPanel .ptabs,#sideTabs,.pgrip,#statusbar,.divider,.project,#scaleDock{display:none!important}
     #appBody{padding-bottom:calc(56px + env(safe-area-inset-bottom,0px))}
     #mbar{display:grid;position:fixed;left:0;right:0;bottom:0;z-index:45;padding-bottom:env(safe-area-inset-bottom,0px)}
@@ -2093,6 +2102,11 @@ dialog.dialog::backdrop { background: rgba(11, 18, 25, .45); }
          (they were in Disegna › Seleziona e modifica); histUi keeps their state and tooltip -->
     <button class="tb icon-only" id="drwUndo" type="button" data-icon="undo" disabled aria-label="Annulla" title="Niente da annullare"></button>
     <button class="tb icon-only" id="drwRedo" type="button" data-icon="redo" disabled aria-label="Ripeti" title="Niente da ripetere"></button>
+    <!-- 25/11 (Z1): «Svuota il lavoro» in sight from every tab, red, between two rules; it asks before it empties (resetWork).
+         On a phone it is a red entry of «Altro» -->
+    <span class="divider"></span>
+    <button class="tb icon-only" id="workClearBtn" type="button" data-icon="trash" aria-label="Svuota il lavoro" title="Svuota il lavoro: toglie tutto dalla mappa e dalla Raccolta e riparte da una mappa pulita. Chiede conferma; Annulla non lo riporta"></button>
+    <span class="divider"></span>
     <button class="signin" id="signin" title="Non connesso ad AGOL · clicca per accedere" aria-label="Accedi con AGOL (non connesso)"><span class="dot" id="authDot" aria-hidden="true"></span><span class="ai" id="authIco" aria-hidden="true" data-icon="login"></span><span class="nm" id="authTxt">Accedi</span></button>
     <button class="tb icon-only" id="themeToggle" data-icon="moon" aria-label="Cambia tema chiaro/scuro" title="Tema chiaro/scuro"></button>
     <button class="tb icon-only" id="setBtn" type="button" data-icon="settings" aria-haspopup="dialog" aria-label="Impostazioni" title="Impostazioni: chiave del catasto e dati salvati nel browser"></button>   <!-- J5g: they were at the foot of every panel -->
@@ -2133,8 +2147,6 @@ dialog.dialog::backdrop { background: rgba(11, 18, 25, .45); }
       <div class="ptabc" data-panel="elenco" id="drawerElenco">
         <!-- R3-4 (Q9 f): the toolbar of the Raccolta: the filter by name, a new group, collapse or expand all -->
         <div class="rctool" id="rcTool"><input type="search" id="rcFilter" placeholder="Filtra per nome…" aria-label="Filtra la Raccolta per nome" autocomplete="off"><span id="rcFilterN" class="rcfn" aria-live="polite"></span><button type="button" class="btn sm" id="grpNewBtn" title="Un gruppo personale della Raccolta: resta nel lavoro e nel progetto .axpo">+ Gruppo</button><button type="button" class="btn sm" id="rcCollapse" title="Comprimi o espandi tutti i blocchi della Raccolta">Comprimi</button></div>
-        <!-- 2/11 (M4): the selection bar, shown with at least one tick: what is selected and what to do with it (rcSelBarSync) -->
-        <div class="rcselbar" id="rcSelBar" role="toolbar" aria-label="Selezione" hidden><span id="rcSelN" class="rcseln" aria-live="polite"></span><span class="rcselacts"><button type="button" class="ibtn" id="rcSelZoom" title="Zoom sulla selezione" aria-label="Zoom sulla selezione" data-icon="target"></button><button type="button" class="btn sm" id="rcSelGrp" aria-haspopup="menu" title="Sposta la selezione in un sottogruppo o in un gruppo" data-icon="folder"><span id="rcSelGrpT">Sottogruppo</span></button><button type="button" class="ibtn" id="rcSelDel" title="Togli la selezione dalla Raccolta (Canc); Annulla la rimette" aria-label="Togli la selezione dalla Raccolta" data-icon="trash"></button><button type="button" class="ibtn" id="rcSelClr" title="Deseleziona tutto" aria-label="Deseleziona tutto" data-icon="close"></button></span></div>
         <div id="rcEmpty" class="empty" hidden>La Raccolta è vuota: cerca o clicca le particelle, disegna, calcola o importa.</div>   <!-- 22/10: the sections show only when populated -->
         <!-- intestazione di sezione: spunta tutti · mostra/nascondi · colore (non nei Disegni: lì il colore è la categoria) · elimina tutti -->
         <div class="gsec" data-sec="parcels">
@@ -2152,6 +2164,10 @@ dialog.dialog::backdrop { background: rgba(11, 18, 25, .45); }
           <div class="gsecH"><b>Immagini</b><span class="gtools" data-sec="images"><button class="vtoggle" data-role="visall" title="Mostra/nascondi tutte" aria-label="Mostra/nascondi tutte le immagini"></button><button type="button" class="gdel" data-role="delall" title="Elimina tutte le immagini" aria-label="Elimina tutte le immagini"></button></span><span id="cntImport" class="gcount">0</span></div>
           <div class="glist"><div id="listImport"><div class="empty">Nessuna immagine.</div></div></div>
         </div>
+        <!-- 2/11 (M4): the selection bar, shown with at least one tick: what is selected and what to do with it (rcSelBarSync).
+             25/11 (Z3): it is the last child and sticks to the bottom of the panel: on top it pushed the whole list down
+             at the first tick, and the next click fell on another row -->
+        <div class="rcselbar" id="rcSelBar" role="toolbar" aria-label="Selezione" hidden><span id="rcSelN" class="rcseln" aria-live="polite"></span><span class="rcselacts"><button type="button" class="ibtn" id="rcSelZoom" title="Zoom sulla selezione" aria-label="Zoom sulla selezione" data-icon="target"></button><button type="button" class="btn sm" id="rcSelGrp" aria-haspopup="menu" title="Sposta la selezione in un sottogruppo o in un gruppo" data-icon="folder"><span id="rcSelGrpT">Sottogruppo</span></button><button type="button" class="ibtn" id="rcSelDel" title="Togli la selezione dalla Raccolta (Canc); Annulla la rimette" aria-label="Togli la selezione dalla Raccolta" data-icon="trash"></button><button type="button" class="ibtn" id="rcSelClr" title="Deseleziona tutto" aria-label="Deseleziona tutto" data-icon="close"></button></span></div>
       </div>
     </div>
     <!-- the actions of the Raccolta: Esporta, Migra, Salva (tab 5 of the ribbon proxies them) -->
@@ -2931,14 +2947,14 @@ dialog.dialog::backdrop { background: rgba(11, 18, 25, .45); }
     <h2>Guida rapida</h2>
     <div class="sub">Geoportale AxpoSolar Italia — dati catastali AdE via Zornade · portale ArcGIS Online interno.</div>
     <ol style="margin:0;padding-left:18px;font-size:13px;line-height:1.7">
-      <li><b>Barra in alto</b> — il nome del <b>progetto</b> .axpo (un clic lo salva con un altro nome); <b data-icon="map">Mappa</b>, la web map del portale in uso: la General Map o una Check Vincoli regionale, con ricerca per nome (cambiandola restano particelle, disegni e risultati; si perdono i layer accesi e i filtri di quella mappa, te lo chiedo prima); <b data-icon="folder"></b> Apri e <b data-icon="save"></b> Salva progetto; <b data-icon="undo"></b> Annulla e <b data-icon="redo"></b> Ripeti, per ogni modifica del lavoro (<kbd>Ctrl</kbd>+<kbd>Z</kbd>, <kbd>Ctrl</kbd>+<kbd>Y</kbd>); <b>Accedi</b> ad AGOL; il tema chiaro o scuro; <b data-icon="settings"></b> Impostazioni (la chiave del catasto, i dati salvati nel browser, Svuota il lavoro); <b data-icon="help"></b> i tour e questa guida.</li>
+      <li><b>Barra in alto</b> — il nome del <b>progetto</b> .axpo (un clic lo salva con un altro nome); <b data-icon="map">Mappa</b>, la web map del portale in uso: la General Map o una Check Vincoli regionale, con ricerca per nome (cambiandola restano particelle, disegni e risultati; si perdono i layer accesi e i filtri di quella mappa, te lo chiedo prima); <b data-icon="folder"></b> Apri e <b data-icon="save"></b> Salva progetto; <b data-icon="undo"></b> Annulla e <b data-icon="redo"></b> Ripeti, per ogni modifica del lavoro (<kbd>Ctrl</kbd>+<kbd>Z</kbd>, <kbd>Ctrl</kbd>+<kbd>Y</kbd>); il cestino rosso <b data-icon="trash"></b> Svuota il lavoro, che riparte da una mappa pulita dopo una conferma; <b>Accedi</b> ad AGOL; il tema chiaro o scuro; <b data-icon="settings"></b> Impostazioni (la chiave del catasto, i dati salvati nel browser); <b data-icon="help"></b> i tour e questa guida.</li>
       <li><b>Schede e ribbon</b> — otto schede, nell'ordine del lavoro: Ricerca particelle · Analizza · Disegna · Modifica · Geoprocessi · Importa · Annotazioni · Salva ed esporta. Sotto, il <b>ribbon</b> con gli strumenti della scheda, a gruppi: ogni gruppo ha il suo nome e una <b data-icon="info"></b> che dice cosa si fa lì, con «Di più» per la spiegazione lunga, spesso con un esempio disegnato. Uno strumento apre le sue impostazioni a destra, in <b>Proprietà</b>.</li>
       <li><b>Ricerca particelle</b> — <b>Catasto</b> › <b>Cerca particelle</b> apre a destra i tre modi di prendere le particelle dal catasto, ognuno in una sezione che si chiude: <b>Per foglio e particella</b> (regione, provincia, comune, foglio e numeri; con una regione scelta ti propongo i suoi vincoli con un clic; all'invio la mappa inquadra le particelle appena aggiunte), <b>Dalla mappa</b> (Puntuale, Rettangolo, Poligono o Linea) e <b>Da un disegno</b> (le particelle toccate da un disegno, un buffer o un file); <b>Raccolta</b>: Crea area lorda dalle particelle, i numeri sulla mappa, lo zoom. Per scegliere sulla mappa quelle già nella Raccolta: <b>Modifica</b> › Seleziona o Riquadro, oppure il tasto destro.</li>
       <li><b>Analizza</b> — quello che legge il territorio senza cambiare la Raccolta. <b>Estensione</b>: su cosa lavorare (un'area lorda, il sito AREAS, le particelle, oppure un rettangolo o un poligono disegnato qui); <b>Modello del terreno</b>: il limite di pendenza, in ogni direzione oppure nord–sud ed est–ovest, e <b>Analizza le pendenze</b>, con le quote di Esri World Elevation (circa 10 m in Italia), e <b>Rimuovi terreno</b>; <b>Analisi terreno</b>: classi di pendenza, quote, esposizione, ombreggiatura, curve di livello e <b>Profilo altimetrico</b> lungo una linea; <b>Contesto</b>: Analisi di contesto (sottostazioni, linee AT e progetti FV intorno a un punto) e Percorso su strada, con l'accesso; <b>Coordinate</b>: in che sistema sono dei valori sconosciuti. Le zone troppo ripide diventano un'esclusione nella Raccolta.</li>
       <li><b>Disegna</b> — <b>Cosa disegni</b>: prima la categoria (la scheda la chiede finché non la scegli; un clic apre l'elenco, anche con le categorie tue), poi tipo, valori e fonte; <b>Con quale strumento</b>: punto, linea, area, rettangolo, cerchio, a mano libera, oppure <b>Copia da layer</b> e <b>Copia a riquadro</b>, che prendono la forma da un layer acceso; <b>Supporto al disegno</b>: aggancio, misure esatte, griglia; <b>Aree automatiche</b>: l'area netta e il rientro dal confine; <b>Collega a sito AREAS</b>: il sito a cui vanno i disegni sul portale (salvando, ogni oggetto si lega da solo all'area che tocca; <b>Sito dalla mappa</b> lo sceglie con un clic).</li>
       <li><b>Modifica</b> — quello che c'è già. <b>Selezione</b>: Seleziona (clic sulla mappa, <kbd>Maiusc</kbd> aggiunge o toglie), Riquadro, Deseleziona; la selezione è la spunta della Raccolta. <b>Modifica</b>, sulla selezione: Rimodella, Sposta e ruota, Dividi, Unisci (le aree selezionate diventano una), Copia (dove clicchi, anche parallela a distanza fissa: le opzioni nella sua finestra) ed Elimina. A destra, in Proprietà, quanti sono e la scheda dell'oggetto selezionato (categoria, tipo e attributi). Le particelle si selezionano ma non si modificano.</li>
       <li><b>Geoprocessi</b> — <b>Oggetti di partenza</b>: metti gli oggetti in A con A dalla mappa, dalle righe spuntate o per categoria (B serve a Parte comune e Sottrai); <b>Geoprocessi</b>: Buffer, Unione, Parte comune, Sottrai B da A, Contorno, Semplifica, Ritaglia, poi <b>Esegui</b> a destra: il risultato è un oggetto nuovo nella Raccolta, gruppo Analisi, e quelli di partenza restano.</li>
-      <li><b>Importa</b> — <b>File</b>: GeoJSON, KML, KMZ, Shapefile (.zip) e il file di <b>Estrazione intestatari</b>, colorato e raggruppato per intestatario in fondo al blocco <b>Particelle</b> della Raccolta, dove il cestino della riga «Per intestatario» lo toglie tutto (i nominativi restano fuori dal salvataggio automatico e dal portale); <b>CAD</b>: un DWG letto nel browser, con il sistema proposto, oppure allineato a mano con due punti; <b>Immagini</b>: GeoTIFF e world file si posizionano da soli, PNG, JPG e PDF con sposta, scala, ruota o punti noti; <b>Servizi web</b>: WMS, WFS e ArcGIS REST dal loro indirizzo; <b>Portale</b>: un layer cercato per titolo.</li>
+      <li><b>Importa</b> — <b>Progetto salvato</b>: riapre un progetto .axpo, come Apri progetto, e sostituisce il lavoro aperto dopo una conferma; <b>File</b>: GeoJSON, KML, KMZ, Shapefile (.zip) e il file di <b>Estrazione intestatari</b>, colorato e raggruppato per intestatario in fondo al blocco <b>Particelle</b> della Raccolta, dove il cestino della riga «Per intestatario» lo toglie tutto (i nominativi restano fuori dal salvataggio automatico e dal portale); <b>CAD</b>: un DWG letto nel browser, con il sistema proposto, oppure allineato a mano con due punti; <b>Immagini</b>: GeoTIFF e world file si posizionano da soli, PNG, JPG e PDF con sposta, scala, ruota o punti noti; <b>Servizi web</b>: WMS, WFS e ArcGIS REST dal loro indirizzo; <b>Portale</b>: un layer cercato per titolo.</li>
       <li><b>Annotazioni</b> — il taccuino del progetto. <b>Taccuino</b>: Nuova nota (titolo, etichetta e blocchi) e Tutte le note, l'elenco con la ricerca; <b>Inserisci</b>: Testo, Da fare (righe da spuntare), Collegamento (titolo e indirizzo di un documento: i file non si allegano), Layer o oggetto, che richiama per nome un layer della mappa, un oggetto della Raccolta o una particella (come <b>@</b> scritto nel testo) e lascia un riferimento da cliccare, <b>Fotografa la mappa</b> (la mappa com'è ora, con il mirino che torna a quella vista), Immagine (un file; una copiata o una schermata si incolla con Ctrl+V) e <b>Post-it sulla mappa</b> (una nota breve appuntata in un punto: è un punto di «Nota e riferimento», nella Raccolta, con il testo scritto sulla mappa); <b>Esporta le note</b>: PDF delle note e Copia come testo. Le note, con le loro immagini, si salvano da sole nel browser e viaggiano nel file .axpo, anche nella copia da condividere; non vanno sul portale e Annulla non le riguarda.</li>
       <li><b>Salva ed esporta</b> — <b>Esporta</b>: GeoJSON, KML, KMZ, Shapefile (.zip) o la tabella XLSX delle particelle, con gli oggetti spuntati nella Raccolta o con tutto (il KML ha una cartella per gruppo, lo shapefile un file per gruppo; il nome del file viene da comune, data e numero di particelle); <b>Portale AGOL</b>: Migra particelle in AREAS (le spuntate o tutte, scelte anche nella sua finestra: una per particella, un'unica area dissolta o un'area per sottogruppo), Salva disegni in Site Features (categoria, tipo, attributi e sito: la seconda volta aggiorna, non duplica), Modifica AREAS COLLECTION; <b>Progetto</b>: Salva, Salva come, Apri; <b>Stampa</b>: un foglio PDF A4 o A3 con la Raccolta in scala, sfondo a scelta, dati, legenda e note (il rettangolo tratteggiato sulla mappa mostra il foglio), con la Risk Matrix allegata se la spunti; in Avanzate la qualità delle immagini, i nomi degli oggetti e la legenda per oggetto; <b>Risk Matrix</b>: quattro passi per la matrice dei rischi del modello aziendale — l’area del progetto, il <b>controllo dei vincoli</b> sui layer della mappa aperta e nazionali entro 1 km dall’area (in «Layer letti» il tema di ogni layer e file), la revisione di colore, testi, fonti e commenti (il ricalcolo non tocca ciò che hai scritto), l’esportazione: <b>Crea l’Excel</b> compila il modello aziendale (scelto una volta, il browser lo ricorda), <b>Aggiorna…</b> scrive nella matrice del progetto, e una matrice già compilata si può leggere nel pannello; i fogli Cadastral e Constraints ricevono la tabella delle particelle e le mappe che scegli.</li>
       <li><b>Raccolta</b>, a sinistra — tutto quello che raccogli, ad albero come i layer di QGIS: i gruppi (Particelle, Aree di progetto, Aree di esclusione, Analisi, Altro, Immagini, e i tuoi, <b>+ Gruppo</b>), dentro i sottogruppi delle particelle, poi gli oggetti, ogni livello un po' più rientrato; numero ed ettari a destra, occhio, nomi e menu passando sopra la riga. In alto il filtro per nome e <b>Comprimi</b>. Ogni riga ha la spunta (la selezione, che usano anche geoprocessi ed esportazione; <kbd>Maiusc</kbd>+clic spunta un intervallo), il colore, il nome (le particelle per foglio e numero, poi il comune), la cifra a destra, l'occhio e il menu <b data-icon="more"></b>, anche col tasto destro: rinomina, zoom, sposta in un gruppo, Proprietà, elimina. Un clic sulla riga fa lampeggiare l'oggetto sulla mappa, un doppio clic ci fa lo zoom. <b>Trascina</b> una riga su un sottogruppo (le particelle) o su un gruppo (gli altri oggetti) per spostarla: se è spuntata, vanno con lei tutte le selezionate; sulla riga Particelle una particella esce dai sottogruppi; dove non può andare non si accende nulla e, al rilascio, ti dico perché. La riga di un sottogruppo, o di un gruppo tuo, trascinata su un'altra ne cambia l'ordine. Annulla rimette tutto. Con qualcosa selezionato (spuntato qui, o scelto sulla mappa con <b>Modifica</b> › Seleziona e Riquadro) compare in cima la <b>barra della selezione</b>: Zoom, Sottogruppo o Gruppo (anche nuovo), Togli (o il tasto <kbd>Canc</kbd>; Annulla rimette tutto) e Deseleziona; il tasto destro su una riga selezionata, o sulla mappa su un oggetto selezionato, offre le stesse azioni per tutta la selezione. Il menu di un gruppo, di un sottogruppo e di Particelle ha lo <b>Zoom</b> su tutti i loro oggetti. Il bordo destro la allarga, <b data-icon="undock"></b> la sgancia in una finestra per il secondo schermo.</li>
@@ -2946,7 +2962,7 @@ dialog.dialog::backdrop { background: rgba(11, 18, 25, .45); }
       <li><b>Sulla mappa</b> — in alto a destra la lente della <b>ricerca</b> (indirizzi, lat lon, oppure X Y in Gauss-Boaga o UTM, di cui indovina il sistema) e, sotto, <b data-icon="measure"></b> le <b>misure</b>: lineare, area, Pulisci (non si salvano); più sotto <b data-icon="cursor"></b> la <b>selezione</b>: Seleziona, Riquadro, Deseleziona, da qualsiasi scheda (le modifiche stanno nel tasto destro sulla selezione). In alto a sinistra zoom, bussola, posizione GPS, <b>Zoom sulla Raccolta</b> e <b>Luoghi</b>, i segnalibri; in basso a destra la <b>mappa di base</b>, con l'opacità; in basso al centro lo scalimetro. Col tasto destro: aggiungi la particella qui, analisi di contesto qui, buffer qui, copia le coordinate, apri in Google Maps, centra qui.</li>
       <li><b>Barra di stato</b>, in basso — il pin fissa le coordinate del prossimo clic; le coordinate del puntatore nel sistema che scegli; la scala, che scegli anche dal suo menu; con il terreno analizzato, la <b>quota</b> e la <b>pendenza</b> sotto il puntatore (in rosso oltre il limite); lo stato del Catasto AdE; a destra la modalità in corso, l'aggancio e l'ora dell'ultimo salvataggio nel browser (in rosso se il browser è pieno).</li>
       <li><b>Progetto .axpo</b> — <b data-icon="save">Salva progetto</b> mette tutto in un file .axpo, come un progetto QGIS: vista, basemap, area di lavoro, mappa e layer del portale (accesi, trasparenza, ordine), servizi web, particelle, disegni e gruppi della Raccolta, categorie tue, geoprocessi, import, sito AREAS, i file di <b>DWG e immagini</b> con il loro posizionamento e il <b>terreno</b> con il suo limite. <b data-icon="folder">Apri progetto</b> lo ripristina (sostituisce il lavoro corrente). <kbd>Ctrl</kbd>+<kbd>S</kbd> risalva sullo stesso file, <kbd>Ctrl</kbd>+<kbd>Maiusc</kbd>+<kbd>S</kbd> salva con nome, <kbd>Ctrl</kbd>+<kbd>O</kbd> apre. Lo stesso file si apre in PV Predesign, che ne legge aree, esclusioni e terreno. Per passarlo a chi non deve vedere gli intestatari, nel modulo Progetto <b>Copia da condividere…</b>: tutto il lavoro tranne i dati personali.</li>
-      <li><b>Sul telefono</b> — in basso cinque voci: Cerca · Analizza · Disegna · Raccolta · Altro (Modifica, Geoprocessi, Importa, Salva ed esporta, Layer, Legenda, Mappa di base, Luoghi, Impostazioni, Guida rapida). I pannelli diventano schede sopra la mappa: la maniglia le allarga, × le chiude; <b>Fine</b>, accanto al messaggio della modalità, fa da <kbd>Esc</kbd>. Modifica AREAS COLLECTION e i tour restano sul computer.</li>
+      <li><b>Sul telefono</b> — in basso cinque voci: Cerca · Analizza · Disegna · Raccolta · Altro (Modifica, Geoprocessi, Importa, Annotazioni, Salva ed esporta, Layer, Legenda, Mappa di base, Luoghi, Svuota il lavoro in rosso, Impostazioni, Guida rapida). I pannelli diventano schede sopra la mappa: la maniglia le allarga, × le chiude; <b>Fine</b>, accanto al messaggio della modalità, fa da <kbd>Esc</kbd>. Modifica AREAS COLLECTION e i tour restano sul computer.</li>
     </ol>
     <div class="hint" style="margin-top:10px"><kbd>Esc</kbd> esce da qualsiasi modalità e interrompe la selezione su area. I tour si riaprono dal <b data-icon="help"></b> in alto a destra; ogni gruppo del ribbon ha la sua <b data-icon="info"></b>. <kbd>Ctrl</kbd>+<kbd>K</kbd> (o «Cerca oggetti e comandi» nel <b data-icon="help"></b>) trova mentre scrivi un oggetto della Raccolta o un comando del ribbon.</div>
     <div class="hprof" role="group" aria-label="Profilo"><span>Profilo</span><div class="segbtns"><button type="button" data-prof="base">Base</button><button type="button" data-prof="avanzato">Avanzato</button></div></div>
@@ -2984,7 +3000,7 @@ dialog.dialog::backdrop { background: rgba(11, 18, 25, .45); }
         <button class="btn" id="resetWork" title="Toglie particelle, disegni, geoprocessi, import, immagini, DWG e layer aggiunti" data-icon="trash">Svuota il lavoro</button>
         <button class="ghost-danger" id="resetAll" title="Cancella anche preferenze, segnalibri e posizionamenti DWG, poi ricarica">Ripristina tutto</button>
       </div>
-      <div class="hint">«Svuota il lavoro» riparte da una mappa pulita e tiene tema, segnalibri e posizionamenti DWG salvati. «Ripristina tutto» cancella ogni dato del geoportale in questo browser e ricarica la pagina. Il salvataggio nel browser tiene particelle e geometrie ma non DWG e immagini: per conservare tutto, o passarlo a un collega, usa <b data-icon="save">Salva progetto</b> in alto (file .axpo).</div>
+      <div class="hint">«Svuota il lavoro» (lo stesso del cestino rosso nella barra in alto) riparte da una mappa pulita e tiene tema, segnalibri e posizionamenti DWG salvati. «Ripristina tutto» cancella ogni dato del geoportale in questo browser e ricarica la pagina. Il salvataggio nel browser tiene particelle e geometrie ma non DWG e immagini: per conservare tutto, o passarlo a un collega, usa <b data-icon="save">Salva progetto</b> in alto (file .axpo).</div>
     </div>
   </div>
 </div>
@@ -3979,6 +3995,7 @@ function wireTools(){
   if($('srAdd')) $('srAdd').onclick=srAddResult;
   if($('srIn')) $('srIn').onkeydown=e=>{ if(e.key==='Enter'&&(e.ctrlKey||e.metaKey)){ e.preventDefault(); srFind(); } };
   if($('resetWork')) $('resetWork').onclick=resetWork;
+  if($('workClearBtn')) $('workClearBtn').onclick=resetWork;   // 25/11 (Z1): the red button of the top bar
   if($('resetAll')) $('resetAll').onclick=resetAll;
   // 2/11 (J5g): the settings are a window of the top bar's ⚙ (they were «Impostazioni avanzate» at the foot of every panel)
   if($('setBtn')) $('setBtn').onclick=()=>{ const m=$('setModal'); if(!m) return; storeInfo(); if(typeof sideModalHere==='function') sideModalHere(m); m.style.display='flex'; const c=$('setClose'); if(c) c.focus(); };
@@ -4245,7 +4262,7 @@ function saveState(){
       try{ if(window.sbSaveSet) window.sbSaveSet(false); }catch(e3){}   // 8 (Y4): red in the status bar while it lasts
       // prima era silenzioso: disegni e import smettevano di sopravvivere al ricaricamento senza che nessuno lo sapesse
       if(!saveState._warned){ saveState._warned=true;
-        msg('Spazio del browser esaurito (circa 5 MB): disegni, buffer e import non vengono più salvati tra una sessione e l\'altra. Esporta ciò che ti serve, poi usa «Svuota il lavoro» in Impostazioni avanzate.','err'); } }
+        msg('Spazio del browser esaurito (circa 5 MB): disegni, buffer e import non vengono più salvati tra una sessione e l\'altra. Esporta ciò che ti serve, poi usa «Svuota il lavoro», il cestino rosso in alto.','err'); } }
   }catch(e){}
 }
 let _saveT; function saveStateDebounced(){ clearTimeout(_saveT); _saveT=setTimeout(saveState,800); try{ histSoon(); }catch(e){} }   // 7a-1: the work changed, the history takes its photo when it settles
@@ -4317,8 +4334,11 @@ function storeInfo(){
   const kb=b=>b<1024*1024? Math.round(b/1024)+' KB' : (b/1048576).toFixed(1)+' MB';
   el.innerHTML='Lavoro salvato <b>'+kb(work)+'</b> · preferenze '+kb(pref)+' · limite del browser ≈ 5 MB'
     +(work+pref>4*1048576? ' — <b style="color:var(--err)">quasi pieno</b>' : ''); }
+// 25/11 (Z1): also the red button of the top bar and, on a phone, the red entry of «Altro»: one click away, so the
+// question says what goes with the work (the notes and the Risk Matrix too) and that Annulla does not bring it back
 function resetWork(){
-  if(!confirm('Svuotare il lavoro? Tolgo particelle, disegni, buffer, geoprocessi, import, immagini, DWG e layer aggiunti. Tema, segnalibri e posizionamenti DWG restano.')) return;
+  if(projBusy){ msg('Attendi: sto salvando o aprendo un progetto.','err'); return; }
+  if(!confirm('Svuotare il lavoro? Tolgo particelle, disegni, buffer, geoprocessi, import, immagini, DWG, layer aggiunti, note e Risk Matrix. Annulla non li riporta: se ti servono, annulla e salva prima il progetto (.axpo). Tema, segnalibri e posizionamenti DWG restano.')) return;
   clearWork(); projSetName(null);
   msg('Lavoro svuotato: la mappa è pulita.','ok'); }
 // toglie tutto il lavoro senza chiedere (lo usano «Svuota il lavoro» e l'apertura di un progetto)
@@ -4362,7 +4382,7 @@ function projSetName(name, handle){
   if(el){ el.hidden=!projCur; el.textContent=projCur? '· '+projCur : ''; el.title=projCur? 'Progetto aperto: '+projCur+PROJ_EXT : ''; }
   const pb=$('projNameBtn'); if(pb){ pb.textContent=projCur||'Senza nome'; pb.title=projCur? 'Progetto: '+projCur+PROJ_EXT+' · clicca per salvarlo con un altro nome' : 'Nessun progetto: clicca per salvarne uno (.axpo)'; }   // 2A-3: top bar
   document.title=projCur? projCur+' · '+PROJ_TITLE : PROJ_TITLE; }
-function projUi(){ ['projOpenBtn','projSaveBtn','pcSave','pcSaveAs','pcOpen'].forEach(id=>{ const b=$(id); if(b) b.disabled=projBusy; }); }
+function projUi(){ ['projOpenBtn','projSaveBtn','pcSave','pcSaveAs','pcOpen','workClearBtn'].forEach(id=>{ const b=$(id); if(b) b.disabled=projBusy; }); }
 // R3-1 (Q10, I4): the module «Progetto», first in Salva ed esporta: the name, the last save or opening, what the work holds, the actions
 function projModRender(){ const n=$('pcName'); if(!n) return; n.textContent=projCur||'Senza nome';
   const st=$('pcState'), hm=d=>String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
@@ -7478,15 +7498,50 @@ function grpMenuActs(G, arr){
   if(arr&&arr.length) acts.push({t:'Elimina tutti gli oggetti', i:'trash', fn:function(){ sectionDelete(G.id); }});
   if(arr&&arr.length) acts.unshift({t:'Zoom sul gruppo', i:'target', fn:function(){ zoomGraphics(arr); }});   // 26/10 (user)
   return acts; }
+// 25/11 (Z4): the hectares in the header of a group. «Aree di progetto» says the gross area alone: gross and net are the
+// same land and are never added up. «Aree di esclusione» says what its areas take from the gross area, an overlap
+// counted once (with no setback, gross − exclusions = net); without a gross area, the land they cover. The other
+// groups add their areas up, as before. The rows keep the whole area of each object; the tooltip says what the figure is.
+let grpFigMemo={}, grpFigWait=false;
+function grpHa(v){ return v.toFixed(2).replace('.',',')+' ha'; }
+function grpGeoHa(geom){ try{ return geom? Math.abs(esriMods.geometryEngine.geodesicArea(geom,'hectares')||0) : 0; }catch(e){ return 0; } }
+function grpIsArea(g){ return !!(g&&g.geometry&&g.geometry.type==='polygon'); }
+function grpGrossAll(){ try{ return toolsGL.graphics.toArray().filter(g=>{ const a=g.attributes||{}; return a._kind&&!a.sf_auto&&a.sf_cat==='gross'&&grpIsArea(g); }); }catch(e){ return []; } }
+// the area of the union of some objects (and of its part inside «within»), remembered until a geometry changes
+function grpUnionHa(key, list, within){
+  const sig=list.map(g=>sfGeomSig(g.geometry)).join(';')+'||'+(within? within.map(g=>sfGeomSig(g.geometry)).join(';') : ''), m=grpFigMemo[key];
+  if(m&&m.sig===sig) return m.ha;
+  let u=geoUnion(list.map(g=>g.geometry));
+  if(u&&within){ const w=geoUnion(within.map(g=>g.geometry)); u=w? geoIntersect(u, w) : null; }
+  const ha=grpGeoHa(u); grpFigMemo[key]={sig:sig, ha:ha}; return ha; }
+function grpFigure(G, arr){
+  let sum=0, nA=0; arr.forEach(g=>{ const a=geomAreaHa(g); if(a!=null){ sum+=a; nA++; } });
+  if(!nA) return {txt:'', tip:''};
+  const plain={txt:grpHa(sum), tip:''};
+  if(G.id!=='project'&&G.id!=='exclusion') return plain;
+  try{
+    if(G.id==='project'){
+      const gross=arr.filter(g=>g.attributes.sf_cat==='gross'&&grpIsArea(g)); if(!gross.length) return plain;
+      const net=arr.filter(g=>g.attributes.sf_cat==='net'&&grpIsArea(g)), haN=net.reduce((s,g)=>s+(geomAreaHa(g)||0), 0);
+      const haG=(gross.length>1&&geoFrameReady())? grpUnionHa('project', gross) : gross.reduce((s,g)=>s+(geomAreaHa(g)||0), 0);
+      return {txt:grpHa(haG), tip:'Area lorda '+grpHa(haG)+(net.length? ' · area netta '+grpHa(haN)+': è la stessa superficie, non si sommano' : '')}; }
+    const ex=arr.filter(g=>grpIsArea(g)&&!g.attributes.own); if(!ex.length) return plain;
+    if(!geoFrameReady()){   // the metric frame is still loading: the plain sum now, the true figure as soon as it is there
+      if(!grpFigWait){ grpFigWait=true; geoFrameLoad().then(()=>{ grpFigWait=false; grpRedraw(); }).catch(()=>{ grpFigWait=false; }); }
+      return plain; }
+    const gross=grpGrossAll(), drawn=ex.reduce((s,g)=>s+(geomAreaHa(g)||0), 0), ha=grpUnionHa('exclusion', ex, gross.length? gross : null);
+    return {txt:grpHa(ha), tip:(gross.length? grpHa(ha)+' dentro l’area lorda' : 'Superficie coperta '+grpHa(ha))+', le sovrapposizioni contate una volta. Somma delle aree disegnate: '+grpHa(drawn)
+      +(gross.length? '' : '. Con un’area lorda conta solo la parte al suo interno')}; }
+  catch(e){ console.warn('[gruppi] cifra', e&&e.message); return plain; } }
 // il blocco di un gruppo nella Raccolta: intestazione (spunta tutti, nome, conteggio e area, occhio, nomi, ⋯), le righe per
 // categoria; una riga sottile di categoria quando il gruppo ne mescola più d'una (X2)
 function grpBlock(G, arr, subOf){
   const sec=document.createElement('div'); sec.className='gsec ggrp'+(grpIsOpen(G.id)? '' : ' collapsed'); sec.dataset.sec=G.id;
   const cats={}; arr.forEach(g=>{ cats[g.attributes.sf_cat||'']=1; }); const mixed=Object.keys(cats).length>1;
-  let ha=0, nA=0; arr.forEach(g=>{ const a=geomAreaHa(g); if(a!=null){ ha+=a; nA++; } });
+  const fig=grpFigure(G, arr);
   const h=document.createElement('div'); h.className='gsecH'; h.draggable=!G.std;   // M8: the custom groups are reordered by dragging their row
   h.innerHTML='<input type="checkbox" class="gselall" data-sec="'+esc(G.id)+'" title="Spunta tutti" aria-label="Spunta tutti gli oggetti di '+esc(G.name)+'"><b>'+esc(G.name)+'</b>'
-    +'<span class="gfig">'+(arr.length? arr.length+(nA? ' · '+ha.toFixed(2).replace('.',',')+' ha' : '') : 'vuoto')+'</span>'
+    +'<span class="gfig"'+(fig.tip? ' title="'+esc(fig.tip)+'"' : '')+'>'+(arr.length? arr.length+(fig.txt? ' · '+fig.txt : '') : 'vuoto')+'</span>'
     +'<span class="gtools" data-sec="'+esc(G.id)+'"><button type="button" class="vtoggle" data-role="visall" title="Mostra/nascondi tutti" aria-label="Mostra/nascondi tutti gli oggetti di '+esc(G.name)+'"></button>'
     +'<button type="button" class="ltoggle" data-role="lblall" title="Nomi sulla mappa" aria-label="Nomi sulla mappa" aria-pressed="false"></button>'
     +'<button type="button" class="gact gmore" data-role="more" title="Altre azioni" aria-label="Altre azioni del gruppo" aria-haspopup="menu">'+icon('more','sm')+'</button></span>';
@@ -11192,16 +11247,17 @@ function baseGroundSet(){
 // key run their function directly (CMD_RUN). One keyboard handler serves every shortcut. 7b (capabilities and profiles)
 // and 7c (Ctrl K) read cmdList(); each entry has its level for the profiles (7b-2, below).
 const CMD_KEYS={undo:['Ctrl+Z'], redo:['Ctrl+Y', 'Ctrl+Maiusc+Z'], 'p-save':['Ctrl+S'], 'p-saveas':['Ctrl+Maiusc+S'], 'p-open':['Ctrl+O'], search:['Ctrl+K']};
-const CMD_RUN={undo:()=>drwUndo(), redo:()=>drwRedo(), 'p-save':()=>projSave(false), 'p-saveas':()=>projSave(true), 'p-open':()=>projOpenPick(), search:()=>srchOpen()};   // 7c: search is not a ribbon tool
+const CMD_RUN={undo:()=>drwUndo(), redo:()=>drwRedo(), 'p-save':()=>projSave(false), 'p-saveas':()=>projSave(true), 'p-open':()=>projOpenPick(), search:()=>srchOpen(), 'work-clear':()=>resetWork()};   // 7c: search is not a ribbon tool
 const CMD_TEXT_KEYS={undo:1, redo:1};   // in a text field these keys stay the field's own (undo of the typing)
 // 2/11 (J5h): the commands of the top bar, not of the ribbon: Annulla and Ripeti sit by the project (they serve every change)
-const CMD_BAR=[{id:'undo', t:'Annulla', i:'undo', s:'Annulla l\'ultima modifica del lavoro'}, {id:'redo', t:'Ripeti', i:'redo', s:'Rifai ciò che hai annullato'}];
+const CMD_BAR=[{id:'undo', t:'Annulla', i:'undo', s:'Annulla l\'ultima modifica del lavoro'}, {id:'redo', t:'Ripeti', i:'redo', s:'Rifai ciò che hai annullato'},
+  {id:'work-clear', t:'Svuota il lavoro', i:'trash', g:'Lavoro', s:'Toglie tutto dalla mappa e dalla Raccolta e riparte da una mappa pulita: chiede conferma, Annulla non lo riporta'}];   // 25/11 (Z1): the red button of the top bar
 let cmdCache=null;
 function cmdList(){ if(cmdCache) return cmdCache; const S=window.SHELL; if(!S) return {}; const out={};
   Object.keys(S).forEach(tab=>{ (S[tab].groups||[]).forEach(g=>{ (g.tools||[]).forEach(t=>{ const id=out[t.id]? tab+':'+t.id : t.id;
     out[id]={id:id, tool:t.id, tab:tab, tabName:S[tab].name, group:g.label, name:t.t||g.label, icon:t.i||null, tip:t.s||null,
       keys:CMD_KEYS[t.id]||[], level:cmdLevel(g.label, t.id), kind:(t.menu||t.card)? 'menu' : t.pop? 'form' : (t.num||t.sel)? 'value' : t.toggle? 'switch' : 'action'}; }); }); });
-  CMD_BAR.forEach(t=>{ if(!out[t.id]) out[t.id]={id:t.id, tool:t.id, tab:'bar', tabName:'Barra in alto', group:'Annulla e Ripeti', name:t.t, icon:t.i, tip:t.s, keys:CMD_KEYS[t.id]||[], level:'base', kind:'action'}; });
+  CMD_BAR.forEach(t=>{ if(!out[t.id]) out[t.id]={id:t.id, tool:t.id, tab:'bar', tabName:'Barra in alto', group:t.g||'Annulla e Ripeti', name:t.t, icon:t.i, tip:t.s, keys:CMD_KEYS[t.id]||[], level:'base', kind:'action'}; });
   return (cmdCache=out); }
 function cmdKeyText(id){ const k=CMD_KEYS[id]; return (k&&k.length)? k[0] : ''; }
 function cmdRun(id){ const c=cmdList()[id], run=CMD_RUN[c? c.tool : id]; if(run){ run(); return true; } if(!c) return false;   // 7c: a CMD_RUN command outside the ribbon runs too
@@ -11626,6 +11682,8 @@ function srchShowRow(obj, soft){ const root=byId('drawerElenco'); if(!root) retu
       {id:'img', t:'Immagini', s:'GeoTIFF, foto e planimetrie', i:'image', roots:['#impSecImg']},
       {id:'svc', t:'Servizi web', s:'WMS, WFS e ArcGIS REST', i:'service', roots:['#impSecSvc']}],
      groups:[
+      // 25/11 (Z2): a saved project is opened from here too (the users looked for it in Importa): the same command as «Apri progetto…»
+      {label:'Progetto salvato', tools:[{id:'imp-proj', t:'Progetto .axpo', i:'folder', size:'large', press:'#projOpenBtn', s:'Apre un progetto salvato (.axpo), anche ricevuto da un collega: sostituisce il lavoro aperto, dopo una conferma · Ctrl+O'}]},
       {label:'File', tools:[{id:'file', t:'File di geometrie', i:'import', size:'large', primary:true, press:'#impBtn', mod:'file'}]},
       {label:'CAD', more:'cad', tools:[{id:'dwg', t:'Disegno DWG', i:'cad', size:'large', press:'#impCadBtn', mod:'cad'},
         {id:'dwg-align', t:'Allinea il disegno', i:'align', size:'small', mod:'cad', fn:function(){ cadAlignStart(cadFiles[cadFiles.length-1]); }, off:function(){ return (window.cadFiles&&cadFiles.length)? null : 'Carica prima un disegno DWG'; }}]},
@@ -11689,7 +11747,8 @@ function srchShowRow(obj, soft){ const root=byId('drawerElenco'); if(!root) retu
     'Analisi terreno':"Le immagini del terreno sulla mappa, una alla volta: Classi di pendenza, Quote, Esposizione (verso dove scende) e Ombreggiatura; sopra, le Curve di livello al Passo scelto. Prima serve il modello: Analizza le pendenze. Profilo altimetrico: la quota del terreno lungo una linea che disegni (Esri World Elevation).",
     'Contesto':"Analisi di contesto: clicca un punto e a destra vedi le sottostazioni vicine, la linea AT più vicina e i progetti FV entro 15 km. Percorso su strada: dalla partenza all'arrivo lungo le strade, come percorso di connessione nella Raccolta. Serve l'accesso.",
     'Coordinate':"Coordinate sconosciute: incolli dei valori (X Y, est nord, lat lon) e lo strumento dice in che sistema possono essere; l'ipotesi scelta va nella Raccolta. Le misure di distanze e aree sono sulla mappa, sotto la lente.",
-    'File':"File di geometrie: GeoJSON, KML, KMZ, Shapefile (.zip) e il file degli intestatari. Le geometrie vanno nella Raccolta; senza sistema di riferimento si apre Coordinate sconosciute.",
+    'Progetto salvato':"Progetto .axpo apre un progetto salvato, anche ricevuto da un collega, con tutto il lavoro: particelle, disegni, DWG, immagini, note e Risk Matrix. Sostituisce il lavoro aperto, e prima te lo chiede. È lo stesso comando di Apri progetto… in Salva ed esporta e della cartella nella barra in alto (Ctrl+O).",
+    'File':"File di geometrie:GeoJSON, KML, KMZ, Shapefile (.zip) e il file degli intestatari. Le geometrie vanno nella Raccolta; senza sistema di riferimento si apre Coordinate sconosciute.",
     'CAD':"Disegno DWG: letto nel browser, con il sistema di coordinate proposto da confermare; Allinea il disegno lo sistema con due punti se è in coordinate locali. I livelli si accendono e si ricolorano dall'elenco a destra.",
     'Immagini':"Immagine sulla mappa: il GeoTIFF e le immagini con world file si posizionano da soli; PNG, JPG e PDF con Posiziona (sposta, scala, ruota o punti noti). Vanno nella Raccolta, blocco Immagini.",
     'Servizi web':"WMS · WFS · REST: incolli l'indirizzo di un servizio, scegli i suoi layer e li aggiungi alla mappa (scheda Layer, a destra). Si leggono solo servizi https che permettono la lettura da altri siti.",
@@ -11979,7 +12038,7 @@ function srchShowRow(obj, soft){ const root=byId('drawerElenco'); if(!root) retu
      press the tabs and openPanel, so every handler stays in one place. */
   var mbar=$g('mbar'), mbarRaf=null, moreMenu=$g('moreMenu');
   var MBAR=[['ricerca','Cerca','parcels'],['analizza','Analizza','terrain'],['disegno','Disegna','draw'],['raccolta','Raccolta','raccolta'],['altro','Altro','more']];   // icons-used: more, help, terrain (T5: the terrain on site, the geoprocesses under Altro)
-  var MORE=[['modifica','Modifica','cursor'],['geoproc','Geoprocessi','geoproc'],['import','Importa','import'],['note','Annotazioni','clipboard'],['export','Salva ed esporta','export'],['layers','Layer','layers'],['legend','Legenda','legend'],['basemaps','Mappa di base','basemap'],['bookmarks','Luoghi (segnalibri)','bookmark'],['settings','Impostazioni','settings'],['guide','Guida rapida','help']];   // J5g: on a phone the ⚙ of the top bar is here
+  var MORE=[['modifica','Modifica','cursor'],['geoproc','Geoprocessi','geoproc'],['import','Importa','import'],['note','Annotazioni','clipboard'],['export','Salva ed esporta','export'],['layers','Layer','layers'],['legend','Legenda','legend'],['basemaps','Mappa di base','basemap'],['bookmarks','Luoghi (segnalibri)','bookmark'],['clear','Svuota il lavoro','trash'],['settings','Impostazioni','settings'],['guide','Guida rapida','help']];   // J5g: on a phone the ⚙ of the top bar is here; 25/11 (Z1): «Svuota il lavoro» too, in red
   function mbarBuild(){ if(!mbar||mbar.children.length) return;
     mbar.innerHTML=MBAR.map(function(d){ return '<button type="button" data-m="'+d[0]+'" aria-selected="false">'+icon(d[2])+escH(d[1])+(d[0]==='raccolta'? '<span class="badge" id="mbRcBadge" hidden>0</span>' : '')+'</button>'; }).join('');
     if(moreMenu) moreMenu.innerHTML=MORE.map(function(d){ return '<button type="button" role="menuitem" data-go="'+d[0]+'">'+icon(d[2])+escH(d[1])+'</button>'; }).join('')+'<p class="hint">Modifica AREAS COLLECTION resta sul computer.</p>';
@@ -11993,6 +12052,7 @@ function srchShowRow(obj, soft){ const root=byId('drawerElenco'); if(!root) retu
       if(k==='modifica'||k==='geoproc'||k==='import'||k==='export'){ openPanel(null); sideShow(); showTab(k); }
       else if(k==='guide'){ var h=$g('hmGuide'); if(h) h.click(); }
       else if(k==='settings'){ var sb=$g('setBtn'); if(sb) sb.click(); }
+      else if(k==='clear'){ try{ resetWork(); }catch(e){} }
       else openPanel(k);
       mbarSync(); });
     mbarSync(); }
@@ -12235,7 +12295,7 @@ function srchShowRow(obj, soft){ const root=byId('drawerElenco'); if(!root) retu
       +'<h3>Copia da condividere</h3><p>Salva una copia con tutto il lavoro <b>tranne i dati personali</b>: le particelle del file degli intestatari restano, senza nomi né dettagli del file, e il tuo nome utente non c\'è. Il progetto aperto resta com\'è.</p>'
       +'<h3>Da sapere</h3><ul>'
       +'<li>Il lavoro si salva comunque da solo in questo browser: particelle e geometrie, non DWG e immagini. Il file .axpo conserva tutto, DWG e immagini compresi, e si apre anche in <b>PV Predesign</b>.</li>'
-      +'<li>Per ripartire da una mappa pulita: <b>'+icon('settings')+' Impostazioni</b>, in alto › <b>Svuota il lavoro</b>.</li></ul>'},
+      +'<li>Per ripartire da una mappa pulita: il cestino rosso <b>'+icon('trash')+' Svuota il lavoro</b>, nella barra in alto (sul telefono in Altro). Chiede conferma, e Annulla non riporta ciò che toglie: se ti serve, salva prima il progetto.</li></ul>'},
     print:{t:'Stampa', s:'Un foglio PDF con la Raccolta in scala, come il report di PV Predesign.', h:   // 3/11 (S1–S6)
       '<h3>Come si usa</h3><ol>'
       +'<li>Scegli il <b>foglio</b> (A4 o A3, orizzontale o verticale), la <b>scala</b> e lo <b>sfondo</b>. Il rettangolo tratteggiato sulla mappa mostra cosa entra nel foglio; <b>'+icon('target')+' Inquadra</b> porta la mappa lì.</li>'
@@ -12770,7 +12830,7 @@ function srchShowRow(obj, soft){ const root=byId('drawerElenco'); if(!root) retu
   var sv=$g('sbSave'), svT=$g('sbSaveT');
   window.sbSaveSet=function(ok){ if(!sv||!svT) return; sv.classList.toggle('full', !ok);
     if(ok){ svT.textContent='Salvato nel browser · '+new Date().toLocaleTimeString('it-IT', {hour:'2-digit', minute:'2-digit'}); sv.title='Il lavoro resta in questo browser; per conservarlo o passarlo usa Salva progetto'; }
-    else { svT.textContent='Non salvato: spazio del browser pieno'; sv.title='Lo spazio del browser (circa 5 MB) è pieno: disegni, buffer e import non sopravvivono a un ricaricamento. Esporta ciò che ti serve, poi usa «Svuota il lavoro» in Impostazioni avanzate.'; } };
+    else { svT.textContent='Non salvato: spazio del browser pieno'; sv.title='Lo spazio del browser (circa 5 MB) è pieno: disegni, buffer e import non sopravvivono a un ricaricamento. Esporta ciò che ti serve, poi usa «Svuota il lavoro», il cestino rosso in alto.'; } };
   /* the mode: what the banner over the map says, in one line */
   var mode=$g('sbMode'), banner=$g('modeBanner');
   function modeSync(){ if(!mode||!banner) return; var on=!banner.hidden&&getComputedStyle(banner).display!=='none';
@@ -12798,7 +12858,7 @@ function srchShowRow(obj, soft){ const root=byId('drawerElenco'); if(!root) retu
     {sel:'#ribbon .rgroup[aria-label="Cosa disegni"]', title:'4 · Disegna', body:"Nella scheda <b>Disegna</b>: in <b>Cosa disegni</b> scegli la categoria (area lorda, esclusione, ostacolo…) con tipo e valori; in <b>Con quale strumento</b> punto, linea, area, rettangolo, cerchio o a mano libera, poi clicchi sulla mappa. Con un'area lorda, l'<b>area netta</b> si calcola da sola. Per cambiare quello che c'è: la scheda <b>Modifica</b>.", open:function(){ openTab('disegno'); }, placement:'below'},
     {sel:'#side', title:'5 · Proprietà, Layer, Legenda', body:"A destra il pannello con tre schede: <b>Proprietà</b> mostra le impostazioni dello strumento aperto e, in Modifica, la scheda dell'oggetto selezionato (categoria, tipo, attributi); <b>Layer</b> e <b>Legenda</b> sono quelli della mappa. Il bordo interno allarga i pannelli, "+icon('undock')+" li sgancia in una finestra.", open:function(){ openTab('disegno'); if(window.spanelSet) window.spanelSet('props'); }, placement:'left'},
     {sel:'#ribbon', title:'6 · Esporta e porta sul portale', body:"Nella scheda <b>Salva ed esporta</b>: <b>Esporta</b> scarica la Raccolta (GeoJSON, KML, KMZ, Shapefile, la tabella XLSX delle particelle), gli oggetti spuntati o tutto; <b>Portale AGOL</b> migra le particelle in AREAS COLLECTION e salva i disegni in Site Features (la seconda volta aggiorna, non duplica).", open:function(){ openTab('export'); }, placement:'below'},
-    {sel:'#projSaveBtn', title:'7 · Salva il progetto', body:"<b>Salva progetto</b> mette tutto il lavoro in un file .axpo, come un progetto QGIS: mappa e layer, particelle, disegni e gruppi, risultati, import, DWG e immagini già posizionati, il terreno. Con <b>Apri progetto</b> lo ritrovi com'era, o lo passi a un collega; lo stesso file si apre in PV Predesign. <kbd>Ctrl</kbd>+<kbd>S</kbd> risalva. Accanto, <b>"+icon('undo')+" Annulla</b> e <b>"+icon('redo')+" Ripeti</b> valgono per ogni modifica del lavoro.", placement:'below'},
+    {sel:'#projSaveBtn', title:'7 · Salva il progetto', body:"<b>Salva progetto</b> mette tutto il lavoro in un file .axpo, come un progetto QGIS: mappa e layer, particelle, disegni e gruppi, risultati, import, DWG e immagini già posizionati, il terreno. Con <b>Apri progetto</b> lo ritrovi com'era, o lo passi a un collega; lo stesso file si apre in PV Predesign. <kbd>Ctrl</kbd>+<kbd>S</kbd> risalva. Accanto, <b>"+icon('undo')+" Annulla</b> e <b>"+icon('redo')+" Ripeti</b> valgono per ogni modifica del lavoro; il cestino rosso <b>"+icon('trash')+" Svuota il lavoro</b> riparte da una mappa pulita, dopo una conferma.", placement:'below'},
     {title:'Pronto!', body:"Questo è il flusso base. I tour si riaprono dal "+icon('help')+" in alto a destra; per gli strumenti avanzati prova <i>Tutti gli strumenti</i>. Ogni gruppo del ribbon ha la sua "+icon('info')+", con «Di più» per la spiegazione lunga."}
   ];
   var TOUR_ALL=[   // 5a (F3): one step per tab, then the panels, the map controls, the status bar, the portal map
@@ -12808,10 +12868,10 @@ function srchShowRow(obj, soft){ const root=byId('drawerElenco'); if(!root) retu
     {sel:'#ribbon', title:'Disegna', body:"<b>Cosa disegni</b> e <b>Con quale strumento</b> per i disegni nuovi; <b>Supporto al disegno</b>: aggancio, misure esatte, griglia; <b>Aree automatiche</b>: area netta e rientro dal confine; <b>Collega a sito AREAS</b>: il sito a cui vanno i disegni sul portale.", open:function(){ openTab('disegno'); }, placement:'below'},
     {sel:'#ribbon', title:'Modifica', body:"Quello che c'è già. <b>Selezione</b>: Seleziona (clic sulla mappa), Riquadro, Deseleziona; la selezione è la spunta della Raccolta. <b>Modifica</b>, sulla selezione: rimodella, sposta e ruota, dividi, unisci, copia (anche parallela, a distanza fissa) ed elimina. A destra quanti sono e la scheda dell'oggetto selezionato.", open:function(){ openTab('modifica'); }, placement:'below'},
     {sel:'#ribbon', title:'Geoprocessi', body:"Metti gli oggetti in <b>A</b> (A dalla mappa, gli spuntati o per categoria; B serve a Parte comune e Sottrai), scegli l'operazione in <b>Geoprocessi</b> e premi <b>Esegui</b> a destra: il risultato è un oggetto nuovo nella Raccolta, gruppo Analisi.", open:function(){ openTab('geoproc'); }, placement:'below'},
-    {sel:'#ribbon', title:'Importa', body:"<b>File</b>: GeoJSON, KML, KMZ, Shapefile e il file degli intestatari; <b>CAD</b>: un DWG letto nel browser, senza uscire dal PC, con il sistema stimato o allineato con due punti; <b>Immagini</b>: il GeoTIFF da solo, foto, planimetrie e PDF con punti noti; <b>Servizi web</b>: WMS, WFS e ArcGIS REST dal loro indirizzo; <b>Portale</b>: un layer cercato per titolo.", open:function(){ openTab('import'); }, placement:'below'},
+    {sel:'#ribbon', title:'Importa', body:"<b>Progetto salvato</b>: riapre un file .axpo; <b>File</b>: GeoJSON, KML, KMZ, Shapefile e il file degli intestatari; <b>CAD</b>: un DWG letto nel browser, senza uscire dal PC, con il sistema stimato o allineato con due punti; <b>Immagini</b>: il GeoTIFF da solo, foto, planimetrie e PDF con punti noti; <b>Servizi web</b>: WMS, WFS e ArcGIS REST dal loro indirizzo; <b>Portale</b>: un layer cercato per titolo.", open:function(){ openTab('import'); }, placement:'below'},
     {sel:'#ribbon', title:'Annotazioni', body:"Il taccuino del progetto. <b>Taccuino</b>: Nuova nota e l’elenco di tutte; <b>Inserisci</b>: testo, righe da fare, un collegamento a un documento, <b>Layer o oggetto</b> (o <b>@</b> nel testo) per richiamare per nome un layer, un oggetto della Raccolta o una particella, <b>Fotografa la mappa</b> o un’immagine (anche incollata con Ctrl+V), e il <b>Post-it sulla mappa</b>; <b>Esporta le note</b>: in PDF o come testo. Le note viaggiano nel file .axpo.", open:function(){ openTab('note'); }, placement:'below'},
     {sel:'#ribbon', title:'Salva ed esporta', body:"<b>Esporta</b> in GeoJSON, KML, KMZ, Shapefile o XLSX; <b>Portale AGOL</b>: Migra particelle in AREAS, Salva disegni in Site Features, Modifica AREAS COLLECTION; <b>Progetto</b>: salva e apri il file .axpo; <b>Stampa</b> un foglio PDF con la Raccolta in scala, su uno sfondo a scelta; <b>Risk Matrix</b>: la matrice dei rischi del progetto, con una bozza dal GIS e dai layer della mappa che correggi tu, e il file Excel aziendale compilato.", open:function(){ openTab('export'); }, placement:'below'},
-    {sel:'#leftPanel', title:'La Raccolta', body:"In gruppi: Particelle, Aree di progetto, Aree di esclusione, Analisi, Altro, Immagini, e i tuoi con <b>+ Gruppo</b>. In alto il filtro per nome e <b>Comprimi</b>; ogni riga ha la cifra a destra, l'occhio e il menu "+icon('more')+". La spunta è la selezione: la usano anche i geoprocessi e l'esportazione.", open:function(){ openDrawer('elenco'); }, placement:'right'},
+    {sel:'#leftPanel', title:'La Raccolta', body:"In gruppi: Particelle, Aree di progetto, Aree di esclusione, Analisi, Altro, Immagini, e i tuoi con <b>+ Gruppo</b>. In alto il filtro per nome e <b>Comprimi</b>; ogni riga ha la cifra a destra, l'occhio e il menu "+icon('more')+". La spunta è la selezione: la usano anche i geoprocessi e l'esportazione, e in fondo compare la sua barra.", open:function(){ openDrawer('elenco'); }, placement:'right'},
     {sel:'#sideTabs', title:'Proprietà, Layer, Legenda', body:"A destra: <b>Proprietà</b> dello strumento aperto o dell'oggetto selezionato; <b>Layer</b> della mappa, con la ricerca nel portale e il <b>filtro per attributo</b>; <b>Legenda</b> dei layer accesi.", open:function(){ if(window.spanelSet) window.spanelSet('layers'); }, placement:'left'},
     {sel:'#sideUndock', title:'Allarga e sgancia', body:"I due pannelli si allargano trascinando il bordo interno (doppio clic per tornare com'erano) e si sganciano con "+icon('undock')+" in una finestra da mettere sul secondo schermo; chiudendo la finestra tornano al loro posto.", open:function(){ if(window.spanelSet) window.spanelSet('props'); }, placement:'left'},
     {sel:'#trStack', title:'Ricerca e misure', body:"La lente cerca indirizzi e coordinate: lat lon, ma anche X Y in Gauss-Boaga o UTM, di cui indovina il sistema. Sotto, "+icon('measure')+" misura una distanza o un'area sulla mappa; le misure non si salvano. Più sotto, "+icon('cursor')+" seleziona da qualsiasi scheda: Seleziona, Riquadro, Deseleziona; col tasto destro sulla selezione la modifichi.", placement:'left'},
